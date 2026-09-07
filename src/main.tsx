@@ -1,19 +1,3 @@
-// Suprimir logs residuales de depuración de librerías de terceros / extensiones
-if (typeof window !== 'undefined' && window.console) {
-  const _origLog = window.console.log;
-  window.console.log = (...args: unknown[]) => {
-    if (
-      args.length >= 2 &&
-      typeof args[0] === 'string' &&
-      args[0].includes('github.io') &&
-      args.slice(1).every(a => a === undefined || a === 'undefined')
-    ) {
-      return;
-    }
-    _origLog.apply(window.console, args);
-  };
-}
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';

@@ -178,15 +178,21 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
                       {topic.notesPdfName || 'Apuntes magistrales estructurados con notas para examen.'}
                     </p>
-                    <a 
-                      href={topic.notesPdfUrl || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="btn btn-sm btn-secondary" 
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                    >
-                      <Download size={13} /> Descargar Apuntes
-                    </a>
+                    {topic.notesPdfUrl && topic.notesPdfUrl.startsWith('http') ? (
+                      <a 
+                        href={topic.notesPdfUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn btn-sm btn-secondary" 
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                      >
+                        <Download size={13} /> Descargar Apuntes
+                      </a>
+                    ) : (
+                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                        Disponible en clase / PRADO
+                      </span>
+                    )}
                   </div>
 
                   {/* 2. Diapositivas PDF */}
@@ -198,15 +204,21 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
                       {topic.slidesPdfName || `Presentación oficial con esquemas SAR (${topic.slideCount} diapositivas).`}
                     </p>
-                    <a 
-                      href={topic.slidesPdfUrl || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="btn btn-sm btn-outline" 
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                    >
-                      <Download size={13} /> Ver Diapositivas
-                    </a>
+                    {topic.slidesPdfUrl && topic.slidesPdfUrl.startsWith('http') ? (
+                      <a 
+                        href={topic.slidesPdfUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn btn-sm btn-outline" 
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                      >
+                        <Download size={13} /> Ver Diapositivas
+                      </a>
+                    ) : (
+                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                        Disponible en clase / PRADO
+                      </span>
+                    )}
                   </div>
 
                   {/* 3. Gemini Notebook */}
@@ -218,15 +230,21 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
                       Cuaderno interactivo de estudio para consultar dudas con IA.
                     </p>
-                    <a 
-                      href={topic.geminiNotebookUrl || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="btn btn-sm btn-mint" 
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                    >
-                      <ExternalLink size={13} /> Abrir NotebookLM
-                    </a>
+                    {topic.geminiNotebookUrl && topic.geminiNotebookUrl.startsWith('http') ? (
+                      <a 
+                        href={topic.geminiNotebookUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="btn btn-sm btn-mint" 
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                      >
+                        <ExternalLink size={13} /> Abrir NotebookLM
+                      </a>
+                    ) : (
+                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                        Próximamente disponible
+                      </span>
+                    )}
                   </div>
 
                   {/* 4. Spotify Podcast */}
@@ -238,13 +256,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
                       Episodio de audio/vídeo oficial con explicaciones del profesor.
                     </p>
-                    <button 
-                      onClick={handlePlayPodcast}
-                      className="btn btn-sm btn-outline" 
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', borderColor: '#1db954', color: '#1db954' }}
-                    >
-                      <Play size={13} /> Reproducir Episodio
-                    </button>
+                    {topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http') ? (
+                      <button 
+                        onClick={handlePlayPodcast}
+                        className="btn btn-sm btn-outline" 
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', borderColor: '#1db954', color: '#1db954' }}
+                      >
+                        <Play size={13} /> Reproducir Episodio
+                      </button>
+                    ) : (
+                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                        Próximamente disponible
+                      </span>
+                    )}
                   </div>
 
                   {/* 5. Cuestionario Test con Moléculas */}

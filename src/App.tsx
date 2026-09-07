@@ -357,7 +357,11 @@ export const App: React.FC = () => {
               <div className="ftr-person">
                 <div className="ftr-person-name">Dr. Juan José Díaz-Mochón</div>
                 <div className="ftr-person-role">Profesor Titular · Responsable del Grupo E</div>
-                <a className="ftr-person-mail" href="mailto:juandiaz@go.ugr.es">juandiaz@go.ugr.es</a>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <a className="ftr-person-mail" href="mailto:juandiaz@go.ugr.es">juandiaz@go.ugr.es</a>
+                  <span style={{ opacity: 0.5, color: 'var(--text-muted)' }}>·</span>
+                  <a className="ftr-person-mail" href="mailto:juandiaz@ugr.es">juandiaz@ugr.es</a>
+                </div>
               </div>
               <p style={{ fontSize: '0.74rem', lineHeight: 1.5, margin: '2px 0 0' }}>
                 Tutorías en la Facultad de Farmacia (Cartuja), en el Centro GENYO (PTS)

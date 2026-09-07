@@ -45,7 +45,10 @@ export function loadRDKit(): Promise<RDKitModule> {
       }
       if (typeof window.initRDKitModule === 'function') {
         window
-          .initRDKitModule()
+          .initRDKitModule({
+            print: () => {},
+            printErr: () => {}
+          })
           .then(instance => {
             window.RDKit = instance;
             resolve(instance);

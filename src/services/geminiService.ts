@@ -4,7 +4,7 @@
 // La función de transcripción de audio fue eliminada en v3.
 // ==========================================================================
 
-import { TestQuestion } from '../data/qfdosData';
+import { TestQuestion, INITIAL_TOPICS, QfdosTopic } from '../data/qfdosData';
 
 const GEMINI_API_KEY_STORAGE_KEY = 'qfdos_gemini_api_key_v3';
 
@@ -220,7 +220,15 @@ export const exportToMarkdownFile = (content: string, filename: string) => {
 };
 
 function generateFallbackExamQuestions(topicId: string, topicTitle: string, count: number, difficulty: string): TestQuestion[] {
-  return [
+  const matchedTopic = INITIAL_TOPICS.find((t: QfdosTopic) => t.id === topicId);
+  const topicQuestions: TestQuestion[] = (matchedTopic?.testQuestions || []).map((q: TestQuestion, idx: number) => ({
+    ...q,
+    id: `topic-fb-${Date.now()}-${idx}`,
+    topicId,
+    difficulty: difficulty as any
+  }));
+
+  const generalPool: TestQuestion[] = [
     {
       id: `fallback-${Date.now()}-1`,
       topicId,
@@ -239,7 +247,7 @@ function generateFallbackExamQuestions(topicId: string, topicTitle: string, coun
     {
       id: `fallback-${Date.now()}-2`,
       topicId,
-      question: '¿Cuál es la ecuación de Cheng-Prusoff para inhibición competitiva?',
+      question: '¿Cuál es la ecuación de Cheng-Prusoff para inhibición competitiva reversible?',
       options: [
         'IC50 = Ki · (1 + [S]/Km)',
         'IC50 = Ki · ln([S] · Km)',
@@ -247,9 +255,86 @@ function generateFallbackExamQuestions(topicId: string, topicTitle: string, coun
         'IC50 = ΔG° · R · T'
       ],
       correctIndex: 0,
-      explanation: 'IC50 = Ki · (1 + [S]/Km): demuestra que a mayor [S] competidor, mayor será el IC50 observado respecto a la Ki intrínseca.',
+      explanation: 'IC50 = Ki · (1 + [S]/Km): demuestra que a mayor concentración de sustrato competidor, mayor será el IC50 experimental observado respecto a la afinidad intrínseca Ki.',
       difficulty: difficulty as any,
       block: 'Cinética Enzimática'
+    },
+    {
+      id: `fallback-${Date.now()}-3`,
+      topicId,
+      question: '¿Qué relación termodinámica fundamental vincula la constante de disociación en el equilibrio (Kd) con la energía libre estándar de Gibbs (ΔG°)?',
+      options: [
+        'ΔG° = -R · T · ln(1 / Kd) = R · T · ln(Kd)',
+        'ΔG° = Kd / (R · T)',
+        'ΔG° = -R · T · Kd²',
+        'ΔG° = e^(-Kd / RT)'
+      ],
+      correctIndex: 0,
+      explanation: 'ΔG° = R · T · ln(Kd). Un valor de Kd en el rango nanomolar (10⁻⁹ M) equivale aproximadamente a una ganancia termodinámica de unión de -12,3 kcal/mol a 298 K.',
+      difficulty: difficulty as any,
+      block: 'Termodinámica de Unión'
+    },
+    {
+      id: `fallback-${Date.now()}-4`,
+      topicId,
+      question: 'Según la Regla de 5 de Lipinski y los criterios de Veber, ¿cuáles son los límites que predicen buena biodisponibilidad oral?',
+      options: [
+        'PM ≤ 500 Da, LogP ≤ 5, HBD ≤ 5, HBA ≤ 10, Enlaces Rotables ≤ 10 y TPSA ≤ 140 Å²',
+        'PM ≥ 800 Da, LogP ≥ 8, HBD ≥ 10, TPSA ≥ 200 Å²',
+        'PM ≤ 200 Da, LogP = 0, HBD = 0, TPSA = 0 Å²',
+        'Cualquier molécula con carga neta zwitteriónica a pH 7,4'
+      ],
+      correctIndex: 0,
+      explanation: 'Lipinski delimitó PM ≤ 500, cLogP ≤ 5, HBD ≤ 5 y HBA ≤ 10. Veber demostró que un TPSA ≤ 140 Å² y ≤ 10 enlaces rotables son determinantes para la permeabilidad pasiva por membrana.',
+      difficulty: difficulty as any,
+      block: 'ADMET & Drug-likeness'
+    },
+    {
+      id: `fallback-${Date.now()}-5`,
+      topicId,
+      question: '¿Cuál es el bioisóstero no clásico del ácido carboxílico más utilizado para mejorar la lipofilia y permeabilidad manteniendo acidez (pKa ≈ 4,5)?',
+      options: [
+        'Anillo de 1H-tetrazol',
+        'Grupo metilo (-CH3)',
+        'Grupo nitro (-NO2)',
+        'Éter metílico (-OCH3)'
+      ],
+      correctIndex: 0,
+      explanation: 'El anillo de tetrazol es un bioisóstero no clásico del carboxilato: deslocaliza la carga negativa de forma planar con similar pKa pero con diez veces mayor lipofilia, como se aplica en los ARA-II (Losartán).',
+      difficulty: difficulty as any,
+      block: 'Bioisosterismo & SAR'
+    },
+    {
+      id: `fallback-${Date.now()}-6`,
+      topicId,
+      question: 'En el diseño de profármacos para atravesar la barrera hematoencefálica (BHE), ¿qué estrategia se emplea comúnmente?',
+      options: [
+        'Esterificación transitoria de grupos hidrofílicos para aumentar la lipofilia pasiva o mimetizar sustratos de transportadores SLC',
+        'Introducción de sulfatos permanentes con carga negativa fija',
+        'Incremento masivo del área superficial polar (TPSA > 200 Å²)',
+        'Polimerización del principio activo'
+      ],
+      correctIndex: 0,
+      explanation: 'La esterificación temporal enmascara grupos ionizables o polares aumentando LogP pasivo, o bien se diseñan análogos que utilicen transportadores activos (como L-DOPA vía LAT1).',
+      difficulty: difficulty as any,
+      block: 'Transporte y Barreras'
     }
-  ].slice(0, count);
+  ];
+
+  // Combinar primero las preguntas específicas del tema y completar con el pool general
+  const combined = [...topicQuestions, ...generalPool];
+  
+  // Si no hay suficientes en el tema, aseguramos que siempre devuelva el número solicitado
+  const results: TestQuestion[] = [];
+  const seenQuestions = new Set<string>();
+
+  for (const q of combined) {
+    if (!seenQuestions.has(q.question)) {
+      seenQuestions.add(q.question);
+      results.push(q);
+    }
+    if (results.length >= count) break;
+  }
+
+  return results;
 }

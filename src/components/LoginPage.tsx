@@ -134,7 +134,7 @@ export const LoginPage: React.FC = () => {
             <Layers size={18} color="var(--navy-ink)" />
             <div>
               <strong>Profesorado</strong>
-              <p>El panel de administración requiere <code>juandiaz@ugr.es</code></p>
+              <p>El panel de administración admite <code>juandiaz@go.ugr.es</code> o <code>juandiaz@ugr.es</code></p>
             </div>
           </div>
         </div>

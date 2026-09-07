@@ -332,8 +332,8 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   },
   {
     id: 'ann-3',
-    title: '🎙️ Nuevos Episodios de Podcast y Cuadernos de Estudio en NotebookLM',
-    content: 'Se han integrado los episodios de Spotify y enlaces de NotebookLM en los módulos del Sistema Nervioso Central y Cardiovascular.',
+    title: '📚 Actualización de Materiales Docentes y Cuaderno de Prácticas',
+    content: 'Los esquemas SAR, estructuras 2D interactivas y casos de estudio se encuentran ya disponibles en cada unidad temática. Las diapositivas y apuntes se irán publicando conforme avance el calendario de clases.',
     date: '14 Septiembre 2026',
     priority: 'normal'
   }
@@ -358,12 +358,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '1UZF',
     targetName: 'Complejo Diana-Ligando Modelo (Reconocimiento Físico-Químico)',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema00_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 00: Presentación y Diapositivas Oficiales.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema00_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 00: Apuntes Magistrales y Fórmulas Biofísicas.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema00',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/7Kx0AfinidadQFDOS00',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Ligando Modelo A (Tetrazol)',
@@ -389,39 +389,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 1
       }
     ],
-    attachments: [
-      {
-        id: 'att-00-1',
-        title: 'Presentación Tema 00: Termodinámica y Afinidad (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema00_qfdos/view',
-        size: '5.8 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-00-2',
-        title: 'Apuntes Oficiales Tema 00: Fórmulas Biofísicas & SAR (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema00_qfdos/view',
-        size: '3.4 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-00-3',
-        title: 'Gemini NotebookLM: Cuaderno de Estudio Tema 00',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema00',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-00-4',
-        title: 'Podcast Spotify: La Termodinámica de la Afinidad Farmacológica',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/7Kx0AfinidadQFDOS00',
-        spotifyUri: 'spotify:episode:7Kx0AfinidadQFDOS00',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't00-q1',
@@ -494,12 +462,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '1UZF',
     targetName: 'Acetilcolinesterasa Recombinant Human (AChE)',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema01_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 01: Diapositivas Oficiales Sistema Colinérgico.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema01_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 01: Apuntes Magistrales de Fármacos Colinérgicos.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema01',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/3Kx9ColinQFDOS01',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Donepezilo',
@@ -536,39 +504,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 1
       }
     ],
-    attachments: [
-      {
-        id: 'att-01-1',
-        title: 'Presentación Tema 01: Fármacos Colinérgicos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema01_qfdos/view',
-        size: '6.2 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-01-2',
-        title: 'Apuntes Tema 01: Mecanismos de AChE y Fármacos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema01_qfdos/view',
-        size: '3.8 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-01-3',
-        title: 'NotebookLM: Guía Inteligente Sistema Colinérgico',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema01',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-01-4',
-        title: 'Podcast Spotify: Inhibidores de AChE y Reactivación con 2-PAM',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/3Kx9ColinQFDOS01',
-        spotifyUri: 'spotify:episode:3Kx9ColinQFDOS01',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't01-q1',
@@ -641,12 +577,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '2RH1',
     targetName: 'Receptor β2-Adrenérgico Humano unido a Timolol',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema02_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 02: Diapositivas Oficiales Sistema Adrenérgico.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema02_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 02: Apuntes de Agonistas β2 y β-bloqueantes.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema02',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/5Jk2AdrenQFDOS02',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Salbutamol',
@@ -683,39 +619,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 7
       }
     ],
-    attachments: [
-      {
-        id: 'att-02-1',
-        title: 'Presentación Tema 02: Fármacos Adrenérgicos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema02_qfdos/view',
-        size: '7.1 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-02-2',
-        title: 'Apuntes Tema 02: SAR y Modulación Adrenérgica (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema02_qfdos/view',
-        size: '4.1 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-02-3',
-        title: 'Gemini NotebookLM: Cuaderno Adrenérgico QFDOS',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema02',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-02-4',
-        title: 'Podcast Spotify: De las Catecolaminas a los β-bloqueantes Selectivos',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/5Jk2AdrenQFDOS02',
-        spotifyUri: 'spotify:episode:5Jk2AdrenQFDOS02',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't02-q1',
@@ -780,12 +684,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '6CM4',
     targetName: 'Receptor Dopaminérgico D2 Humano unido a Risperidona',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema03_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 03: Diapositivas Oficiales Sistema Dopaminérgico.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema03_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 03: Apuntes Magistrales Fármacos Dopaminérgicos.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema03',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/8Kd3DopaQFDOS03',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Haloperidol',
@@ -821,39 +725,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 3
       }
     ],
-    attachments: [
-      {
-        id: 'att-03-1',
-        title: 'Presentación Tema 03: Fármacos Dopaminérgicos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema03_qfdos/view',
-        size: '5.9 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-03-2',
-        title: 'Apuntes Tema 03: Antipsicóticos y Parkinson (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema03_qfdos/view',
-        size: '3.6 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-03-3',
-        title: 'NotebookLM: Cuaderno Dopaminérgico y BHE',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema03',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-03-4',
-        title: 'Podcast Spotify: De las Fenotiazinas a los Antipsicóticos Atípicos',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/8Kd3DopaQFDOS03',
-        spotifyUri: 'spotify:episode:8Kd3DopaQFDOS03',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't03-q1',
@@ -901,12 +773,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '6G79',
     targetName: 'Transportador Humano de Serotonina (SERT) unido a Paroxetina',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema04_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 04: Diapositivas Oficiales Sistema Serotoninérgico.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema04_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 04: Apuntes Magistrales de Triptanes e ISRS.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema04',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/9Kx4SeroQFDOS04',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Sumatriptán',
@@ -943,39 +815,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 1
       }
     ],
-    attachments: [
-      {
-        id: 'att-04-1',
-        title: 'Presentación Tema 04: Fármacos Serotoninérgicos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema04_qfdos/view',
-        size: '5.6 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-04-2',
-        title: 'Apuntes Tema 04: Triptanes, ISRS y Setrones (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema04_qfdos/view',
-        size: '3.5 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-04-3',
-        title: 'NotebookLM: Cuaderno Serotoninérgico 5-HT',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema04',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-04-4',
-        title: 'Podcast Spotify: Triptanes en Migraña y la Selectividad de los ISRS',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/9Kx4SeroQFDOS04',
-        spotifyUri: 'spotify:episode:9Kx4SeroQFDOS04',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't04-q1',
@@ -1025,12 +865,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '6HUP',
     targetName: 'Receptor GABAA Humano unido a Diazepam y GABA',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema05_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 05: Diapositivas Oficiales Sistema GABAérgico.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema05_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 05: Apuntes Magistrales Benzodiazepinas y GABAA.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema05',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/2Kx5GabaQFDOS05',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Diazepam',
@@ -1067,39 +907,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 2
       }
     ],
-    attachments: [
-      {
-        id: 'att-05-1',
-        title: 'Presentación Tema 05: Fármacos GABAérgicos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema05_qfdos/view',
-        size: '6.0 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-05-2',
-        title: 'Apuntes Tema 05: Benzodiazepinas y Canal de Cloro (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema05_qfdos/view',
-        size: '3.7 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-05-3',
-        title: 'NotebookLM: Cuaderno GABAérgico y Farmacóforo BZD',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema05',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-05-4',
-        title: 'Podcast Spotify: Mecanismo Alostérico de las Benzodiazepinas',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/2Kx5GabaQFDOS05',
-        spotifyUri: 'spotify:episode:2Kx5GabaQFDOS05',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't05-q1',
@@ -1148,12 +956,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '4DKL',
     targetName: 'Receptor Opioide Mu Humano unido al Antagonista β-FNA',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema06_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 06: Diapositivas Oficiales Sistema Opioide.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema06_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 06: Apuntes Magistrales Fármacos Opioides y SAR.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema06',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/1Kx6OpioQFDOS06',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Morfina',
@@ -1190,39 +998,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 2
       }
     ],
-    attachments: [
-      {
-        id: 'att-06-1',
-        title: 'Presentación Tema 06: Analgésicos Opioides (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema06_qfdos/view',
-        size: '6.8 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-06-2',
-        title: 'Apuntes Tema 06: SAR Morfinanos y Péptidos Opioides (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema06_qfdos/view',
-        size: '3.9 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-06-3',
-        title: 'NotebookLM: Cuaderno Opioides y Beckett-Casy',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema06',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-06-4',
-        title: 'Podcast Spotify: De la Morfina al Fentanilo y Antagonistas Puros',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/1Kx6OpioQFDOS06',
-        spotifyUri: 'spotify:episode:1Kx6OpioQFDOS06',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't06-q1',
@@ -1271,12 +1047,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '3RZE',
     targetName: 'Receptor Histaminérgico H1 Humano unido a Doxepina',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema07_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 07: Diapositivas Oficiales Sistema Histaminérgico.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema07_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 07: Apuntes Magistrales Antihistamínicos H1 y H2.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema07',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/3Kx7HistaQFDOS07',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Cetirizina',
@@ -1313,39 +1089,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 5
       }
     ],
-    attachments: [
-      {
-        id: 'att-07-1',
-        title: 'Presentación Tema 07: Fármacos Histaminérgicos (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema07_qfdos/view',
-        size: '5.4 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-07-2',
-        title: 'Apuntes Tema 07: Antihistamínicos y Bloqueantes H2 (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema07_qfdos/view',
-        size: '3.4 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-07-3',
-        title: 'NotebookLM: Cuaderno Histamina H1 y H2',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema07',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-07-4',
-        title: 'Podcast Spotify: Antihistamínicos de 2ª Generación y BHE',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/3Kx7HistaQFDOS07',
-        spotifyUri: 'spotify:episode:3Kx7HistaQFDOS07',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't07-q1',
@@ -1394,12 +1138,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '1E86',
     targetName: 'ECA Humana Somática Complejada con Captopril (Zn2+)',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema08_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 08: Diapositivas Oficiales SRAA (IECA & ARA-II).pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema08_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 08: Apuntes de Inhibidores de ECA y Antagonistas AT1.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema08',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/4Kx8SraaQFDOS08',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Captopril',
@@ -1436,39 +1180,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 6
       }
     ],
-    attachments: [
-      {
-        id: 'att-08-1',
-        title: 'Presentación Tema 08: Fármacos del SRAA (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema08_qfdos/view',
-        size: '6.4 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-08-2',
-        title: 'Apuntes Tema 08: Metaloproteasas y Bloqueo de AT1 (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema08_qfdos/view',
-        size: '4.0 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-08-3',
-        title: 'NotebookLM: Cuaderno SRAA, Enalapril y ARA-II',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema08',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-08-4',
-        title: 'Podcast Spotify: Diseño de IECAs y Quelación del Zinc Catalítico',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/4Kx8SraaQFDOS08',
-        spotifyUri: 'spotify:episode:4Kx8SraaQFDOS08',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't08-q1',
@@ -1517,12 +1229,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '3LN1',
     targetName: 'Complejo COX-2 Humana unida a Celecoxib (Bolsillo Val523)',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema09_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 09: Diapositivas Oficiales AINEs y Coxibs.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema09_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 09: Apuntes de Inhibidores de Ciclooxigenasa.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema09',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/4Kx9Val523QFDOS09',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Celecoxib',
@@ -1559,39 +1271,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 2
       }
     ],
-    attachments: [
-      {
-        id: 'att-09-1',
-        title: 'Presentación Tema 09: AINEs y Coxibs (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema09_qfdos/view',
-        size: '7.5 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-09-2',
-        title: 'Apuntes Tema 09: Ciclooxigenasas y Bolsillo Val523 (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema09_qfdos/view',
-        size: '4.3 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-09-3',
-        title: 'NotebookLM: Cuaderno AINEs, Coxibs y SAR',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema09',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-09-4',
-        title: 'Podcast Spotify: La Mutación Val523 y la Selectividad de los Coxibs',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/4Kx9Val523QFDOS09',
-        spotifyUri: 'spotify:episode:4Kx9Val523QFDOS09',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't09-q1',
@@ -1641,12 +1321,12 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     pdbTargetId: '6QEX',
     targetName: 'Glicoproteína P Humana (P-gp / ABCB1) en Estado de Eflujo',
     status: 'Publicado',
-    slidesPdfUrl: 'https://drive.google.com/file/d/1_slides_tema10_qfdos/view',
+    slidesPdfUrl: '',
     slidesPdfName: 'Tema 10: Diapositivas Oficiales Transporte de Membrana y ADMET.pdf',
-    notesPdfUrl: 'https://drive.google.com/file/d/1_apuntes_tema10_qfdos/view',
+    notesPdfUrl: '',
     notesPdfName: 'Tema 10: Apuntes Magistrales de Transportadores y P-gp.pdf',
-    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/qfdos-2627-tema10',
-    spotifyPodcastUrl: 'https://open.spotify.com/episode/5Kx10AdmetQFDOS10',
+    geminiNotebookUrl: '',
+    spotifyPodcastUrl: '',
     drugs: [
       {
         name: 'Valaciclovir',
@@ -1682,39 +1362,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         rotBonds: 13
       }
     ],
-    attachments: [
-      {
-        id: 'att-10-1',
-        title: 'Presentación Tema 10: Transporte de Membrana y ADMET (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_slides_tema10_qfdos/view',
-        size: '6.7 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-10-2',
-        title: 'Apuntes Tema 10: Farmacocinética Molecular y PEPT1 (PDF)',
-        type: 'pdf',
-        url: 'https://drive.google.com/file/d/1_apuntes_tema10_qfdos/view',
-        size: '4.2 MB',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-10-3',
-        title: 'NotebookLM: Cuaderno ADMET, P-gp y Veber',
-        type: 'notebook',
-        url: 'https://notebooklm.google.com/notebook/qfdos-2627-tema10',
-        date: 'Sept 2026'
-      },
-      {
-        id: 'att-10-4',
-        title: 'Podcast Spotify: Superando la Barrera Intestinal con Profármacos',
-        type: 'spotify',
-        url: 'https://open.spotify.com/episode/5Kx10AdmetQFDOS10',
-        spotifyUri: 'spotify:episode:5Kx10AdmetQFDOS10',
-        date: 'Sept 2026'
-      }
-    ],
+    attachments: [],
     testQuestions: [
       {
         id: 't10-q1',
