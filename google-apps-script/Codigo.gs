@@ -13,8 +13,13 @@
  * ---------------------------------------------------------------------------
  *  1. Hoja: https://docs.google.com/spreadsheets/d/1RrMzWJPFOKKH76vJh70pQw9vbiQZNOGOJH7vNaTGkso
  *  2. Extensiones → Apps Script. Pega este fichero entero y guarda.
- *  3. CAMBIA la constante CLAVE_PUBLICACION de abajo por una tuya.
- *  4. Implementar → Nueva implementación → Aplicación web
+ *  3. Configura la clave secreta fuera del código:
+ *       · Icono de engranaje (⚙️ Configuración del proyecto) a la izquierda.
+ *       · Sección "Propiedades de la secuencia de comandos" → "Añadir propiedad".
+ *       · Nombre: CLAVE_PUBLICACION
+ *       · Valor:  <tu_clave_secreta_privada>
+ *  4. Implementar → Gestionar implementaciones (o Nueva implementación) → Editar:
+ *       · Versión:             Nueva versión
  *       · Ejecutar como:       Yo
  *       · Quién tiene acceso:  CUALQUIER USUARIO
  *  5. Copia la URL /exec en .env.local (VITE_PRACTICAS_WEBAPP_URL).
@@ -27,15 +32,22 @@
 var HOJA_ID = '1RrMzWJPFOKKH76vJh70pQw9vbiQZNOGOJH7vNaTGkso';
 
 /**
- * Clave que autoriza a publicar contenido del curso.
+ * Clave de publicación segura del curso.
  *
- * Sin ella, cualquiera que abriese las herramientas del navegador podría
- * reescribir el temario de todos. No se guarda en el código de la web: el
- * profesor la teclea una vez y queda en SU navegador.
+ * Para máxima seguridad y evitar exponer secretos en repositorios públicos,
+ * la clave se almacena en las "Propiedades de la secuencia de comandos"
+ * (Script Properties) del proyecto de Google Apps Script:
  *
- * CÁMBIALA por una tuya antes de desplegar.
+ * Configuración del proyecto (icono ⚙️) → Propiedades de la secuencia de comandos
+ *   Nombre: CLAVE_PUBLICACION
+ *   Valor:  <tu_clave_secreta_aqui>
+ *
+ * Si no está definida en las propiedades, el servidor rechazará la publicación.
  */
-var CLAVE_PUBLICACION = 'qfdos-2627-jjdm';
+function obtenerClavePublicacion_() {
+  var props = PropertiesService.getScriptProperties();
+  return (props.getProperty('CLAVE_PUBLICACION') || '').trim();
+}
 
 /** Pestaña donde vive el contenido publicado. */
 var HOJA_CONTENIDO = '_Contenido';
@@ -111,7 +123,12 @@ function anotarFila(p) {
  * caracteres y el temario completo los supera con holgura.
  */
 function guardarContenido(p, e) {
-  if (p.clave !== CLAVE_PUBLICACION) {
+  var claveEsperada = obtenerClavePublicacion_();
+  if (!claveEsperada) {
+    return json({ ok: false, error: 'La clave de publicación no está configurada en Script Properties de Apps Script.' });
+  }
+
+  if (!p.clave || String(p.clave).trim() !== claveEsperada) {
     return json({ ok: false, error: 'Clave de publicación incorrecta.' });
   }
 
