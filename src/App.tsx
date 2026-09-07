@@ -13,7 +13,8 @@ import {
   QfdosResourceLink,
   StudentQuestion,
   CourseAttachment,
-  TestQuestion
+  TestQuestion,
+  MoleculeDrug
 } from './data/qfdosData';
 import { useAuth } from './context/AuthContext';
 import { descargarContenido, contenidoEnCache } from './services/contenidoRemoto';

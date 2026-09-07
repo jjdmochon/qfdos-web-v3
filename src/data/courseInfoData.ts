@@ -54,6 +54,15 @@ export const COURSE_GENERAL_INFO = {
   },
   examSchedule: [
     {
+      tipo: "Convocatoria Especial de Noviembre",
+      fecha: "10 de noviembre de 2026",
+      hora: "Horario oficial según llamamiento de Facultad",
+      observaciones: "Convocatoria especial para estudiantes con derecho a finalización de estudios (QF2, 4.º curso).",
+      ponderacion: "100%",
+      caracter: "Fin de estudios (100%)",
+      badgeColor: "amber"
+    },
+    {
       tipo: "Examen Parcial (Evaluación Continua)",
       fecha: "19 de noviembre de 2026",
       hora: "Horario de docencia (17:00 h)",
@@ -214,15 +223,6 @@ export const ACADEMIC_CALENDAR_EVENTS: AcademicCalendarEvent[] = [
   },
   // Noviembre 2026
   {
-    id: 'cal-qfdos-parcial-2026',
-    date: '2026-11-19',
-    title: '📝 Examen Parcial QFDOS (Evaluación Continua)',
-    category: 'examen',
-    description: 'Prueba parcial teórica no eliminatoria en horario de docencia (17:00 h). Pondera un 20% de la nota final.',
-    semester: 1,
-    important: true
-  },
-  {
     id: 'cal-nov-01',
     date: '2026-11-01',
     title: 'Todos los Santos',
@@ -238,6 +238,24 @@ export const ACADEMIC_CALENDAR_EVENTS: AcademicCalendarEvent[] = [
     category: 'examen',
     description: 'Convocatoria especial de noviembre para finalización de estudios (excepto TFG).',
     semester: 1
+  },
+  {
+    id: 'cal-qfdos-especial-nov-2026',
+    date: '2026-11-10',
+    title: '📝 Examen QFDOS (Convocatoria Especial de Noviembre)',
+    category: 'examen',
+    description: 'Examen oficial de la convocatoria especial de noviembre para Química Farmacéutica II (QF2, 4.º curso).',
+    semester: 1,
+    important: true
+  },
+  {
+    id: 'cal-qfdos-parcial-2026',
+    date: '2026-11-19',
+    title: '📝 Examen Parcial QFDOS (Evaluación Continua)',
+    category: 'examen',
+    description: 'Prueba parcial teórica no eliminatoria en horario de docencia (17:00 h). Pondera un 20% de la nota final.',
+    semester: 1,
+    important: true
   },
   {
     id: 'cal-nov-29',

@@ -323,8 +323,21 @@ export const CourseInfoSection: React.FC = () => {
               {examSchedule.map((ex, idx) => {
                 const isFinal = ex.tipo.includes('Ordinaria') || ex.tipo.includes('Final');
                 const isParcial = ex.tipo.includes('Parcial');
-                const accentBorder = isFinal ? 'var(--navy)' : isParcial ? 'var(--teal)' : 'var(--purple-border, #9333ea)';
-                const accentBg = isFinal ? 'rgba(30, 58, 138, 0.04)' : isParcial ? 'rgba(13, 148, 136, 0.04)' : 'rgba(147, 51, 234, 0.04)';
+                const isEspecial = ex.tipo.includes('Especial');
+                const accentBorder = isFinal 
+                  ? 'var(--navy)' 
+                  : isParcial 
+                  ? 'var(--teal)' 
+                  : isEspecial 
+                  ? '#d97706' 
+                  : 'var(--purple-border, #9333ea)';
+                const accentBg = isFinal 
+                  ? 'rgba(30, 58, 138, 0.04)' 
+                  : isParcial 
+                  ? 'rgba(13, 148, 136, 0.04)' 
+                  : isEspecial 
+                  ? 'rgba(217, 119, 6, 0.05)' 
+                  : 'rgba(147, 51, 234, 0.04)';
 
                 return (
                   <div 

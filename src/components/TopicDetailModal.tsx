@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QfdosTopic, CourseAttachment } from '../data/qfdosData';
+import { QfdosTopic, CourseAttachment, MoleculeDrug } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { useAuth } from '../context/AuthContext';
 import { 
