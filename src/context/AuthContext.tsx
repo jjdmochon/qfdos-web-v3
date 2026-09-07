@@ -19,6 +19,7 @@ interface AuthContextType {
   /** true sólo si la cuenta pertenece a un dominio de la Universidad de Granada */
   isInstitucional: boolean;
   loginWithGoogle: (credentialResponse: { credential?: string }) => { success: boolean; error?: string };
+  loginAsGuest: () => void;
   logout: () => void;
 }
 
@@ -115,6 +116,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   };
 
+  const loginAsGuest = () => {
+    setUser({
+      name: 'Revisor Invitado',
+      email: 'revisor.invitado@ugr.es',
+      role: 'estudiante',
+      institucional: true
+    });
+  };
+
   const logout = () => setUser(null);
 
   return (
@@ -125,6 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isEstudiante: user?.role === 'estudiante',
       isInstitucional: !!user && user.institucional !== false,
       loginWithGoogle,
+      loginAsGuest,
       logout
     }}>
       {children}

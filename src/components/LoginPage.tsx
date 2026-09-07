@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, GraduationCap, FlaskConical, Atom, Layers } from 'lucide-react';
+import { AlertCircle, GraduationCap, FlaskConical, Atom, Layers, Eye } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, loginAsGuest } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -90,6 +90,33 @@ export const LoginPage: React.FC = () => {
               <span>{error}</span>
             </div>
           )}
+        </div>
+
+        {/* Acceso para tribunales, evaluadores y revisores externos */}
+        <div style={{ margin: '0.25rem 0 1.25rem 0', textAlign: 'center' }}>
+          <button
+            type="button"
+            onClick={loginAsGuest}
+            className="btn btn-sm btn-outline"
+            style={{
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              padding: '7px 16px',
+              borderRadius: '8px',
+              color: 'var(--text-title)',
+              borderColor: 'var(--border-color)',
+              background: 'var(--surface-alt)',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Eye size={14} color="var(--teal)" /> Acceso de revisión / Modo demo
+          </button>
+          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '5px' }}>
+            Para tribunales, evaluadores y revisores sin cuenta institucional UGR
+          </div>
         </div>
 
         {/* Info boxes */}
