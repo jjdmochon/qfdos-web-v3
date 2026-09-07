@@ -319,7 +319,7 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-1',
     title: '🚀 Bienvenida al Curso 2026/2027: Portal QFDOS v3 con quimioinformática RDKit',
-    content: 'Plataforma oficial para profesorado y alumnado con cuenta institucional UGR. Estructuras 2D renderizadas con RDKit y descriptores calculados sobre la marcha, podcasts en Spotify, flashcards con repetición espaciada y generador de exámenes.',
+    content: 'Plataforma desarrollada por el Prof. Mochón (beta) para el alumnado del Grupo E. Estructuras 2D renderizadas con RDKit y descriptores calculados sobre la marcha, podcasts en Spotify, flashcards con repetición espaciada y generador de exámenes.',
     date: '10 Septiembre 2026',
     priority: 'alta'
   },

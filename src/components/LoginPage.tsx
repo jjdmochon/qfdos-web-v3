@@ -54,13 +54,13 @@ export const LoginPage: React.FC = () => {
 
           <h1 className="login-title">Química Farmacéutica II</h1>
           <p className="login-subtitle">
-            Plataforma académica oficial · Facultad de Farmacia, UGR
+            Plataforma desarrollada por el Prof. Mochón (beta) · Grado en Farmacia, UGR
           </p>
         </div>
 
         {/* Divider */}
         <div className="login-divider">
-          <span>Acceso con cuenta institucional</span>
+          <span>Acceso con @go.ugr.es o @gmail.com</span>
         </div>
 
         {/* Google login */}
@@ -126,9 +126,7 @@ export const LoginPage: React.FC = () => {
             <div>
               <strong>Estudiantes</strong>
               <p>
-                Entra con tu cuenta de la UGR (<code>@correo.ugr.es</code> o{' '}
-                <code>@go.ugr.es</code>). Si todavía no la tienes activa, también
-                sirve una cuenta de <code>Gmail</code>.
+                Entra con tu cuenta institucional (<code>@go.ugr.es</code>) o con tu cuenta de <code>@gmail.com</code>.
               </p>
             </div>
           </div>

@@ -1,7 +1,7 @@
 {
   "name": "QFDOS v3 - Química Farmacéutica II UGR",
   "short_name": "QFDOS UGR",
-  "description": "Plataforma académica oficial y cuaderno de prácticas interactivo de Química Farmacéutica II (Grupo E), Universidad de Granada.",
+  "description": "Plataforma desarrollada por el Prof. Mochón (beta) y cuaderno de prácticas interactivo de Química Farmacéutica II (Grupo E), Universidad de Granada.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070e18",

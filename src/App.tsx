@@ -325,7 +325,7 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Footer Oficial QFDOS UGR Rediseñado */}
+      {/* Footer QFDOS UGR */}
       <footer className="qfdos-footer-root">
         <div className="container">
           <div className="qfdos-footer-grid">
@@ -398,12 +398,12 @@ export const App: React.FC = () => {
           {/* Subfooter de copyright y acceso institucional */}
           <div className="qfdos-footer-sub">
             <div>
-              Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E)
+              Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E) · Plataforma desarrollada por el Prof. Mochón (beta)
             </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <span>Acceso institucional: @correo.ugr.es / @ugr.es</span>
+              <span>Acceso: @go.ugr.es / @gmail.com</span>
               <span>•</span>
-              <span>Plataforma QFDOS v3.2</span>
+              <span>Plataforma QFDOS v3.2 (beta)</span>
             </div>
           </div>
         </div>

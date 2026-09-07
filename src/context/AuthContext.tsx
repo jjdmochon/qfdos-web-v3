@@ -101,8 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return {
         success: false,
         error:
-          `Esta cuenta no está admitida. Entra con tu correo de la UGR ` +
-          `(@correo.ugr.es, @go.ugr.es o @ugr.es) o con una cuenta de Gmail. ` +
+          `Esta cuenta no está admitida. Entra con tu correo @go.ugr.es o con una cuenta de @gmail.com. ` +
           `Cuenta recibida: ${email}`
       };
     }
