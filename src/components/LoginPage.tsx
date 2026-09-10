@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { AlertCircle, GraduationCap, FlaskConical, Atom, Layers, Eye, ExternalLink } from 'lucide-react';
@@ -7,6 +7,19 @@ export const LoginPage: React.FC = () => {
   const { loginWithGoogle, loginAsGuest } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const posterUrl = `${baseUrl}video-header-poster.webp`;
+  const webmUrl = `${baseUrl}video-header.webm`;
+  const mp4Url = `${baseUrl}video-header.mp4`;
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.55;
+    }
+  }, []);
 
   const handleSuccess = (credentialResponse: { credential?: string }) => {
     setLoading(true);
@@ -24,6 +37,30 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="login-root">
+      {/* Background Ambient Molecular Video Loop */}
+      <div className="login-video-wrap" aria-hidden="true">
+        <video
+          ref={videoRef}
+          className={`login-bg-video ${videoLoaded ? 'is-loaded' : ''}`}
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={posterUrl}
+          preload="metadata"
+          onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
+          onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
+          onCanPlayThrough={() => {
+            if (videoRef.current) videoRef.current.playbackRate = 0.55;
+            setVideoLoaded(true);
+          }}
+        >
+          <source src={webmUrl} type="video/webm" />
+          <source src={mp4Url} type="video/mp4" />
+        </video>
+        <div className="login-video-overlay" />
+      </div>
+
       {/* Background decorative grid */}
       <div className="login-bg-grid" aria-hidden="true" />
 

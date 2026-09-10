@@ -534,6 +534,61 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   padding: 2rem 1rem;
 }
 
+/* Ambient Molecular Video Loop en Pantalla de Entrada */
+.login-video-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.login-bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.35;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-bg-video.is-loaded {
+  opacity: 0.45;
+}
+
+.login-video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    140deg,
+    rgba(11, 31, 69, 0.82) 0%,
+    rgba(15, 45, 92, 0.74) 35%,
+    rgba(13, 118, 110, 0.78) 80%,
+    rgba(11, 94, 88, 0.86) 100%
+  );
+  backdrop-filter: blur(1.5px);
+}
+
+@media (max-width: 768px) {
+  .login-bg-video {
+    display: none;
+  }
+  .login-video-wrap {
+    background-image: url('/video-header-poster.webp');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-bg-video {
+    display: none;
+  }
+}
+
 .login-bg-grid {
   position: absolute;
   inset: 0;

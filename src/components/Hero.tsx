@@ -25,6 +25,14 @@ export const Hero: React.FC<HeroProps> = ({
   const mp4Url = `${baseUrl}video-header.mp4`;
 
   useEffect(() => {
+    // Ajustar velocidad de reproducción más lenta (0.55x) para un movimiento molecular suave y majestuoso
+    const applyPlaybackRate = () => {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = 0.55;
+      }
+    };
+    applyPlaybackRate();
+
     // Respetar preferencia de reducción de movimiento
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (mediaQuery.matches) return;
@@ -35,7 +43,9 @@ export const Hero: React.FC<HeroProps> = ({
         entries.forEach(entry => {
           if (!videoRef.current) return;
           if (entry.isIntersecting) {
-            videoRef.current.play().catch(() => {});
+            videoRef.current.play().then(() => {
+              if (videoRef.current) videoRef.current.playbackRate = 0.55;
+            }).catch(() => {});
           } else {
             videoRef.current.pause();
           }
@@ -64,7 +74,12 @@ export const Hero: React.FC<HeroProps> = ({
           playsInline
           poster={posterUrl}
           preload="metadata"
-          onCanPlayThrough={() => setVideoLoaded(true)}
+          onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
+          onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
+          onCanPlayThrough={() => {
+            if (videoRef.current) videoRef.current.playbackRate = 0.55;
+            setVideoLoaded(true);
+          }}
         >
           <source src={webmUrl} type="video/webm" />
           <source src={mp4Url} type="video/mp4" />
