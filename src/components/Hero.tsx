@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { QFDOS_INFO } from '../data/qfdosData';
 import { BookOpen, Award, CheckCircle2, FlaskConical, Sparkles, ChevronRight, GraduationCap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -15,9 +15,64 @@ export const Hero: React.FC<HeroProps> = ({
   onOpenDrugSearch
 }) => {
   const { user, isProfesor } = useAuth();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const posterUrl = `${baseUrl}video-header-poster.webp`;
+  const webmUrl = `${baseUrl}video-header.webm`;
+  const mp4Url = `${baseUrl}video-header.mp4`;
+
+  useEffect(() => {
+    // Respetar preferencia de reducción de movimiento
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) return;
+
+    // IntersectionObserver: pausa el vídeo al hacer scroll para no consumir GPU/batería
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!videoRef.current) return;
+          if (entry.isIntersecting) {
+            videoRef.current.play().catch(() => {});
+          } else {
+            videoRef.current.pause();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section className="qfdos-hero-section">
+    <section className="qfdos-hero-section" ref={heroRef}>
+      {/* Background Ambient Molecular Video Loop */}
+      <div className="qfdos-hero-video-wrap" aria-hidden="true">
+        <video
+          ref={videoRef}
+          className={`qfdos-hero-bg-video ${videoLoaded ? 'is-loaded' : ''}`}
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={posterUrl}
+          preload="metadata"
+          onCanPlayThrough={() => setVideoLoaded(true)}
+        >
+          <source src={webmUrl} type="video/webm" />
+          <source src={mp4Url} type="video/mp4" />
+        </video>
+        {/* Filtro de color y contraste para máxima legibilidad del texto */}
+        <div className="qfdos-hero-video-overlay" />
+      </div>
+
       {/* Dynamic structural background grid */}
       <div className="qfdos-hero-bg-grid" />
       <div className="qfdos-hero-glow-orb" />

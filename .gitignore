@@ -35,5 +35,7 @@ client_secret_*.json
 Prácticas v4/
 "Prácticas v4"
 
-# Media local
+# Media local (se ignoran vídeos brutos, se permite el optimizado web de ~700 KB)
 *.mp4
+!public/video-header.mp4
+!docs/video-header.mp4
