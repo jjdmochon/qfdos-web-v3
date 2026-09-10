@@ -18,6 +18,7 @@ import {
 } from './data/qfdosData';
 import { useAuth } from './context/AuthContext';
 import { descargarContenido, contenidoEnCache } from './services/contenidoRemoto';
+import { ExternalLink } from 'lucide-react';
 
 import { LoginPage } from './components/LoginPage';
 import { Header } from './components/Header';
@@ -344,10 +345,32 @@ export const App: React.FC = () => {
                 {QFDOS_INFO.faculty} · {QFDOS_INFO.institution}<br />
                 Campus Universitario de Cartuja · Granada (España)
               </p>
-              <div style={{ marginTop: '12px' }}>
-                <span className="qfdos-badge" style={{ fontSize: '0.66rem' }}>
-                  QFDOS Structural Affinity v2.0
-                </span>
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div>
+                  <span className="qfdos-badge" style={{ fontSize: '0.66rem' }}>
+                    QFDOS Structural Affinity v2.0
+                  </span>
+                </div>
+                {/* NEXUS.LAB Developer Badge Card */}
+                <a
+                  href="https://nexus-lab-antonio.netlify.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ftr-nexus-card"
+                  title="Visitar NEXUS.LAB — Ingeniería Digital & Ciencia Aplicada"
+                >
+                  <div className="ftr-nexus-icon-box">
+                    <svg className="ftr-nexus-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                  </div>
+                  <div className="ftr-nexus-info">
+                    <span className="ftr-nexus-eyebrow">Desarrollado por</span>
+                    <span className="ftr-nexus-title">NEXUS<span className="ftr-nexus-dot">.LAB</span></span>
+                    <span className="ftr-nexus-sub">Ingeniería Digital & Ciencia Aplicada</span>
+                  </div>
+                  <ExternalLink size={14} className="ftr-nexus-arrow" />
+                </a>
               </div>
             </div>
 
@@ -402,12 +425,31 @@ export const App: React.FC = () => {
           {/* Subfooter de copyright y acceso institucional */}
           <div className="qfdos-footer-sub">
             <div>
-              Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E) · Plataforma desarrollada por el Prof. Mochón (beta)
+              Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E) · Desarrollada por{' '}
+              <a
+                href="https://nexus-lab-antonio.netlify.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nexus-footer-inline-link"
+              >
+                <strong>NEXUS.LAB</strong>
+              </a>
             </div>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <span>Acceso: @go.ugr.es / @gmail.com</span>
               <span>•</span>
-              <span>Plataforma QFDOS v3.2 (beta)</span>
+              <a
+                href="https://nexus-lab-antonio.netlify.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nexus-footer-inline-link"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+              >
+                <span>Desarrollado por <strong>NEXUS.LAB</strong></span>
+                <ExternalLink size={11} />
+              </a>
+              <span>•</span>
+              <span>Plataforma QFDOS v3.2</span>
             </div>
           </div>
         </div>

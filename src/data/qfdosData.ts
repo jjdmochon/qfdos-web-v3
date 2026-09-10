@@ -174,6 +174,19 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-nexus-lab',
+    title: 'NEXUS.LAB: Ingeniería Digital & Ciencia Aplicada',
+    url: 'https://nexus-lab-antonio.netlify.app/',
+    summary:
+      'Equipo y laboratorio de ingeniería responsable del diseño, algoritmia biofísica e infraestructura digital de la plataforma QFDOS v3. Sinergia académico-industrial fundada por el Dr. Antonio Marín y el Dr. Juan José Díaz-Mochón para la digitalización con rigor científico.',
+    category: 'Industria & carrera profesional',
+    source: 'NEXUS.LAB',
+    duration: '5 min',
+    relatedTopic: 'Plataforma QFDOS',
+    featured: true,
+    addedAt: '2026-09-10'
+  },
+  {
     id: 'link-acs-fall-2026-disclosures',
     title: 'ACS Fall 2026: 13 nuevas estructuras y candidatos clínicos desvelados',
     url: 'https://drughunter.com/articles/acs-fall-2026-first-time-disclosures',
@@ -287,6 +300,7 @@ export interface StudentQuestion {
  * contenido oficial. Sin esto, un navegador que ya visitó la plataforma se
  * queda con la versión antigua para siempre.
  *
+ * v3.2.1 — Atribución oficial de desarrollo por NEXUS.LAB (https://nexus-lab-antonio.netlify.app/).
  * v3.2.0 — Nueva seccion de enlaces de interes (INITIAL_RESOURCE_LINKS).
  * v3.1.0 — Estructuras SMILES verificadas contra PubChem y corregidas:
  *          haloperidol y zolpidem no eran ni siquiera moléculas válidas;
@@ -295,7 +309,7 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.2.0';
+export const COURSE_DATA_VERSION = '3.2.1';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -305,6 +319,12 @@ export const QFDOS_INFO = {
   faculty: "Facultad de Farmacia",
   department: "Química Farmacéutica y Orgánica",
   professors: ["Dr. Juan José Díaz-Mochón (Profesor Responsable · Grupo E)"],
+  developer: {
+    name: "NEXUS.LAB",
+    tagline: "Ingeniería Digital & Ciencia Aplicada",
+    url: "https://nexus-lab-antonio.netlify.app/",
+    founders: ["Dr. Antonio Marín", "Dr. Juan José Díaz-Mochón"]
+  },
   designSystem: "QFDOS Structural Affinity Identity v2.0",
   driveFolderUrl: "https://drive.google.com/drive/folders/1_QFDOS_2627_Classroom",
   evaluacion: {
@@ -318,8 +338,8 @@ export const QFDOS_INFO = {
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-1',
-    title: '🚀 Bienvenida al Curso 2026/2027: Portal QFDOS v3 con quimioinformática RDKit',
-    content: 'Plataforma desarrollada por el Prof. Mochón (beta) para el alumnado del Grupo E. Estructuras 2D renderizadas con RDKit y descriptores calculados sobre la marcha, podcasts en Spotify, flashcards con repetición espaciada y generador de exámenes.',
+    title: '🚀 Bienvenida al Curso 2026/2027: Portal QFDOS v3 desarrollado por NEXUS LAB',
+    content: 'Plataforma desarrollada por NEXUS LAB para el Prof. Mochón y el alumnado del Grupo E. Estructuras 2D renderizadas con RDKit y descriptores calculados sobre la marcha, podcasts en Spotify, flashcards con repetición espaciada y generador de exámenes.',
     date: '10 Septiembre 2026',
     priority: 'alta'
   },

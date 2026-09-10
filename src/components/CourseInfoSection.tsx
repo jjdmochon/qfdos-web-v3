@@ -282,6 +282,58 @@ export const CourseInfoSection: React.FC = () => {
             </div>
           </div>
 
+          {/* Card: Desarrollo Tecnológico y Plataforma — NEXUS.LAB */}
+          <div className="qfdos-card" style={{ borderLeft: '3px solid #00bcd4', background: 'var(--surface)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(0, 188, 212, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00bcd4' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                  Desarrollo de la Plataforma
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Ingeniería Digital & Algoritmia Biofísica</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '0.75rem', padding: '12px 14px', background: 'var(--surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-title)' }}>
+                  NEXUS<span style={{ color: 'var(--teal-ink)' }}>.LAB</span>
+                </span>
+                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>Tech Partner</span>
+              </div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '4px' }}>
+                Plataforma interactiva diseñada y desarrollada por <strong>NEXUS.LAB</strong> (Dr. Antonio Marín & Dr. Juan José Díaz-Mochón). Sinergia académico-industrial para la docencia en farmacia y quimioinformática.
+              </div>
+              <div style={{ marginTop: '10px' }}>
+                <a
+                  href="https://nexus-lab-antonio.netlify.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: 'var(--navy-ink)',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    textDecoration: 'none'
+                  }}
+                >
+                  <span>Conocer más sobre NEXUS.LAB</span>
+                  <ExternalLink size={13} />
+                </a>
+              </div>
+            </div>
+
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '0.25rem', background: 'var(--neutral-bg)', padding: '10px', borderRadius: '8px' }}>
+              🌐 <strong>Web Oficial:</strong> <a href="https://nexus-lab-antonio.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', fontWeight: 700 }}>nexus-lab-antonio.netlify.app</a>
+            </div>
+          </div>
+
           {/* Card: Calendario Oficial de Exámenes (Teoría) - Rediseño Editorial de Alta Gama */}
           <div className="qfdos-card card-navy" style={{ gridColumn: '1 / -1', padding: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1.25rem' }}>

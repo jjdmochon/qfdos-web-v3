@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, GraduationCap, FlaskConical, Atom, Layers, Eye } from 'lucide-react';
+import { AlertCircle, GraduationCap, FlaskConical, Atom, Layers, Eye, ExternalLink } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const { loginWithGoogle, loginAsGuest } = useAuth();
@@ -54,7 +54,17 @@ export const LoginPage: React.FC = () => {
 
           <h1 className="login-title">Química Farmacéutica II</h1>
           <p className="login-subtitle">
-            Plataforma desarrollada por el Prof. Mochón (beta) · Grado en Farmacia, UGR
+            Plataforma desarrollada por{' '}
+            <a
+              href="https://nexus-lab-antonio.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nexus-login-link"
+              style={{ color: '#0d9488', fontWeight: 800, textDecoration: 'none' }}
+            >
+              NEXUS.LAB
+            </a>{' '}
+            · Grado en Farmacia, UGR
           </p>
         </div>
 
@@ -140,9 +150,34 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="login-footer-note">
-          Universidad de Granada · Departamento de Química Farmacéutica y Orgánica
-        </p>
+        <div className="login-footer-note" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+          <div>Universidad de Granada · Departamento de Química Farmacéutica y Orgánica</div>
+          <a
+            href="https://nexus-lab-antonio.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nexus-login-badge"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.78rem',
+              color: 'var(--text-muted)',
+              textDecoration: 'none',
+              marginTop: '4px',
+              padding: '3px 10px',
+              borderRadius: '20px',
+              background: 'rgba(13, 148, 136, 0.07)',
+              border: '1px solid rgba(13, 148, 136, 0.18)'
+            }}
+          >
+            <span>Desarrollado por</span>
+            <strong style={{ color: 'var(--teal-ink)', letterSpacing: '-0.2px' }}>
+              NEXUS<span style={{ color: '#00bcd4' }}>.LAB</span>
+            </strong>
+            <ExternalLink size={12} style={{ opacity: 0.7 }} />
+          </a>
+        </div>
       </div>
     </div>
   );

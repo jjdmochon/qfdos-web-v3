@@ -1217,6 +1217,137 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
 .qfdos-footer-sub a { color: var(--ftr-muted); }
 .qfdos-footer-sub a:hover { color: var(--ftr-accent); }
 
+/* --- NEXUS.LAB Branding Integration --- */
+.ftr-nexus-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--ftr-well, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--ftr-well-edge, rgba(255, 255, 255, 0.1));
+  border-left: 3px solid #00E0FF;
+  border-radius: var(--radius-md, 8px);
+  padding: 10px 14px;
+  text-decoration: none;
+  color: var(--ftr-ink, #ffffff);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 10px;
+}
+
+.ftr-nexus-card:hover {
+  background: rgba(0, 224, 255, 0.08);
+  border-color: rgba(0, 224, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 224, 255, 0.15);
+}
+
+.ftr-nexus-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(0, 224, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #00E0FF;
+}
+
+.ftr-nexus-svg {
+  width: 18px;
+  height: 18px;
+  filter: drop-shadow(0 0 4px rgba(0, 224, 255, 0.5));
+}
+
+.ftr-nexus-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.ftr-nexus-eyebrow {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ftr-muted, #94a3b8);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ftr-nexus-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.ftr-nexus-dot {
+  color: #00E0FF;
+}
+
+.ftr-nexus-sub {
+  font-size: 0.68rem;
+  color: var(--ftr-muted, #94a3b8);
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+.ftr-nexus-arrow {
+  color: var(--ftr-muted, #94a3b8);
+  opacity: 0.6;
+  transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ftr-nexus-card:hover .ftr-nexus-arrow {
+  opacity: 1;
+  color: #00E0FF;
+  transform: translateX(2px);
+}
+
+.nexus-footer-inline-link {
+  color: #00E0FF !important;
+  text-decoration: none;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
+}
+
+.nexus-footer-inline-link:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+.nexus-login-badge {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.nexus-login-badge:hover {
+  border-color: rgba(13, 148, 136, 0.45) !important;
+  background: rgba(13, 148, 136, 0.12) !important;
+}
+
+.header-dropdown-nexus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--surface-alt);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.header-dropdown-nexus:hover {
+  background: rgba(0, 224, 255, 0.08);
+  color: var(--text-title);
+}
+
+
 /* Responsive Header Media Queries */
 @media (max-width: 1200px) {
   .brand-sub { display: none; }
