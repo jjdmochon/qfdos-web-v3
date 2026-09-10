@@ -65,144 +65,96 @@ export const CourseInfoSection: React.FC = () => {
     return formattedD1;
   };
 
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const baseUrl = import.meta.env.BASE_URL || '/';
-
-  React.useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.55;
-    }
-  }, []);
-
   return (
     <div className="container" style={{ padding: '2rem 1rem' }}>
       
-      {/* Banner Principal de la Asignatura con Video Loop Sapphire */}
-      <div className="qfdos-card" style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%)',
-        color: '#ffffff',
-        padding: '2rem',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-lg)',
-        marginBottom: '2rem',
-        border: 'none',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Ambient Molecular Video Loop (Sapphire / Navy) */}
-        <div className="module-video-wrap" aria-hidden="true">
-          <video
-            ref={videoRef}
-            className="module-bg-video"
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={`${baseUrl}video-curso-poster.webp`}
-            preload="metadata"
-            onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
-            onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
-          >
-            <source src={`${baseUrl}video-curso.webm`} type="video/webm" />
-            <source src={`${baseUrl}video-curso.mp4`} type="video/mp4" />
-          </video>
-          <div className="module-video-overlay overlay-curso" />
+      {/* Title Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+            <span className="qfdos-badge badge-navy" style={{ fontSize: '0.74rem' }}>
+              {subject.code}
+            </span>
+            <span className="qfdos-badge badge-teal" style={{ fontSize: '0.74rem' }}>
+              {subject.credits} • {subject.year}
+            </span>
+            <span className="qfdos-badge" style={{ background: '#047857', color: '#ffffff', fontSize: '0.74rem', fontWeight: 700 }}>
+              {subject.group}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <BookOpen size={24} color="var(--navy-ink)" />
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)', letterSpacing: '-0.02em', margin: 0 }}>
+              {subject.name}
+            </h2>
+          </div>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.3rem 0 1rem 0', maxWidth: '720px' }}>
+            {subject.degree} • {subject.faculty} • {subject.university}. 
+            Coordinación e información docente oficial, horarios de aula, tutorías presenciales y online, y calendario académico completo.
+          </p>
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <a
+              href={links.geminiNotebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-teal"
+              style={{
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                textDecoration: 'none'
+              }}
+            >
+              <Sparkles size={15} /> Gemini Notebook Oficial del Curso
+            </a>
+            <a
+              href={links.teachingGuide}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-outline"
+              style={{
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                textDecoration: 'none'
+              }}
+            >
+              <BookOpen size={15} /> Guía Docente UGR
+            </a>
+          </div>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-              <span className="qfdos-badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#ffffff', fontSize: '0.74rem' }}>
-                {subject.code}
-              </span>
-              <span className="qfdos-badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#ffffff', fontSize: '0.74rem' }}>
-                {subject.credits} • {subject.year}
-              </span>
-              <span className="qfdos-badge" style={{ background: '#047857', color: '#ffffff', fontSize: '0.74rem', fontWeight: 700 }}>
-                {subject.group}
-              </span>
-            </div>
-            <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#ffffff', margin: '0.3rem 0', fontFamily: 'Montserrat, sans-serif' }}>
-              {subject.name}
-            </h1>
-            <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.92)', margin: '0.3rem 0 1rem 0', maxWidth: '750px' }}>
-              {subject.degree} • {subject.faculty} • {subject.university}. 
-              Coordinación e información docente oficial, horarios de aula, tutorías presenciales y online, y calendario académico completo.
-            </p>
-
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <a
-                href={links.geminiNotebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm"
-                style={{
-                  background: '#2dd4bf',
-                  color: '#042f2e',
-                  fontWeight: 800,
-                  fontSize: '0.82rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  border: 'none',
-                  textDecoration: 'none'
-                }}
-              >
-                <Sparkles size={15} color="#0f766e" /> Gemini Notebook Oficial del Curso
-              </a>
-              <a
-                href={links.teachingGuide}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm"
-                style={{
-                  background: 'rgba(255,255,255,0.16)',
-                  color: '#ffffff',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  fontWeight: 700,
-                  fontSize: '0.82rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  textDecoration: 'none'
-                }}
-              >
-                <BookOpen size={15} /> Guía Docente UGR
-              </a>
-            </div>
+        {/* Tarjeta de horario rápido */}
+        <div className="qfdos-card" style={{
+          padding: '1.1rem 1.25rem',
+          minWidth: '260px',
+          boxShadow: 'var(--shadow-sm)',
+          border: '1px solid var(--border-color)',
+          background: 'var(--surface)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+            <Clock size={15} color="var(--teal)" /> HORARIO DE CLASE (GRUPO E)
           </div>
-
-          {/* Tarjeta de horario rápido */}
-          <div style={{
-            background: 'rgba(255,255,255,0.12)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: 'var(--radius-md)',
-            padding: '1.25rem',
-            border: '1px solid rgba(255,255,255,0.2)',
-            minWidth: '260px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
-              <Clock size={16} /> HORARIO DE CLASE (GRUPO E)
-            </div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>
-              {classSchedule.room}
-            </div>
-            <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', marginTop: '4px' }}>
-              {classSchedule.frequency}
-            </div>
-            <div style={{ fontSize: '0.76rem', color: 'rgba(255,255,255,0.75)', marginTop: '8px', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '6px' }}>
-              📍 Facultad de Farmacia · Cartuja
-            </div>
+          <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)' }}>
+            {classSchedule.room}
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-body)', marginTop: '4px' }}>
+            {classSchedule.frequency}
+          </div>
+          <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '6px', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+            📍 Facultad de Farmacia · Cartuja
           </div>
         </div>
       </div>
-    </div>
 
       {/* Selector de Pestañas Interiores */}
       <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border-color)', marginBottom: '1.75rem', paddingBottom: '0.2rem', overflowX: 'auto' }}>

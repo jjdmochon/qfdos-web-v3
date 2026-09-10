@@ -12,7 +12,7 @@ import { LimiteDeError } from '../LimiteDeError';
 import {
   FlaskConical, Layers, Calculator, Droplets, Activity,
   Settings, GraduationCap, Sparkles, BookOpen, ExternalLink, Users,
-  ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck
+  ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck, Download, ShieldCheck, ChevronRight
 } from 'lucide-react';
 
 interface PracticasSectionProps {
@@ -40,13 +40,47 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
     return accepted ? 'progreso' : 'safety';
   });
 
+  const heroRef = React.useRef<HTMLElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
-  const baseUrl = import.meta.env.BASE_URL || '/';
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
-  React.useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.55;
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const posterUrl = `${baseUrl}video-header-poster.webp`;
+  const webmUrl = `${baseUrl}video-header.webm`;
+  const mp4Url = `${baseUrl}video-header.mp4`;
+
+  useEffect(() => {
+    const applyPlaybackRate = () => {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = 0.55;
+      }
+    };
+    applyPlaybackRate();
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!videoRef.current) return;
+          if (entry.isIntersecting) {
+            videoRef.current.play().then(() => {
+              if (videoRef.current) videoRef.current.playbackRate = 0.55;
+            }).catch(() => {});
+          } else {
+            videoRef.current.pause();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
     }
+
+    return () => observer.disconnect();
   }, []);
 
   React.useEffect(() => {
@@ -131,148 +165,155 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
   return (
     <div className="container" style={{ padding: '2rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
-      {/* Top Banner Hero with Emerald/Mint Ambient Video Loop */}
-      <div className="qfdos-card" style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%)',
-        color: '#ffffff',
-        padding: '2rem',
-        borderRadius: '16px',
-        position: 'relative',
-        overflow: 'hidden',
-        boxShadow: '0 8px 24px rgba(30,58,138,0.18)'
-      }}>
-        {/* Background Ambient Video Loop (Emerald / Mint Lab) */}
-        <div className="module-video-wrap" aria-hidden="true">
+      {/* Top Hero Section matching Hub with 3D Molecular Video Loop */}
+      <section className="qfdos-hero-section" ref={heroRef} style={{ margin: 0, width: '100%', boxSizing: 'border-box' }}>
+        {/* Background Ambient Molecular Video Loop */}
+        <div className="qfdos-hero-video-wrap" aria-hidden="true">
           <video
             ref={videoRef}
-            className="module-bg-video"
+            className={`qfdos-hero-bg-video ${videoLoaded ? 'is-loaded' : ''}`}
             autoPlay
             loop
             muted
             playsInline
-            poster={`${baseUrl}video-practicas-poster.webp`}
+            poster={posterUrl}
             preload="metadata"
             onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
             onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
+            onCanPlayThrough={() => {
+              if (videoRef.current) videoRef.current.playbackRate = 0.55;
+              setVideoLoaded(true);
+            }}
           >
-            <source src={`${baseUrl}video-practicas.webm`} type="video/webm" />
-            <source src={`${baseUrl}video-practicas.mp4`} type="video/mp4" />
+            <source src={webmUrl} type="video/webm" />
+            <source src={mp4Url} type="video/mp4" />
           </video>
-          <div className="module-video-overlay overlay-practicas" />
+          {/* Filtro de color y contraste para máxima legibilidad del texto */}
+          <div className="qfdos-hero-video-overlay" />
         </div>
 
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '850px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.6rem', flexWrap: 'wrap' }}>
-            <span style={{
-              background: 'rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(6px)',
-              padding: '4px 10px',
-              borderRadius: '999px',
-              fontSize: '0.74rem',
-              fontWeight: 700,
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              <FlaskConical size={13} /> MÓDULO INTERACTIVO DE LABORATORIO
-            </span>
-            <span style={{ fontSize: '0.74rem', opacity: 0.9 }}>
-              Química Farmacéutica II · UGR
-            </span>
-            {isSafetyAccepted ? (
-              <span style={{
-                background: 'rgba(45, 212, 191, 0.2)',
-                color: '#5eead4',
-                border: '1px solid rgba(45, 212, 191, 0.4)',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: '999px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <CheckCircle2 size={12} /> Normas de Seguridad Aceptadas
-              </span>
-            ) : (
-              <span style={{
-                background: 'rgba(239, 68, 68, 0.2)',
-                color: '#fca5a5',
-                border: '1px solid rgba(239, 68, 68, 0.4)',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: '999px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <Lock size={12} /> Lectura de Seguridad Pendiente
-              </span>
-            )}
-          </div>
+        {/* Dynamic structural background grid */}
+        <div className="qfdos-hero-bg-grid" />
+        <div className="qfdos-hero-glow-orb" />
 
-          <h1 style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'Montserrat, sans-serif', margin: '0.2rem 0 0.6rem 0', color: '#ffffff', letterSpacing: '-0.02em' }}>
-            Cuaderno de Prácticas y Entrenador de Examen
-          </h1>
+        <div style={{ position: 'relative', zIndex: 2, width: '100%' }}>
+          <div className="qfdos-hero-layout">
 
-          <p style={{ fontSize: '0.92rem', color: 'rgba(255,255,255,0.92)', lineHeight: 1.55, margin: '0 0 1.25rem 0' }}>
-            Plataforma integral para preparar y registrar tus prácticas de laboratorio: comprométete con las normas oficiales de seguridad, 
-            visualiza las síntesis de Propranolol y DHPP, calcula reactivos limitantes y rendimientos en tiempo real, domina las disoluciones 
-            de reactivos sólidos y líquidos, elucida espectros de RMN/MS, prepárate para el examen con estructuras 2D y entrega el informe oficial por parejas.
-          </p>
+            {/* Left Column: Subject identity, typography and primary actions */}
+            <div className="qfdos-hero-main">
+              {/* Context Badge row */}
+              <div className="qfdos-hero-badges">
+                <span className="qfdos-hero-pill pill-cyan">
+                  MÓDULO INTERACTIVO DE LABORATORIO
+                </span>
+                <span className="qfdos-hero-pill pill-translucent">
+                  QUÍMICA FARMACÉUTICA II · UGR
+                </span>
+                {isSafetyAccepted ? (
+                  <span className="qfdos-hero-pill pill-prof" style={{ color: '#5eead4', borderColor: 'rgba(45, 212, 191, 0.4)' }}>
+                    <CheckCircle2 size={13} /> NORMAS ACEPTADAS
+                  </span>
+                ) : (
+                  <span className="qfdos-hero-pill" style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
+                    <Lock size={13} /> LECTURA PENDIENTE
+                  </span>
+                )}
+              </div>
 
-          {/* Quick Metrics Bar & Download Cuaderno */}
-          <div style={{
-            display: 'flex',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            background: 'rgba(0, 0, 0, 0.2)',
-            padding: '0.85rem 1rem',
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            backdropFilter: 'blur(8px)'
-          }}>
-            <a
-              href="https://drive.google.com/file/d/1zHi7DsEEQ9TsXbelODcG5hcy8_pMl4Bl/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-sm"
-              style={{
-                fontWeight: 800,
-                fontSize: '0.82rem',
-                padding: '8px 16px',
-                background: '#2dd4bf',
-                color: '#042f2e',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                border: 'none',
-                textDecoration: 'none'
-              }}
-            >
-              📥 <span>Descargar Cuaderno de Prácticas (PDF)</span>
-            </a>
-            <div style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600 }}>
-              🛡️ <strong>Seguridad:</strong> 16 normas y precauciones
+              <h1 className="qfdos-hero-title">
+                Cuaderno de<br />
+                <span className="qfdos-hero-title-accent">
+                  Prácticas & Examen
+                </span>
+              </h1>
+
+              <p className="qfdos-hero-description">
+                Plataforma integral para preparar y registrar tus prácticas de laboratorio: comprométete con las normas oficiales de seguridad, 
+                visualiza las síntesis de Propranolol y DHPP, calcula reactivos limitantes y rendimientos en vivo, elucida espectros de RMN/MS y prepara el examen.
+              </p>
+
+              <div className="qfdos-hero-cta-group">
+                <a
+                  href="https://drive.google.com/file/d/1zHi7DsEEQ9TsXbelODcG5hcy8_pMl4Bl/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-hero-primary"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Download size={17} />
+                  <span>Descargar Cuaderno (PDF)</span>
+                  <ChevronRight size={15} style={{ opacity: 0.8 }} />
+                </a>
+                <button
+                  onClick={() => {
+                    setActiveSubTab('protocols');
+                    onSubTabChange?.('protocols');
+                  }}
+                  className="btn-hero-secondary"
+                >
+                  <FlaskConical size={17} />
+                  <span>Protocolos de Síntesis</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveSubTab('safety');
+                    onSubTabChange?.('safety');
+                  }}
+                  className="btn-hero-tertiary"
+                >
+                  <ShieldCheck size={16} />
+                  <span>Normas de Seguridad</span>
+                </button>
+              </div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600 }}>
-              ⚗️ <strong>3 Reacciones:</strong> Propranolol (I y II) & DHPP
+
+            {/* Right Column: Laboratory matrix card */}
+            <div className="qfdos-hero-matrix-card">
+              <div className="qfdos-matrix-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={16} color="var(--mint)" />
+                  <span className="qfdos-matrix-title">
+                    Resumen de Laboratorio
+                  </span>
+                </div>
+                <span className="qfdos-matrix-pct-total">100%</span>
+              </div>
+
+              <div className="qfdos-matrix-items">
+                {[
+                  { label: '16 Normas de Seguridad Oficiales', pct: 100, barClass: 'bar-practicas' },
+                  { label: '3 Reacciones (Propranolol I, II & DHPP)', pct: 100, barClass: 'bar-final' },
+                  { label: '12 Espectros (¹H, ¹³C, DEPT, HRMS)', pct: 100, barClass: 'bar-parcial' },
+                  { label: 'Cuaderno Conjunto por Parejas', pct: 100, barClass: 'bar-seminarios' }
+                ].map(item => (
+                  <div key={item.label} className="qfdos-matrix-row">
+                    <div className="qfdos-matrix-label-row">
+                      <span className="qfdos-matrix-item-name">{item.label}</span>
+                      <span className="qfdos-matrix-item-pct">{item.pct}%</span>
+                    </div>
+                    <div className="qfdos-matrix-track">
+                      <div className={`qfdos-matrix-fill ${item.barClass}`} style={{ width: `${item.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="qfdos-matrix-features">
+                {[
+                  'Reactivos Líquidos & Sólidos', 'Rendimientos en Vivo',
+                  'Simulador de Examen', 'Entrega Digital'
+                ].map(feat => (
+                  <div key={feat} className="qfdos-matrix-feature-pill">
+                    <CheckCircle2 size={13} color="var(--mint)" style={{ flexShrink: 0 }} />
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600 }}>
-              🔬 <strong>12 Espectros:</strong> ¹H, ¹³C, DEPT & HRMS
-            </div>
-            <div style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600 }}>
-              👥 <strong>Parejas:</strong> Cuaderno conjunto
-            </div>
+
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Sub-Navigation Navigation Bar */}
       <div className="qfdos-card" style={{ padding: '0.6rem 0.8rem', background: 'var(--surface)' }}>

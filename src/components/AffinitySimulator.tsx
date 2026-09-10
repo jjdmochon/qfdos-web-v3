@@ -31,63 +31,25 @@ export const AffinitySimulator: React.FC = () => {
     saturationPoints.push({ conc: c, occupancy: occ });
   }
 
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const baseUrl = import.meta.env.BASE_URL || '/';
-
-  React.useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.55;
-    }
-  }, []);
-
   return (
     <div className="container" style={{ padding: '2rem 1rem' }}>
       
-      {/* Title Header con Video Loop Violet / Indigo */}
-      <div style={{
-        background: 'linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '2rem',
-        color: '#ffffff',
-        marginBottom: '2rem',
-        boxShadow: 'var(--shadow-md)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Ambient Video Loop (Violet / Indigo Bio-affinity) */}
-        <div className="module-video-wrap" aria-hidden="true">
-          <video
-            ref={videoRef}
-            className="module-bg-video"
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={`${baseUrl}video-simulador-poster.webp`}
-            preload="metadata"
-            onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
-            onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
-          >
-            <source src={`${baseUrl}video-simulador.webm`} type="video/webm" />
-            <source src={`${baseUrl}video-simulador.mp4`} type="video/mp4" />
-          </video>
-          <div className="module-video-overlay overlay-simulador" />
-        </div>
-
-        <div style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-            <Award size={24} color="var(--mint)" />
-            <span className="qfdos-badge badge-mint" style={{ fontSize: '0.72rem' }}>
-              Simulador Biofísico & Cinético
-            </span>
+      {/* Title Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.75rem' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <Award size={24} color="var(--navy-ink)" />
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)', letterSpacing: '-0.02em', margin: 0 }}>
+              Simulador de Afinidad Estructural & Ecuación de Cheng-Prusoff
+            </h2>
           </div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff', marginBottom: '6px' }}>
-            Simulador de Afinidad Estructural & Ecuación de Cheng-Prusoff
-          </h2>
-          <p style={{ fontSize: '0.92rem', opacity: 0.95, maxWidth: '840px', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.3rem 0 0 0', maxWidth: '840px', lineHeight: 1.5 }}>
             Calcula en tiempo real la constante de afinidad (Kd), constante de inhibición (Ki), valor experimental de IC50 mediante la ecuación de Cheng-Prusoff, energía libre de Gibbs de unión (ΔG°) y eficiencia de ligando (LE).
           </p>
         </div>
+        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.74rem', padding: '6px 12px' }}>
+          Simulador Biofísico & Cinético
+        </span>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>

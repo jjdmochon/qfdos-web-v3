@@ -150,8 +150,9 @@ if ($Build) {
     Write-Host "Build en $Local\dist" -ForegroundColor Green
 } else {
     Clear-Port -Port 3001
-    Write-Host 'Servidor en http://localhost:3001  (Ctrl+C para parar)' -ForegroundColor Green
-    node 'node_modules\vite\bin\vite.js' --port 3001 --strictPort
+    Write-Host 'Servidor en http://127.0.0.1:3001  (Ctrl+C para parar)' -ForegroundColor Green
+    node 'node_modules\vite\bin\vite.js' --port 3001 --strictPort --host 127.0.0.1
 }
 
 Pop-Location
+
