@@ -1491,35 +1491,39 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   height: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: 0.42;
+  opacity: 0.72;
   transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qfdos-hero-bg-video.is-loaded {
-  opacity: 0.52;
+  opacity: 0.85;
 }
 
 .qfdos-hero-video-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(6, 19, 38, 0.84) 0%,
-    rgba(10, 32, 65, 0.76) 45%,
-    rgba(9, 74, 68, 0.74) 85%,
-    rgba(6, 52, 48, 0.88) 100%
+  /* Neutral dark-slate/deep-navy overlay without teal/green tint */
+  background: radial-gradient(
+    ellipse 95% 95% at 50% 35%,
+    rgba(8, 18, 36, 0.38) 0%,
+    rgba(5, 13, 26, 0.65) 60%,
+    rgba(2, 6, 16, 0.86) 100%
   );
   backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 .qfdos-hero-video-overlay.overlay-practicas {
-  background: linear-gradient(
-    135deg,
-    rgba(8, 28, 58, 0.86) 0%,
-    rgba(9, 44, 76, 0.78) 45%,
-    rgba(8, 85, 75, 0.76) 85%,
-    rgba(5, 58, 50, 0.90) 100%
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 95% 95% at 50% 35%,
+    rgba(8, 18, 36, 0.38) 0%,
+    rgba(5, 13, 26, 0.65) 60%,
+    rgba(2, 6, 16, 0.86) 100%
   );
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 /* Fallback defensivo si una sección hero se coloca dentro de .container */
@@ -1642,7 +1646,7 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   width: 520px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.18) 0%, rgba(14, 165, 233, 0.09) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(30, 58, 138, 0.05) 40%, transparent 70%);
   pointer-events: none;
 }
 

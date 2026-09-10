@@ -26,8 +26,7 @@ export const Hero: React.FC<HeroProps> = ({
 
   const baseUrl = import.meta.env.BASE_URL || '/';
   const posterUrl = `${baseUrl}video-header-poster.webp`;
-  const webmUrl = `${baseUrl}video-header.webm`;
-  const mp4Url = `${baseUrl}video-header.mp4`;
+  const mp4Url = `${baseUrl}video-header-hub.mp4`;
 
   useEffect(() => {
     // Ajustar velocidad de reproducción lenta (0.55x) para un movimiento molecular suave
@@ -103,7 +102,6 @@ export const Hero: React.FC<HeroProps> = ({
             setVideoLoaded(true);
           }}
         >
-          <source src={webmUrl} type="video/webm" />
           <source src={mp4Url} type="video/mp4" />
         </video>
         {/* Filtro cinemático de color y contraste para máxima legibilidad */}

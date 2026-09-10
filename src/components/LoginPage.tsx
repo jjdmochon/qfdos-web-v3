@@ -12,8 +12,8 @@ export const LoginPage: React.FC = () => {
 
   const baseUrl = import.meta.env.BASE_URL || '/';
   const posterUrl = `${baseUrl}video-header-poster.webp`;
-  const webmUrl = `${baseUrl}video-header.webm`;
   const mp4Url = `${baseUrl}video-header.mp4`;
+  const webmUrl = `${baseUrl}video-header.webm`;
 
   useEffect(() => {
     if (videoRef.current) {
@@ -55,8 +55,8 @@ export const LoginPage: React.FC = () => {
             setVideoLoaded(true);
           }}
         >
-          <source src={webmUrl} type="video/webm" />
           <source src={mp4Url} type="video/mp4" />
+          {webmUrl && <source src={webmUrl} type="video/webm" />}
         </video>
         <div className="login-video-overlay" />
       </div>

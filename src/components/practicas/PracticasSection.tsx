@@ -15,7 +15,6 @@ import {
   ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck, Download, ShieldCheck, ChevronRight,
   Pause, Play
 } from 'lucide-react';
-
 interface PracticasSectionProps {
   currentSubTab?: string;
   onSubTabChange?: (subTab: string) => void;
@@ -49,8 +48,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
 
   const baseUrl = import.meta.env.BASE_URL || '/';
   const posterUrl = `${baseUrl}video-header-poster.webp`;
-  const webmUrl = `${baseUrl}video-header.webm`;
-  const mp4Url = `${baseUrl}video-header.mp4`;
+  const mp4Url = `${baseUrl}video-header-practicas.mp4`;
 
   useEffect(() => {
     const applyPlaybackRate = () => {
@@ -207,7 +205,6 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
               setVideoLoaded(true);
             }}
           >
-            <source src={webmUrl} type="video/webm" />
             <source src={mp4Url} type="video/mp4" />
           </video>
           {/* Filtro cinemático de color y contraste con tinte de laboratorio */}
