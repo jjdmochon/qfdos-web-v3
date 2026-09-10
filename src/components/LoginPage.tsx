@@ -61,9 +61,8 @@ export const LoginPage: React.FC = () => {
         <div className="login-video-overlay" />
       </div>
 
-      {/* Background decorative grid */}
-      <div className="login-bg-grid" aria-hidden="true" />
-
+      {/* Ambient breathing glow behind card */}
+      <div className="login-ambient-orb" aria-hidden="true" />
 
       {/* Center card */}
       <div className="login-card">

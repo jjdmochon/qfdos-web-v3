@@ -522,13 +522,13 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
 .anim-spin-slow { animation: spin 1.2s linear infinite; }
 .anim-fade-in { animation: fadeIn 300ms ease-out; }
 
-/* ========== Login Page ========== */
+/* ========== Login Page (Aesthetic & Peaceful Atmospheric Redesign) ========== */
 .login-root {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #050f1e;
+  background: #060e1d;
   position: relative;
   overflow: hidden;
   padding: 2rem 1rem;
@@ -550,26 +550,48 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   height: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: 0.55;
-  filter: saturate(1.18) contrast(1.05);
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  /* El ligero zoom aleja cualquier artefacto de borde y centra la visión */
+  transform: scale(1.06);
+  /* Atenuación armónica de saturación: evita el choque agresivo de colores
+     (cian vs rojo vs azul) y unifica las moléculas en una atmósfera oceánica serena */
+  filter: saturate(0.50) brightness(0.70) contrast(0.92);
+  opacity: 0.45;
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .login-bg-video.is-loaded {
-  opacity: 0.68;
+  opacity: 0.58;
 }
 
-/* Overlay cinemático de viñeta radial: mantiene las moléculas 3D nítidas y luminosas
-   a los lados mientras genera un fondo de alto contraste detrás de la tarjeta central */
+/* Overlay cinemático de serenidad:
+   - Difusión de desenfoque suave (6px) para convertir las moléculas en un bokeh etéreo que respira
+   - Gradiente radial armónico centrado que elimina divisiones bruscas de color */
 .login-video-overlay {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 85% 85% at 50% 50%,
-    rgba(5, 15, 30, 0.42) 0%,
-    rgba(5, 15, 30, 0.72) 60%,
-    rgba(3, 9, 18, 0.92) 100%
+    ellipse 80% 80% at 50% 50%,
+    rgba(10, 25, 48, 0.50) 0%,
+    rgba(6, 17, 34, 0.78) 55%,
+    rgba(4, 11, 22, 0.96) 100%
   );
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* Halo luminoso ambiental que conecta suavemente la tarjeta central con el fondo */
+.login-ambient-orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(20, 110, 130, 0.16) 0%, rgba(14, 40, 80, 0.08) 50%, transparent 70%);
+  pointer-events: none;
+  filter: blur(50px);
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
@@ -580,7 +602,8 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
     background-image: url('/video-header-poster.webp');
     background-size: cover;
     background-position: center;
-    opacity: 0.45;
+    opacity: 0.35;
+    filter: saturate(0.50) brightness(0.70);
   }
 }
 
@@ -590,26 +613,23 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   }
 }
 
-.login-bg-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(rgba(45, 212, 191, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
-  pointer-events: none;
-  opacity: 0.4;
-}
+.login-bg-grid { display: none; }
 .login-deco { display: none; }
 
 .login-card {
   position: relative;
   z-index: 2;
   background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.28), 0 8px 24px rgba(0,0,0,0.12);
-  padding: 2.5rem 2rem;
-  width: min(440px, 96vw);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    0 0 45px rgba(13, 148, 136, 0.10);
+  padding: 2.5rem 2.25rem;
+  width: min(440px, 94vw);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -617,8 +637,12 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
 }
 
 [data-theme='dark'] .login-card {
-  background: rgba(13, 24, 41, 0.92);
-  border-color: rgba(45,212,191,0.18);
+  background: rgba(10, 22, 40, 0.90);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 60px -15px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 50px rgba(45, 212, 191, 0.08);
 }
 
 .login-card-header {
