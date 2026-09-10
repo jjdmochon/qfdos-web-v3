@@ -12,7 +12,8 @@ import { LimiteDeError } from '../LimiteDeError';
 import {
   FlaskConical, Layers, Calculator, Droplets, Activity,
   Settings, GraduationCap, Sparkles, BookOpen, ExternalLink, Users,
-  ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck, Download, ShieldCheck, ChevronRight
+  ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck, Download, ShieldCheck, ChevronRight,
+  Pause, Play
 } from 'lucide-react';
 
 interface PracticasSectionProps {
@@ -43,6 +44,8 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
   const heroRef = React.useRef<HTMLElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const userPausedRef = React.useRef(false);
 
   const baseUrl = import.meta.env.BASE_URL || '/';
   const posterUrl = `${baseUrl}video-header-poster.webp`;
@@ -58,15 +61,20 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
     applyPlaybackRate();
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mediaQuery.matches) return;
+    if (mediaQuery.matches) {
+      setIsPlaying(false);
+      userPausedRef.current = true;
+      return;
+    }
 
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
           if (!videoRef.current) return;
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !userPausedRef.current) {
             videoRef.current.play().then(() => {
               if (videoRef.current) videoRef.current.playbackRate = 0.55;
+              setIsPlaying(true);
             }).catch(() => {});
           } else {
             videoRef.current.pause();
@@ -82,6 +90,21 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
 
     return () => observer.disconnect();
   }, []);
+
+  const togglePlayback = React.useCallback(() => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+      userPausedRef.current = true;
+    } else {
+      userPausedRef.current = false;
+      videoRef.current.play().then(() => {
+        if (videoRef.current) videoRef.current.playbackRate = 0.55;
+        setIsPlaying(true);
+      }).catch(() => {});
+    }
+  }, [isPlaying]);
 
   React.useEffect(() => {
     if (currentSubTab && ['progreso', 'safety', 'protocols', 'yields', 'solutions', 'spectroscopy', 'equipment', 'exam', 'pair_report'].includes(currentSubTab)) {
@@ -163,10 +186,9 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
   };
 
   return (
-    <div className="container" style={{ padding: '2rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      
-      {/* Top Hero Section matching Hub with 3D Molecular Video Loop */}
-      <section className="qfdos-hero-section" ref={heroRef} style={{ margin: 0, width: '100%', boxSizing: 'border-box' }}>
+    <>
+      {/* Top Hero Section matching Hub with 3D Molecular Video Loop (Full-bleed) */}
+      <section className="qfdos-hero-section" ref={heroRef} aria-label="Módulo de Prácticas y Laboratorio">
         {/* Background Ambient Molecular Video Loop */}
         <div className="qfdos-hero-video-wrap" aria-hidden="true">
           <video
@@ -188,15 +210,15 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
             <source src={webmUrl} type="video/webm" />
             <source src={mp4Url} type="video/mp4" />
           </video>
-          {/* Filtro de color y contraste para máxima legibilidad del texto */}
-          <div className="qfdos-hero-video-overlay" />
+          {/* Filtro cinemático de color y contraste con tinte de laboratorio */}
+          <div className="qfdos-hero-video-overlay overlay-practicas" />
         </div>
 
-        {/* Dynamic structural background grid */}
-        <div className="qfdos-hero-bg-grid" />
-        <div className="qfdos-hero-glow-orb" />
+        {/* Dynamic structural background grid & ambient lighting */}
+        <div className="qfdos-hero-bg-grid" aria-hidden="true" />
+        <div className="qfdos-hero-glow-orb" aria-hidden="true" />
 
-        <div style={{ position: 'relative', zIndex: 2, width: '100%' }}>
+        <div className="qfdos-hero-container">
           <div className="qfdos-hero-layout">
 
             {/* Left Column: Subject identity, typography and primary actions */}
@@ -237,21 +259,21 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
                   href="https://drive.google.com/file/d/1zHi7DsEEQ9TsXbelODcG5hcy8_pMl4Bl/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-hero-primary"
+                  className="btn-hero-pill-primary"
                   style={{ textDecoration: 'none' }}
                 >
-                  <Download size={17} />
+                  <Download size={16} />
                   <span>Descargar Cuaderno (PDF)</span>
-                  <ChevronRight size={15} style={{ opacity: 0.8 }} />
+                  <ChevronRight size={15} className="cta-arrow" />
                 </a>
                 <button
                   onClick={() => {
                     setActiveSubTab('protocols');
                     onSubTabChange?.('protocols');
                   }}
-                  className="btn-hero-secondary"
+                  className="btn-hero-pill-secondary"
                 >
-                  <FlaskConical size={17} />
+                  <FlaskConical size={16} />
                   <span>Protocolos de Síntesis</span>
                 </button>
                 <button
@@ -259,7 +281,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
                     setActiveSubTab('safety');
                     onSubTabChange?.('safety');
                   }}
-                  className="btn-hero-tertiary"
+                  className="btn-hero-pill-tertiary"
                 >
                   <ShieldCheck size={16} />
                   <span>Normas de Seguridad</span>
@@ -267,11 +289,11 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
               </div>
             </div>
 
-            {/* Right Column: Laboratory matrix card */}
+            {/* Right Column: Laboratory matrix card with ultra-glassmorphism */}
             <div className="qfdos-hero-matrix-card">
               <div className="qfdos-matrix-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={16} color="var(--mint)" />
+                  <Sparkles size={16} color="var(--mint, #5eead4)" />
                   <span className="qfdos-matrix-title">
                     Resumen de Laboratorio
                   </span>
@@ -304,7 +326,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
                   'Simulador de Examen', 'Entrega Digital'
                 ].map(feat => (
                   <div key={feat} className="qfdos-matrix-feature-pill">
-                    <CheckCircle2 size={13} color="var(--mint)" style={{ flexShrink: 0 }} />
+                    <CheckCircle2 size={13} color="var(--mint, #5eead4)" style={{ flexShrink: 0 }} />
                     <span>{feat}</span>
                   </div>
                 ))}
@@ -312,8 +334,29 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
             </div>
 
           </div>
+
+          {/* Floating Dompé-style Video Playback Control */}
+          <div className="qfdos-hero-footer-ctrls">
+            <button
+              type="button"
+              onClick={togglePlayback}
+              className="btn-hero-video-ctrl"
+              aria-label={isPlaying ? 'Pausar vídeo molecular de fondo' : 'Reanudar vídeo molecular de fondo'}
+              aria-pressed={!isPlaying}
+              title={isPlaying ? 'Pausar animación molecular' : 'Reanudar animación molecular'}
+            >
+              {isPlaying ? (
+                <Pause size={13} className="ctrl-icon" />
+              ) : (
+                <Play size={13} className="ctrl-icon" />
+              )}
+              <span>{isPlaying ? 'Pausar vídeo' : 'Reanudar vídeo'}</span>
+            </button>
+          </div>
         </div>
       </section>
+
+      <div className="container" style={{ padding: '2rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
       {/* Sub-Navigation Navigation Bar */}
       <div className="qfdos-card" style={{ padding: '0.6rem 0.8rem', background: 'var(--surface)' }}>
@@ -421,5 +464,6 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
       </div>
 
     </div>
+    </>
   );
 };
