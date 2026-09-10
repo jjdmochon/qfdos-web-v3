@@ -64,12 +64,6 @@ export const LoginPage: React.FC = () => {
       {/* Background decorative grid */}
       <div className="login-bg-grid" aria-hidden="true" />
 
-      {/* Floating molecules decoration */}
-      <div className="login-deco" aria-hidden="true">
-        <Atom size={120} strokeWidth={0.5} color="rgba(45,212,191,0.08)" style={{ position: 'absolute', top: '8%', left: '6%' }} />
-        <FlaskConical size={80} strokeWidth={0.5} color="rgba(255,255,255,0.05)" style={{ position: 'absolute', bottom: '12%', right: '8%' }} />
-        <Layers size={90} strokeWidth={0.5} color="rgba(59,130,246,0.07)" style={{ position: 'absolute', top: '55%', left: '3%' }} />
-      </div>
 
       {/* Center card */}
       <div className="login-card">

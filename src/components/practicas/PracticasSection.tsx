@@ -15,7 +15,15 @@ import {
   ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck
 } from 'lucide-react';
 
-export const PracticasSection: React.FC = () => {
+interface PracticasSectionProps {
+  currentSubTab?: string;
+  onSubTabChange?: (subTab: string) => void;
+}
+
+export const PracticasSection: React.FC<PracticasSectionProps> = ({
+  currentSubTab,
+  onSubTabChange
+}) => {
   const [isSafetyAccepted, setIsSafetyAccepted] = useState<boolean>(() => {
     return !!localStorage.getItem('qfdos_practicas_safety_accepted');
   });
@@ -25,9 +33,27 @@ export const PracticasSection: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<
     'progreso' | 'safety' | 'protocols' | 'yields' | 'solutions' | 'spectroscopy' | 'equipment' | 'exam' | 'pair_report'
   >(() => {
+    if (currentSubTab && ['progreso', 'safety', 'protocols', 'yields', 'solutions', 'spectroscopy', 'equipment', 'exam', 'pair_report'].includes(currentSubTab)) {
+      return currentSubTab as any;
+    }
     const accepted = !!localStorage.getItem('qfdos_practicas_safety_accepted');
     return accepted ? 'progreso' : 'safety';
   });
+
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const baseUrl = import.meta.env.BASE_URL || '/';
+
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.55;
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (currentSubTab && ['progreso', 'safety', 'protocols', 'yields', 'solutions', 'spectroscopy', 'equipment', 'exam', 'pair_report'].includes(currentSubTab)) {
+      setActiveSubTab(currentSubTab as any);
+    }
+  }, [currentSubTab]);
 
   const SUB_TABS = [
     {
@@ -99,12 +125,13 @@ export const PracticasSection: React.FC = () => {
   const handleSafetyAccepted = () => {
     setIsSafetyAccepted(true);
     setActiveSubTab('protocols');
+    onSubTabChange?.('protocols');
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div className="container" style={{ padding: '2rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
-      {/* Top Banner Hero */}
+      {/* Top Banner Hero with Emerald/Mint Ambient Video Loop */}
       <div className="qfdos-card" style={{
         background: 'linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%)',
         color: '#ffffff',
@@ -114,6 +141,26 @@ export const PracticasSection: React.FC = () => {
         overflow: 'hidden',
         boxShadow: '0 8px 24px rgba(30,58,138,0.18)'
       }}>
+        {/* Background Ambient Video Loop (Emerald / Mint Lab) */}
+        <div className="module-video-wrap" aria-hidden="true">
+          <video
+            ref={videoRef}
+            className="module-bg-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={`${baseUrl}video-practicas-poster.webp`}
+            preload="metadata"
+            onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
+            onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
+          >
+            <source src={`${baseUrl}video-practicas.webm`} type="video/webm" />
+            <source src={`${baseUrl}video-practicas.mp4`} type="video/mp4" />
+          </video>
+          <div className="module-video-overlay overlay-practicas" />
+        </div>
+
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '850px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.6rem', flexWrap: 'wrap' }}>
             <span style={{
@@ -241,9 +288,11 @@ export const PracticasSection: React.FC = () => {
                   if (isLocked) {
                     setShowLockNotice(true);
                     setActiveSubTab('safety');
+                    onSubTabChange?.('safety');
                   } else {
                     setShowLockNotice(false);
                     setActiveSubTab(tab.id as any);
+                    onSubTabChange?.(tab.id);
                   }
                 }}
                 style={{

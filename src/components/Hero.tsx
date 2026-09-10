@@ -92,7 +92,7 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="qfdos-hero-bg-grid" />
       <div className="qfdos-hero-glow-orb" />
 
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+      <div style={{ position: 'relative', zIndex: 2, width: '100%' }}>
         <div className="qfdos-hero-layout">
 
           {/* Left Column: Subject identity, typography and primary actions */}

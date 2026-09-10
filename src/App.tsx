@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   QFDOS_INFO,
   COURSE_DATA_VERSION,
@@ -99,10 +99,73 @@ const PONDERACION = [
   { pct:  5, tone: 'minor',   label: 'Trabajos y seminarios', note: '' },
 ] as const;
 
+export type TabType = 'hub' | 'info' | 'temas' | 'practicas' | 'simulador' | 'admet' | 'glosario' | 'enlaces' | 'evaluacion';
+
+const TAB_TO_HASH: Record<TabType, string> = {
+  hub: 'hub',
+  info: 'curso',
+  temas: 'temario',
+  practicas: 'practicas',
+  simulador: 'simulador',
+  admet: 'admet',
+  glosario: 'glosario',
+  enlaces: 'enlaces',
+  evaluacion: 'evaluacion'
+};
+
+const HASH_TO_TAB: Record<string, TabType> = {
+  '': 'hub',
+  hub: 'hub',
+  inicio: 'hub',
+  curso: 'info',
+  info: 'info',
+  horarios: 'info',
+  temario: 'temas',
+  temas: 'temas',
+  practicas: 'practicas',
+  laboratorio: 'practicas',
+  simulador: 'simulador',
+  afinidad: 'simulador',
+  admet: 'admet',
+  glosario: 'glosario',
+  enlaces: 'enlaces',
+  evaluacion: 'evaluacion'
+};
+
+function parseUrlHash(): { tab: TabType; sub?: string } {
+  try {
+    const raw = window.location.hash.replace(/^#\/?/, '').trim();
+    if (!raw) return { tab: 'hub' };
+    const [main, sub] = raw.split('/');
+    const tab = HASH_TO_TAB[main.toLowerCase()] || 'hub';
+    return { tab, sub };
+  } catch {
+    return { tab: 'hub' };
+  }
+}
+
 export const App: React.FC = () => {
   const { isAuthenticated, isProfesor } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'hub' | 'info' | 'temas' | 'practicas' | 'simulador' | 'admet' | 'glosario' | 'enlaces' | 'evaluacion'>('hub');
+  const initialRoute = useMemo(() => parseUrlHash(), []);
+  const [activeTab, setActiveTab] = useState<TabType>(initialRoute.tab);
+  const [practicasSubTab, setPracticasSubTab] = useState<string | undefined>(initialRoute.sub);
+
+  const navigateTo = useCallback((tab: TabType, subRoute?: string, replace = false) => {
+    setActiveTab(tab);
+    if (tab === 'practicas' && subRoute) {
+      setPracticasSubTab(subRoute);
+    }
+    const hashPrefix = TAB_TO_HASH[tab] || 'hub';
+    const targetHash = subRoute ? `#/${hashPrefix}/${subRoute}` : `#/${hashPrefix}`;
+    if (window.location.hash !== targetHash) {
+      if (replace) {
+        window.history.replaceState({ tab, subRoute }, '', targetHash);
+      } else {
+        window.history.pushState({ tab, subRoute }, '', targetHash);
+      }
+    }
+  }, []);
 
   // Se ejecuta antes que cualquier lectura de caché de abajo
   const [topics, setTopics] = useState<QfdosTopic[]>(() => {
@@ -141,7 +204,7 @@ export const App: React.FC = () => {
 
   const handleOpenAdmet = (drug: MoleculeDrug) => {
     setSelectedAdmetDrug(drug);
-    setActiveTab('admet');
+    navigateTo('admet');
   };
 
   // Persist data
@@ -192,6 +255,46 @@ export const App: React.FC = () => {
     ));
   };
 
+  // Sincronización bidireccional con el historial del navegador (Back / Forward)
+  useEffect(() => {
+    const handleHashSync = () => {
+      const { tab, sub } = parseUrlHash();
+      setActiveTab(tab);
+      if (tab === 'practicas') {
+        if (sub) setPracticasSubTab(sub);
+      } else if (tab === 'temas') {
+        if (sub) {
+          const topic = topics.find(t => t.id === sub);
+          if (topic) setSelectedTopicDetail(topic);
+        } else {
+          setSelectedTopicDetail(null);
+        }
+      }
+      // Cerrar modales abiertos si el usuario pulsó Atrás
+      setIsSearchOpen(false);
+      setIsDrugSearchOpen(false);
+      setIsExamGeneratorOpen(false);
+      setIsStudentQuestionOpen(false);
+      setSelectedQuizTopic(null);
+      setSelectedFlashcardsTopic(null);
+      setSelectedSpotifyAttachment(null);
+    };
+
+    if (!window.location.hash) {
+      window.history.replaceState({ tab: 'hub' }, '', '#/hub');
+    } else {
+      handleHashSync();
+    }
+
+    window.addEventListener('popstate', handleHashSync);
+    window.addEventListener('hashchange', handleHashSync);
+
+    return () => {
+      window.removeEventListener('popstate', handleHashSync);
+      window.removeEventListener('hashchange', handleHashSync);
+    };
+  }, [topics]);
+
   // Gate: show login if not authenticated
   if (!isAuthenticated) {
     return <LoginPage />;
@@ -202,7 +305,7 @@ export const App: React.FC = () => {
 
       <Header
         activeTab={activeTab}
-        setActiveTab={(tab: any) => setActiveTab(tab)}
+        setActiveTab={(tab: any) => navigateTo(tab)}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
         onOpenStudentQuestion={() => setIsStudentQuestionOpen(true)}
@@ -211,8 +314,8 @@ export const App: React.FC = () => {
 
       {activeTab === 'hub' && (
         <Hero
-          onNavigateToTemas={() => setActiveTab('temas')}
-          onNavigateToSimulador={() => setActiveTab('simulador')}
+          onNavigateToTemas={() => navigateTo('temas')}
+          onNavigateToSimulador={() => navigateTo('simulador')}
           onOpenDrugSearch={() => setIsDrugSearchOpen(true)}
         />
       )}
@@ -222,12 +325,12 @@ export const App: React.FC = () => {
           <HubDashboard
             topics={topics}
             announcements={announcements}
-            onSelectTopic={setSelectedTopicDetail}
-            onNavigateToCourseInfo={() => setActiveTab('info')}
-            onNavigateToTemas={() => setActiveTab('temas')}
-            onNavigateToSimulador={() => setActiveTab('simulador')}
-            onNavigateToAdmet={() => setActiveTab('admet')}
-            onNavigateToPracticas={() => setActiveTab('practicas')}
+            onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
+            onNavigateToCourseInfo={() => navigateTo('info')}
+            onNavigateToTemas={() => navigateTo('temas')}
+            onNavigateToSimulador={() => navigateTo('simulador')}
+            onNavigateToAdmet={() => navigateTo('admet')}
+            onNavigateToPracticas={() => navigateTo('practicas')}
             onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
             onOpenAdminCms={() => setIsAdminCmsOpen(true)}
           />
@@ -236,12 +339,17 @@ export const App: React.FC = () => {
         {activeTab === 'temas' && (
           <TemasSection
             topics={topics}
-            onSelectTopic={setSelectedTopicDetail}
+            onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
             onOpenQuiz={setSelectedQuizTopic}
             onOpenFlashcards={setSelectedFlashcardsTopic}
           />
         )}
-        {activeTab === 'practicas' && <PracticasSection />}
+        {activeTab === 'practicas' && (
+          <PracticasSection
+            currentSubTab={practicasSubTab}
+            onSubTabChange={sub => navigateTo('practicas', sub)}
+          />
+        )}
         {activeTab === 'simulador' && <AffinitySimulator />}
         {activeTab === 'admet' && <AdmetCalculator initialDrug={selectedAdmetDrug} />}
         {activeTab === 'glosario' && <GlossarySection glossary={glossary} />}
@@ -258,7 +366,12 @@ export const App: React.FC = () => {
       {selectedTopicDetail && (
         <TopicDetailModal
           topic={selectedTopicDetail}
-          onClose={() => setSelectedTopicDetail(null)}
+          onClose={() => {
+            setSelectedTopicDetail(null);
+            if (window.location.hash.includes('tema-')) {
+              navigateTo('temas', undefined, true);
+            }
+          }}
           onOpenQuiz={t => { setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
           onOpenFlashcards={t => { setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
@@ -280,8 +393,8 @@ export const App: React.FC = () => {
         onClose={() => setIsSearchOpen(false)}
         topics={topics}
         glossary={glossary}
-        onSelectTopic={setSelectedTopicDetail}
-        onNavigateToTab={(tab: any) => setActiveTab(tab)}
+        onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
+        onNavigateToTab={(tab: any) => navigateTo(tab)}
         onOpenNotesGenerator={() => {}}
         onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
         onOpenDrugSearch={() => setIsDrugSearchOpen(true)}
@@ -292,8 +405,8 @@ export const App: React.FC = () => {
         isOpen={isDrugSearchOpen}
         onClose={() => setIsDrugSearchOpen(false)}
         topics={topics}
-        onSelectTopic={setSelectedTopicDetail}
-        onNavigateToTab={(tab: any) => setActiveTab(tab)}
+        onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
+        onNavigateToTab={(tab: any) => navigateTo(tab)}
         onOpenAdmet={handleOpenAdmet}
       />
 

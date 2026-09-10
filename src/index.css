@@ -528,7 +528,7 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(140deg, #0b1f45 0%, #0f2d5c 35%, #0d766e 80%, #0b5e58 100%);
+  background: #050f1e;
   position: relative;
   overflow: hidden;
   padding: 2rem 1rem;
@@ -550,25 +550,26 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   height: 100%;
   object-fit: cover;
   object-position: center;
-  opacity: 0.35;
+  opacity: 0.55;
+  filter: saturate(1.18) contrast(1.05);
   transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .login-bg-video.is-loaded {
-  opacity: 0.45;
+  opacity: 0.68;
 }
 
+/* Overlay cinemático de viñeta radial: mantiene las moléculas 3D nítidas y luminosas
+   a los lados mientras genera un fondo de alto contraste detrás de la tarjeta central */
 .login-video-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    140deg,
-    rgba(11, 31, 69, 0.82) 0%,
-    rgba(15, 45, 92, 0.74) 35%,
-    rgba(13, 118, 110, 0.78) 80%,
-    rgba(11, 94, 88, 0.86) 100%
+  background: radial-gradient(
+    ellipse 85% 85% at 50% 50%,
+    rgba(5, 15, 30, 0.42) 0%,
+    rgba(5, 15, 30, 0.72) 60%,
+    rgba(3, 9, 18, 0.92) 100%
   );
-  backdrop-filter: blur(1.5px);
 }
 
 @media (max-width: 768px) {
@@ -579,7 +580,7 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
     background-image: url('/video-header-poster.webp');
     background-size: cover;
     background-position: center;
-    opacity: 0.35;
+    opacity: 0.45;
   }
 }
 
@@ -593,12 +594,12 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(45,212,191,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(45,212,191,0.06) 1px, transparent 1px);
-  background-size: 32px 32px;
+    radial-gradient(rgba(45, 212, 191, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
   pointer-events: none;
+  opacity: 0.4;
 }
-.login-deco { position: absolute; inset: 0; pointer-events: none; }
+.login-deco { display: none; }
 
 .login-card {
   position: relative;
@@ -1414,13 +1415,30 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
 
 /* ========== Hero Section Redesign (Top Tier Academic Standard) ========== */
 .qfdos-hero-section {
+  max-width: 1280px;
+  margin: 1.5rem auto 0;
+  border-radius: 20px;
   background: linear-gradient(135deg, #07152b 0%, #0d2852 40%, #0b5c54 85%, #084842 100%);
   color: #ffffff;
-  padding: 3.5rem 1.5rem 4rem;
-  border-bottom: 1px solid rgba(45, 212, 191, 0.25);
+  padding: 3rem 2.25rem 3.5rem;
+  border: 1px solid rgba(45, 212, 191, 0.25);
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 -20px 40px -15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 40px -12px rgba(5, 15, 35, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 1320px) {
+  .qfdos-hero-section {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+}
+@media (max-width: 640px) {
+  .qfdos-hero-section {
+    margin: 1rem 0.75rem 0;
+    padding: 2rem 1.25rem 2.25rem;
+    border-radius: 14px;
+  }
 }
 
 /* Ambient Molecular Video Loop */
@@ -1458,6 +1476,80 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
     rgba(8, 72, 66, 0.86) 100%
   );
   backdrop-filter: blur(1px);
+}
+
+/* Generic module banner ambient video loops */
+.module-video-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.module-bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.36;
+  filter: saturate(1.2);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.module-bg-video.is-loaded {
+  opacity: 0.46;
+}
+
+.module-video-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.module-video-overlay.overlay-curso {
+  background: linear-gradient(
+    135deg,
+    rgba(14, 45, 96, 0.86) 0%,
+    rgba(13, 105, 115, 0.78) 100%
+  );
+}
+
+.module-video-overlay.overlay-practicas {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 50, 115, 0.85) 0%,
+    rgba(13, 130, 105, 0.80) 100%
+  );
+}
+
+.module-video-overlay.overlay-simulador {
+  background: linear-gradient(
+    135deg,
+    rgba(32, 22, 75, 0.88) 0%,
+    rgba(14, 85, 118, 0.80) 100%
+  );
+}
+
+.module-video-overlay.overlay-admet {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 42, 80, 0.87) 0%,
+    rgba(13, 115, 110, 0.82) 100%
+  );
+}
+
+@media (max-width: 768px) {
+  .module-bg-video {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .module-bg-video {
+    display: none;
+  }
 }
 
 /* Optimización para móviles (<= 768px):

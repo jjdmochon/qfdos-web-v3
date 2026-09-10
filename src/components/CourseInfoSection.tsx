@@ -65,10 +65,19 @@ export const CourseInfoSection: React.FC = () => {
     return formattedD1;
   };
 
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const baseUrl = import.meta.env.BASE_URL || '/';
+
+  React.useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.55;
+    }
+  }, []);
+
   return (
     <div className="container" style={{ padding: '2rem 1rem' }}>
       
-      {/* Banner Principal de la Asignatura */}
+      {/* Banner Principal de la Asignatura con Video Loop Sapphire */}
       <div className="qfdos-card" style={{
         background: 'linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%)',
         color: '#ffffff',
@@ -76,9 +85,32 @@ export const CourseInfoSection: React.FC = () => {
         borderRadius: 'var(--radius-lg)',
         boxShadow: 'var(--shadow-lg)',
         marginBottom: '2rem',
-        border: 'none'
+        border: 'none',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
+        {/* Ambient Molecular Video Loop (Sapphire / Navy) */}
+        <div className="module-video-wrap" aria-hidden="true">
+          <video
+            ref={videoRef}
+            className="module-bg-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={`${baseUrl}video-curso-poster.webp`}
+            preload="metadata"
+            onPlay={e => { e.currentTarget.playbackRate = 0.55; }}
+            onLoadedMetadata={e => { e.currentTarget.playbackRate = 0.55; }}
+          >
+            <source src={`${baseUrl}video-curso.webm`} type="video/webm" />
+            <source src={`${baseUrl}video-curso.mp4`} type="video/mp4" />
+          </video>
+          <div className="module-video-overlay overlay-curso" />
+        </div>
+
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
               <span className="qfdos-badge" style={{ background: 'rgba(255,255,255,0.2)', color: '#ffffff', fontSize: '0.74rem' }}>
@@ -170,6 +202,7 @@ export const CourseInfoSection: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Selector de Pestañas Interiores */}
       <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border-color)', marginBottom: '1.75rem', paddingBottom: '0.2rem', overflowX: 'auto' }}>
