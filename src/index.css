@@ -522,13 +522,13 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
 .anim-spin-slow { animation: spin 1.2s linear infinite; }
 .anim-fade-in { animation: fadeIn 300ms ease-out; }
 
-/* ========== Login Page (Aesthetic & Peaceful Atmospheric Redesign) ========== */
+/* ========== Login Page (Serene, Luminous & Aesthetic Atmosphere) ========== */
 .login-root {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #060e1d;
+  background: linear-gradient(135deg, #0e2a47 0%, #0d344e 45%, #0a4049 100%);
   position: relative;
   overflow: hidden;
   padding: 2rem 1rem;
@@ -550,33 +550,32 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   height: 100%;
   object-fit: cover;
   object-position: center;
-  /* El ligero zoom aleja cualquier artefacto de borde y centra la visión */
-  transform: scale(1.06);
-  /* Atenuación armónica de saturación: evita el choque agresivo de colores
-     (cian vs rojo vs azul) y unifica las moléculas en una atmósfera oceánica serena */
-  filter: saturate(0.50) brightness(0.70) contrast(0.92);
-  opacity: 0.45;
-  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1.05);
+  /* Definición nítida y luminosa de las moléculas con una colorimetría serena:
+     Saturación suavemente equilibrada para evitar estridencias, pero luminosa y clara */
+  filter: saturate(0.80) brightness(0.92) contrast(1.0);
+  opacity: 0.72;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .login-bg-video.is-loaded {
-  opacity: 0.58;
+  opacity: 0.82;
 }
 
-/* Overlay cinemático de serenidad:
-   - Difusión de desenfoque suave (6px) para convertir las moléculas en un bokeh etéreo que respira
-   - Gradiente radial armónico centrado que elimina divisiones bruscas de color */
+/* Overlay luminoso de serenidad:
+   - Desenfoque sutil (1px) para que las moléculas no queden borrosas sino definidas y nítidas
+   - Tonalidad más clara y serena, con alta luminosidad y elegancia */
 .login-video-overlay {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 80% 80% at 50% 50%,
-    rgba(10, 25, 48, 0.50) 0%,
-    rgba(6, 17, 34, 0.78) 55%,
-    rgba(4, 11, 22, 0.96) 100%
+    ellipse 85% 85% at 50% 50%,
+    rgba(13, 38, 66, 0.32) 0%,
+    rgba(10, 32, 56, 0.50) 55%,
+    rgba(8, 24, 44, 0.72) 100%
   );
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 /* Halo luminoso ambiental que conecta suavemente la tarjeta central con el fondo */
@@ -585,12 +584,12 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 580px;
-  height: 580px;
+  width: 620px;
+  height: 620px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(20, 110, 130, 0.16) 0%, rgba(14, 40, 80, 0.08) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.12) 0%, rgba(14, 116, 144, 0.06) 50%, transparent 70%);
   pointer-events: none;
-  filter: blur(50px);
+  filter: blur(45px);
   z-index: 1;
 }
 
