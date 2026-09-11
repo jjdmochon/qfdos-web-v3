@@ -124,6 +124,86 @@ export interface GenerateExamParams {
   difficulty?: 'Fácil' | 'Medio' | 'Avanzado';
   customApiKey?: string;
   focusArea?: ExamFocusArea;
+  topic?: QfdosTopic;
+  uploadedMaterialsContext?: string;
+}
+
+/**
+ * Compila el Dossier Vivo de Conocimiento Docente de la unidad.
+ * Permite al generador de preguntas alimentarse y auto-mejorarse continuamente
+ * conforme el profesor sube diapositivas, apuntes, fármacos o enlaces a la plataforma.
+ */
+export function buildTopicKnowledgeContext(topic?: QfdosTopic, customContext?: string): string {
+  if (!topic && !customContext) return '';
+
+  const sections: string[] = [];
+
+  if (topic) {
+    sections.push(`=== DOSSIER VIVO DE MATERIALES DOCENTES (UNIDAD: ${topic.number} - ${topic.title}) ===`);
+    if (topic.subtitle) sections.push(`Orientación y Subtítulo: ${topic.subtitle}`);
+    if (topic.description) sections.push(`Objetivos Docentes: ${topic.description}`);
+
+    if (topic.keyConcepts && topic.keyConcepts.length > 0) {
+      sections.push(`Conceptos Clave Subidos: ${topic.keyConcepts.join(' · ')}`);
+    }
+
+    if (topic.targetName || topic.pdbTargetId) {
+      sections.push(`Diana Farmacológica Principal: ${topic.targetName || 'N/A'} (Código PDB: ${topic.pdbTargetId || 'N/A'})`);
+    }
+
+    if (topic.drugs && topic.drugs.length > 0) {
+      sections.push(`Catálogo de Fármacos Registrados en la Unidad (${topic.drugs.length} moléculas):`);
+      topic.drugs.forEach(d => {
+        const props = [
+          d.role ? `Función: ${d.role}` : '',
+          d.smiles ? `SMILES: ${d.smiles}` : '',
+          d.formula ? `Fórmula: ${d.formula}` : '',
+          d.mw ? `PM: ${d.mw} Da` : '',
+          d.logP !== undefined ? `LogP: ${d.logP}` : '',
+          d.tpsa !== undefined ? `TPSA: ${d.tpsa} Å²` : ''
+        ].filter(Boolean).join(', ');
+        sections.push(`  - ${d.name}: ${props}`);
+      });
+    }
+
+    if (topic.attachments && topic.attachments.length > 0) {
+      sections.push(`Materiales y Documentos Adjuntos Subidos (${topic.attachments.length} archivos):`);
+      topic.attachments.forEach(att => {
+        sections.push(`  - [${att.type || 'documento'}] ${att.title}`);
+      });
+    }
+
+    if (topic.slidesPdfName || topic.notesPdfName) {
+      sections.push(`Recursos Oficiales de Cátedra:`);
+      if (topic.slidesPdfName) sections.push(`  - Diapositivas: ${topic.slidesPdfName} (${topic.slideCount || 0} diapositivas)`);
+      if (topic.notesPdfName) sections.push(`  - Apuntes de Cátedra: ${topic.notesPdfName}`);
+    }
+
+    if (topic.testQuestions && topic.testQuestions.length > 0) {
+      sections.push(`Banco de Preguntas Previas ya Validadas en este Tema (${topic.testQuestions.length} preguntas):`);
+      topic.testQuestions.slice(0, 5).forEach((tq, i) => {
+        const sol = typeof tq.options[tq.correctIndex] === 'string' ? tq.options[tq.correctIndex] : (tq.options[tq.correctIndex] as any)?.text;
+        sections.push(`  * [Referencia prev. #${i + 1}] ${tq.question.substring(0, 110)}... (Respuesta: ${sol})`);
+      });
+      sections.push(`  -> DIRECTIVA: No repitas estas preguntas. Utilízalas como calibrador de estilo y evalúa aspectos complementarios de los nuevos materiales subidos.`);
+    }
+
+    if (topic.lectureAudios && topic.lectureAudios.length > 0) {
+      sections.push(`Notas de Síntesis y Transcripciones:`);
+      topic.lectureAudios.forEach(la => {
+        if (la.synthesizedNotesMarkdown) {
+          sections.push(`  - Síntesis docente: ${la.synthesizedNotesMarkdown.substring(0, 250)}...`);
+        }
+      });
+    }
+  }
+
+  if (customContext && customContext.trim()) {
+    sections.push(`Documentos y archivos docentes subidos recientemente a la plataforma:`);
+    sections.push(customContext.trim());
+  }
+
+  return sections.join('\n');
 }
 
 export const generateExamQuestionsWithGemini = async ({
@@ -132,15 +212,27 @@ export const generateExamQuestionsWithGemini = async ({
   questionCount = 3,
   difficulty = 'Medio',
   customApiKey,
-  focusArea = 'sintesis_reactividad'
+  focusArea = 'sintesis_reactividad',
+  topic,
+  uploadedMaterialsContext
 }: GenerateExamParams): Promise<TestQuestion[]> => {
   const activeKey = customApiKey || getStoredGeminiApiKey();
-  if (!activeKey) return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea);
+  if (!activeKey) return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea, topic);
 
   const isSynthesisFocus = focusArea === 'sintesis_reactividad';
+  const topicKnowledge = buildTopicKnowledgeContext(topic, uploadedMaterialsContext);
 
   const systemInstruction = `Eres el evaluador principal de Química Farmacéutica II (UGR).
 Genera exactamente ${questionCount} preguntas tipo test de nivel ${difficulty} para el módulo "${topicTitle}".
+
+${topicKnowledge ? `MATERIALES Y RECURSOS DOCENTES ACTUALIZADOS EN LA PLATAFORMA (APRENDIZAJE CONTINUO DEL CURSO):
+${topicKnowledge}
+
+INSTRUCCIONES DE ALINEACIÓN CON LOS MATERIALES SUBIDOS POR EL PROFESOR:
+- Basa prioritariamente tus preguntas en los fármacos, conceptos, apuntes, diapositivas y documentos que el profesorado ha incorporado en el dossier anterior.
+- Si hay fármacos registrados con estructuras SMILES en el tema, selecciona preferentemente esas moléculas para preguntas de síntesis, reactividad, diana o SAR.
+- Si existen preguntas previas validadas en el tema, no las repitas literalmente: úsalas para calibrar la profundidad y evalúa aspectos complementarios o mecanismos avanzados.
+` : ''}
 ${isSynthesisFocus ? `
 ENFOQUE TEMÁTICO OBLIGATORIO: REACTIVIDAD Y SÍNTESIS QUÍMICA FARMACÉUTICA CON ESTRUCTURAS MOLECULARES:
 1. Formula preguntas rigurosas sobre rutas de síntesis química de fármacos, quimioselectividad, reactivos necesarios para transformaciones, apertura nucleófila de anillos (epóxidos, heterociclos), ciclocondensaciones (Hantzsch, ciclaciones a diazepinas o β-lactamas), acoplamientos amídicos, grupos protectores ortogonales (Boc, Fmoc, Cbz) y oxidaciones/reducciones quimioselectivas.
@@ -205,6 +297,8 @@ export interface SmartExamParams {
   difficulty?: 'Fácil' | 'Medio' | 'Avanzado';
   mode?: 'ai' | 'fir' | 'hybrid';
   focusArea?: ExamFocusArea;
+  topic?: QfdosTopic;
+  uploadedMaterialsContext?: string;
   customApiKey?: string;
 }
 
@@ -215,12 +309,14 @@ export const generateSmartExamQuestions = async ({
   difficulty = 'Medio',
   mode = 'hybrid',
   focusArea = 'sintesis_reactividad',
+  topic,
+  uploadedMaterialsContext,
   customApiKey
 }: SmartExamParams): Promise<TestQuestion[]> => {
   if (mode === 'fir') {
     const firQs = generateFirExamSlice(questionCount, topicId);
     if (firQs.length >= questionCount) return firQs;
-    const fallback = generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea);
+    const fallback = generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea, topic);
     return [...firQs, ...fallback].slice(0, questionCount);
   }
   return generateExamQuestionsWithGemini({
@@ -229,6 +325,8 @@ export const generateSmartExamQuestions = async ({
     questionCount,
     difficulty,
     focusArea,
+    topic,
+    uploadedMaterialsContext,
     customApiKey
   });
 };
@@ -495,7 +593,8 @@ function generateFallbackExamQuestions(
   topicTitle: string, 
   count: number, 
   difficulty: string,
-  focusArea: ExamFocusArea = 'sintesis_reactividad'
+  focusArea: ExamFocusArea = 'sintesis_reactividad',
+  topic?: QfdosTopic
 ): TestQuestion[] {
   // 1. Preguntas especializadas de Reactividad y Síntesis Química con estructuras
   const synthesisForTopic = SYNTHESIS_REACTIVITY_QUESTIONS.filter(q => q.topicId === topicId);
@@ -505,8 +604,8 @@ function generateFallbackExamQuestions(
   // 2. Preguntas oficiales del FIR específicas para este tema de QFDOS
   const firForTopic = getFirQuestionsByTopic(topicId).map(convertFirToTestQuestion);
 
-  // 3. Preguntas base configuradas en el tema
-  const matchedTopic = INITIAL_TOPICS.find((t: QfdosTopic) => t.id === topicId);
+  // 3. Tema activo: usa el objeto vivo 'topic' (con materiales subidos por el profesor) si existe, o fallback a INITIAL_TOPICS
+  const matchedTopic = topic || INITIAL_TOPICS.find((t: QfdosTopic) => t.id === topicId);
   const topicQuestions: TestQuestion[] = (matchedTopic?.testQuestions || []).map((q: TestQuestion, idx: number) => ({
     ...q,
     id: `topic-fb-${Date.now()}-${idx}`,
@@ -514,23 +613,46 @@ function generateFallbackExamQuestions(
     difficulty: difficulty as any
   }));
 
-  // 4. Preguntas estructuradas con fármacos y SMILES reales del tema (RDKit)
-  const drugQuestions: TestQuestion[] = (matchedTopic?.drugs || []).slice(0, 3).map((d, dIdx) => ({
-    id: `drug-sar-${Date.now()}-${dIdx}`,
-    topicId,
-    question: `Considerando la estructura química y el farmacóforo de "${d.name}", ¿cuál es su diana o mecanismo molecular clave en ${topicTitle}?`,
-    questionSmiles: d.smiles,
-    options: [
-      d.role,
-      'Inhibidor irreversible inespecífico de transportadores ABC.',
-      'Agonista alostérico puro sin modulación termodinámica.',
-      'Profármaco inactivo sin permeabilidad en membrana biológica.'
-    ],
-    correctIndex: 0,
-    explanation: `El compuesto ${d.name} actúa como ${d.role}. Presenta un peso molecular de ${d.mw} Da, LogP de ${d.logP} y TPSA de ${d.tpsa} Å², optimizado para su diana biológica.`,
-    difficulty: difficulty as any,
-    block: 'SAR Molecular & Dianas'
-  }));
+  // 4. Preguntas dinámicas basadas en fármacos y materiales subidos a la web (RDKit)
+  // Conforme el profesor sube nuevos fármacos con estructuras, se generan automáticamente preguntas de evaluación
+  const drugQuestions: TestQuestion[] = (matchedTopic?.drugs || []).map((d, dIdx) => {
+    // Si el enfoque es síntesis/reactividad, generamos pregunta de reactividad/transformación del fármaco subido
+    if (focusArea === 'sintesis_reactividad') {
+      return {
+        id: `uploaded-drug-react-${Date.now()}-${dIdx}`,
+        topicId,
+        question: `En la estrategia de optimización química y síntesis de "${d.name}", ¿cuál es la modificación estructural o reactivo clave asociado a su perfil farmacológico (${d.role})?`,
+        questionSmiles: d.smiles,
+        options: [
+          { text: `Optimización de afinidad y farmacocinética para actuar como ${d.role}`, smiles: d.smiles },
+          { text: 'Sustitución inespecífica por grupo perfluoroalquilo sin retención de actividad', smiles: 'C(F)(F)F' },
+          { text: 'Apertura desestabilizadora del núcleo aromático central', smiles: 'C=CC=C' },
+          { text: 'Alquilación destructiva que suprime el farmacóforo', smiles: 'CC' }
+        ],
+        correctIndex: 0,
+        explanation: `El fármaco ${d.name} (incorporado en los materiales docentes de la unidad) actúa como ${d.role}. Posee un peso molecular de ${d.mw || 'N/A'} Da, LogP de ${d.logP ?? 'N/A'} y TPSA de ${d.tpsa ?? 'N/A'} Å², siendo una diana clave en ${topicTitle}.`,
+        difficulty: difficulty as any,
+        block: 'Reactividad & Síntesis Química'
+      };
+    }
+
+    return {
+      id: `uploaded-drug-sar-${Date.now()}-${dIdx}`,
+      topicId,
+      question: `Considerando la estructura molecular y el farmacóforo de "${d.name}" (material docente de ${topicTitle}), ¿cuál es su diana o mecanismo molecular clave?`,
+      questionSmiles: d.smiles,
+      options: [
+        d.role,
+        'Inhibidor irreversible inespecífico de transportadores ABC.',
+        'Agonista alostérico puro sin modulación termodinámica.',
+        'Profármaco inactivo sin permeabilidad en membrana biológica.'
+      ],
+      correctIndex: 0,
+      explanation: `El compuesto ${d.name} actúa como ${d.role}. Presenta un peso molecular de ${d.mw || 'N/A'} Da, LogP de ${d.logP ?? 'N/A'} y TPSA de ${d.tpsa ?? 'N/A'} Å², optimizado para su diana biológica.`,
+      difficulty: difficulty as any,
+      block: 'SAR Molecular & Dianas'
+    };
+  });
 
   const generalPool: TestQuestion[] = [
     {

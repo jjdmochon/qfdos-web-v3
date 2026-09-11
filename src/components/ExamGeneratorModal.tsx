@@ -6,6 +6,7 @@ import {
   ExamFocusArea 
 } from '../services/geminiService';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { listFiles, StoredFileMeta } from '../services/fileStorage';
 import { getFirQuestionsByTopic, getAllFirQuestions, convertFirToTestQuestion, FirQuestion } from '../data/firQuestionsData';
 import { 
   X, 
@@ -46,6 +47,17 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState<TestQuestion[]>([]);
   const [addedSuccess, setAddedSuccess] = useState(false);
+  const [topicFiles, setTopicFiles] = useState<StoredFileMeta[]>([]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    listFiles(selectedTopicId)
+      .then(files => {
+        if (isMounted) setTopicFiles(files);
+      })
+      .catch(err => console.warn('Error fetching topic files', err));
+    return () => { isMounted = false; };
+  }, [selectedTopicId]);
 
   // Manual Question Builder State
   const [manualQuestion, setManualQuestion] = useState('');
@@ -67,12 +79,18 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
     setAddedSuccess(false);
 
     try {
+      const filesDesc = topicFiles.length > 0
+        ? `Materiales docentes y archivos subidos por el profesor: ${topicFiles.map(f => `${f.name} [${f.kind}]`).join(', ')}`
+        : undefined;
+
       const results = await generateExamQuestionsWithGemini({
         topicId: selectedTopicId,
         topicTitle: `${selectedTopic.number}: ${selectedTopic.title}`,
         questionCount,
         difficulty,
-        focusArea
+        focusArea,
+        topic: selectedTopic,
+        uploadedMaterialsContext: filesDesc
       });
       setGeneratedQuestions(results);
     } catch (e) {
@@ -186,13 +204,19 @@ ${q.options.map((opt, oIdx) => {
               onClick={() => setActiveTab('ai')}
               className={`tab-btn ${activeTab === 'ai' ? 'active' : ''}`}
             >
-              <Sparkles size={14} /> Generación Asistida por IA (Gemini)
+              <Sparkles size={14} /> Generación con IA & Aprendizaje Continuo
+            </button>
+            <button
+              onClick={() => setActiveTab('fir')}
+              className={`tab-btn ${activeTab === 'fir' ? 'active' : ''}`}
+            >
+              <Award size={14} /> Banco Oficial FIR (136 Preguntas)
             </button>
             <button
               onClick={() => setActiveTab('manual')}
               className={`tab-btn ${activeTab === 'manual' ? 'active' : ''}`}
             >
-              <Edit3 size={14} /> Redacción Manual con Estructuras Químicas 2D
+              <Edit3 size={14} /> Redacción Manual con Estructuras 2D
             </button>
           </div>
         </div>
@@ -203,6 +227,111 @@ ${q.options.map((opt, oIdx) => {
           {/* TAB 1: AI Generator */}
           {activeTab === 'ai' && (
             <>
+              {/* Live Knowledge Ingestion Banner */}
+              <div style={{
+                padding: '12px 16px',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(13, 148, 136, 0.08) 100%)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={16} color="#10b981" />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-title)' }}>
+                      Algoritmo de Aprendizaje Continuo Vinculado al Tema
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.68rem', 
+                      fontWeight: 700, 
+                      padding: '2px 8px', 
+                      borderRadius: '999px', 
+                      background: 'rgba(16, 185, 129, 0.2)', 
+                      color: '#047857',
+                      border: '1px solid rgba(16, 185, 129, 0.3)'
+                    }}>
+                      ACTIVO & SINCRONIZADO
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Dossier en vivo: cada material subido afina el examen
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', margin: 0, lineHeight: 1.4 }}>
+                  El generador ingiere automáticamente todos los fármacos, rutas y documentos que subas a este tema para formular preguntas de examen personalizadas:
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '2px' }}>
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '5px', 
+                    fontSize: '0.74rem', 
+                    padding: '4px 9px', 
+                    borderRadius: '6px', 
+                    background: 'var(--surface)', 
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-title)',
+                    fontWeight: 600
+                  }}>
+                    <Atom size={13} color="var(--teal)" />
+                    {selectedTopic.drugs?.length || 0} fármacos con estructura SMILES
+                  </span>
+
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '5px', 
+                    fontSize: '0.74rem', 
+                    padding: '4px 9px', 
+                    borderRadius: '6px', 
+                    background: 'var(--surface)', 
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-title)',
+                    fontWeight: 600
+                  }}>
+                    <Layers size={13} color="#8b5cf6" />
+                    {selectedTopic.keyConcepts?.length || 0} conceptos clave
+                  </span>
+
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '5px', 
+                    fontSize: '0.74rem', 
+                    padding: '4px 9px', 
+                    borderRadius: '6px', 
+                    background: 'var(--surface)', 
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-title)',
+                    fontWeight: 600
+                  }}>
+                    <FileText size={13} color="#f59e0b" />
+                    {(selectedTopic.attachments?.length || 0) + topicFiles.length} documentos & diapositivas
+                  </span>
+
+                  {(selectedTopic.testQuestions?.length || 0) > 0 && (
+                    <span style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '5px', 
+                      fontSize: '0.74rem', 
+                      padding: '4px 9px', 
+                      borderRadius: '6px', 
+                      background: 'var(--surface)', 
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-title)',
+                      fontWeight: 600
+                    }}>
+                      <Award size={13} color="#10b981" />
+                      {selectedTopic.testQuestions?.length} preguntas previas en repositorio
+                    </span>
+                  )}
+                </div>
+              </div>
               {/* Controls Bar */}
               <div className="qfdos-card" style={{ padding: '1.25rem', gap: '1rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
