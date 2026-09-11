@@ -291,11 +291,11 @@ export const CourseInfoSection: React.FC = () => {
                 <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>Tech Partner</span>
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '4px' }}>
-                Plataforma interactiva diseñada y desarrollada por <strong>NEXUS.LAB</strong> (Dr. Antonio Marín & Dr. Juan José Díaz-Mochón). Sinergia académico-industrial para la docencia en farmacia y quimioinformática.
+                Plataforma interactiva diseñada y desarrollada por <strong>NEXUS.LAB</strong>. Sinergia académico-industrial para la docencia en farmacia, algoritmia biofísica y quimioinformática.
               </div>
               <div style={{ marginTop: '10px' }}>
                 <a
-                  href="https://nexus-lab-antonio.netlify.app/"
+                  href="https://nexus-lab-team.netlify.app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -315,7 +315,7 @@ export const CourseInfoSection: React.FC = () => {
             </div>
 
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '0.25rem', background: 'var(--neutral-bg)', padding: '10px', borderRadius: '8px' }}>
-              🌐 <strong>Web Oficial:</strong> <a href="https://nexus-lab-antonio.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', fontWeight: 700 }}>nexus-lab-antonio.netlify.app</a>
+              🌐 <strong>Web Oficial:</strong> <a href="https://nexus-lab-team.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', fontWeight: 700 }}>nexus-lab-team.netlify.app</a>
             </div>
           </div>
 

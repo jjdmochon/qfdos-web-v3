@@ -86,7 +86,7 @@ export const LoginPage: React.FC = () => {
           <p className="login-subtitle">
             Plataforma desarrollada por{' '}
             <a
-              href="https://nexus-lab-antonio.netlify.app/"
+              href="https://nexus-lab-team.netlify.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="nexus-login-link"
@@ -183,7 +183,7 @@ export const LoginPage: React.FC = () => {
         <div className="login-footer-note" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           <div>Universidad de Granada · Departamento de Química Farmacéutica y Orgánica</div>
           <a
-            href="https://nexus-lab-antonio.netlify.app/"
+            href="https://nexus-lab-team.netlify.app/"
             target="_blank"
             rel="noopener noreferrer"
             className="nexus-login-badge"

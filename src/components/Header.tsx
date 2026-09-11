@@ -220,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
                   <a
-                    href="https://nexus-lab-antonio.netlify.app/"
+                    href="https://nexus-lab-team.netlify.app/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="header-dropdown-nexus"

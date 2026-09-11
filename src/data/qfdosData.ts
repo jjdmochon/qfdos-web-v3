@@ -176,9 +176,9 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
     id: 'link-nexus-lab',
     title: 'NEXUS.LAB: Ingeniería Digital & Ciencia Aplicada',
-    url: 'https://nexus-lab-antonio.netlify.app/',
+    url: 'https://nexus-lab-team.netlify.app/',
     summary:
-      'Equipo y laboratorio de ingeniería responsable del diseño, algoritmia biofísica e infraestructura digital de la plataforma QFDOS v3. Sinergia académico-industrial fundada por el Dr. Antonio Marín y el Dr. Juan José Díaz-Mochón para la digitalización con rigor científico.',
+      'Equipo y laboratorio de ingeniería responsable del diseño, algoritmia biofísica e infraestructura digital de la plataforma QFDOS v3. Sinergia académico-industrial para la digitalización con rigor científico y docencia farmacéutica.',
     category: 'Industria & carrera profesional',
     source: 'NEXUS.LAB',
     duration: '5 min',
@@ -300,7 +300,7 @@ export interface StudentQuestion {
  * contenido oficial. Sin esto, un navegador que ya visitó la plataforma se
  * queda con la versión antigua para siempre.
  *
- * v3.2.1 — Atribución oficial de desarrollo por NEXUS.LAB (https://nexus-lab-antonio.netlify.app/).
+ * v3.2.2 — Atribución y actualización de enlace oficial de NEXUS.LAB (https://nexus-lab-team.netlify.app/).
  * v3.2.0 — Nueva seccion de enlaces de interes (INITIAL_RESOURCE_LINKS).
  * v3.1.0 — Estructuras SMILES verificadas contra PubChem y corregidas:
  *          haloperidol y zolpidem no eran ni siquiera moléculas válidas;
@@ -322,8 +322,7 @@ export const QFDOS_INFO = {
   developer: {
     name: "NEXUS.LAB",
     tagline: "Ingeniería Digital & Ciencia Aplicada",
-    url: "https://nexus-lab-antonio.netlify.app/",
-    founders: ["Dr. Antonio Marín", "Dr. Juan José Díaz-Mochón"]
+    url: "https://nexus-lab-team.netlify.app/"
   },
   designSystem: "QFDOS Structural Affinity Identity v2.0",
   driveFolderUrl: "https://drive.google.com/drive/folders/1_QFDOS_2627_Classroom",

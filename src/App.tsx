@@ -466,7 +466,7 @@ export const App: React.FC = () => {
                 </div>
                 {/* NEXUS.LAB Developer Badge Card */}
                 <a
-                  href="https://nexus-lab-antonio.netlify.app/"
+                  href="https://nexus-lab-team.netlify.app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ftr-nexus-card"
@@ -540,7 +540,7 @@ export const App: React.FC = () => {
             <div>
               Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E) · Desarrollada por{' '}
               <a
-                href="https://nexus-lab-antonio.netlify.app/"
+                href="https://nexus-lab-team.netlify.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="nexus-footer-inline-link"
@@ -552,7 +552,7 @@ export const App: React.FC = () => {
               <span>Acceso: @go.ugr.es / @gmail.com</span>
               <span>•</span>
               <a
-                href="https://nexus-lab-antonio.netlify.app/"
+                href="https://nexus-lab-team.netlify.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="nexus-footer-inline-link"
