@@ -115,12 +115,15 @@ export function cleanRawLatexArtifacts(text: string): string {
     .replace(/\$\$/g, '').replace(/\$/g, '');
 }
 
-interface GenerateExamParams {
+export type ExamFocusArea = 'sintesis_reactividad' | 'sar_farmacoforos' | 'mecanismos_dianas' | 'general';
+
+export interface GenerateExamParams {
   topicId: string;
   topicTitle: string;
   questionCount?: number;
   difficulty?: 'Fácil' | 'Medio' | 'Avanzado';
   customApiKey?: string;
+  focusArea?: ExamFocusArea;
 }
 
 export const generateExamQuestionsWithGemini = async ({
@@ -128,23 +131,52 @@ export const generateExamQuestionsWithGemini = async ({
   topicTitle,
   questionCount = 3,
   difficulty = 'Medio',
-  customApiKey
+  customApiKey,
+  focusArea = 'sintesis_reactividad'
 }: GenerateExamParams): Promise<TestQuestion[]> => {
   const activeKey = customApiKey || getStoredGeminiApiKey();
-  if (!activeKey) return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty);
+  if (!activeKey) return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea);
+
+  const isSynthesisFocus = focusArea === 'sintesis_reactividad';
 
   const systemInstruction = `Eres el evaluador principal de Química Farmacéutica II (UGR).
 Genera exactamente ${questionCount} preguntas tipo test de nivel ${difficulty} para el módulo "${topicTitle}".
-
+${isSynthesisFocus ? `
+ENFOQUE TEMÁTICO OBLIGATORIO: REACTIVIDAD Y SÍNTESIS QUÍMICA FARMACÉUTICA CON ESTRUCTURAS MOLECULARES:
+1. Formula preguntas rigurosas sobre rutas de síntesis química de fármacos, quimioselectividad, reactivos necesarios para transformaciones, apertura nucleófila de anillos (epóxidos, heterociclos), ciclocondensaciones (Hantzsch, ciclaciones a diazepinas o β-lactamas), acoplamientos amídicos, grupos protectores ortogonales (Boc, Fmoc, Cbz) y oxidaciones/reducciones quimioselectivas.
+2. OBLIGATORIO: Incluye la estructura SMILES canónica válida del reactivo de partida, intermedio o fármaco en "questionSmiles" para su renderizado con RDKit MinimalLib.
+3. OBLIGATORIO: En las 4 opciones de respuesta ("options"), cuando se comparen reactivos, intermedios o productos de reacción, incluye objetos con { "text": "Nombre del reactivo/producto y justificación", "smiles": "SMILES_CANONICO_VALIDO" } para que el alumno identifique visualmente la estructura molecular 2D.
+4. Explica detalladamente el mecanismo químico de la reacción en "explanation" (control cinético vs termodinámico, tipo de ataque nucleófilo/electrófilo, grupos salientes y quimioselectividad).
+` : `
 CRITERIOS DOCENTES (INSPIRADOS EN EL RIGOR OFICIAL DEL EXAMEN FIR - MINISTERIO DE SANIDAD):
 1. Formula preguntas rigurosas sobre relaciones estructura-actividad (SAR), farmacóforos, bioisósteros, mecanismos de bioactivación (profármacos, latenciación) y dianas moleculares.
 2. Cuando la pregunta mencione un fármaco o molécula clave, incluye su estructura en formato SMILES válido en el campo "questionSmiles" (o en las opciones si compara estructuras) para su renderizado con RDKit MinimalLib.
-3. Responde ÚNICAMENTE con un bloque JSON válido con un array de objetos TestQuestion.
-4. Cada objeto: { "question": "...", "questionSmiles": "SMILES_OPCIONAL", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "...", "difficulty": "${difficulty}", "block": "SAR & Dianas" }
-5. CERO SINTAXIS LATEX: Usa caracteres Unicode limpios (ΔG°, IC50, Kd, Ki, Km, pKa, Å, µM, β-lactámico, Zn²⁺). No uses $ ni fórmulas crudas de LaTeX.`;
+3. Si la pregunta compara reactivos o análogos estructurales, incluye en las opciones objetos con { "text": "...", "smiles": "SMILES_VALIDO" }.
+`}
+4. Responde ÚNICAMENTE con un bloque JSON válido con un array de objetos TestQuestion.
+5. Formato exacto de cada objeto:
+{
+  "question": "Enunciado claro y preciso...",
+  "questionSmiles": "SMILES_CANONICO_VALIDO",
+  "options": [
+    { "text": "Opción A...", "smiles": "SMILES_OPCIONAL" },
+    { "text": "Opción B...", "smiles": "SMILES_OPCIONAL" },
+    { "text": "Opción C...", "smiles": "SMILES_OPCIONAL" },
+    { "text": "Opción D...", "smiles": "SMILES_OPCIONAL" }
+  ],
+  "correctIndex": 0,
+  "explanation": "Mecanismo y justificación química razonada...",
+  "difficulty": "${difficulty}",
+  "block": "${isSynthesisFocus ? 'Reactividad & Síntesis Química' : 'SAR & Dianas'}"
+}
+6. CERO SINTAXIS LATEX: Usa caracteres Unicode limpios (ΔG°, IC50, Kd, Ki, Km, pKa, Å, µM, β-lactámico, Zn²⁺). No uses $ ni fórmulas crudas de LaTeX.`;
 
   try {
-    const responseText = await callGeminiWithFallback(activeKey, systemInstruction, `Genera ${questionCount} preguntas para ${topicTitle}. Solo el JSON.`);
+    const userPrompt = isSynthesisFocus
+      ? `Genera ${questionCount} preguntas de reactividad y síntesis química con estructuras SMILES en el enunciado y en las opciones para ${topicTitle}. Solo el bloque JSON.`
+      : `Genera ${questionCount} preguntas tipo test para ${topicTitle}. Solo el bloque JSON.`;
+
+    const responseText = await callGeminiWithFallback(activeKey, systemInstruction, userPrompt);
     const cleaned = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleaned);
     if (Array.isArray(parsed)) {
@@ -157,13 +189,13 @@ CRITERIOS DOCENTES (INSPIRADOS EN EL RIGOR OFICIAL DEL EXAMEN FIR - MINISTERIO D
         correctIndex: typeof q.correctIndex === 'number' ? q.correctIndex : 0,
         explanation: cleanRawLatexArtifacts(q.explanation || 'Explicación oficial de cátedra.'),
         difficulty: q.difficulty || difficulty,
-        block: q.block || 'Evaluación Oficial & FIR'
+        block: q.block || (isSynthesisFocus ? 'Reactividad & Síntesis Química' : 'Evaluación Oficial & FIR')
       }));
     }
   } catch (e) {
     console.warn('Gemini exam generation failed, using fallback:', e);
   }
-  return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty);
+  return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea);
 };
 
 export interface SmartExamParams {
@@ -172,6 +204,7 @@ export interface SmartExamParams {
   questionCount?: number;
   difficulty?: 'Fácil' | 'Medio' | 'Avanzado';
   mode?: 'ai' | 'fir' | 'hybrid';
+  focusArea?: ExamFocusArea;
   customApiKey?: string;
 }
 
@@ -181,12 +214,13 @@ export const generateSmartExamQuestions = async ({
   questionCount = 3,
   difficulty = 'Medio',
   mode = 'hybrid',
+  focusArea = 'sintesis_reactividad',
   customApiKey
 }: SmartExamParams): Promise<TestQuestion[]> => {
   if (mode === 'fir') {
     const firQs = generateFirExamSlice(questionCount, topicId);
     if (firQs.length >= questionCount) return firQs;
-    const fallback = generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty);
+    const fallback = generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea);
     return [...firQs, ...fallback].slice(0, questionCount);
   }
   return generateExamQuestionsWithGemini({
@@ -194,6 +228,7 @@ export const generateSmartExamQuestions = async ({
     topicTitle,
     questionCount,
     difficulty,
+    focusArea,
     customApiKey
   });
 };
@@ -260,11 +295,217 @@ export const exportToMarkdownFile = (content: string, filename: string) => {
   URL.revokeObjectURL(url);
 };
 
-function generateFallbackExamQuestions(topicId: string, topicTitle: string, count: number, difficulty: string): TestQuestion[] {
-  // 1. Obtener preguntas oficiales del FIR específicas para este tema de QFDOS
+export const SYNTHESIS_REACTIVITY_QUESTIONS: TestQuestion[] = [
+  {
+    id: 'syn-react-propranolol',
+    topicId: 'tema-06',
+    question: 'En la ruta sintética del Propranolol (bloqueante β-adrenérgico), el 1-naftol reacciona con epiclorhidrina en medio alcalino rindiendo el intermedio oxirano mostrado. ¿Qué reactivo nucleófilo produce la apertura regioselectiva del anillo de epóxido para generar el principio activo?',
+    questionSmiles: 'C1=CC=C2C(=C1)C=CC=C2OCC3CO3',
+    options: [
+      { text: 'Isopropilamina: ataque SN2 sobre el carbono menos impedido del epóxido', smiles: 'CC(C)N' },
+      { text: 'Dimetilamina: generaría un análogo N,N-dimetilado inactivo', smiles: 'CNC' },
+      { text: 'Terc-butilamina: generaría un análogo voluminoso tipo bupranolol', smiles: 'CC(C)(C)N' },
+      { text: 'Anilina: arilamina de escasa nucleofilia sin actividad biológica', smiles: 'c1ccccc1N' }
+    ],
+    correctIndex: 0,
+    explanation: 'La isopropilamina (amina primaria voluminosa) ataca por un mecanismo SN2 al carbono metilénico menos impedido (C-3) del anillo de oxirano del 1-(oxiran-2-ilmetoxi)naftaleno, rindiendo con alta quimioselectividad la cadena de 1-(isopropilamino)propan-2-ol característica del Propranolol.',
+    difficulty: 'Medio',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-hantzsch',
+    topicId: 'tema-06',
+    question: 'Para la preparación de la 1,4-dihidropiridina antihipertensiva Nifedipino mediante la ciclocondensación multicomponente clásica de Hantzsch, ¿cuál es la combinación estequiométrica de reactivos de partida?',
+    questionSmiles: 'COC(=O)C1=C(NC(=C(C1c2ccccc2[N+](=O)[O-])C(=O)OC)C)C',
+    options: [
+      { text: '2-Nitrobenzaldehído + 2 equiv. de acetoacetato de metilo + amoníaco (NH3)', smiles: 'O=Cc1ccccc1[N+](=O)[O-]' },
+      { text: 'Benzaldehído no sustituido + 2 equiv. de malonato de dimetilo + hidrazina', smiles: 'O=Cc1ccccc1' },
+      { text: '4-Nitrobenzaldehído + 1 equiv. de acetilacetona + urea', smiles: 'O=Cc1ccc([N+](=O)[O-])cc1' },
+      { text: 'Ácido 2-nitrobenzoico + acetoacetato de etilo + metilamina', smiles: 'O=C(O)c1ccccc1[N+](=O)[O-]' }
+    ],
+    correctIndex: 0,
+    explanation: 'La síntesis de Hantzsch clásica para Nifedipino condensa una molécula de 2-nitrobenzaldehído aromático con dos moléculas de éster β-dicarbonílico (acetoacetato de metilo) y una fuente de amoníaco (o acetato amónico), vía condensación de Knoevenagel y adición de Michael con ciclación deshidratante.',
+    difficulty: 'Medio',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-paracetamol',
+    topicId: 'tema-04',
+    question: 'En la síntesis de Paracetamol a partir de 4-aminofenol, ¿por qué la reacción con 1 equivalente de anhídrido acético en medio acuoso produce exclusivamente la N-acetilación (Paracetamol) y no la O-acetilación en el hidroxilo fenólico?',
+    questionSmiles: 'Oc1ccc(N)cc1',
+    options: [
+      { text: 'El grupo amino (-NH2) posee un par de electrones más polarizable y nucleófilo que el oxígeno fenólico (-OH)', smiles: 'CC(=O)Nc1ccc(O)cc1' },
+      { text: 'El grupo fenólico se oxida reversiblemente a quinona impidiendo el ataque del oxígeno', smiles: 'O=C1C=CC(=O)C=C1' },
+      { text: 'El éster fenólico se hidroliza de forma espontánea durante la reacción rindiendo diacetato', smiles: 'CC(=O)Nc1ccc(OC(=O)C)cc1' },
+      { text: 'El anhídrido acético solo es electrofílico frente a centros con carga formal negativa', smiles: 'CC(=O)OC(=O)C' }
+    ],
+    correctIndex: 0,
+    explanation: 'El par solitario del nitrógeno es menos electronegativo y mucho más polarizable/nucleófilo que el par del oxígeno fenólico. Bajo control cinético a pH neutro o moderadamente ácido, el ataque nucleófilo sobre el anhídrido acético ocurre exclusivamente a través del grupo amino, obteniéndose Paracetamol con rendimiento cuantitativo sin necesidad de proteger el fenol.',
+    difficulty: 'Fácil',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-captopril',
+    topicId: 'tema-06',
+    question: 'En la síntesis asimétrica de Captopril (inhibidor de la ECA), el acoplamiento directo de la L-prolina con un derivado que contenga un tiol (-SH) libre provocaría oxidaciones a disulfuro y reacciones secundarias. ¿Qué precursor protegido de tiol se acopla a la prolina?',
+    questionSmiles: 'CC(CS)C(=O)N1CCCC1C(=O)O',
+    options: [
+      { text: 'Ácido (2S)-3-(acetiltio)-2-metilpropanoico: el tioacetato enmascara el azufre y se hidroliza con NH4OH', smiles: 'CC(=O)SCC(C)C(=O)O' },
+      { text: 'Ácido 3-mercaptoacético libre: reacciona sin necesidad de activación del carboxilo', smiles: 'SCC(=O)O' },
+      { text: 'Ácido 2-cloropropanoico: requiere posterior desplazamiento con sulfuro de sodio a 150 °C', smiles: 'CC(Cl)C(=O)O' },
+      { text: 'Cloruro de bencilsulfonilo: forma una sulfonamida irreversible', smiles: 'c1ccccc1CS(=O)(=O)Cl' }
+    ],
+    correctIndex: 0,
+    explanation: 'El derivado tioacetato (ácido 3-acetiltio-2-metilpropanoico) enmascara temporalmente el grupo sulfhidrilo reactivo permitiendo la activación del carboxilo (vía cloruro de ácido o anhídrido mixto) y acoplamiento limpio con el nitrógeno pirrolidínico de la L-prolina. La desprotección final mediante aminólisis suave con hidróxido amónico libera el tiol libre del Captopril.',
+    difficulty: 'Avanzado',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-omeprazol',
+    topicId: 'tema-05',
+    question: 'El paso final en la síntesis industrial del antiulceroso Omeprazol es la oxidación quimioselectiva del puente tioéter entre el núcleo de piridina y el bencimidazol. ¿Qué condiciones de reactividad evitan la sobreoxidación irreversible a sulfona inactiva?',
+    questionSmiles: 'COc1ccc2[nH]c(SCc3ncc(C)c(OC)c3C)nc2c1',
+    options: [
+      { text: 'Ácido m-cloroperbenzoico (m-CPBA, 1 equiv.) o NaIO4 a baja temperatura (0-5 °C)', smiles: 'COc1ccc2[nH]c(S(=O)Cc3ncc(C)c(OC)c3C)nc2c1' },
+      { text: 'KMnO4 en medio sulfúrico concentrado a ebullición', smiles: '[O-][Mn](=O)(=O)=O' },
+      { text: 'Hidruro de litio y aluminio (LiAlH4) en éter etílico anhidro', smiles: '[Li+].[AlH4-]' },
+      { text: 'Mezcla sulfonítrica (HNO3/H2SO4) a temperatura ambiente', smiles: 'O=[N+]([O-])O' }
+    ],
+    correctIndex: 0,
+    explanation: 'La transformación de sulfuro aromático a sulfóxido quiral en el Omeprazol requiere un agente oxidante electrófilo suave en estricta proporción estequiométrica (1.0 equivalente de m-CPBA o peroxiácidos/periodato sódico a 0 °C). Agentes oxidantes más enérgicos o exceso de peróxido sobreoxidan el azufre a sulfona (-SO2-), la cual carece de capacidad de reordenamiento para formar el ácido sulfénico activo.',
+    difficulty: 'Avanzado',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-sulfamidas',
+    topicId: 'tema-08',
+    question: 'En la síntesis de antibacterianos sulfonamídicos como el Sulfametoxazol, ¿cuál es la razón mecanística fundamental por la cual la anilina debe introducirse protegida como derivado N-acetilado (cloruro de N-acetilsulfanililo)?',
+    questionSmiles: 'CC1=CC(=NO1)NS(=O)(=O)C2=CC=C(C=C2)N',
+    options: [
+      { text: 'El grupo -NH2 libre atacaría de forma intermolecular al cloruro de sulfonilo electrofílico generando polímeros', smiles: 'CC(=O)Nc1ccc(S(=O)(=O)Cl)cc1' },
+      { text: 'El grupo N-acetilo actúa como catalizador básico para la desprotonación del isoxazol', smiles: 'Cc1cc(no1)N' },
+      { text: 'Para inducir quiralidad axial sobre el átomo de azufre durante la sustitución', smiles: 'O=S(=O)(Cl)c1ccccc1' },
+      { text: 'Porque el ácido clorhídrico liberado descarboxilaría el anillo de sulfonamida', smiles: 'Cl' }
+    ],
+    correctIndex: 0,
+    explanation: 'Si la anilina estuviera desprotegida, el nitrógeno amino aromático nucleófilo atacaría de inmediato al grupo cloruro de sulfonilo de otra molécula, provocando policondensación descontrolada. La acetilación (amida) deslocaliza el par de electrones en el carbonilo y suprime su nucleofilia, permitiendo el acoplamiento selectivo con la 3-amino-5-metilisoxazol y posterior desprotección ácida.',
+    difficulty: 'Medio',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-lidocaina',
+    topicId: 'tema-03',
+    question: 'La síntesis clásica de la Lidocaína se realiza en dos etapas consecutivas a partir de 2,6-dimetilanilina. ¿Cuál es la secuencia de reactivos y el intermedio formado en la primera etapa?',
+    questionSmiles: 'CCN(CC)CC(=O)NC1=C(C=CC=C1C)C',
+    options: [
+      { text: '1) Cloruro de cloroacetilo (forma 2-cloro-N-(2,6-dimetilfenil)acetamida); 2) Dietilamina (SN2)', smiles: 'Cc1cccc(C)c1NC(=O)CCl' },
+      { text: '1) Cloruro de acetilo; 2) Bromación electrofílica con NBS', smiles: 'Cc1cccc(C)c1NC(=O)C' },
+      { text: '1) Epiclorhidrina en NaOH; 2) Trietilamina a reflujo', smiles: 'OCC1CO1' },
+      { text: '1) Cloroformiato de etilo; 2) Reducción con LiAlH4', smiles: 'CCOC(=O)Cl' }
+    ],
+    correctIndex: 0,
+    explanation: 'La 2,6-dimetilanilina (con impedimento estérico orto que confiere resistencia a hidrólisis plasmática) reacciona con cloruro de cloroacetilo dando la α-cloroacetamida intermedia (SMILES: Cc1cccc(C)c1NC(=O)CCl). Seguidamente, el átomo de cloro alifático primario es desplazado por dietilamina mediante sustitución nucleófila bimolecular (SN2), incorporando el nitrógeno básico terminal.',
+    difficulty: 'Medio',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-diazepam',
+    topicId: 'tema-01',
+    question: 'En la síntesis de 1,4-benzodiazepinas como el Diazepam según la ruta clásica de Sternbach, ¿qué reactivo bifuncional permite acilar y ciclar sobre la 5-cloro-2-(metilamino)benzofenona?',
+    questionSmiles: 'CN1C(=O)CN=C(C2=C1C=CC(=C2)Cl)C3=CC=CC=C3',
+    options: [
+      { text: 'Cloruro de cloroacetilo o éster etílico de glicina en piridina', smiles: 'ClCC(=O)Cl' },
+      { text: 'Bromuro de fenilmagnesio seguido de nitrito de sodio', smiles: '[Mg+]Br' },
+      { text: 'Ácido acético glacial en presencia de ácido sulfúrico concentrado', smiles: 'CC(=O)O' },
+      { text: 'Ortoformiato de trietilo y azida de sodio', smiles: 'CCOC(OCC)OCC' }
+    ],
+    correctIndex: 0,
+    explanation: 'La 5-cloro-2-(metilamino)benzofenona reacciona con cloruro de cloroacetilo dando una haloacetamida que seguidamente cicla intramolecularmente con una fuente de nitrógeno (amoníaco / urotropina), o bien cicla directamente por condensación con el clorhidrato del éster etílico de glicina a reflujo de piridina para rendir el heterociclo de diazepin-2-ona.',
+    difficulty: 'Avanzado',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-protecting-groups',
+    topicId: 'tema-00',
+    question: 'En la síntesis de fármacos peptídicos o conjugados biológicos, ¿cuál es el principio mecanístico de ortogonalidad entre los grupos protectores de amino Boc (terc-butoxicarbonilo) y Fmoc (9-fluorenilmetoxicarbonilo)?',
+    questionSmiles: 'CC(C)(C)OC(=O)N',
+    options: [
+      { text: 'Boc es lábil a ácidos (TFA / carbocatión terc-butilo) y estable a bases; Fmoc es lábil a bases (piperidina / eliminación β) y estable a ácidos', smiles: 'c1ccc2c(c1)c3ccccc3c2COC(=O)N' },
+      { text: 'Boc se escinde por hidrogenación catalítica con Pd/C y Fmoc por irradiación UV con láser', smiles: '[Pd]' },
+      { text: 'Boc se desprotege exclusivamente con fluoruro de tetrabutilamonio (TBAF) y Fmoc con cloruro de tionilo', smiles: '[F-]' },
+      { text: 'Ambos se escinden simultáneamente a pH 7.0 mediante enzimas esterasas plasmáticas', smiles: 'O' }
+    ],
+    correctIndex: 0,
+    explanation: 'El grupo Boc se desprotege mediante catálisis ácida (TFA al 50% en diclorometano) generando isobuteno y CO2 tras formar el catión terc-butilo, permaneciendo inerte ante bases. Por contra, el grupo Fmoc posee un protón fuertemente acidificado en el C-9 del fluoreno, que es sustraído por una base secundaria no nucleófila (piperidina al 20% en DMF) produciendo dibenzofulveno por mecanismo E1cb, siendo 100% estable al ácido.',
+    difficulty: 'Avanzado',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-enalapril',
+    topicId: 'tema-06',
+    question: 'En la síntesis estereoselectiva del Enalapril (profármaco éster etílico del Enalaprilato), ¿qué reacción química ensambla el enlace C-N entre el 2-oxo-4-fenilbutanoato de etilo y el dipéptido L-alanil-L-prolina?',
+    questionSmiles: 'CCOC(=O)C(CCc1ccccc1)NC(C)C(=O)N2CCCC2C(=O)O',
+    options: [
+      { text: 'Aminación reductiva quimioselectiva: formación in situ de imina y reducción con NaBH3CN o H2/Pd-C', smiles: 'CCOC(=O)C(=O)CCc1ccccc1' },
+      { text: 'Sustitución nucleófila aromática (SNAr) catalizada por sales de cobre', smiles: 'c1ccccc1' },
+      { text: 'Reacción de Wittig empleando un iluro de fósforo estabilizado', smiles: 'P(c1ccccc1)(c2ccccc2)c3ccccc3' },
+      { text: 'Adición de Michael sobre un aceptor conjugado α,β-insaturado', smiles: 'C=CC(=O)O' }
+    ],
+    correctIndex: 0,
+    explanation: 'La condensación del carbonilo electrofílico del α-cetoéster (2-oxo-4-fenilbutanoato de etilo) con el grupo amino primario de la L-Ala-L-Pro genera una base de Schiff (imina) intermedia. La reducción concomitante con cianoborohidruro sódico (NaBH3CN a pH 6) o hidrogenación catalítica sobre Pd/C rinde el diastereómero de configuración (S,S,S) característico del Enalapril.',
+    difficulty: 'Avanzado',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-ibuprofeno',
+    topicId: 'tema-04',
+    question: 'En la moderna síntesis "verde" del Ibuprofeno (proceso catalítico BHC de 3 etapas con alta economía atómica), ¿cuáles son las tres transformaciones consecutivas a partir de isobutilbenceno?',
+    questionSmiles: 'CC(C)Cc1ccc(C(C)C(=O)O)cc1',
+    options: [
+      { text: '1) Acilación Friedel-Crafts con Ac2O (HF catalítico); 2) Hidrogenación catalítica con Raney-Ni; 3) Carbonilación con CO/Pd', smiles: 'CC(C)Cc1ccccc1' },
+      { text: '1) Cloración radicalaria con Cl2/luz; 2) Eliminación E2 con KOH; 3) Ozonólisis oxidativa', smiles: 'CC(C)Cc1ccccc1' },
+      { text: '1) Nitración aromática; 2) Reducción con Fe/HCl; 3) Reacción de Sandmeyer con KCN', smiles: 'N#C' },
+      { text: '1) Alquilación con bromuro de isopropilo; 2) Formilación de Vilsmeier; 3) Oxidación de Jones', smiles: 'CC(C)Br' }
+    ],
+    correctIndex: 0,
+    explanation: 'El método BHC desarrollado para Ibuprofeno es un modelo de Química Sostenible: 1) Acilación de Friedel-Crafts selectiva para dar 4-isobutilacetofenona; 2) Hidrogenación catalítica del carbonilo a alcohol secundario (1-(4-isobutilfenil)etanol); 3) Carbonilación directa asistida por complejos de Pd(0) con monóxido de carbono (CO) e incorporación del 100% de los átomos sin generar residuos.',
+    difficulty: 'Medio',
+    block: 'Reactividad & Síntesis Química'
+  },
+  {
+    id: 'syn-react-salification',
+    topicId: 'tema-01',
+    question: 'En la formulación química de neurolépticos fenotiazínicos como la Clorpromazina para administración parenteral acuosa, ¿qué centro nucleófilo/básico de la estructura molecular reacciona estequiométricamente con ácido clorhídrico para formar el monoclorhidrato soluble?',
+    questionSmiles: 'CN(C)CCCN1c2ccccc2Sc3ccc(Cl)cc13',
+    options: [
+      { text: 'El nitrógeno de la amina alifática terciaria terminal (-N(CH3)2, pKa ≈ 9.3)', smiles: 'CN(C)C' },
+      { text: 'El átomo de nitrógeno heterocíclico N-10 del anillo de fenotiazina', smiles: 'c1ccc2[nH]c3ccccc3sc2c1' },
+      { text: 'El átomo de azufre tioéter del núcleo tricíclico', smiles: 'CSC' },
+      { text: 'El átomo de cloro aromático mediante adición-eliminación', smiles: 'Cl' }
+    ],
+    correctIndex: 0,
+    explanation: 'El nitrógeno alifático terciario dimetilamino posee hibridación sp³ y un pKa de ~9.3, siendo el único centro fuertemente básico de la molécula. Por contra, el nitrógeno fenotiazínico N-10 deslocaliza intensamente su par de electrones solitarios en el sistema aromático conjugado de los dos anillos de benceno, careciendo de basicidad apreciable a pH ácido o fisiológico.',
+    difficulty: 'Fácil',
+    block: 'Reactividad & Síntesis Química'
+  }
+];
+
+function generateFallbackExamQuestions(
+  topicId: string, 
+  topicTitle: string, 
+  count: number, 
+  difficulty: string,
+  focusArea: ExamFocusArea = 'sintesis_reactividad'
+): TestQuestion[] {
+  // 1. Preguntas especializadas de Reactividad y Síntesis Química con estructuras
+  const synthesisForTopic = SYNTHESIS_REACTIVITY_QUESTIONS.filter(q => q.topicId === topicId);
+  const otherSynthesis = SYNTHESIS_REACTIVITY_QUESTIONS.filter(q => q.topicId !== topicId);
+  const prioritizedSynthesis = [...synthesisForTopic, ...otherSynthesis];
+
+  // 2. Preguntas oficiales del FIR específicas para este tema de QFDOS
   const firForTopic = getFirQuestionsByTopic(topicId).map(convertFirToTestQuestion);
 
-  // 2. Obtener preguntas base configuradas en el tema
+  // 3. Preguntas base configuradas en el tema
   const matchedTopic = INITIAL_TOPICS.find((t: QfdosTopic) => t.id === topicId);
   const topicQuestions: TestQuestion[] = (matchedTopic?.testQuestions || []).map((q: TestQuestion, idx: number) => ({
     ...q,
@@ -273,7 +514,7 @@ function generateFallbackExamQuestions(topicId: string, topicTitle: string, coun
     difficulty: difficulty as any
   }));
 
-  // 3. Generar preguntas estructuradas con fármacos y SMILES reales del tema (RDKit)
+  // 4. Preguntas estructuradas con fármacos y SMILES reales del tema (RDKit)
   const drugQuestions: TestQuestion[] = (matchedTopic?.drugs || []).slice(0, 3).map((d, dIdx) => ({
     id: `drug-sar-${Date.now()}-${dIdx}`,
     topicId,
@@ -384,8 +625,15 @@ function generateFallbackExamQuestions(topicId: string, topicTitle: string, coun
     }
   ];
 
-  // Priorizar preguntas oficiales del FIR, preguntas del tema con fármacos y completar con el pool
-  const combined = [...firForTopic, ...topicQuestions, ...drugQuestions, ...generalPool];
+  // Ordenar según el enfoque pedagógico solicitado
+  let combined: TestQuestion[] = [];
+  if (focusArea === 'sintesis_reactividad') {
+    combined = [...prioritizedSynthesis, ...firForTopic, ...drugQuestions, ...topicQuestions, ...generalPool];
+  } else if (focusArea === 'sar_farmacoforos') {
+    combined = [...drugQuestions, ...firForTopic, ...topicQuestions, ...prioritizedSynthesis, ...generalPool];
+  } else {
+    combined = [...firForTopic, ...prioritizedSynthesis, ...topicQuestions, ...drugQuestions, ...generalPool];
+  }
   
   const results: TestQuestion[] = [];
   const seenQuestions = new Set<string>();

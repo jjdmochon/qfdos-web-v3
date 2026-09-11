@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { QfdosTopic, TestQuestion, TestQuestionOption } from '../data/qfdosData';
 import { 
   generateExamQuestionsWithGemini, 
-  getStoredGeminiApiKey 
+  getStoredGeminiApiKey,
+  ExamFocusArea 
 } from '../services/geminiService';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { getFirQuestionsByTopic, getAllFirQuestions, convertFirToTestQuestion, FirQuestion } from '../data/firQuestionsData';
@@ -41,6 +42,7 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
   const [selectedTopicId, setSelectedTopicId] = useState(topics[0]?.id || 'tema-00');
   const [questionCount, setQuestionCount] = useState<number>(3);
   const [difficulty, setDifficulty] = useState<'Fácil' | 'Medio' | 'Avanzado'>('Medio');
+  const [focusArea, setFocusArea] = useState<ExamFocusArea>('sintesis_reactividad');
   const [isLoading, setIsLoading] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState<TestQuestion[]>([]);
   const [addedSuccess, setAddedSuccess] = useState(false);
@@ -69,7 +71,8 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
         topicId: selectedTopicId,
         topicTitle: `${selectedTopic.number}: ${selectedTopic.title}`,
         questionCount,
-        difficulty
+        difficulty,
+        focusArea
       });
       setGeneratedQuestions(results);
     } catch (e) {
@@ -253,7 +256,31 @@ ${q.options.map((opt, oIdx) => {
                       <option value="Avanzado">Avanzado (Biofísica, enantiómeros & dianas)</option>
                     </select>
                   </div>
+
+                  {/* Focus Area */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '3px' }}>
+                      Enfoque Temático:
+                    </label>
+                    <select
+                      value={focusArea}
+                      onChange={e => setFocusArea(e.target.value as ExamFocusArea)}
+                      className="form-select"
+                      style={{ fontWeight: 600, borderColor: focusArea === 'sintesis_reactividad' ? 'var(--teal)' : undefined }}
+                    >
+                      <option value="sintesis_reactividad">🧪 Reactividad & Síntesis Química (Estructuras 2D)</option>
+                      <option value="sar_farmacoforos">🎯 SAR & Farmacóforos (Estructura-Actividad)</option>
+                      <option value="mecanismos_dianas">🧬 Dianas Moleculares & Mecanismo Farmacológico</option>
+                      <option value="general">⚖️ General / Criterio Oficial FIR (Equilibrado)</option>
+                    </select>
+                  </div>
                 </div>
+
+                {focusArea === 'sintesis_reactividad' && (
+                  <div style={{ padding: '8px 12px', background: 'rgba(13, 148, 136, 0.08)', borderRadius: '6px', borderLeft: '3px solid var(--teal)', fontSize: '0.78rem', color: 'var(--teal-ink)' }}>
+                    💡 <strong>Modo Reactividad & Síntesis:</strong> Se generarán cuestiones sobre rutas de síntesis de fármacos, quimioselectividad, reactivos e intermedios con estructuras moleculares 2D (RDKit) tanto en el enunciado como en las opciones de respuesta.
+                  </div>
+                )}
 
                 <button
                   onClick={handleGenerate}
