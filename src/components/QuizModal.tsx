@@ -156,6 +156,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   Pregunta {currentIndex + 1} de {questions.length}
                 </span>
                 <div style={{ display: 'flex', gap: '6px' }}>
+                  {currentQ.badge && (
+                    <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#3b82f6', color: '#fff' }}>
+                      {currentQ.badge}
+                    </span>
+                  )}
                   {currentQ.block && (
                     <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>
                       {currentQ.block}
@@ -173,6 +178,17 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
                 {currentQ.question}
               </div>
+
+              {/* Optional Figure / Image for Question */}
+              {currentQ.imagePath && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', background: '#ffffff', padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                  <img 
+                    src={currentQ.imagePath.startsWith('http') ? currentQ.imagePath : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath.replace(/^\//, '')}`}
+                    alt="Figura de la pregunta" 
+                    style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain' }} 
+                  />
+                </div>
+              )}
 
               {/* Optional SMILES Structure for Question */}
               {currentQ.questionSmiles && (

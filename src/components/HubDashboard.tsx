@@ -20,6 +20,7 @@ interface HubDashboardProps {
   onNavigateToPracticas: () => void;
   onOpenExamGenerator: () => void;
   onOpenAdminCms: () => void;
+  onOpenFirSimulator?: () => void;
 }
 
 export const HubDashboard: React.FC<HubDashboardProps> = ({
@@ -32,7 +33,8 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
   onNavigateToAdmet,
   onNavigateToPracticas,
   onOpenExamGenerator,
-  onOpenAdminCms
+  onOpenAdminCms,
+  onOpenFirSimulator
 }) => {
   const { isProfesor } = useAuth();
 
@@ -207,6 +209,34 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                 Evaluar <ArrowRight size={12} />
               </span>
             </button>
+
+            {onOpenFirSimulator && (
+              <button 
+                onClick={onOpenFirSimulator} 
+                className="qfdos-card card-teal tool-card"
+                style={{ gridColumn: '1 / -1', background: 'linear-gradient(135deg, rgba(30,58,138,0.08) 0%, rgba(45,212,191,0.12) 100%)', borderLeft: '4px solid #2dd4bf' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Award size={24} color="var(--teal)" />
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h4 style={{ margin: 0, fontSize: '1.02rem', fontWeight: 700, color: 'var(--navy-ink)' }}>
+                          Simulador Oficial Examen FIR (2020-2025)
+                        </h4>
+                        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>136 Preguntas QF</span>
+                      </div>
+                      <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        Entrenador interactivo de Química Farmacéutica, estructuras 2D RDKit, figuras ministeriales y simulador FIR completo.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="tool-card-cta" style={{ color: 'var(--teal-ink)', whiteSpace: 'nowrap', marginLeft: '8px' }}>
+                    Practicar FIR <ArrowRight size={13} />
+                  </span>
+                </div>
+              </button>
+            )}
 
             <button
               onClick={onOpenExamGenerator}

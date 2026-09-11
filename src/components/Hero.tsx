@@ -10,12 +10,14 @@ interface HeroProps {
   onNavigateToTemas: () => void;
   onNavigateToSimulador: () => void;
   onOpenDrugSearch: () => void;
+  onOpenFirSimulator?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   onNavigateToTemas,
   onNavigateToSimulador,
-  onOpenDrugSearch
+  onOpenDrugSearch,
+  onOpenFirSimulator
 }) => {
   const { user, isProfesor } = useAuth();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -160,6 +162,17 @@ export const Hero: React.FC<HeroProps> = ({
                 <Award size={16} />
                 <span>Simulador Biofísico</span>
               </button>
+              {onOpenFirSimulator && (
+                <button
+                  onClick={onOpenFirSimulator}
+                  className="btn-hero-pill-secondary"
+                  style={{ background: 'rgba(13, 148, 136, 0.22)', borderColor: 'rgba(45, 212, 191, 0.45)', color: '#2dd4bf' }}
+                  title="Simulador Oficial Examen FIR (2020-2025)"
+                >
+                  <Award size={16} />
+                  <span>Simulador FIR</span>
+                </button>
+              )}
               <button
                 onClick={onOpenDrugSearch}
                 className="btn-hero-pill-tertiary"

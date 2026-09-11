@@ -12,6 +12,7 @@ interface HeaderProps {
   setActiveTab: (tab: string) => void;
   onOpenSearch: () => void;
   onOpenExamGenerator: () => void;
+  onOpenFirSimulator: () => void;
   onOpenStudentQuestion: () => void;
   onOpenAdminCms: () => void;
 }
@@ -21,6 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   onOpenSearch,
   onOpenExamGenerator,
+  onOpenFirSimulator,
   onOpenStudentQuestion,
   onOpenAdminCms
 }) => {
@@ -128,6 +130,16 @@ export const Header: React.FC<HeaderProps> = ({
               title="Generador de Exámenes IA"
             >
               <FileText size={14} /><span className="tool-label">Examen IA</span>
+            </button>
+
+            {/* Simulador FIR */}
+            <button
+              onClick={onOpenFirSimulator}
+              className="btn btn-sm btn-header-action"
+              style={{ borderColor: 'rgba(45, 212, 191, 0.4)', color: 'var(--teal-ink)' }}
+              title="Simulador Oficial Examen FIR (2020-2025)"
+            >
+              <Award size={14} /><span className="tool-label">Simulador FIR</span>
             </button>
 
             {/* Buzón de Consultas */}

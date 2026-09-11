@@ -41,6 +41,7 @@ import { SpotifyPlayerModal } from './components/SpotifyPlayerModal';
 import { SearchModal } from './components/SearchModal';
 import { DrugSearchModal } from './components/DrugSearchModal';
 import { ExamGeneratorModal } from './components/ExamGeneratorModal';
+import { FirSimulatorModal } from './components/FirSimulatorModal';
 import { AdminCmsModal } from './components/AdminCmsModal';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
@@ -198,6 +199,7 @@ export const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDrugSearchOpen, setIsDrugSearchOpen] = useState(false);
   const [isExamGeneratorOpen, setIsExamGeneratorOpen] = useState(false);
+  const [isFirModalOpen, setIsFirModalOpen] = useState(false);
   const [isStudentQuestionOpen, setIsStudentQuestionOpen] = useState(false);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
@@ -259,6 +261,10 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHashSync = () => {
       const { tab, sub } = parseUrlHash();
+      const raw = window.location.hash.replace(/^#\/?/, '').trim().toLowerCase();
+      if (raw === 'fir' || raw === 'simulador-fir') {
+        setIsFirModalOpen(true);
+      }
       setActiveTab(tab);
       if (tab === 'practicas') {
         if (sub) setPracticasSubTab(sub);
@@ -274,6 +280,9 @@ export const App: React.FC = () => {
       setIsSearchOpen(false);
       setIsDrugSearchOpen(false);
       setIsExamGeneratorOpen(false);
+      if (raw !== 'fir' && raw !== 'simulador-fir') {
+        setIsFirModalOpen(false);
+      }
       setIsStudentQuestionOpen(false);
       setSelectedQuizTopic(null);
       setSelectedFlashcardsTopic(null);
@@ -308,6 +317,7 @@ export const App: React.FC = () => {
         setActiveTab={(tab: any) => navigateTo(tab)}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
+        onOpenFirSimulator={() => setIsFirModalOpen(true)}
         onOpenStudentQuestion={() => setIsStudentQuestionOpen(true)}
         onOpenAdminCms={() => setIsAdminCmsOpen(true)}
       />
@@ -317,6 +327,7 @@ export const App: React.FC = () => {
           onNavigateToTemas={() => navigateTo('temas')}
           onNavigateToSimulador={() => navigateTo('simulador')}
           onOpenDrugSearch={() => setIsDrugSearchOpen(true)}
+          onOpenFirSimulator={() => setIsFirModalOpen(true)}
         />
       )}
 
@@ -333,6 +344,7 @@ export const App: React.FC = () => {
             onNavigateToPracticas={() => navigateTo('practicas')}
             onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
             onOpenAdminCms={() => setIsAdminCmsOpen(true)}
+            onOpenFirSimulator={() => setIsFirModalOpen(true)}
           />
         )}
         {activeTab === 'info' && <CourseInfoSection />}
@@ -359,7 +371,11 @@ export const App: React.FC = () => {
             onOpenAdminCms={() => setIsAdminCmsOpen(true)}
           />
         )}
-        {activeTab === 'evaluacion' && <EvaluationSection />}
+        {activeTab === 'evaluacion' && (
+          <EvaluationSection 
+            onOpenFirSimulator={() => setIsFirModalOpen(true)} 
+          />
+        )}
       </main>
 
       {/* Modals */}
@@ -417,6 +433,15 @@ export const App: React.FC = () => {
           onQuestionsAddedToTopic={handleQuestionsAddedToTopic}
         />
       )}
+      <FirSimulatorModal
+        isOpen={isFirModalOpen}
+        onClose={() => {
+          setIsFirModalOpen(false);
+          if (window.location.hash.includes('fir')) {
+            window.history.pushState(null, '', '#/hub');
+          }
+        }}
+      />
       {isStudentQuestionOpen && (
         <StudentQuestionModal topics={topics} onClose={() => setIsStudentQuestionOpen(false)} />
       )}

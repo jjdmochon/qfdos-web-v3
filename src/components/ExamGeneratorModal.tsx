@@ -5,6 +5,7 @@ import {
   getStoredGeminiApiKey 
 } from '../services/geminiService';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { getFirQuestionsByTopic, getAllFirQuestions, convertFirToTestQuestion, FirQuestion } from '../data/firQuestionsData';
 import { 
   X, 
   FileText, 
@@ -32,7 +33,11 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
   onClose,
   onQuestionsAddedToTopic
 }) => {
-  const [activeTab, setActiveTab] = useState<'ai' | 'manual'>('ai');
+  const [activeTab, setActiveTab] = useState<'ai' | 'fir' | 'manual'>('ai');
+  const [selectedFirIds, setSelectedFirIds] = useState<Set<string>>(new Set());
+  const [firTopicFilter, setFirTopicFilter] = useState<string>('current');
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const baseUrl = import.meta.env.BASE_URL || '/';
   const [selectedTopicId, setSelectedTopicId] = useState(topics[0]?.id || 'tema-00');
   const [questionCount, setQuestionCount] = useState<number>(3);
   const [difficulty, setDifficulty] = useState<'Fácil' | 'Medio' | 'Avanzado'>('Medio');
@@ -361,6 +366,218 @@ ${q.options.map((opt, oIdx) => {
               )}
             </>
           )}
+
+          
+          {/* TAB: Official FIR Questions Bank */}
+          {activeTab === 'fir' && (() => {
+            const availableFir = firTopicFilter === 'current'
+              ? getFirQuestionsByTopic(selectedTopicId)
+              : getAllFirQuestions();
+
+            const handleToggleSelectFir = (id: string) => {
+              setSelectedFirIds(prev => {
+                const next = new Set(prev);
+                if (next.has(id)) next.delete(id);
+                else next.add(id);
+                return next;
+              });
+            };
+
+            const handleSelectAllFir = () => {
+              if (selectedFirIds.size === availableFir.length) {
+                setSelectedFirIds(new Set());
+              } else {
+                setSelectedFirIds(new Set(availableFir.map(q => q.id)));
+              }
+            };
+
+            const handleAddSelectedFir = () => {
+              if (!onQuestionsAddedToTopic || selectedFirIds.size === 0) return;
+              const toAdd = availableFir
+                .filter(q => selectedFirIds.has(q.id))
+                .map(convertFirToTestQuestion);
+              onQuestionsAddedToTopic(selectedTopicId, toAdd);
+              setSelectedFirIds(new Set());
+              setAddedSuccess(true);
+              setTimeout(() => setAddedSuccess(false), 3000);
+            };
+
+            return (
+              <div className="qfdos-card" style={{ padding: '1.25rem', gap: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                      Banco Oficial FIR · Química & Química Farmacéutica
+                    </h4>
+                    <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      136 preguntas oficiales del Ministerio de Sanidad (2020-2025) con estructuras moleculares y retroalimentación razonada
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <select
+                      value={selectedTopicId}
+                      onChange={e => setSelectedTopicId(e.target.value)}
+                      className="form-select"
+                      style={{ fontSize: '0.78rem', padding: '5px 10px', width: 'auto' }}
+                    >
+                      {topics.map(t => (
+                        <option key={t.id} value={t.id}>{t.number}: {t.title}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={firTopicFilter}
+                      onChange={e => setFirTopicFilter(e.target.value)}
+                      className="form-select"
+                      style={{ fontSize: '0.78rem', padding: '5px 10px', width: 'auto' }}
+                    >
+                      <option value="current">Solo preguntas de este tema</option>
+                      <option value="all">Todas las 136 preguntas FIR</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Toolbar */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-alt)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
+                    <button
+                      onClick={handleSelectAllFir}
+                      className="btn btn-sm btn-outline"
+                      style={{ fontSize: '0.75rem', padding: '3px 10px' }}
+                    >
+                      {selectedFirIds.size === availableFir.length && availableFir.length > 0 ? 'Deseleccionar todas' : 'Seleccionar todas'}
+                    </button>
+                    <span style={{ color: 'var(--text-muted)' }}>
+                      <strong>{selectedFirIds.size}</strong> seleccionadas de <strong>{availableFir.length}</strong> disponibles
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={handleAddSelectedFir}
+                    disabled={selectedFirIds.size === 0}
+                    className="btn btn-sm btn-primary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '0.78rem',
+                      opacity: selectedFirIds.size === 0 ? 0.5 : 1
+                    }}
+                  >
+                    <PlusCircle size={14} />
+                    <span>Añadir {selectedFirIds.size} preguntas al {selectedTopic.number}</span>
+                  </button>
+                </div>
+
+                {addedSuccess && (
+                  <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#047857', padding: '8px 12px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={16} /> Preguntas oficiales FIR agregadas correctamente al temario.
+                  </div>
+                )}
+
+                {/* Questions List */}
+                {availableFir.length === 0 ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <p>No hay preguntas clasificadas específicamente para este tema.</p>
+                    <button onClick={() => setFirTopicFilter('all')} className="btn btn-sm btn-outline">
+                      Ver todas las 136 preguntas FIR
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '50vh', overflowY: 'auto' }}>
+                    {availableFir.map(fir => {
+                      const isSelected = selectedFirIds.has(fir.id);
+                      return (
+                        <div
+                          key={fir.id}
+                          style={{
+                            padding: '12px 16px',
+                            borderRadius: '10px',
+                            border: `1.5px solid ${isSelected ? 'var(--teal)' : 'var(--border-color)'}`,
+                            background: isSelected ? 'var(--primary-bg)' : 'var(--surface)',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleToggleSelectFir(fir.id)}
+                                style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--teal)' }}
+                              />
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px', background: 'linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%)', color: '#fff' }}>
+                                {fir.badge}
+                              </span>
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', background: 'var(--surface-alt)', padding: '2px 6px', borderRadius: '4px' }}>
+                                {fir.block}
+                              </span>
+                            </div>
+
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                              {fir.qfdosTopicName}
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.45, marginBottom: '8px' }}>
+                            {fir.question}
+                          </div>
+
+                          {/* Visuals */}
+                          {(fir.hasImage || fir.smiles) && (
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'center', margin: '8px 0', flexWrap: 'wrap' }}>
+                              {fir.hasImage && fir.imagePath && (
+                                <img
+                                  src={`${baseUrl}${fir.imagePath}`}
+                                  alt="Figura oficial"
+                                  style={{ maxHeight: '110px', maxWidth: '240px', objectFit: 'contain', borderRadius: '4px', border: '1px solid var(--border-color)', cursor: 'pointer' }}
+                                  onClick={() => setZoomedImage(`${baseUrl}${fir.imagePath}`)}
+                                  title="Haz clic para ampliar"
+                                />
+                              )}
+                              {fir.smiles && (
+                                <Chem2DDrawer smiles={fir.smiles} width={180} height={90} />
+                              )}
+                            </div>
+                          )}
+
+                          {/* Options preview */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '6px', marginTop: '8px' }}>
+                            {fir.options.map((opt, oIdx) => (
+                              <div
+                                key={oIdx}
+                                style={{
+                                  padding: '6px 10px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.78rem',
+                                  background: oIdx === fir.correctIndex ? 'rgba(16, 185, 129, 0.12)' : 'var(--surface-alt)',
+                                  border: `1px solid ${oIdx === fir.correctIndex ? '#10b981' : 'transparent'}`,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px'
+                                }}
+                              >
+                                <strong style={{ color: oIdx === fir.correctIndex ? '#047857' : 'var(--text-muted)', fontSize: '0.72rem' }}>
+                                  {String.fromCharCode(65 + oIdx)})
+                                </strong>
+                                <span style={{ color: 'var(--text-title)' }}>{opt}</span>
+                                {oIdx === fir.correctIndex && <Check size={12} color="#10b981" style={{ marginLeft: 'auto' }} />}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div style={{ marginTop: '8px', fontSize: '0.74rem', color: 'var(--teal-ink)', borderLeft: '2px solid var(--teal)', paddingLeft: '8px' }}>
+                            {fir.explanation}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* TAB 2: Manual Chemical Question Builder */}
           {activeTab === 'manual' && (

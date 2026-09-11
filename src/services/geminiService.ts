@@ -5,6 +5,12 @@
 // ==========================================================================
 
 import { TestQuestion, INITIAL_TOPICS, QfdosTopic } from '../data/qfdosData';
+import {
+  getFirQuestionsByTopic,
+  convertFirToTestQuestion,
+  generateFirExamSlice,
+  getAllFirQuestions
+} from '../data/firQuestionsData';
 
 const GEMINI_API_KEY_STORAGE_KEY = 'qfdos_gemini_api_key_v3';
 
@@ -130,10 +136,12 @@ export const generateExamQuestionsWithGemini = async ({
   const systemInstruction = `Eres el evaluador principal de Química Farmacéutica II (UGR).
 Genera exactamente ${questionCount} preguntas tipo test de nivel ${difficulty} para el módulo "${topicTitle}".
 
-REGLAS:
-1. Responde ÚNICAMENTE con un bloque JSON válido con un array de objetos TestQuestion.
-2. Cada objeto: { "question": "...", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "...", "difficulty": "${difficulty}", "block": "SAR & Dianas" }
-3. CERO SINTAXIS LATEX: Usa caracteres Unicode (ΔG°, IC50, Kd, Ki, β-bloqueantes). No uses $.`;
+CRITERIOS DOCENTES (INSPIRADOS EN EL RIGOR OFICIAL DEL EXAMEN FIR - MINISTERIO DE SANIDAD):
+1. Formula preguntas rigurosas sobre relaciones estructura-actividad (SAR), farmacóforos, bioisósteros, mecanismos de bioactivación (profármacos, latenciación) y dianas moleculares.
+2. Cuando la pregunta mencione un fármaco o molécula clave, incluye su estructura en formato SMILES válido en el campo "questionSmiles" (o en las opciones si compara estructuras) para su renderizado con RDKit MinimalLib.
+3. Responde ÚNICAMENTE con un bloque JSON válido con un array de objetos TestQuestion.
+4. Cada objeto: { "question": "...", "questionSmiles": "SMILES_OPCIONAL", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "...", "difficulty": "${difficulty}", "block": "SAR & Dianas" }
+5. CERO SINTAXIS LATEX: Usa caracteres Unicode limpios (ΔG°, IC50, Kd, Ki, Km, pKa, Å, µM, β-lactámico, Zn²⁺). No uses $ ni fórmulas crudas de LaTeX.`;
 
   try {
     const responseText = await callGeminiWithFallback(activeKey, systemInstruction, `Genera ${questionCount} preguntas para ${topicTitle}. Solo el JSON.`);
@@ -144,17 +152,50 @@ REGLAS:
         id: `gemini-q-${Date.now()}-${idx}`,
         topicId,
         question: cleanRawLatexArtifacts(q.question),
-        options: Array.isArray(q.options) ? q.options.map((o: string) => cleanRawLatexArtifacts(o)) : [],
+        questionSmiles: q.questionSmiles?.trim() || undefined,
+        options: Array.isArray(q.options) ? q.options.map((o: any) => typeof o === 'string' ? cleanRawLatexArtifacts(o) : { text: cleanRawLatexArtifacts(o.text), smiles: o.smiles }) : [],
         correctIndex: typeof q.correctIndex === 'number' ? q.correctIndex : 0,
         explanation: cleanRawLatexArtifacts(q.explanation || 'Explicación oficial de cátedra.'),
         difficulty: q.difficulty || difficulty,
-        block: q.block || 'Evaluación Oficial'
+        block: q.block || 'Evaluación Oficial & FIR'
       }));
     }
   } catch (e) {
     console.warn('Gemini exam generation failed, using fallback:', e);
   }
   return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty);
+};
+
+export interface SmartExamParams {
+  topicId: string;
+  topicTitle: string;
+  questionCount?: number;
+  difficulty?: 'Fácil' | 'Medio' | 'Avanzado';
+  mode?: 'ai' | 'fir' | 'hybrid';
+  customApiKey?: string;
+}
+
+export const generateSmartExamQuestions = async ({
+  topicId,
+  topicTitle,
+  questionCount = 3,
+  difficulty = 'Medio',
+  mode = 'hybrid',
+  customApiKey
+}: SmartExamParams): Promise<TestQuestion[]> => {
+  if (mode === 'fir') {
+    const firQs = generateFirExamSlice(questionCount, topicId);
+    if (firQs.length >= questionCount) return firQs;
+    const fallback = generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty);
+    return [...firQs, ...fallback].slice(0, questionCount);
+  }
+  return generateExamQuestionsWithGemini({
+    topicId,
+    topicTitle,
+    questionCount,
+    difficulty,
+    customApiKey
+  });
 };
 
 // Export utilities
@@ -220,12 +261,34 @@ export const exportToMarkdownFile = (content: string, filename: string) => {
 };
 
 function generateFallbackExamQuestions(topicId: string, topicTitle: string, count: number, difficulty: string): TestQuestion[] {
+  // 1. Obtener preguntas oficiales del FIR específicas para este tema de QFDOS
+  const firForTopic = getFirQuestionsByTopic(topicId).map(convertFirToTestQuestion);
+
+  // 2. Obtener preguntas base configuradas en el tema
   const matchedTopic = INITIAL_TOPICS.find((t: QfdosTopic) => t.id === topicId);
   const topicQuestions: TestQuestion[] = (matchedTopic?.testQuestions || []).map((q: TestQuestion, idx: number) => ({
     ...q,
     id: `topic-fb-${Date.now()}-${idx}`,
     topicId,
     difficulty: difficulty as any
+  }));
+
+  // 3. Generar preguntas estructuradas con fármacos y SMILES reales del tema (RDKit)
+  const drugQuestions: TestQuestion[] = (matchedTopic?.drugs || []).slice(0, 3).map((d, dIdx) => ({
+    id: `drug-sar-${Date.now()}-${dIdx}`,
+    topicId,
+    question: `Considerando la estructura química y el farmacóforo de "${d.name}", ¿cuál es su diana o mecanismo molecular clave en ${topicTitle}?`,
+    questionSmiles: d.smiles,
+    options: [
+      d.role,
+      'Inhibidor irreversible inespecífico de transportadores ABC.',
+      'Agonista alostérico puro sin modulación termodinámica.',
+      'Profármaco inactivo sin permeabilidad en membrana biológica.'
+    ],
+    correctIndex: 0,
+    explanation: `El compuesto ${d.name} actúa como ${d.role}. Presenta un peso molecular de ${d.mw} Da, LogP de ${d.logP} y TPSA de ${d.tpsa} Å², optimizado para su diana biológica.`,
+    difficulty: difficulty as any,
+    block: 'SAR Molecular & Dianas'
   }));
 
   const generalPool: TestQuestion[] = [
@@ -321,10 +384,9 @@ function generateFallbackExamQuestions(topicId: string, topicTitle: string, coun
     }
   ];
 
-  // Combinar primero las preguntas específicas del tema y completar con el pool general
-  const combined = [...topicQuestions, ...generalPool];
+  // Priorizar preguntas oficiales del FIR, preguntas del tema con fármacos y completar con el pool
+  const combined = [...firForTopic, ...topicQuestions, ...drugQuestions, ...generalPool];
   
-  // Si no hay suficientes en el tema, aseguramos que siempre devuelva el número solicitado
   const results: TestQuestion[] = [];
   const seenQuestions = new Set<string>();
 

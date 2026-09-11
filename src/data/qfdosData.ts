@@ -31,6 +31,8 @@ export interface TestQuestion {
   correctIndex: number;
   explanation: string;
   difficulty?: 'Fácil' | 'Medio' | 'Avanzado';
+  imagePath?: string;
+  badge?: string;
   authorEmail?: string;
   authorName?: string;
   isStudentSubmitted?: boolean;
@@ -173,6 +175,19 @@ export const RESOURCE_CATEGORIES = [
 export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
+  {
+    id: 'link-simulador-fir',
+    title: 'Simulador Oficial de Exámenes FIR (2020-2025)',
+    url: 'https://jjdmochon.github.io/FIR/',
+    summary:
+      'Plataforma oficial interactiva de preparación para la prueba selectiva de Farmacéutico Interno Residente (FIR), convocada por el Ministerio de Sanidad. Incluye 6 exámenes oficiales completos (1.235 preguntas), módulo especializado de Química Farmacéutica (136 preguntas con estructuras 2D RDKit y figuras HD), temporizador de 4h 30m y baremo ministerial (+3 / -1 / 0).',
+    category: 'Industria & carrera profesional',
+    source: 'Ministerio de Sanidad / UGR',
+    duration: 'Exámenes 4h 30m / Modo Estudio',
+    relatedTopic: 'Evaluación Oficial & FIR',
+    featured: true,
+    addedAt: '2026-09-11'
+  },
   {
     id: 'link-nexus-lab',
     title: 'NEXUS.LAB: Ingeniería Digital & Ciencia Aplicada',

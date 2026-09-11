@@ -23,7 +23,11 @@ import {
 const EVALUATION_SHEET_ID = '1gbbet7PZavZQKffB3d7BUs3nhbg9dMJy4ZYGoh3q9yQ';
 const EVALUATION_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${EVALUATION_SHEET_ID}/export?format=csv`;
 
-export const EvaluationSection: React.FC = () => {
+interface EvaluationSectionProps {
+  onOpenFirSimulator?: () => void;
+}
+
+export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirSimulator }) => {
   const { isProfesor, user } = useAuth();
   const [students, setStudents] = useState<StudentEvaluationProfile[]>(() => {
     const saved = localStorage.getItem('qfdos_v3_evaluations');
@@ -358,6 +362,48 @@ export const EvaluationSection: React.FC = () => {
         }}>
           <CheckCircle2 size={15} color={sheetSyncStatus.startsWith('✓') ? '#10b981' : 'var(--navy)'} />
           <span>{sheetSyncStatus}</span>
+        </div>
+      )}
+
+      {/* Banner de Preparación Oficial Examen FIR */}
+      {onOpenFirSimulator && (
+        <div 
+          className="qfdos-card" 
+          style={{ 
+            marginBottom: '2rem', 
+            background: 'linear-gradient(135deg, rgba(30,58,138,0.06) 0%, rgba(13,148,136,0.1) 100%)',
+            borderColor: 'rgba(45,212,191,0.4)',
+            padding: '1.25rem 1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '1rem'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--teal-ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+              <Award size={24} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy-ink)' }}>
+                  Preparación de Exámenes Oficiales: Simulador FIR (2020-2025)
+                </h3>
+                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>136 Preguntas QF</span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.84rem', color: 'var(--text-main)', maxWidth: '650px' }}>
+                Entrénate con las preguntas ministeriales reales de Química Farmacéutica y Orgánica. Incluye fórmulas 2D interactivas en RDKit, figuras oficiales y el baremo ministerial (+3 acierto, -1 fallo).
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={onOpenFirSimulator} 
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, padding: '10px 18px' }}
+          >
+            <Award size={16} /> Abrir Simulador FIR
+          </button>
         </div>
       )}
 
