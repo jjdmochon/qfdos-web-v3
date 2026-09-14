@@ -413,6 +413,10 @@ export const App: React.FC = () => {
               navigateTo('temas', undefined, true);
             }
           }}
+          onUpdateTopic={updatedTopic => {
+            setTopics(prev => prev.map(t => t.id === updatedTopic.id ? updatedTopic : t));
+            setSelectedTopicDetail(updatedTopic);
+          }}
           onOpenQuiz={t => { setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
           onOpenFlashcards={t => { setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}

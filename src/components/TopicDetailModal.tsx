@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QfdosTopic, CourseAttachment, MoleculeDrug } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { useAuth } from '../context/AuthContext';
@@ -22,7 +22,9 @@ import {
   Lock,
   Globe,
   Database,
-  Activity
+  Activity,
+  Upload,
+  Settings
 } from 'lucide-react';
 
 interface TopicDetailModalProps {
@@ -32,6 +34,7 @@ interface TopicDetailModalProps {
   onOpenFlashcards: (topic: QfdosTopic) => void;
   onOpenSpotifyPlayer: (att: CourseAttachment) => void;
   onOpenAdmet?: (drug: MoleculeDrug) => void;
+  onUpdateTopic?: (updatedTopic: QfdosTopic) => void;
 }
 
 export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
@@ -40,10 +43,36 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onOpenQuiz,
   onOpenFlashcards,
   onOpenSpotifyPlayer,
-  onOpenAdmet
+  onOpenAdmet,
+  onUpdateTopic
 }) => {
   const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs'>('sar');
   const { isProfesor } = useAuth();
+
+  const [isEditingDriveLinks, setIsEditingDriveLinks] = useState(false);
+  const [editSlidesUrl, setEditSlidesUrl] = useState(topic.slidesPdfUrl || '');
+  const [editNotesUrl, setEditNotesUrl] = useState(topic.notesPdfUrl || '');
+  const [editNotebookUrl, setEditNotebookUrl] = useState(topic.geminiNotebookUrl || '');
+
+  useEffect(() => {
+    setEditSlidesUrl(topic.slidesPdfUrl || '');
+    setEditNotesUrl(topic.notesPdfUrl || '');
+    setEditNotebookUrl(topic.geminiNotebookUrl || '');
+    setIsEditingDriveLinks(false);
+  }, [topic]);
+
+  const handleSaveDriveLinks = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onUpdateTopic) return;
+    const updated: QfdosTopic = {
+      ...topic,
+      slidesPdfUrl: editSlidesUrl.trim() || undefined,
+      notesPdfUrl: editNotesUrl.trim() || undefined,
+      geminiNotebookUrl: editNotebookUrl.trim() || undefined
+    };
+    onUpdateTopic(updated);
+    setIsEditingDriveLinks(false);
+  };
 
   // Última barrera: aquí convergen el temario, el panel de inicio y la búsqueda
   // global, así que basta con comprobarlo una vez en este punto.
@@ -163,13 +192,91 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', lineHeight: 1.65 }}>
                   {topic.description}
                 </p>
-              </div>
-
-              {/* 6 PRIMARY RESOURCES SHOWCASE */}
+                   {/* PRIMARY RESOURCES SHOWCASE */}
               <div>
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={16} color="var(--teal-ink)" /> Suite Completa de Recursos para el Alumno
-                </h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={16} color="var(--teal-ink)" /> Suite Completa de Recursos para el Alumno
+                  </h4>
+                  {isProfesor && onUpdateTopic && (
+                    <button
+                      onClick={() => setIsEditingDriveLinks(prev => !prev)}
+                      className="btn btn-sm btn-secondary"
+                      style={{ fontSize: '0.78rem', padding: '5px 12px', gap: '6px', fontWeight: 700 }}
+                    >
+                      <Settings size={14} /> {isEditingDriveLinks ? 'Cerrar editor' : 'Añadir / Editar enlaces de Drive'}
+                    </button>
+                  )}
+                </div>
+
+                {/* Inline Drive links editor for docent */}
+                {isEditingDriveLinks && (
+                  <form onSubmit={handleSaveDriveLinks} className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1rem', border: '2px solid var(--teal)', background: 'var(--surface-raised)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <strong style={{ fontSize: '0.92rem', color: 'var(--teal-ink)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Upload size={15} /> Configurar Enlaces Oficiales (Google Drive / Web)
+                      </strong>
+                      <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>Modo Docente</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
+                          📄 Enlace Google Drive · Apuntes Oficiales (PDF)
+                        </label>
+                        <input
+                          type="text"
+                          value={editNotesUrl}
+                          onChange={e => setEditNotesUrl(e.target.value)}
+                          placeholder="https://drive.google.com/file/d/.../view"
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
+                          📑 Enlace Google Drive · Diapositivas (PDF)
+                        </label>
+                        <input
+                          type="text"
+                          value={editSlidesUrl}
+                          onChange={e => setEditSlidesUrl(e.target.value)}
+                          placeholder="https://drive.google.com/file/d/.../view"
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
+                          📓 Enlace Google NotebookLM
+                        </label>
+                        <input
+                          type="text"
+                          value={editNotebookUrl}
+                          onChange={e => setEditNotebookUrl(e.target.value)}
+                          placeholder="https://notebook.google.com/notebook/..."
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingDriveLinks(false)}
+                        className="btn btn-sm btn-outline"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn-sm btn-primary"
+                        style={{ fontWeight: 700 }}
+                      >
+                        Guardar Enlaces
+                      </button>
+                    </div>
+                  </form>
+                )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
                   
@@ -190,11 +297,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         className="btn btn-sm btn-secondary" 
                         style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
                       >
-                        <Download size={13} /> Descargar Apuntes
+                        <ExternalLink size={13} /> {topic.notesPdfUrl.includes('drive.google.com') ? 'Abrir en Google Drive' : 'Descargar Apuntes'}
                       </a>
                     ) : (
                       <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                        Disponible en clase / PRADO
+                        Próximamente disponible
                       </span>
                     )}
                   </div>
@@ -206,7 +313,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>2. Diapositivas (PDF)</strong>
                     </div>
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      {topic.slidesPdfName || `Presentación oficial con esquemas SAR (${topic.slideCount} diapositivas).`}
+                      {topic.slidesPdfName || (topic.slideCount ? `Presentación oficial con esquemas SAR (${topic.slideCount} diapositivas).` : 'Presentación oficial de diapositivas.')}
                     </p>
                     {topic.slidesPdfUrl && topic.slidesPdfUrl.startsWith('http') ? (
                       <a 
@@ -216,11 +323,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         className="btn btn-sm btn-outline" 
                         style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
                       >
-                        <Download size={13} /> Ver Diapositivas
+                        <ExternalLink size={13} /> {topic.slidesPdfUrl.includes('drive.google.com') ? 'Ver en Google Drive' : 'Ver Diapositivas'}
                       </a>
                     ) : (
                       <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                        Disponible en clase / PRADO
+                        Próximamente disponible
                       </span>
                     )}
                   </div>
@@ -251,29 +358,31 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     )}
                   </div>
 
-                  {/* 4. Spotify Podcast */}
-                  <div className="qfdos-card" style={{ padding: '1rem', background: 'var(--surface)', borderTop: '4px solid #1db954' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <Radio size={18} color="#1db954" />
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>4. Podcast en Spotify</strong>
+                  {/* 4. Spotify Podcast (Omitido en Presentación del Curso) */}
+                  {topic.id !== 'tema-00' && (
+                    <div className="qfdos-card" style={{ padding: '1rem', background: 'var(--surface)', borderTop: '4px solid #1db954' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <Radio size={18} color="#1db954" />
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>4. Podcast en Spotify</strong>
+                      </div>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                        Episodio de audio/vídeo oficial con explicaciones del profesor.
+                      </p>
+                      {topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http') ? (
+                        <button 
+                          onClick={handlePlayPodcast}
+                          className="btn btn-sm btn-outline" 
+                          style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', borderColor: '#1db954', color: '#1db954' }}
+                        >
+                          <Play size={13} /> Reproducir Episodio
+                        </button>
+                      ) : (
+                        <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                          Próximamente disponible
+                        </span>
+                      )}
                     </div>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      Episodio de audio/vídeo oficial con explicaciones del profesor.
-                    </p>
-                    {topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http') ? (
-                      <button 
-                        onClick={handlePlayPodcast}
-                        className="btn btn-sm btn-outline" 
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', borderColor: '#1db954', color: '#1db954' }}
-                      >
-                        <Play size={13} /> Reproducir Episodio
-                      </button>
-                    ) : (
-                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                        Próximamente disponible
-                      </span>
-                    )}
-                  </div>
+                  )}                 </div>
 
                   {/* 5. Cuestionario Test con Moléculas */}
                   {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
@@ -461,12 +570,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         {/* Modal Footer */}
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.75rem' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
-              <HelpCircle size={14} /> Test ({topic.testQuestions?.length || 0})
-            </button>
-            <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">
-              <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
-            </button>
+            {topic.id !== 'tema-00' && (
+              <>
+                <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
+                  <HelpCircle size={14} /> Test ({topic.testQuestions?.length || 0})
+                </button>
+                <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">
+                  <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
+                </button>
+              </>
+            )}
           </div>
 
           <button onClick={onClose} className="btn btn-outline">

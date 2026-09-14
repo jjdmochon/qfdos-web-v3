@@ -296,7 +296,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
       });
 
       onUpdateTopics(updatedTopics);
-      localStorage.setItem('qfdos_v2_topics', JSON.stringify(updatedTopics));
+      localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
     } else {
       // Create new module
       const newId = `mod_${Date.now()}`;
@@ -329,7 +329,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
       const updatedTopics = [...topics, newTopic];
       onUpdateTopics(updatedTopics);
-      localStorage.setItem('qfdos_v2_topics', JSON.stringify(updatedTopics));
+      localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
     }
 
     resetModuleForm();
@@ -340,7 +340,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     if (!window.confirm('¿Está seguro de que desea eliminar este módulo del curso?')) return;
     const updated = topics.filter(t => t.id !== id);
     onUpdateTopics(updated);
-    localStorage.setItem('qfdos_v2_topics', JSON.stringify(updated));
+    localStorage.setItem('qfdos_v3_topics', JSON.stringify(updated));
     if (editingModuleId === id) resetModuleForm();
   };
 
@@ -400,7 +400,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     });
 
     onUpdateTopics(updatedTopics);
-    localStorage.setItem('qfdos_v2_topics', JSON.stringify(updatedTopics));
+    localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
 
     setNewDrugName('');
     setNewDrugSmiles('');
@@ -420,7 +420,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     });
 
     onUpdateTopics(updatedTopics);
-    localStorage.setItem('qfdos_v2_topics', JSON.stringify(updatedTopics));
+    localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
   };
 
   // Handle Respond to Student Question

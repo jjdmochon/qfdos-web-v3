@@ -50,9 +50,21 @@ export function limpiarCacheRemota(): void {
  */
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
+  const base0 = INITIAL_TOPICS[0];
   return topics.map(t => {
     if (t.id === 'tema-00') {
-      return INITIAL_TOPICS[0];
+      return {
+        ...base0,
+        slidesPdfUrl: typeof t.slidesPdfUrl === 'string' ? t.slidesPdfUrl : (base0.slidesPdfUrl || ''),
+        slidesPdfName: t.slidesPdfName || base0.slidesPdfName,
+        notesPdfUrl: typeof t.notesPdfUrl === 'string' ? t.notesPdfUrl : (base0.notesPdfUrl || ''),
+        notesPdfName: t.notesPdfName || base0.notesPdfName,
+        geminiNotebookUrl: t.geminiNotebookUrl || base0.geminiNotebookUrl,
+        spotifyPodcastUrl: undefined,
+        videoPodcastUrl: undefined,
+        testQuestions: [],
+        flashcards: []
+      };
     }
     return t;
   });
