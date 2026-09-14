@@ -135,19 +135,75 @@ export interface EntregaPropia {
   datos: Record<string, string>;
 }
 
-/** Lo que esa persona ha entregado, buscando su correo en todas las hojas. */
-export async function misEntregas(email: string): Promise<EntregaPropia[] | null> {
-  if (!publicacionDisponible() || !email) return null;
+const ENTREGAS_CACHE_PREFIX = 'qfdos_v3_entregas_';
 
+export function getCachedEntregas(email: string): EntregaPropia[] | null {
+  if (!email) return null;
+  const key = `${ENTREGAS_CACHE_PREFIX}${email.toLowerCase().trim()}`;
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
   try {
-    const resp = await fetch(
-      `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(email)}&t=${Date.now()}`,
-      { method: 'GET', redirect: 'follow' }
-    );
-    if (!resp.ok) return null;
-    const cuerpo = await resp.json();
-    return cuerpo?.ok ? (cuerpo.entregas ?? []) : null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : null;
   } catch {
     return null;
   }
+}
+
+export function setCachedEntregas(email: string, entregas: EntregaPropia[]): void {
+  if (!email || !Array.isArray(entregas)) return;
+  const key = `${ENTREGAS_CACHE_PREFIX}${email.toLowerCase().trim()}`;
+  try {
+    localStorage.setItem(key, JSON.stringify(entregas));
+  } catch {
+    // cuota
+  }
+}
+
+export function addCachedEntrega(email: string, entrega: EntregaPropia): void {
+  if (!email || !entrega) return;
+  const current = getCachedEntregas(email) || [];
+  const filtered = current.filter(e => !(e.hoja === entrega.hoja && e.fila === entrega.fila));
+  setCachedEntregas(email, [entrega, ...filtered]);
+}
+
+const inFlightMisEntregas = new Map<string, Promise<EntregaPropia[] | null>>();
+
+/**
+ * Lo que esa persona ha entregado, buscando su correo en todas las hojas.
+ * Con deduplicación de peticiones concurrentes y persistencia en caché local
+ * para reconocimiento instantáneo entre dispositivos y sesiones.
+ */
+export async function misEntregas(email: string): Promise<EntregaPropia[] | null> {
+  const normEmail = (email || '').toLowerCase().trim();
+  if (!publicacionDisponible() || !normEmail) return null;
+
+  if (inFlightMisEntregas.has(normEmail)) {
+    return inFlightMisEntregas.get(normEmail)!;
+  }
+
+  const promesa = (async () => {
+    try {
+      const resp = await fetch(
+        `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(normEmail)}&t=${Date.now()}`,
+        { method: 'GET', redirect: 'follow' }
+      );
+      if (!resp.ok) {
+        return getCachedEntregas(normEmail);
+      }
+      const cuerpo = await resp.json();
+      if (cuerpo?.ok && Array.isArray(cuerpo.entregas)) {
+        setCachedEntregas(normEmail, cuerpo.entregas);
+        return cuerpo.entregas;
+      }
+      return getCachedEntregas(normEmail);
+    } catch {
+      return getCachedEntregas(normEmail);
+    } finally {
+      inFlightMisEntregas.delete(normEmail);
+    }
+  })();
+
+  inFlightMisEntregas.set(normEmail, promesa);
+  return promesa;
 }

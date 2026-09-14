@@ -10,6 +10,8 @@
 // y en ambos casos se ofrece una vía alternativa que sí llega al profesor.
 // ==========================================================================
 
+import { addCachedEntrega } from './contenidoRemoto';
+
 export const PROFESOR_EMAIL = 'juandiaz@ugr.es';
 
 const GSHEET_ID = '1RrMzWJPFOKKH76vJh70pQw9vbiQZNOGOJH7vNaTGkso';
@@ -62,9 +64,23 @@ export async function enviarAHoja(
 
   try {
     const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
+    const registrarEnCache = (filaNum?: number) => {
+      const posiblesEmails = [datos.email, datos.email1, datos.email2, datos.cuentaDeEnvio].filter(Boolean);
+      for (const em of posiblesEmails) {
+        if (typeof em === 'string' && em.includes('@')) {
+          addCachedEntrega(em, {
+            hoja,
+            fila: filaNum || 0,
+            datos: { ...datos, recibidoEn: new Date().toISOString() }
+          });
+        }
+      }
+    };
+
     if (resp.ok) {
       const cuerpo = await resp.json().catch(() => null);
       if (cuerpo?.ok) {
+        registrarEnCache(cuerpo.fila);
         return {
           estado: 'confirmado',
           fila: cuerpo.fila,
@@ -81,6 +97,16 @@ export async function enviarAHoja(
     // CORS bloqueado: el envío puede haber llegado igualmente, pero no se sabe
     try {
       await fetch(url, { method: 'GET', mode: 'no-cors' });
+      const posiblesEmails = [datos.email, datos.email1, datos.email2, datos.cuentaDeEnvio].filter(Boolean);
+      for (const em of posiblesEmails) {
+        if (typeof em === 'string' && em.includes('@')) {
+          addCachedEntrega(em, {
+            hoja,
+            fila: 0,
+            datos: { ...datos, recibidoEn: new Date().toISOString() }
+          });
+        }
+      }
       return {
         estado: 'enviado-sin-confirmar',
         mensaje:

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Circle, Loader2, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { misEntregas, EntregaPropia, publicacionDisponible } from '../../services/contenidoRemoto';
+import { misEntregas, EntregaPropia, publicacionDisponible, getCachedEntregas } from '../../services/contenidoRemoto';
 import { MisEntregas } from '../MisEntregas';
 import { MiSemanaPracticas } from '../MiSemanaPracticas';
 
 interface PracticasProgresoProps {
   /** Lleva a la subpestaña que resuelve cada pendiente */
   onIr: (destino: string) => void;
+  onSafetyStatusKnown?: (accepted: boolean) => void;
 }
 
 /**
@@ -16,19 +17,37 @@ interface PracticasProgresoProps {
  * Va en primer lugar a propósito: al entrar en Prácticas, lo primero que
  * necesita saber un alumno no es el protocolo, sino si lo suyo ha llegado.
  */
-export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr }) => {
+export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr, onSafetyStatusKnown }) => {
   const { user } = useAuth();
-  const [entregas, setEntregas] = useState<EntregaPropia[] | null>(null);
-  const [cargando, setCargando] = useState(true);
+  const [entregas, setEntregas] = useState<EntregaPropia[] | null>(() => {
+    return user?.email ? getCachedEntregas(user.email) : null;
+  });
+  const [cargando, setCargando] = useState<boolean>(() => {
+    return user?.email ? !getCachedEntregas(user.email) : true;
+  });
   const [error, setError] = useState(false);
 
   const cargar = async () => {
     if (!user?.email) return;
-    setCargando(true);
+    if (!entregas) setCargando(true);
     setError(false);
     const r = await misEntregas(user.email);
-    if (r === null) setError(true);
-    setEntregas(r);
+    if (r === null && !entregas) {
+      setError(true);
+    } else if (r !== null) {
+      setEntregas(r);
+      const safetyAccepted = r.some(e => /normas/i.test(e.hoja));
+      if (safetyAccepted) {
+        try {
+          localStorage.setItem('qfdos_practicas_safety_accepted', JSON.stringify({
+            email: user.email,
+            accepted: true,
+            syncedFromRemote: true
+          }));
+        } catch {}
+        onSafetyStatusKnown?.(true);
+      }
+    }
     setCargando(false);
   };
 
@@ -37,7 +56,17 @@ export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr }) =>
   const hayEn = (patron: RegExp) =>
     !!entregas?.some(e => patron.test(e.hoja));
 
-  const firmadoEnEsteEquipo = !!localStorage.getItem('qfdos_practicas_safety_accepted');
+  const firmadoEnEsteEquipo = (() => {
+    try {
+      const raw = localStorage.getItem('qfdos_practicas_safety_accepted');
+      if (!raw) return false;
+      if (raw === 'true') return true;
+      const p = JSON.parse(raw);
+      return !!p.accepted;
+    } catch {
+      return !!localStorage.getItem('qfdos_practicas_safety_accepted');
+    }
+  })();
 
   const tareas = [
     {
@@ -91,15 +120,16 @@ export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr }) =>
         </div>
       )}
 
+      {cargando && (
+        <div className="mis-entregas-estado" style={{ padding: '0.65rem 1rem', fontSize: '0.82rem', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+          <Loader2 size={15} className="spin" style={{ color: 'var(--teal-ink)' }} />
+          <span>{entregas ? 'Sincronizando entregas con el registro central…' : 'Comprobando tus entregas en el registro central…'}</span>
+        </div>
+      )}
+
       {/* Lista de tareas */}
       <div className="progreso-lista">
-        {cargando && (
-          <div className="mis-entregas-estado">
-            <Loader2 size={16} className="spin" /> Comprobando qué has entregado…
-          </div>
-        )}
-
-        {!cargando && tareas.map(t => (
+        {tareas.map(t => (
           <div key={t.id} className={`progreso-item ${t.hecho ? 'is-hecho' : ''}`}>
             {t.hecho
               ? <CheckCircle2 size={19} color="var(--accent-emerald)" style={{ flexShrink: 0 }} />
@@ -139,8 +169,8 @@ export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr }) =>
 
       <MiSemanaPracticas />
 
-      {/* Detalle de cada entrega */}
-      <MisEntregas />
+      {/* Detalle de cada entrega compartiendo estado para evitar peticiones redundantes */}
+      <MisEntregas entregasProp={entregas} cargandoProp={cargando} onRecargar={cargar} />
     </div>
   );
 };

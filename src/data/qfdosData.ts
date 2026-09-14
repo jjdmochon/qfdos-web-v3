@@ -202,6 +202,19 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
     addedAt: '2026-09-10'
   },
   {
+    id: 'link-notebooklm-general',
+    title: 'Google NotebookLM: Información General y Guía del Curso QFDOS',
+    url: 'https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986',
+    summary:
+      'Cuaderno interactivo oficial de Google NotebookLM con toda la información general de Química Farmacéutica II, guía docente oficial aprobada por la UGR, criterios de evaluación continua y normativa académica.',
+    category: 'Industria & carrera profesional',
+    source: 'Google NotebookLM · QFDOS UGR',
+    duration: 'Interactivo',
+    relatedTopic: 'Tema 00',
+    featured: true,
+    addedAt: '2026-09-14'
+  },
+  {
     id: 'link-acs-fall-2026-disclosures',
     title: 'ACS Fall 2026: 13 nuevas estructuras y candidatos clínicos desvelados',
     url: 'https://drughunter.com/articles/acs-fall-2026-first-time-disclosures',
@@ -333,7 +346,10 @@ export const QFDOS_INFO = {
   institution: "Universidad de Granada (UGR)",
   faculty: "Facultad de Farmacia",
   department: "Química Farmacéutica y Orgánica",
-  professors: ["Dr. Juan José Díaz-Mochón (Profesor Responsable · Grupo E)"],
+  professors: [
+    "Dr. Juan José Díaz-Mochón (Profesor Responsable · Grupo E)",
+    "Dra. Ana Sousa (Coordinadora de Prácticas de Laboratorio · ana.sousa@ugr.es)"
+  ],
   developer: {
     name: "NEXUS.LAB",
     tagline: "Ingeniería Digital & Ciencia Aplicada",
@@ -377,104 +393,100 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
   {
     id: 'tema-00',
     number: 'Tema 00',
-    title: 'Introducción & Afinidad Estructural',
-    subtitle: 'Termodinámica de Unión Ligando-Receptor, Isósteros y Modulación Alostérica',
-    description: 'Bases físico-químicas del reconocimiento molecular en Química Farmacéutica. Cuantificación de la afinidad mediante energía libre de Gibbs (ΔG° = R · T · ln(Kd)), relaciones entre constante de disociación (Kd) e inhibición (Ki), ecuación de Cheng-Prusoff (IC50 = Ki · (1 + [S]/Km)) y principios de bioisosterismo clásico y no clásico.',
+    title: 'Presentación del curso',
+    subtitle: 'Guía Docente Oficial, Evaluación Continua y Ecosistema de Aprendizaje',
+    description: 'Sesión inaugural de Química Farmacéutica II (Grupo E). Presentación de la guía docente oficial aprobada por la UGR, criterios de evaluación continua (70% examen final, 20% parcial, 5% prácticas de laboratorio, 5% seminarios y trabajos), calendario de clases magistrales y prácticas, cuaderno de laboratorio y ecosistema digital de aprendizaje interactivo.',
     keyConcepts: [
-      'Energía libre de Gibbs de unión (ΔG°)',
-      'Constante de afinidad y disociación (Kd y Ki)',
-      'Ecuación de Cheng-Prusoff (IC50)',
-      'Eficiencia de ligando (LE = -ΔG° / Nheavy)',
-      'Bioisósteros clásicos y no clásicos',
-      'Modulación ortostérica vs. alostérica'
+      'Guía docente y competencias formativas',
+      'Criterios de evaluación continua (70/20/5/5)',
+      'Calendario de clases magistrales, seminarios y prácticas',
+      'Normativa académica y régimen de convocatorias (UGR)',
+      'Ecosistema interactivo QFDOS v3 y NotebookLM'
     ],
-    slideCount: 42,
-    pdbTargetId: '1UZF',
-    targetName: 'Complejo Diana-Ligando Modelo (Reconocimiento Físico-Químico)',
+    slideCount: 28,
+    targetName: 'Química Farmacéutica II · Guía Docente y Evaluación',
     status: 'Publicado',
     slidesPdfUrl: '',
-    slidesPdfName: 'Tema 00: Presentación y Diapositivas Oficiales.pdf',
+    slidesPdfName: 'Tema 00: Presentación del Curso (Diapositivas).pdf',
     notesPdfUrl: '',
-    notesPdfName: 'Tema 00: Apuntes Magistrales y Fórmulas Biofísicas.pdf',
-    geminiNotebookUrl: '',
+    notesPdfName: 'Tema 00: Apuntes y Guía de Presentación del Curso.pdf',
+    geminiNotebookUrl: 'https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986',
     spotifyPodcastUrl: '',
-    drugs: [
+    drugs: [],
+    attachments: [
       {
-        name: 'Ligando Modelo A (Tetrazol)',
-        smiles: 'c1ccc(cc1)c2nnn[nH]2',
-        role: 'Bioisóstero clásico de ácido carboxílico con mayor lipofilia',
-        mw: 146.15,
-        logP: 1.62,
-        hbd: 1,
-        hba: 3,
-        tpsa: 43.1,
-        rotBonds: 1,
-        pdbId: '1UZF'
-      },
-      {
-        name: 'Ligando Modelo B (Carboxilato)',
-        smiles: 'c1ccc(cc1)C(=O)O',
-        role: 'Ácido carboxílico aromático de referencia',
-        mw: 122.12,
-        logP: 1.87,
-        hbd: 1,
-        hba: 2,
-        tpsa: 37.3,
-        rotBonds: 1
+        id: 'att-t00-notebook',
+        title: 'NotebookLM: Información General del Curso',
+        url: 'https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986',
+        type: 'notebook',
+        date: '14/09/2026'
       }
     ],
-    attachments: [],
     testQuestions: [
       {
         id: 't00-q1',
         topicId: 'tema-00',
-        block: 'Biofísica & Termodinámica',
-        question: '¿Qué ocurre con el valor experimental de IC50 cuando la concentración de sustrato competidor [S] en un ensayo enzimático aumenta al doble de su constante de Michaelis-Menten ([S] = 2 · Km)?',
+        block: 'Evaluación Continua UGR',
+        question: '¿Cuál es la ponderación oficial de las distintas actividades en la modalidad de Evaluación Continua de QFDOS (Grupo E)?',
         options: [
-          'El valor de IC50 se mantiene exactamente igual a Ki.',
-          'El valor de IC50 se triplica respecto a Ki (IC50 = 3 · Ki) según la ecuación de Cheng-Prusoff.',
-          'El valor de IC50 disminuye a la mitad (IC50 = Ki / 2).',
-          'El valor de IC50 pasa a ser cero porque el inhibidor se satura.'
+          'Examen Final 50%, Examen Parcial 30%, Prácticas 20%.',
+          'Examen Final 70%, Examen Parcial 20%, Prácticas 5%, Seminarios/Trabajos 5%.',
+          'Examen Final 80%, Prácticas 20%.',
+          'Examen Final 60%, Examen Parcial 20%, Trabajos 20%.'
         ],
         correctIndex: 1,
-        explanation: 'Aplicando la ecuación de Cheng-Prusoff para inhibición competitiva: IC50 = Ki · (1 + [S]/Km). Si [S] = 2 · Km, entonces IC50 = Ki · (1 + 2) = 3 · Ki.',
-        difficulty: 'Medio'
+        explanation: 'De acuerdo con la guía docente oficial aprobada por la UGR, la evaluación continua se desglosa en: Examen Final teórico 70%, Examen Parcial no eliminatorio 20%, Prácticas de Laboratorio 5% y Seminarios/Trabajos dirigidos 5%.',
+        difficulty: 'Fácil'
       },
       {
         id: 't00-q2',
         topicId: 'tema-00',
-        block: 'Bioisosterismo Químico',
-        question: '¿Cuál de las siguientes estructuras representa el bioisóstero clásico no-ionizable de un grupo ácido carboxílico que conserva los enlaces de hidrógeno mejorando la permeabilidad lipofílica?',
-        questionSmiles: 'c1ccccc1C(=O)O',
+        block: 'Normativa de Evaluación',
+        question: 'Para poder promediar las calificaciones obtenidas en el parcial, prácticas y seminarios con el examen final en evaluación continua, ¿qué requisito indispensable debe cumplirse?',
         options: [
-          { text: 'Anillo 1H-Tetrazol-5-ilo', smiles: 'c1ccccc1c2nnn[nH]2' },
-          { text: 'Alcohol Bencílico (-CH2OH)', smiles: 'c1ccccc1CO' },
-          { text: 'Amina Primaria (-NH2)', smiles: 'c1ccccc1N' },
-          { text: 'Grupo Nitro aromático (-NO2)', smiles: 'c1ccccc1[N+](=O)[O-]' }
+          'Haber asistido al 100% de las clases teóricas.',
+          'Obtener una calificación mínima de 5,0 sobre 10 en el Examen Final Oficial.',
+          'Entregar el cuaderno de prácticas antes del mes de octubre.',
+          'Aprobar el examen parcial con al menos un 6,0.'
+        ],
+        correctIndex: 1,
+        explanation: 'Es condición indispensable obtener una calificación mínima de 5,0 puntos sobre 10 en el examen final para que puedan sumarse las notas ponderadas de la evaluación continua.',
+        difficulty: 'Medio'
+      },
+      {
+        id: 't00-q3',
+        topicId: 'tema-00',
+        block: 'Prácticas de Laboratorio',
+        question: '¿Quién es la Coordinadora de Prácticas de Laboratorio encargada de gestionar todas las incidencias de prácticas de QFDOS?',
+        options: [
+          'Prof.ª Dra. Ana Sousa (ana.sousa@ugr.es).',
+          'Prof. Dr. Juan José Díaz-Mochón.',
+          'El delegado de curso de 4.º de Farmacia.',
+          'El servicio de conserjería de la Facultad de Farmacia.'
         ],
         correctIndex: 0,
-        explanation: 'El anillo 1H-tetrazol es el bioisóstero clásico más utilizado para reemplazar el ácido carboxílico: posee un pKa ácido similar (~4.5-4.9), deslocalización de carga negativa similar y una lipofilia (LogP) significativamente superior.',
-        difficulty: 'Avanzado'
+        explanation: 'La gestión de turnos, cambios de grupo, puestos e incidencias de las prácticas de laboratorio está a cargo de la Coordinadora de Prácticas, la Prof.ª Dra. Ana Sousa (ana.sousa@ugr.es).',
+        difficulty: 'Fácil'
       }
     ],
     flashcards: [
       {
         id: 'fc-00-1',
         topicId: 'tema-00',
-        concept: 'Ecuación de Cheng-Prusoff',
-        front: '¿Cuál es la formulación de la ecuación de Cheng-Prusoff para un inhibidor competitivo y qué cuantifica?',
-        back: 'IC50 = Ki · (1 + [S]/Km). Relaciona el parámetro experimental IC50 (dependiente del sustrato y del ensayo) con la constante termodinámica intrínseca de inhibición (Ki).',
-        difficulty: 'medium',
-        category: 'Biofísica'
+        concept: 'Ponderación de Evaluación Continua',
+        front: '¿Cómo se desglosa la nota final en Evaluación Continua de QFDOS?',
+        back: '70% Examen Final (mínimo 5,0 para promediar), 20% Examen Parcial, 5% Prácticas de Laboratorio y 5% Seminarios y Trabajos Dirigidos.',
+        difficulty: 'easy',
+        category: 'Guía Docente'
       },
       {
         id: 'fc-00-2',
         topicId: 'tema-00',
-        concept: 'Eficiencia de Ligando (LE)',
-        front: '¿Cómo se define y calcula la Eficiencia de Ligando (Ligand Efficiency, LE)?',
-        back: 'LE = -ΔG° / Nheavy, expresada en kcal/(mol · átomo pesado). Mide la contribución promedio de cada átomo no-hidrógeno a la energía libre de unión. Un valor LE >= 0.3 kcal/(mol·átomo) se considera óptimo.',
-        difficulty: 'hard',
-        category: 'Optimización de Leads'
+        concept: 'Coordinación e Incidencias de Prácticas',
+        front: '¿A quién debe dirigirse el alumnado ante cualquier incidencia de prácticas de laboratorio?',
+        back: 'A la Coordinadora de Prácticas, Prof.ª Dra. Ana Sousa (ana.sousa@ugr.es).',
+        difficulty: 'easy',
+        category: 'Prácticas'
       }
     ]
   },
@@ -1504,13 +1516,13 @@ export const INITIAL_STUDENT_QUESTIONS: StudentQuestion[] = [
   {
     id: 'sq-1',
     topicId: 'tema-00',
-    topicTitle: 'Tema 00: Introducción & Afinidad Estructural',
+    topicTitle: 'Tema 00: Presentación del curso',
     studentName: 'Elena García Pérez',
     studentEmail: 'alumno.demo@correo.ugr.es',
-    question: 'Profesor Mochón, en la ecuación de Cheng-Prusoff para un inhibidor competitivo (IC50 = Ki · (1 + [S]/Km)), ¿siempre que [S] es mucho menor que Km, la IC50 coincide exactamente con Ki?',
+    question: 'Profesor Mochón, respecto a la evaluación continua, ¿la nota mínima de 5 sobre 10 en el examen final es indispensable para que sumen el parcial (20%) y las prácticas (5%)?',
     timestamp: '14/09/2026 11:20',
     status: 'respondida',
-    response: '¡Exacto, Elena! Cuando [S] << Km, el término [S]/Km tiende a 0, por lo que (1 + [S]/Km) ≈ 1 y en consecuencia IC50 ≈ Ki. Esta es la condición óptima en ensayos bioquímicos para estimar la afinidad termodinámica directa.'
+    response: '¡Hola, Elena! Efectivamente: de acuerdo con la guía docente aprobada por la UGR, es requisito indispensable alcanzar un mínimo de 5,0 sobre 10 en el examen final oficial para promediar con las calificaciones de la evaluación continua obtenidas durante el semestre.'
   },
   {
     id: 'sq-2',

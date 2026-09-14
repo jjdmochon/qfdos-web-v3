@@ -9,11 +9,13 @@ import { PracticasPairReport } from './PracticasPairReport';
 import { PracticasSafetyRules } from './PracticasSafetyRules';
 import { PracticasProgreso } from './PracticasProgreso';
 import { LimiteDeError } from '../LimiteDeError';
+import { useAuth } from '../../context/AuthContext';
+import { misEntregas, getCachedEntregas } from '../../services/contenidoRemoto';
 import {
   FlaskConical, Layers, Calculator, Droplets, Activity,
   Settings, GraduationCap, Sparkles, BookOpen, ExternalLink, Users,
   ShieldAlert, CheckCircle2, Lock, X, ClipboardCheck, Download, ShieldCheck, ChevronRight,
-  Pause, Play
+  Pause, Play, AlertTriangle, Mail
 } from 'lucide-react';
 interface PracticasSectionProps {
   currentSubTab?: string;
@@ -24,20 +26,83 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
   currentSubTab,
   onSubTabChange
 }) => {
+  const { user } = useAuth();
+
+  const isLocallyAccepted = () => {
+    try {
+      const item = localStorage.getItem('qfdos_practicas_safety_accepted');
+      if (!item) return false;
+      if (item === 'true') return true;
+      const parsed = JSON.parse(item);
+      return !!parsed.accepted || !!parsed.email;
+    } catch {
+      return !!localStorage.getItem('qfdos_practicas_safety_accepted');
+    }
+  };
+
+  const isRemoteAccepted = (email?: string) => {
+    if (!email) return false;
+    const cached = getCachedEntregas(email);
+    return !!cached?.some(e => /normas/i.test(e.hoja));
+  };
+
   const [isSafetyAccepted, setIsSafetyAccepted] = useState<boolean>(() => {
-    return !!localStorage.getItem('qfdos_practicas_safety_accepted');
+    return isLocallyAccepted() || isRemoteAccepted(user?.email);
   });
+
+  // Reconocimiento automático de normas firmadas en cualquier equipo o sesión
+  useEffect(() => {
+    if (!user?.email) return;
+
+    if (isRemoteAccepted(user.email)) {
+      setIsSafetyAccepted(true);
+      try {
+        localStorage.setItem('qfdos_practicas_safety_accepted', JSON.stringify({
+          email: user.email,
+          accepted: true,
+          syncedFromRemote: true
+        }));
+      } catch {}
+    }
+
+    misEntregas(user.email).then(entregas => {
+      if (entregas && entregas.some(e => /normas/i.test(e.hoja))) {
+        setIsSafetyAccepted(true);
+        try {
+          localStorage.setItem('qfdos_practicas_safety_accepted', JSON.stringify({
+            email: user.email,
+            accepted: true,
+            syncedFromRemote: true
+          }));
+        } catch {}
+      }
+    });
+  }, [user?.email]);
 
   const [showLockNotice, setShowLockNotice] = useState(false);
 
-  const [activeSubTab, setActiveSubTab] = useState<
-    'progreso' | 'safety' | 'protocols' | 'yields' | 'solutions' | 'spectroscopy' | 'equipment' | 'exam' | 'pair_report'
-  >(() => {
-    if (currentSubTab && ['progreso', 'safety', 'protocols', 'yields', 'solutions', 'spectroscopy', 'equipment', 'exam', 'pair_report'].includes(currentSubTab)) {
-      return currentSubTab as any;
+  const VALID_SUB_TABS = [
+    'progreso',
+    'safety',
+    'protocols',
+    'yields',
+    'solutions',
+    'spectroscopy',
+    'equipment',
+    'exam',
+    'pair_report'
+  ] as const;
+  type SubTabId = (typeof VALID_SUB_TABS)[number];
+
+  const [activeSubTab, setActiveSubTab] = useState<SubTabId>(() => {
+    const accepted = isLocallyAccepted() || isRemoteAccepted(user?.email);
+    if (currentSubTab && (VALID_SUB_TABS as readonly string[]).includes(currentSubTab)) {
+      if (!accepted && currentSubTab !== 'safety' && currentSubTab !== 'progreso') {
+        return 'safety';
+      }
+      return currentSubTab as SubTabId;
     }
-    const accepted = !!localStorage.getItem('qfdos_practicas_safety_accepted');
-    return accepted ? 'progreso' : 'safety';
+    return 'progreso';
   });
 
   const heroRef = React.useRef<HTMLElement>(null);
@@ -105,10 +170,19 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
   }, [isPlaying]);
 
   React.useEffect(() => {
-    if (currentSubTab && ['progreso', 'safety', 'protocols', 'yields', 'solutions', 'spectroscopy', 'equipment', 'exam', 'pair_report'].includes(currentSubTab)) {
-      setActiveSubTab(currentSubTab as any);
+    if (currentSubTab && (VALID_SUB_TABS as readonly string[]).includes(currentSubTab)) {
+      if (!isSafetyAccepted && currentSubTab !== 'safety' && currentSubTab !== 'progreso') {
+        setShowLockNotice(true);
+        setActiveSubTab('safety');
+      } else {
+        setShowLockNotice(false);
+        setActiveSubTab(currentSubTab as SubTabId);
+      }
+    } else if (!currentSubTab) {
+      setShowLockNotice(false);
+      setActiveSubTab(prev => prev || 'progreso');
     }
-  }, [currentSubTab]);
+  }, [currentSubTab, isSafetyAccepted]);
 
   const SUB_TABS = [
     {
@@ -116,7 +190,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
       label: 'Mi progreso',
       icon: <ClipboardCheck size={15} />,
       desc: 'Qué has entregado y qué te falta',
-      locked: !isSafetyAccepted
+      locked: false
     },
     {
       id: 'safety',
@@ -177,10 +251,22 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
     }
   ];
 
+  const handleSubTabChange = (targetTab: string) => {
+    const tabObj = SUB_TABS.find(t => t.id === targetTab);
+    if (tabObj?.locked) {
+      setShowLockNotice(true);
+      setActiveSubTab('safety');
+      onSubTabChange?.('safety');
+      return;
+    }
+    setShowLockNotice(false);
+    setActiveSubTab(targetTab as SubTabId);
+    onSubTabChange?.(targetTab);
+  };
+
   const handleSafetyAccepted = () => {
     setIsSafetyAccepted(true);
-    setActiveSubTab('protocols');
-    onSubTabChange?.('protocols');
+    handleSubTabChange('protocols');
   };
 
   return (
@@ -355,6 +441,101 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
 
       <div className="container" style={{ padding: '2rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
+      {/* Aviso Oficial: Versión Beta y Coordinación de Prácticas */}
+      <div
+        className="qfdos-card"
+        style={{
+          padding: '1.2rem 1.5rem',
+          background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.55) 0%, rgba(204, 251, 241, 0.45) 100%)',
+          border: '1px solid rgba(217, 119, 6, 0.35)',
+          borderRadius: '12px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
+        }}
+        role="region"
+        aria-label="Aviso oficial de prácticas de laboratorio"
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div
+            style={{
+              background: '#fef3c7',
+              color: '#b45309',
+              padding: '8px',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <AlertTriangle size={22} />
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
+              <span
+                style={{
+                  background: '#f59e0b',
+                  color: '#ffffff',
+                  fontWeight: 800,
+                  fontSize: '0.68rem',
+                  letterSpacing: '0.04em',
+                  padding: '2px 8px',
+                  borderRadius: '999px',
+                  textTransform: 'uppercase'
+                }}
+              >
+                Versión Beta · No Oficial
+              </span>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                Plataforma de Innovación Docente QFDOS v3 · UGR
+              </span>
+            </div>
+
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-title)', lineHeight: 1.55 }}>
+              <strong>El Módulo de Prácticas de la Plataforma de innovación docente QFDOS v3 es una versión beta y no oficial.</strong> Deben seguir las indicaciones de su profesor de prácticas para la correcta ejecución de las mismas.
+            </p>
+
+            <div
+              style={{
+                marginTop: '0.85rem',
+                paddingTop: '0.75rem',
+                borderTop: '1px solid rgba(217, 119, 6, 0.18)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.75rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'var(--text-main)' }}>
+                <Users size={16} color="var(--teal-ink)" style={{ flexShrink: 0 }} />
+                <span>
+                  <strong>Coordinación de Prácticas:</strong> Prof.ª Dra. Ana Sousa · Gestión de todas las incidencias de prácticas de laboratorio (turnos, cambios de grupo y puestos).
+                </span>
+              </div>
+
+              <a
+                href="mailto:ana.sousa@ugr.es?subject=Incidencia%20Pr%C3%A1cticas%20QFDOS%20v3"
+                className="btn btn-sm btn-outline"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: 'var(--navy-ink)',
+                  borderColor: 'rgba(217, 119, 6, 0.4)',
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  textDecoration: 'none'
+                }}
+              >
+                <Mail size={13} color="#d97706" /> Contactar con Dra. Ana Sousa (ana.sousa@ugr.es)
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Sub-Navigation Navigation Bar */}
       <div className="qfdos-card" style={{ padding: '0.6rem 0.8rem', background: 'var(--surface)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.5rem' }}>
@@ -365,17 +546,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
             return (
               <button
                 key={tab.id}
-                onClick={() => {
-                  if (isLocked) {
-                    setShowLockNotice(true);
-                    setActiveSubTab('safety');
-                    onSubTabChange?.('safety');
-                  } else {
-                    setShowLockNotice(false);
-                    setActiveSubTab(tab.id as any);
-                    onSubTabChange?.(tab.id);
-                  }
-                }}
+                onClick={() => handleSubTabChange(tab.id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -428,7 +599,10 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
       <div>
         {activeSubTab === 'progreso' && (
           <LimiteDeError zona="Mi progreso">
-            <PracticasProgreso onIr={(d) => setActiveSubTab(d as any)} />
+            <PracticasProgreso
+              onIr={handleSubTabChange}
+              onSafetyStatusKnown={(accepted) => setIsSafetyAccepted(accepted)}
+            />
           </LimiteDeError>
         )}
         {activeSubTab === 'safety' && (

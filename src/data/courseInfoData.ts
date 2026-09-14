@@ -39,7 +39,10 @@ export const COURSE_GENERAL_INFO = {
   teachingStaff: {
     coordinator: "Dr. Juan José Díaz-Mochón",
     email: "juandiaz@go.ugr.es",
-    role: "Profesor Titular · Responsable y Docente Único (Grupo E)",
+    role: "Profesor Titular · Responsable y Docente Único de Teoría (Grupo E)",
+    practicasCoordinator: "Dra. Ana Sousa",
+    practicasEmail: "ana.sousa@ugr.es",
+    practicasRole: "Coordinadora de Prácticas de Laboratorio (Gestión de Incidencias de Prácticas)",
     departmentLocation: "Departamento de Química Farmacéutica y Orgánica, Facultad de Farmacia, Campus de Cartuja",
     researchCenterLocation: "Centro GENYO (Centro de Genómica e Investigación Oncológica), Parque Tecnológico de la Salud (PTS), Avenida de la Ilustración 114, 18016 Granada, España"
   },

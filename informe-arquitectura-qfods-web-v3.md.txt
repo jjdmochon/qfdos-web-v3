@@ -1,0 +1,72 @@
+# Revisión de arquitectura — qfods-web-v3
+
+**Repo:** https://github.com/jjdmochon/qfods-web-v3 · **Web:** https://jjdmochon.github.io/qfods-web-v3/
+**Revisado:** 11-sep-2026, HEAD `15a9944` (fix branding NEXUS.LAB, hoy 12:38). Solo lectura; no se ha tocado nada.
+**Estado del despliegue:** el sitio sirve el bundle `index-fNcgFds2.js`, que coincide con HEAD. Src y `docs/` van sincronizados.
+
+---
+
+## 1. Cómo está montado
+
+**Frontend.** SPA en React 19 + TypeScript + Vite (plugin SWC), sin backend propio. Todo el estado vive en el navegador (localStorage / IndexedDB). Enrutado por hash (`#temario`, `#practicas`…) con sincronización al historial. Buscador global con ⌘K.
+
+**Despliegue.** GitHub Pages sirviendo la carpeta `docs/` del propio repo. El build es manual (`dev.ps1 -Pages`, que define `PAGES_BASE=/qfods-web-v3/` para que Vite genere rutas con esa base; sin ella, página en blanco). No hay CI: cada cambio de `src/` exige recompilar y commitear `docs/` a mano. Hay un `vercel.json` residual de un despliegue anterior (inofensivo, pero ruido).
+
+**Autenticación.** Google OAuth (`@react-oauth/google`); el ID token se decodifica en el cliente. Dominios admitidos: `@correo.ugr.es`, `@ugr.es`, `@go.ugr.es` (institucionales) y `@gmail.com` (externas, marcadas como no verificables). Rol profesor = lista fija en el código (`juandiaz@ugr.es`, `juandiaz@go.ugr.es`). El Client ID va en `.env.local` (ignorado por git, bien).
+
+**Backend "CMS" = Google Apps Script + una hoja de cálculo.** Un solo endpoint (`Codigo.gs`, desplegado como web app "cualquier usuario") con tres acciones:
+- `leerContenido` (GET, pública): devuelve el temario/avisos/glosario/enlaces publicados, troceados en celdas de 45.000 caracteres en la pestaña oculta `_Contenido`.
+- `guardarContenido` (POST): reescribe esa pestaña entera. Exige la clave `CLAVE_PUBLICACION`, ahora en Script Properties (bien resuelto tras la rotación de septiembre).
+- `misEntregas` (GET): devuelve las entregas del correo que se pida.
+- Además, un modo genérico (`anotarFila`) vuelca entregas de prácticas en pestañas por nombre.
+
+**Flujo de publicación.** El profesor edita en el CMS (modal admin con módulos, avisos, enlaces, fármacos, preguntas, generador de exámenes IA con clave Gemini guardada en su navegador). Los cambios viven en su localStorage hasta que pulsa "Publicar cambios" con la clave → la hoja queda como estado oficial. En cada arranque, cualquier visitante descarga la hoja y **esa versión pisa al contenido compilado** en el bundle.
+
+**Prácticas.** Módulo extenso propio (normas de seguridad con firma, cuaderno de parejas, calculadoras de rendimiento/disoluciones, taller de espectroscopia). Las entregas van al mismo Apps Script; los PDF/materiales que sube el profesor van a IndexedDB de su navegador (no se distribuyen: solo los enlaces llegan al alumnado).
+
+---
+
+## 2. Puntos frágiles
+
+**P1 — La hoja publicada pisa al build, y la caché la hace pegajosa (el problema activo).**
+En cada arranque `descargarContenido()` sustituye el contenido compilado por el de la hoja. Además: (a) lo descargado se guarda en `qfdos_v3_contenido_remoto`, que `purgeStaleCourseCache()` **no purga** al subir `COURSE_DATA_VERSION` (ahora 3.2.1); y (b) al aplicarse, los topics remotos se reescriben también en `qfdos_v3_topics`. Resultado: aunque la hoja se vaciara, los navegadores que la leyeron siguen sirviendo lo malo. Es exactamente lo que está pasando: la hoja (publicada 08-sep 01:19) sigue sirviendo Tema 01 "Próximamente" y enlaces placeholder aunque el build está limpio. **El botón "Restablecer contenido" (parche pendiente de subir) es el camino correcto, pero conviene además purgar la caché remota al cambiar de versión y no persistir los topics remotos en la clave de caché local.**
+
+**P2 — El buzón de dudas no entrega nada (roto de punta a punta).**
+`StudentQuestionModal` guarda la pregunta solo en el localStorage **del propio estudiante**, bajo la clave `qfdos_v2_student_questions`. El CMS del profesor lee `qfdos_v3_student_questions`, que alimenta el estado de `App.tsx`. Dos claves distintas, cero red: el estudiante ve "enviada" y nadie la recibe nunca. Y el profesor ve como "preguntas" los ejemplos semilla (`INITIAL_STUDENT_QUESTIONS`). Hay que conectarlo al Apps Script (una acción más, el patrón ya existe) o ocultar el buzón hasta hacerlo.
+
+**P3 — Credenciales y endpoint abiertos.**
+- `misEntregas` responde con las entregas de **cualquier** correo que se le pida, sin autenticación: quien sepa el email de un compañero puede leer sus entregas.
+- El modo genérico de entregas (`anotarFila`) tampoco pide clave: cualquiera puede escribir filas en la hoja.
+- El ID de la hoja es público (está en el repo); la hoja en sí sigue siendo privada, pero el endpoint es la puerta.
+- El rol profesor se decide en el cliente: editando `localStorage` cualquiera abre el CMS. Aceptable mientras publicar exija la clave (que sí está en el servidor), pero hay que saberlo.
+
+**P4 — Apps Script: dos ficheros y deriva del despliegue.**
+Hay `google-apps-script/Codigo.gs` (el bueno, v2 con las tres acciones) y `google-apps-script-receiver.gs` en la raíz (duplicado antiguo, solo entregas). El que manda es el que esté pegado en el editor de Apps Script, y guardar el repo no actualiza el endpoint: hay que crear una **nueva implementación** a mano. Conviene borrar el duplicado y verificar que el despliegue vivo coincide con `Codigo.gs` (si la rotación de clave no se redeployó, publicar seguirá fallando o aceptando la clave vieja).
+
+**P5 — Build manual sin red de seguridad.**
+Src y `docs/` se despliegan a mano; hoy van sincronizados, pero nada impide un push de `src/` sin rebuild. Un GitHub Action que compile `docs/` (o Pages con Actions directamente) elimina esta clase de error y también el problema de que los parches tengan que incluir el bundle.
+
+**P6 — Escombros.**
+`src/data/qfdosData.ts.bak` (78 KB muertos), `src/utils/fileStorage.ts` (resto de la v2, sin uso), `vercel.json`, y la copia de login ("Acceso con @go.ugr.es o @gmail.com") que no menciona `@correo.ugr.es`, el correo real del alumnado. Pestañas vacías "Exámenes Oficiales (0)" y "Trabajos & Proyectos (0)" visibles sin contenido.
+
+---
+
+## 3. Recomendaciones priorizadas
+
+1. **Ahora — arreglar lo que ven los estudiantes.** Aplicar el parche del botón "Restablecer contenido" y subir. Ojo: el parche se generó sobre `496b810` y HEAD ya va por `15a9944` (que tocó `docs/`); si `git am` da conflicto en el bundle, aplicar solo los cambios de `src/` y recompilar `docs/` localmente. Después, en el CMS: Restablecer → Publicar. Verificar en una ventana de incógnito que Tema 01 ya no sale "Próximamente".
+2. **Esta semana — buzón de dudas.** Conectarlo al Apps Script (acción `guardarDuda` + lectura para el profesor) o ocultarlo. Quitar las preguntas semilla.
+3. **Esta semana — purga de cachés.** Incluir `qfdos_v3_contenido_remoto` en la purga por versión y dejar de volcar los topics remotos a `qfdos_v3_topics`.
+4. **Cuando se pueda — higiene del Apps Script.** Borrar el receiver duplicado, redeploy de `Codigo.gs` confirmando que `CLAVE_PUBLICACION` está en Script Properties, y considerar exigir alguna prueba (o al menos limitar campos) en `misEntregas` y en las entregas anónimas.
+5. **Cuando se pueda — CI de build.** GitHub Action: `npm ci && PAGES_BASE=/qfods-web-v3/ npm run build` y commit/publish de `docs/`. Quita el paso manual más frágil del ciclo.
+6. **Limpieza menor.** Borrar `.bak`, `utils/fileStorage.ts`, `vercel.json`; ajustar la copia de login a `@correo.ugr.es`; ocultar pestañas vacías hasta que tengan contenido.
+7. **A medio plazo.** Si la plataforma se presenta como oficial UGR, valorar dominio institucional (la UGR ofrece alojamiento docente) o al menos una nota de que es una herramienta del profesor. Y si el buzón o las entregas crecen, mover la autenticación de rol al lado del Apps Script (verificando el ID token allí) en lugar del cliente.
+
+---
+
+## 4. Lo que está bien
+
+- Clave de publicación fuera del código (Script Properties) y publicación protegida en servidor; lectura pública sin clave, separación deliberada.
+- Contenido troceado para superar el límite de celda; caché offline en el cliente.
+- Build reproducible documentado (`dev.ps1` con la historia de Drive/K:), README honesto.
+- Src y `docs/` sincronizados hoy; el sitio en producción sirve HEAD.
+- Diseño de "editar en local → publicar" correcto como concepto: el fallo es la falta de camino de vuelta (reset), ya en camino con el parche.

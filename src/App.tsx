@@ -145,6 +145,20 @@ function parseUrlHash(): { tab: TabType; sub?: string } {
   }
 }
 
+function trackPageView(hash: string) {
+  if (typeof (window as any).gtag === 'function') {
+    try {
+      (window as any).gtag('event', 'page_view', {
+        page_path: hash,
+        page_location: window.location.href,
+        page_title: document.title
+      });
+    } catch {
+      // analytics fail-safe
+    }
+  }
+}
+
 export const App: React.FC = () => {
   const { isAuthenticated, isProfesor } = useAuth();
 
@@ -154,7 +168,7 @@ export const App: React.FC = () => {
 
   const navigateTo = useCallback((tab: TabType, subRoute?: string, replace = false) => {
     setActiveTab(tab);
-    if (tab === 'practicas' && subRoute) {
+    if (tab === 'practicas') {
       setPracticasSubTab(subRoute);
     }
     const hashPrefix = TAB_TO_HASH[tab] || 'hub';
@@ -166,6 +180,7 @@ export const App: React.FC = () => {
         window.history.pushState({ tab, subRoute }, '', targetHash);
       }
     }
+    trackPageView(targetHash);
   }, []);
 
   // Se ejecuta antes que cualquier lectura de caché de abajo
@@ -267,7 +282,7 @@ export const App: React.FC = () => {
       }
       setActiveTab(tab);
       if (tab === 'practicas') {
-        if (sub) setPracticasSubTab(sub);
+        setPracticasSubTab(sub);
       } else if (tab === 'temas') {
         if (sub) {
           const topic = topics.find(t => t.id === sub);
@@ -287,6 +302,7 @@ export const App: React.FC = () => {
       setSelectedQuizTopic(null);
       setSelectedFlashcardsTopic(null);
       setSelectedSpotifyAttachment(null);
+      trackPageView(window.location.hash || '#/hub');
     };
 
     if (!window.location.hash) {
@@ -512,9 +528,9 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Columna 2: Profesorado Responsable */}
+            {/* Columna 2: Profesorado Responsable & Coordinación */}
             <div className="qfdos-footer-col">
-              <h5 className="qfdos-footer-heading">Profesorado responsable</h5>
+              <h5 className="qfdos-footer-heading">Profesorado y coordinación</h5>
               <div className="ftr-person">
                 <div className="ftr-person-name">Dr. Juan José Díaz-Mochón</div>
                 <div className="ftr-person-role">Profesor Titular · Responsable del Grupo E</div>
@@ -524,9 +540,13 @@ export const App: React.FC = () => {
                   <a className="ftr-person-mail" href="mailto:juandiaz@ugr.es">juandiaz@ugr.es</a>
                 </div>
               </div>
-              <p style={{ fontSize: '0.74rem', lineHeight: 1.5, margin: '2px 0 0' }}>
-                Tutorías en la Facultad de Farmacia (Cartuja), en el Centro GENYO (PTS)
-                o por videoconferencia en Google Meet.
+              <div className="ftr-person" style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="ftr-person-name">Dra. Ana Sousa</div>
+                <div className="ftr-person-role">Coordinadora de Prácticas · Gestión de Incidencias</div>
+                <a className="ftr-person-mail" href="mailto:ana.sousa@ugr.es">ana.sousa@ugr.es</a>
+              </div>
+              <p style={{ fontSize: '0.74rem', lineHeight: 1.5, margin: '6px 0 0' }}>
+                Tutorías de teoría en Farmacia (Cartuja), GENYO (PTS) o Meet. Incidencias de laboratorio a través de Coordinación de Prácticas.
               </p>
             </div>
 

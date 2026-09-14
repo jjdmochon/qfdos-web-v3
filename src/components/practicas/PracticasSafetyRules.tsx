@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { NORMAS_SEGURIDAD_CHECKLIST, REACTIVOS_PRECAUCIONES } from '../../data/practicasData';
 import { enviarAHoja } from '../../services/entregaPracticas';
+import { useAuth } from '../../context/AuthContext';
+import { getCachedEntregas } from '../../services/contenidoRemoto';
 
 interface PracticasSafetyRulesProps {
   onAcceptAndProceed: () => void;
@@ -15,12 +17,20 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
   onAcceptAndProceed,
   isUnlocked = false
 }) => {
+  const { user } = useAuth();
   const [initials, setInitials] = useState<string>('');
-  const [studentName, setStudentName] = useState<string>('');
-  const [studentEmail, setStudentEmail] = useState<string>('');
+  const [studentName, setStudentName] = useState<string>(() => user?.name || '');
+  const [studentEmail, setStudentEmail] = useState<string>(() => user?.email || '');
   const [checkedRules, setCheckedRules] = useState<{ [key: number]: boolean }>({});
   const [allChecked, setAllChecked] = useState<boolean>(false);
-  const [hasSubmitted, setHasSubmitted] = useState<boolean>(isUnlocked);
+  const [hasSubmitted, setHasSubmitted] = useState<boolean>(() => {
+    if (isUnlocked) return true;
+    if (user?.email) {
+      const cached = getCachedEntregas(user.email);
+      if (cached?.some(e => /normas/i.test(e.hoja))) return true;
+    }
+    return false;
+  });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // El envio real vive en services/entregaPracticas: alli se distingue entre
@@ -29,21 +39,40 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
     return enviarAHoja(sheetName, rowData);
   };
 
-  // Load from localStorage if present
+  // Carga consentimientos guardados localmente o sincronizados por cuenta
   useEffect(() => {
+    if (isUnlocked) {
+      setHasSubmitted(true);
+    }
+    if (user?.name && !studentName) {
+      setStudentName(user.name);
+    }
+    if (user?.email && !studentEmail) {
+      setStudentEmail(user.email);
+    }
+    if (user?.email) {
+      const cached = getCachedEntregas(user.email);
+      if (cached?.some(e => /normas/i.test(e.hoja))) {
+        setHasSubmitted(true);
+      }
+    }
     const savedConsent = localStorage.getItem('qfdos_practicas_safety_accepted');
     if (savedConsent) {
       try {
-        const parsed = JSON.parse(savedConsent);
-        setStudentName(parsed.name || '');
-        setStudentEmail(parsed.email || '');
-        setInitials(parsed.initials || '');
-        setHasSubmitted(true);
+        if (savedConsent === 'true') {
+          setHasSubmitted(true);
+        } else {
+          const parsed = JSON.parse(savedConsent);
+          if (parsed.name && !studentName) setStudentName(parsed.name);
+          if (parsed.email && !studentEmail) setStudentEmail(parsed.email);
+          if (parsed.initials && !initials) setInitials(parsed.initials);
+          if (parsed.accepted) setHasSubmitted(true);
+        }
       } catch (e) {
         console.error(e);
       }
     }
-  }, []);
+  }, [user, isUnlocked]);
 
   const totalRules = NORMAS_SEGURIDAD_CHECKLIST.length;
   const currentCheckedCount = Object.values(checkedRules).filter(Boolean).length;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Inbox, RefreshCw, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { misEntregas, EntregaPropia, publicacionDisponible } from '../services/contenidoRemoto';
+import { misEntregas, EntregaPropia, publicacionDisponible, getCachedEntregas } from '../services/contenidoRemoto';
 
 /** Etiquetas legibles para las claves que llegan de la hoja. */
 const ETIQUETAS: Record<string, string> = {
@@ -17,6 +17,12 @@ const ETIQUETAS: Record<string, string> = {
 
 const OCULTAR = ['email1', 'email2', 'cuentaDeEnvio', 'email', 'iniciales'];
 
+interface MisEntregasProps {
+  entregasProp?: EntregaPropia[] | null;
+  cargandoProp?: boolean;
+  onRecargar?: () => void;
+}
+
 /**
  * Lo que esta persona ha entregado, leído de la hoja del profesor.
  *
@@ -24,27 +30,45 @@ const OCULTAR = ['email1', 'email2', 'cuentaDeEnvio', 'email', 'iniciales'];
  * necesaria a que las entregas salgan del navegador: sin esto, el alumnado
  * envía y se queda sin ninguna prueba de haberlo hecho.
  */
-export const MisEntregas: React.FC = () => {
+export const MisEntregas: React.FC<MisEntregasProps> = ({
+  entregasProp,
+  cargandoProp,
+  onRecargar
+}) => {
   const { user } = useAuth();
-  const [entregas, setEntregas] = useState<EntregaPropia[] | null>(null);
-  const [cargando, setCargando] = useState(true);
+  const [entregasLocal, setEntregasLocal] = useState<EntregaPropia[] | null>(() =>
+    user?.email ? getCachedEntregas(user.email) : null
+  );
+  const [cargandoLocal, setCargandoLocal] = useState<boolean>(() =>
+    user?.email ? !getCachedEntregas(user.email) : true
+  );
   const [error, setError] = useState<string | null>(null);
 
+  const entregas = entregasProp !== undefined ? entregasProp : entregasLocal;
+  const cargando = cargandoProp !== undefined ? cargandoProp : cargandoLocal;
+
   const cargar = async () => {
+    if (onRecargar) {
+      onRecargar();
+      return;
+    }
     if (!user?.email) return;
-    setCargando(true);
+    if (!entregas) setCargandoLocal(true);
     setError(null);
     const r = await misEntregas(user.email);
-    if (r === null) {
+    if (r === null && !entregas) {
       setError('No se ha podido consultar el registro de entregas ahora mismo.');
-      setEntregas(null);
-    } else {
-      setEntregas(r);
+    } else if (r !== null) {
+      setEntregasLocal(r);
     }
-    setCargando(false);
+    setCargandoLocal(false);
   };
 
-  useEffect(() => { cargar(); /* eslint-disable-next-line */ }, [user?.email]);
+  useEffect(() => {
+    if (entregasProp === undefined) {
+      cargar();
+    }
+  }, [user?.email, entregasProp]);
 
   if (!publicacionDisponible()) return null;
 
@@ -69,7 +93,7 @@ export const MisEntregas: React.FC = () => {
         Registrado a nombre de <code>{user?.email}</code>
       </p>
 
-      {cargando && (
+      {cargando && !entregas && (
         <div className="mis-entregas-estado">
           <Loader2 size={16} className="spin" /> Consultando el registro…
         </div>
@@ -89,7 +113,7 @@ export const MisEntregas: React.FC = () => {
         </div>
       )}
 
-      {!cargando && !error && !!entregas?.length && (
+      {!error && !!entregas?.length && (
         <ul className="mis-entregas-lista">
           {entregas.map(e => {
             const campos = Object.entries(e.datos)

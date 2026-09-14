@@ -143,7 +143,7 @@ export const MiSemanaPracticas: React.FC = () => {
           </button>
           <p className="calc-nota">
             Cinco eventos, uno por sesión, con el guion del día y aviso la tarde anterior.
-            La hora exacta la confirma el profesor: se marcan como jornada de laboratorio.
+            La hora exacta la confirma el profesor de laboratorio. Para cambios de turno o cualquier incidencia de asignación de semana, contacta con la Coordinadora de Prácticas: <strong>Prof.ª Dra. Ana Sousa</strong> (<a href="mailto:ana.sousa@ugr.es" style={{ color: 'var(--teal-ink)', fontWeight: 600 }}>ana.sousa@ugr.es</a>).
           </p>
         </>
       )}

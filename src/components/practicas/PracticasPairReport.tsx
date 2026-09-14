@@ -89,9 +89,9 @@ export const PracticasPairReport: React.FC = () => {
       turno: '8:30-11:30',
       fecha: new Date().toISOString().split('T')[0],
       student1: {
-        nombre: '',
+        nombre: user?.name || '',
         dni: '',
-        email: ''
+        email: user?.email || ''
       },
       student2: {
         nombre: '',
@@ -178,6 +178,20 @@ export const PracticasPairReport: React.FC = () => {
       window.removeEventListener('focus', handleSync);
     };
   }, []);
+
+  // Sincronizar automáticamente el correo del estudiante autenticado en la pareja
+  useEffect(() => {
+    if (user?.email && (!currentReport.student1.email || !currentReport.student1.nombre)) {
+      setCurrentReport(prev => ({
+        ...prev,
+        student1: {
+          ...prev.student1,
+          nombre: prev.student1.nombre || user.name || '',
+          email: prev.student1.email || user.email || ''
+        }
+      }));
+    }
+  }, [user?.email, user?.name]);
 
   // UI state for submit notification
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);

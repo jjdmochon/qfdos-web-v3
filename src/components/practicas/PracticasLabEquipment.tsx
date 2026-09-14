@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { recurso } from '../../services/rutas';
 import {
   LAB_EQUIPMENT_INVENTORY,
@@ -6,6 +6,7 @@ import {
   MATERIAL_PUESTO
 } from '../../data/practicasData';
 import { enviarAHoja } from '../../services/entregaPracticas';
+import { useAuth } from '../../context/AuthContext';
 import {
   Box, Settings, Wind, Layers, CheckCircle2, HelpCircle,
   AlertTriangle, Info, ArrowRight, ShieldCheck, Flame, RefreshCw
@@ -181,13 +182,19 @@ export const PracticasLabEquipment: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   // Missing material reporting
+  const { user } = useAuth();
   const [missingItems, setMissingItems] = useState<Set<string>>(new Set());
-  const [reporterName, setReporterName] = useState<string>('');
-  const [reporterEmail, setReporterEmail] = useState<string>('');
+  const [reporterName, setReporterName] = useState<string>(() => user?.name || '');
+  const [reporterEmail, setReporterEmail] = useState<string>(() => user?.email || '');
   const [puestoNumber, setPuestoNumber] = useState<string>('');
   const [isReportSubmitting, setIsReportSubmitting] = useState<boolean>(false);
   const [reportSubmitted, setReportSubmitted] = useState<boolean>(false);
   const [reportStatus, setReportStatus] = useState<string>('');
+
+  useEffect(() => {
+    if (user?.name && !reporterName) setReporterName(user.name);
+    if (user?.email && !reporterEmail) setReporterEmail(user.email);
+  }, [user]);
 
   const sendMaterialReport = async () => {
     if (missingItems.size === 0 || !reporterName.trim() || !reporterEmail.trim() || !puestoNumber.trim()) {
@@ -205,7 +212,8 @@ export const PracticasLabEquipment: React.FC = () => {
       totalFaltante: String(missingItems.size)
     });
     setReportStatus(resultado.mensaje);
-    setReportSubmitted(resultado.estado === 'enviado-sin-confirmar');
+    const exito = resultado.estado === 'confirmado' || resultado.estado === 'enviado-sin-confirmar';
+    setReportSubmitted(exito);
     setIsReportSubmitting(false);
   };
 
@@ -586,10 +594,10 @@ export const PracticasLabEquipment: React.FC = () => {
                 <AlertTriangle size={11} /> NOTIFICAR MATERIAL FALTANTE O DEFECTUOSO
               </span>
               <h4 style={{ margin: '0.2rem 0', fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-title)' }}>
-                Informe de Material Ausente
+                Informe de Material Ausente o Incidencias de Puesto
               </h4>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-                Marca los elementos que faltan o están defectuosos en tu puesto y envía el informe al profesor.
+                Marca los elementos que faltan o están defectuosos en tu puesto. Las incidencias son gestionadas por el profesor responsable y la Coordinadora de Prácticas, <strong>Prof.ª Dra. Ana Sousa</strong> (<a href="mailto:ana.sousa@ugr.es" style={{ color: 'var(--teal-ink)' }}>ana.sousa@ugr.es</a>).
               </p>
             </div>
 
