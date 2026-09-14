@@ -55,7 +55,8 @@ const SHIPPED_KEYS = [
   'qfdos_v3_topics',
   'qfdos_v3_announcements',
   'qfdos_v3_glossary',
-  'qfdos_v3_contenido_remoto'
+  'qfdos_v3_contenido_remoto',
+  'qfdos_v3_links'
 ];
 
 /**
@@ -200,7 +201,7 @@ export const App: React.FC = () => {
   );
 
   const [resourceLinks, setResourceLinks] = useState<QfdosResourceLink[]>(() =>
-    contenidoEnCache()?.resourceLinks ?? loadUserOwned('qfdos_v3_links', INITIAL_RESOURCE_LINKS)
+    contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS)
   );
 
   const [studentQuestions, setStudentQuestions] = useState<StudentQuestion[]>(() =>
@@ -230,7 +231,11 @@ export const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('qfdos_v3_topics', JSON.stringify(topics)); }, [topics]);
   useEffect(() => { localStorage.setItem('qfdos_v3_announcements', JSON.stringify(announcements)); }, [announcements]);
   useEffect(() => { localStorage.setItem('qfdos_v3_glossary', JSON.stringify(glossary)); }, [glossary]);
-  useEffect(() => { localStorage.setItem('qfdos_v3_links', JSON.stringify(resourceLinks)); }, [resourceLinks]);
+  useEffect(() => {
+    if (isProfesor) {
+      localStorage.setItem('qfdos_v3_links', JSON.stringify(resourceLinks));
+    }
+  }, [resourceLinks, isProfesor]);
   useEffect(() => { localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(studentQuestions)); }, [studentQuestions]);
 
   /**

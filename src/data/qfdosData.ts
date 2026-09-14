@@ -176,54 +176,13 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
-    id: 'link-simulador-fir',
-    title: 'Simulador Oficial de Exámenes FIR (2020-2025)',
-    url: 'https://jjdmochon.github.io/FIR/',
-    summary:
-      'Plataforma oficial interactiva de preparación para la prueba selectiva de Farmacéutico Interno Residente (FIR), convocada por el Ministerio de Sanidad. Incluye 6 exámenes oficiales completos (1.235 preguntas), módulo especializado de Química Farmacéutica (136 preguntas con estructuras 2D RDKit y figuras HD), temporizador de 4h 30m y baremo ministerial (+3 / -1 / 0).',
-    category: 'Industria & carrera profesional',
-    source: 'Ministerio de Sanidad / UGR',
-    duration: 'Exámenes 4h 30m / Modo Estudio',
-    relatedTopic: 'Evaluación Oficial & FIR',
-    featured: true,
-    addedAt: '2026-09-11'
-  },
-  {
-    id: 'link-nexus-lab',
-    title: 'NEXUS.LAB: Ingeniería Digital & Ciencia Aplicada',
-    url: 'https://nexus-lab-team.netlify.app/',
-    summary:
-      'Equipo y laboratorio de ingeniería responsable del diseño, algoritmia biofísica e infraestructura digital de la plataforma QFDOS v3. Sinergia académico-industrial para la digitalización con rigor científico y docencia farmacéutica.',
-    category: 'Industria & carrera profesional',
-    source: 'NEXUS.LAB',
-    duration: '5 min',
-    relatedTopic: 'Plataforma QFDOS',
-    featured: true,
-    addedAt: '2026-09-10'
-  },
-  {
-    id: 'link-notebooklm-general',
-    title: 'Google NotebookLM: Información General y Guía del Curso QFDOS',
-    url: 'https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986',
-    summary:
-      'Cuaderno interactivo oficial de Google NotebookLM con toda la información general de Química Farmacéutica II, guía docente oficial aprobada por la UGR, criterios de evaluación continua y normativa académica.',
-    category: 'Industria & carrera profesional',
-    source: 'Google NotebookLM · QFDOS UGR',
-    duration: 'Interactivo',
-    relatedTopic: 'Tema 00',
-    featured: true,
-    addedAt: '2026-09-14'
-  },
-  {
     id: 'link-acs-fall-2026-disclosures',
-    title: 'ACS Fall 2026: 13 nuevas estructuras y candidatos clínicos desvelados',
-    url: 'https://drughunter.com/articles/acs-fall-2026-first-time-disclosures',
+    title: 'ACS Otoño 2026: 13 nuevas estructuras y candidatos clínicos',
+    url: 'https://drughunter.com/articles/acs-fall-2026-first-time-disclosures?utm_term=fall%202026%20disclosures&utm_campaign=33777960-2026_Articles_Social&utm_content=384911386&utm_medium=social&utm_source=twitter&hss_channel=tw-1366500304867401729',
     summary:
-      'Primera publicación de 13 candidatos de molécula pequeña presentados en la división MEDI de la ACS. Ejemplos reales de vanguardia: inhibidores alostéricos de KRAS G12D, pegamentos moleculares de IKZF2/4, inhibidores duales Wee1/Myt1 por FEP, fármacos antivirulencia contra FimH y dianas emergentes en inflamación (cGAS, MRGPRX2, KIT). Imprescindible para ver cómo la optimización farmacófora y de seguridad (hERG, atropoisomería) se aplica hoy en día.',
+      'Primera publicación de 13 candidatos de molécula pequeña presentados en la división MEDI de la ACS. Ejemplos reales de vanguardia: inhibidores alostéricos de KRAS G12D, pegamentos moleculares de IKZF2/4, inhibidores duales Wee1/Myt1 por FEP, fármacos antivirulencia contra FimH y dianas emergentes en inflamación (cGAS, MRGPRX2, KIT). Imprescindible para ver cómo la optimización farmacófora y de seguridad (hERG, atropoisomería) se aplica hoy en día',
     category: 'Descubrimiento de fármacos',
-    source: 'Drug Hunter / ACS MEDI',
-    duration: '12 min',
-    relatedTopic: 'Tema 00',
+    source: 'DrugHunter, ACS',
     featured: true,
     addedAt: '2026-08-29'
   },
@@ -285,17 +244,6 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
     category: 'Impacto en pacientes',
     source: 'Organización Mundial de la Salud',
     addedAt: '2026-08-28'
-  },
-  {
-    id: 'link-career',
-    title: 'Qué hace de verdad un químico medicinal en la industria',
-    url: 'https://www.acs.org/careers/chemical-sciences/fields/medicinal-chemistry.html',
-    summary:
-      'Descripción del puesto por la American Chemical Society: ciclos de diseño-síntesis-ensayo, trabajo con biólogos y farmacólogos, y qué se espera de un recién titulado. Útil si estáis decidiendo por dónde seguir después del grado.',
-    category: 'Industria & carrera profesional',
-    source: 'American Chemical Society',
-    duration: '10 min',
-    addedAt: '2026-08-28'
   }
 ];
 
@@ -337,8 +285,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.3.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-14T16:10:00.000Z';
+export const COURSE_DATA_VERSION = '3.3.3';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-14T14:20:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
