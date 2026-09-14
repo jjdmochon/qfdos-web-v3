@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QfdosTopic, QfdosGlossaryTerm, MoleculeDrug } from '../data/qfdosData';
+import { useAuth } from '../context/AuthContext';
 import { 
   Search, 
   X, 
@@ -40,6 +41,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onOpenDrugSearch,
   onOpenAdmet
 }) => {
+  const { isProfesor } = useAuth();
   const [query, setQuery] = useState('');
 
   // Keyboard shortcut listener for ESC
@@ -93,7 +95,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     { title: 'Buscador de Fármacos (PubChem & DrugBank)', desc: 'Exploración química 2D, propiedades moleculares y enlaces oficiales', action: onOpenDrugSearch, icon: FlaskConical },
     { title: 'Simulador de Afinidad & Cheng-Prusoff', desc: 'Cálculo de ΔG°, Kd, Ki, IC50 y eficiencia de ligando', tab: 'simulador', icon: Award },
     { title: 'Calculadora ADMET & Reglas de Lipinski / Veber', desc: 'Perfilado físico-químico y gráfico radar', tab: 'admet', icon: Activity },
-    { title: 'Generador Oficial de Exámenes IA', desc: 'Creación de preguntas tipo test por nivel de dificultad', action: onOpenExamGenerator, icon: FileText }
+    ...(isProfesor ? [{ title: 'Generador Oficial de Exámenes IA', desc: 'Creación de preguntas tipo test por nivel de dificultad', action: onOpenExamGenerator, icon: FileText }] : [])
   ];
 
   const matchedTools = cleanQuery

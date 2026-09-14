@@ -337,8 +337,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.3.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-14T15:55:00.000Z';
+export const COURSE_DATA_VERSION = '3.3.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-14T16:10:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -393,7 +393,7 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
     id: 'tema-00',
-    number: 'Tema 00',
+    number: '',
     title: 'Presentación del Curso',
     subtitle: 'Guía Docente Oficial, Evaluación Continua y Ecosistema de Aprendizaje',
     description: 'Sesión inaugural de Química Farmacéutica II (Grupo E). Presentación de la guía docente oficial aprobada por la UGR, criterios de evaluación continua (70% examen final, 20% parcial, 5% prácticas de laboratorio, 5% seminarios y trabajos), calendario de clases magistrales y prácticas, cuaderno de laboratorio y ecosistema digital de aprendizaje interactivo.',
@@ -408,9 +408,9 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     targetName: 'Química Farmacéutica II · Guía Docente y Evaluación',
     status: 'Publicado',
     slidesPdfUrl: '',
-    slidesPdfName: 'Tema 00: Presentación del Curso (Diapositivas).pdf',
+    slidesPdfName: 'Presentación del Curso (Diapositivas).pdf',
     notesPdfUrl: '',
-    notesPdfName: 'Tema 00: Apuntes y Guía de Presentación del Curso.pdf',
+    notesPdfName: 'Apuntes y Guía de Presentación del Curso.pdf',
     geminiNotebookUrl: 'https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986',
     spotifyPodcastUrl: '',
     drugs: [],
@@ -423,73 +423,8 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         date: '14/09/2026'
       }
     ],
-    testQuestions: [
-      {
-        id: 't00-q1',
-        topicId: 'tema-00',
-        block: 'Evaluación Continua UGR',
-        question: '¿Cuál es la ponderación oficial de las distintas actividades en la modalidad de Evaluación Continua de QFDOS (Grupo E)?',
-        options: [
-          'Examen Final 50%, Examen Parcial 30%, Prácticas 20%.',
-          'Examen Final 70%, Examen Parcial 20%, Prácticas 5%, Seminarios/Trabajos 5%.',
-          'Examen Final 80%, Prácticas 20%.',
-          'Examen Final 60%, Examen Parcial 20%, Trabajos 20%.'
-        ],
-        correctIndex: 1,
-        explanation: 'De acuerdo con la guía docente oficial aprobada por la UGR, la evaluación continua se desglosa en: Examen Final teórico 70%, Examen Parcial no eliminatorio 20%, Prácticas de Laboratorio 5% y Seminarios/Trabajos dirigidos 5%.',
-        difficulty: 'Fácil'
-      },
-      {
-        id: 't00-q2',
-        topicId: 'tema-00',
-        block: 'Normativa de Evaluación',
-        question: 'Para poder promediar las calificaciones obtenidas en el parcial, prácticas y seminarios con el examen final en evaluación continua, ¿qué requisito indispensable debe cumplirse?',
-        options: [
-          'Haber asistido al 100% de las clases teóricas.',
-          'Obtener una calificación mínima de 5,0 sobre 10 en el Examen Final Oficial.',
-          'Entregar el cuaderno de prácticas antes del mes de octubre.',
-          'Aprobar el examen parcial con al menos un 6,0.'
-        ],
-        correctIndex: 1,
-        explanation: 'Es condición indispensable obtener una calificación mínima de 5,0 puntos sobre 10 en el examen final para que puedan sumarse las notas ponderadas de la evaluación continua.',
-        difficulty: 'Medio'
-      },
-      {
-        id: 't00-q3',
-        topicId: 'tema-00',
-        block: 'Prácticas de Laboratorio',
-        question: '¿Quién es la Coordinadora de Prácticas de Laboratorio encargada de gestionar todas las incidencias de prácticas de QFDOS?',
-        options: [
-          'Prof.ª Dra. Ana Sousa (ana.sousa@ugr.es).',
-          'Prof. Dr. Juan José Díaz-Mochón.',
-          'El delegado de curso de 4.º de Farmacia.',
-          'El servicio de conserjería de la Facultad de Farmacia.'
-        ],
-        correctIndex: 0,
-        explanation: 'La gestión de turnos, cambios de grupo, puestos e incidencias de las prácticas de laboratorio está a cargo de la Coordinadora de Prácticas, la Prof.ª Dra. Ana Sousa (ana.sousa@ugr.es).',
-        difficulty: 'Fácil'
-      }
-    ],
-    flashcards: [
-      {
-        id: 'fc-00-1',
-        topicId: 'tema-00',
-        concept: 'Ponderación de Evaluación Continua',
-        front: '¿Cómo se desglosa la nota final en Evaluación Continua de QFDOS?',
-        back: '70% Examen Final (mínimo 5,0 para promediar), 20% Examen Parcial, 5% Prácticas de Laboratorio y 5% Seminarios y Trabajos Dirigidos.',
-        difficulty: 'easy',
-        category: 'Guía Docente'
-      },
-      {
-        id: 'fc-00-2',
-        topicId: 'tema-00',
-        concept: 'Coordinación e Incidencias de Prácticas',
-        front: '¿A quién debe dirigirse el alumnado ante cualquier incidencia de prácticas de laboratorio?',
-        back: 'A la Coordinadora de Prácticas, Prof.ª Dra. Ana Sousa (ana.sousa@ugr.es).',
-        difficulty: 'easy',
-        category: 'Prácticas'
-      }
-    ]
+    testQuestions: [],
+    flashcards: []
   },
   {
     id: 'tema-01',

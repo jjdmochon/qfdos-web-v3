@@ -102,9 +102,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         {/* Modal Header */}
         <div className="modal-header" style={{ padding: '1.25rem 1.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span className={`qfdos-badge ${topic.category === 'examen' ? 'badge-amber' : topic.category === 'trabajo' ? 'badge-emerald' : 'badge-navy'}`} style={{ fontSize: '0.85rem', padding: '4px 10px' }}>
-              {topic.number}
-            </span>
+            {topic.id !== 'tema-00' && topic.number && (
+              <span className={`qfdos-badge ${topic.category === 'examen' ? 'badge-amber' : topic.category === 'trabajo' ? 'badge-emerald' : 'badge-navy'}`} style={{ fontSize: '0.85rem', padding: '4px 10px' }}>
+                {topic.number}
+              </span>
+            )}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-title)', lineHeight: 1.2, margin: 0 }}>
@@ -133,14 +135,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               onClick={() => setActiveTab('sar')}
               className={`tab-btn ${activeTab === 'sar' ? 'active' : ''}`}
             >
-              <BookOpen size={14} /> Contenido & Autoevaluación
+              <BookOpen size={14} /> Contenido & Guía Docente
             </button>
-            <button
-              onClick={() => setActiveTab('drugs')}
-              className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`}
-            >
-              <Layers size={14} /> Fármacos & Quimioinformática ({topic.drugs?.length || 0})
-            </button>
+            {topic.drugs && topic.drugs.length > 0 && (
+              <button
+                onClick={() => setActiveTab('drugs')}
+                className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`}
+              >
+                <Layers size={14} /> Fármacos & Quimioinformática ({topic.drugs.length})
+              </button>
+            )}
           </div>
         </div>
 
@@ -272,40 +276,44 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   </div>
 
                   {/* 5. Cuestionario Test con Moléculas */}
-                  <div className="qfdos-card card-amber" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <HelpCircle size={18} color="var(--accent-amber)" />
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
+                  {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
+                    <div className="qfdos-card card-amber" style={{ padding: '1rem', background: 'var(--surface)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <HelpCircle size={18} color="var(--accent-amber)" />
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
+                      </div>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                        {topic.testQuestions.length} preguntas con estructuras químicas y corrección razonada.
+                      </p>
+                      <button 
+                        onClick={() => onOpenQuiz(topic)}
+                        className="btn btn-sm btn-primary" 
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                      >
+                        <HelpCircle size={13} /> Realizar Test
+                      </button>
                     </div>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      {topic.testQuestions?.length || 0} preguntas con estructuras químicas y corrección razonada.
-                    </p>
-                    <button 
-                      onClick={() => onOpenQuiz(topic)}
-                      className="btn btn-sm btn-primary" 
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                    >
-                      <HelpCircle size={13} /> Realizar Test
-                    </button>
-                  </div>
+                  )}
 
                   {/* 6. Flashcards Interactivas */}
-                  <div className="qfdos-card card-teal" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <Award size={18} color="var(--teal-ink)" />
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>6. Flashcards Interactivas</strong>
+                  {topic.id !== 'tema-00' && topic.flashcards && topic.flashcards.length > 0 && (
+                    <div className="qfdos-card card-teal" style={{ padding: '1rem', background: 'var(--surface)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <Award size={18} color="var(--teal-ink)" />
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>6. Flashcards Interactivas</strong>
+                      </div>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                        {topic.flashcards.length} tarjetas de memorización con estructuras 2D.
+                      </p>
+                      <button 
+                        onClick={() => onOpenFlashcards(topic)}
+                        className="btn btn-sm btn-secondary" 
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                      >
+                        <Award size={13} /> Repasar Flashcards
+                      </button>
                     </div>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      {topic.flashcards?.length || 0} tarjetas de memorización con estructuras 2D.
-                    </p>
-                    <button 
-                      onClick={() => onOpenFlashcards(topic)}
-                      className="btn btn-sm btn-secondary" 
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                    >
-                      <Award size={13} /> Repasar Flashcards
-                    </button>
-                  </div>
+                  )}
 
                 </div>
               </div>

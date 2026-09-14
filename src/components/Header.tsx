@@ -123,14 +123,16 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Right tools */}
           <div className="header-tools">
-            {/* Exam AI */}
-            <button
-              onClick={onOpenExamGenerator}
-              className="btn btn-sm btn-header-action"
-              title="Generador de Exámenes IA"
-            >
-              <FileText size={14} /><span className="tool-label">Examen IA</span>
-            </button>
+            {/* Exam AI (Solo para profesores) */}
+            {isProfesor && (
+              <button
+                onClick={onOpenExamGenerator}
+                className="btn btn-sm btn-header-action"
+                title="Generador de Exámenes IA"
+              >
+                <FileText size={14} /><span className="tool-label">Examen IA</span>
+              </button>
+            )}
 
             {/* Simulador FIR */}
             <button

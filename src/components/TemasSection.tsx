@@ -144,9 +144,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                 {/* Card Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className={`qfdos-badge ${isExam ? 'badge-amber' : isProject ? 'badge-emerald' : 'badge-navy'}`} style={{ fontSize: '0.72rem' }}>
-                      {topic.number}
-                    </span>
+                    {topic.id !== 'tema-00' && topic.number && (
+                      <span className={`qfdos-badge ${isExam ? 'badge-amber' : isProject ? 'badge-emerald' : 'badge-navy'}`} style={{ fontSize: '0.72rem' }}>
+                        {topic.number}
+                      </span>
+                    )}
                     {topic.category && topic.category !== 'teoria' && (
                       <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>
                         {topic.category.toUpperCase()}
@@ -250,7 +252,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     {bloqueado ? <><Lock size={12} /> No disponible</> : <>Guía & Materiales <ArrowRight size={12} /></>}
                   </button>
 
-                  {topic.testQuestions && topic.testQuestions.length > 0 && (
+                  {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
                     <button
                       onClick={() => onOpenQuiz(topic)}
                       disabled={bloqueado}
@@ -262,7 +264,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     </button>
                   )}
 
-                  {topic.flashcards && topic.flashcards.length > 0 && (
+                  {topic.id !== 'tema-00' && topic.flashcards && topic.flashcards.length > 0 && (
                     <button
                       onClick={() => onOpenFlashcards(topic)}
                       disabled={bloqueado}

@@ -446,7 +446,7 @@ export const App: React.FC = () => {
         onOpenAdmet={handleOpenAdmet}
       />
 
-      {isExamGeneratorOpen && (
+      {isProfesor && isExamGeneratorOpen && (
         <ExamGeneratorModal
           topics={topics}
           onClose={() => setIsExamGeneratorOpen(false)}

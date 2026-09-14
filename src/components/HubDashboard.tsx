@@ -238,17 +238,19 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
               </button>
             )}
 
-            <button
-              onClick={onOpenExamGenerator}
-              className="qfdos-card card-purple tool-card"
-              style={{ gridColumn: '1 / -1' }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <FileText size={20} color="var(--accent-purple)" />
-                <h4 style={{ margin: 0 }}>Generador de exámenes</h4>
-              </div>
-              <p>Preguntas tipo test calibradas al nivel de dificultad UGR.</p>
-            </button>
+            {isProfesor && (
+              <button
+                onClick={onOpenExamGenerator}
+                className="qfdos-card card-purple tool-card"
+                style={{ gridColumn: '1 / -1' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FileText size={20} color="var(--accent-purple)" />
+                  <h4 style={{ margin: 0 }}>Generador de exámenes</h4>
+                </div>
+                <p>Preguntas tipo test calibradas al nivel de dificultad UGR.</p>
+              </button>
+            )}
           </div>
         </div>
 

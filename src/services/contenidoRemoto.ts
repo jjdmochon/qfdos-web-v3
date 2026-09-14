@@ -51,7 +51,7 @@ export function limpiarCacheRemota(): void {
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
   return topics.map(t => {
-    if (t.id === 'tema-00' && (t.title !== 'Presentación del Curso' || !t.geminiNotebookUrl || t.geminiNotebookUrl.includes('qfdos-2627-tema00'))) {
+    if (t.id === 'tema-00') {
       return INITIAL_TOPICS[0];
     }
     return t;
