@@ -17,7 +17,7 @@ import {
   MoleculeDrug
 } from './data/qfdosData';
 import { useAuth } from './context/AuthContext';
-import { descargarContenido, contenidoEnCache } from './services/contenidoRemoto';
+import { descargarContenido, contenidoEnCache, normalizarTemas } from './services/contenidoRemoto';
 import { ExternalLink } from 'lucide-react';
 
 import { LoginPage } from './components/LoginPage';
@@ -54,7 +54,8 @@ const VERSION_KEY = 'qfdos_v3_data_version';
 const SHIPPED_KEYS = [
   'qfdos_v3_topics',
   'qfdos_v3_announcements',
-  'qfdos_v3_glossary'
+  'qfdos_v3_glossary',
+  'qfdos_v3_contenido_remoto'
 ];
 
 /**
@@ -186,7 +187,8 @@ export const App: React.FC = () => {
   // Se ejecuta antes que cualquier lectura de caché de abajo
   const [topics, setTopics] = useState<QfdosTopic[]>(() => {
     purgeStaleCourseCache();
-    return contenidoEnCache()?.topics ?? loadCached('qfdos_v3_topics', INITIAL_TOPICS);
+    const raw = contenidoEnCache()?.topics ?? loadCached('qfdos_v3_topics', INITIAL_TOPICS);
+    return normalizarTemas(raw);
   });
 
   const [announcements, setAnnouncements] = useState<QfdosAnnouncement[]>(() =>
@@ -244,7 +246,9 @@ export const App: React.FC = () => {
 
     descargarContenido().then(remoto => {
       if (cancelado || !remoto) return;
-      if (Array.isArray(remoto.topics) && remoto.topics.length) setTopics(remoto.topics);
+      if (Array.isArray(remoto.topics) && remoto.topics.length) {
+        setTopics(normalizarTemas(remoto.topics));
+      }
       if (Array.isArray(remoto.announcements)) setAnnouncements(remoto.announcements);
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
       if (Array.isArray(remoto.resourceLinks)) setResourceLinks(remoto.resourceLinks);

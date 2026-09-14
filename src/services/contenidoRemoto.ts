@@ -11,7 +11,7 @@
 //                en su navegador, nunca en el código distribuido
 // ==========================================================================
 
-import { QfdosTopic, QfdosAnnouncement, QfdosGlossaryTerm, QfdosResourceLink } from '../data/qfdosData';
+import { QfdosTopic, QfdosAnnouncement, QfdosGlossaryTerm, QfdosResourceLink, COURSE_BUILD_TIMESTAMP, INITIAL_TOPICS } from '../data/qfdosData';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 const CLAVE_KEY = 'qfdos_v3_clave_publicacion';
@@ -40,6 +40,24 @@ export function setClavePublicacion(clave: string): void {
   localStorage.setItem(CLAVE_KEY, clave.trim());
 }
 
+export function limpiarCacheRemota(): void {
+  localStorage.removeItem(CACHE_KEY);
+}
+
+/**
+ * Sanitiza la lista de temas para garantizar que Tema 00 nunca quede
+ * atrapado en una versión obsoleta de la hoja remota o enlaces caídos.
+ */
+export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
+  if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
+  return topics.map(t => {
+    if (t.id === 'tema-00' && (t.title !== 'Presentación del Curso' || !t.geminiNotebookUrl || t.geminiNotebookUrl.includes('qfdos-2627-tema00'))) {
+      return INITIAL_TOPICS[0];
+    }
+    return t;
+  });
+}
+
 /**
  * Descarga el contenido publicado. Devuelve null si no hay nada publicado
  * todavía o si no se puede alcanzar la hoja — en ambos casos la aplicación
@@ -58,7 +76,20 @@ export async function descargarContenido(): Promise<ContenidoPublicado | null> {
     const cuerpo = await resp.json();
     if (!cuerpo?.ok || cuerpo.vacio || !cuerpo.contenido) return null;
 
-    const publicado: ContenidoPublicado = { ...cuerpo.contenido, publicadoEn: cuerpo.publicadoEn ?? '' };
+    const publicadoEn = cuerpo.publicadoEn ?? '';
+    // Si la publicación en la hoja remota es más antigua que la versión oficial compilada,
+    // se descarta para no pisar el código nuevo con datos históricos obsoletos de la hoja.
+    if (publicadoEn && publicadoEn < COURSE_BUILD_TIMESTAMP) {
+      limpiarCacheRemota();
+      return null;
+    }
+
+    const topicsNormalizados = normalizarTemas(cuerpo.contenido.topics);
+    const publicado: ContenidoPublicado = { 
+      ...cuerpo.contenido, 
+      topics: topicsNormalizados,
+      publicadoEn 
+    };
 
     // Se guarda una copia para poder arrancar sin conexión
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(publicado)); } catch { /* cuota */ }
@@ -73,7 +104,17 @@ export async function descargarContenido(): Promise<ContenidoPublicado | null> {
 export function contenidoEnCache(): ContenidoPublicado | null {
   const raw = localStorage.getItem(CACHE_KEY);
   if (!raw) return null;
-  try { return JSON.parse(raw) as ContenidoPublicado; } catch { return null; }
+  try { 
+    const data = JSON.parse(raw) as ContenidoPublicado;
+    if (data.publicadoEn && data.publicadoEn < COURSE_BUILD_TIMESTAMP) {
+      limpiarCacheRemota();
+      return null;
+    }
+    data.topics = normalizarTemas(data.topics);
+    return data;
+  } catch { 
+    return null; 
+  }
 }
 
 export interface ResultadoPublicacion {
