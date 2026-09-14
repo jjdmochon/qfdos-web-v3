@@ -285,8 +285,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.3.4';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-14T14:20:00.000Z';
+export const COURSE_DATA_VERSION = '3.3.5';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-14T19:45:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -315,6 +315,13 @@ export const QFDOS_INFO = {
 };
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-presentacion-disp',
+    title: '📢 Material de la Presentación del Curso ya Disponible',
+    content: 'Todo el material de la Presentación del Curso de Química Farmacéutica II (Grupo E) se encuentra ya disponible para su consulta y descarga: Guía Docente Oficial, Diapositivas de clase en PDF y Cuaderno interactivo de estudio en Google NotebookLM. Podéis acceder directamente desde el módulo inaugural.',
+    date: '14 Septiembre 2026',
+    priority: 'alta'
+  },
   {
     id: 'ann-1',
     title: '🚀 Bienvenida al Curso 2026/2027: Portal QFDOS v3 desarrollado por NEXUS LAB',

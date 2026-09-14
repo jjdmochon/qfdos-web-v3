@@ -37,6 +37,74 @@
   border-top: 4px solid var(--accent-amber);
 }
 
+/* --- Resource Cards (Suite de Materiales) --- */
+.resource-card {
+  transition: all var(--transition-fast);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.resource-card.is-active {
+  border-width: 1.5px;
+}
+
+.resource-card.is-inactive {
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border-color) !important;
+  opacity: 0.88;
+}
+
+.resource-card.card-teal.is-active {
+  background: linear-gradient(180deg, rgba(13, 148, 136, 0.08) 0%, rgba(13, 148, 136, 0.02) 100%), var(--surface) !important;
+  border: 1.5px solid rgba(13, 148, 136, 0.35) !important;
+  border-top: 4px solid var(--teal) !important;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.10);
+}
+.resource-card.card-teal.is-active:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.18);
+  border-color: var(--teal) !important;
+}
+
+.resource-card.card-navy.is-active {
+  background: linear-gradient(180deg, rgba(30, 58, 138, 0.08) 0%, rgba(30, 58, 138, 0.02) 100%), var(--surface) !important;
+  border: 1.5px solid rgba(30, 58, 138, 0.35) !important;
+  border-top: 4px solid var(--navy) !important;
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.10);
+}
+.resource-card.card-navy.is-active:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.18);
+  border-color: var(--navy) !important;
+}
+
+.resource-card.card-mint.is-active {
+  background: linear-gradient(180deg, rgba(45, 212, 191, 0.12) 0%, rgba(13, 148, 136, 0.03) 100%), var(--surface) !important;
+  border: 1.5px solid rgba(13, 148, 136, 0.38) !important;
+  border-top: 4px solid var(--mint) !important;
+  box-shadow: 0 4px 14px rgba(45, 212, 191, 0.16);
+}
+.resource-card.card-mint.is-active:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(45, 212, 191, 0.24);
+  border-color: var(--teal) !important;
+}
+
+.resource-card.card-spotify.is-active {
+  background: linear-gradient(180deg, rgba(29, 185, 84, 0.10) 0%, rgba(29, 185, 84, 0.02) 100%), var(--surface) !important;
+  border: 1.5px solid rgba(29, 185, 84, 0.35) !important;
+  border-top: 4px solid #1db954 !important;
+  box-shadow: 0 4px 14px rgba(29, 185, 84, 0.12);
+}
+.resource-card.card-spotify.is-active:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(29, 185, 84, 0.20);
+  border-color: #1db954 !important;
+}
+
+
 /* --- Buttons --- */
 .btn {
   display: inline-flex;

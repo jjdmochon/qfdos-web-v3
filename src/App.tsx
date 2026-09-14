@@ -68,8 +68,36 @@ function purgeStaleCourseCache(): void {
   const stored = localStorage.getItem(VERSION_KEY);
   if (stored === COURSE_DATA_VERSION) return;
 
+  // Preservar enlaces y modificaciones locales introducidas por el profesor
+  const oldTopicsStr = localStorage.getItem('qfdos_v3_topics');
+  const customTopicOverrides: Record<string, Partial<QfdosTopic>> = {};
+  if (oldTopicsStr) {
+    try {
+      const parsed = JSON.parse(oldTopicsStr) as QfdosTopic[];
+      parsed.forEach(t => {
+        if (t.notesPdfUrl || t.slidesPdfUrl || (t.geminiNotebookUrl && t.geminiNotebookUrl !== INITIAL_TOPICS[0]?.geminiNotebookUrl)) {
+          customTopicOverrides[t.id] = {
+            notesPdfUrl: t.notesPdfUrl,
+            notesPdfName: t.notesPdfName,
+            slidesPdfUrl: t.slidesPdfUrl,
+            slidesPdfName: t.slidesPdfName,
+            geminiNotebookUrl: t.geminiNotebookUrl
+          };
+        }
+      });
+    } catch { /* ignorar dato corrupto */ }
+  }
+
   SHIPPED_KEYS.forEach(k => localStorage.removeItem(k));
   localStorage.setItem(VERSION_KEY, COURSE_DATA_VERSION);
+
+  if (Object.keys(customTopicOverrides).length > 0) {
+    const updated = INITIAL_TOPICS.map(t => {
+      const over = customTopicOverrides[t.id];
+      return over ? { ...t, ...over } : t;
+    });
+    localStorage.setItem('qfdos_v3_topics', JSON.stringify(updated));
+  }
 }
 
 /** Lee del navegador y, si no hay nada válido, cae al contenido distribuido. */

@@ -187,7 +187,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               {/* Description */}
               <div className="qfdos-card" style={{ padding: '1.25rem' }}>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '8px' }}>
-                  Fundamento Teórico & Farmacología Molecular
+                  {topic.id === 'tema-00'
+                    ? 'Presentación del Curso Química Farmacéutica 2 del Grado de Farmacia. Grupo E. Prof. Mochon'
+                    : 'Fundamento Teórico & Farmacología Molecular'}
                 </h3>
                 <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', lineHeight: 1.65 }}>
                   {topic.description}
@@ -278,153 +280,305 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   </form>
                 )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
-                  
-                  {/* 1. Apuntes PDF */}
-                  <div className="qfdos-card card-teal" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <FileText size={18} color="var(--teal-ink)" />
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>1. Apuntes Oficiales (PDF)</strong>
-                    </div>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      {topic.notesPdfName || 'Apuntes magistrales estructurados con notas para examen.'}
-                    </p>
-                    {topic.notesPdfUrl && topic.notesPdfUrl.startsWith('http') ? (
-                      <a 
-                        href={topic.notesPdfUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="btn btn-sm btn-secondary" 
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                      >
-                        <ExternalLink size={13} /> {topic.notesPdfUrl.includes('drive.google.com') ? 'Abrir en Google Drive' : 'Descargar Apuntes'}
-                      </a>
-                    ) : (
-                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                        Próximamente disponible
-                      </span>
-                    )}
-                  </div>
+                {(() => {
+                  const hasNotes = !!(topic.notesPdfUrl && topic.notesPdfUrl.startsWith('http'));
+                  const hasSlides = !!(topic.slidesPdfUrl && topic.slidesPdfUrl.startsWith('http'));
+                  const hasNotebook = !!(topic.geminiNotebookUrl && topic.geminiNotebookUrl.startsWith('http'));
+                  const hasSpotify = !!(topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http'));
 
-                  {/* 2. Diapositivas PDF */}
-                  <div className="qfdos-card card-navy" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <FileText size={18} color="var(--navy-ink)" />
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>2. Diapositivas (PDF)</strong>
-                    </div>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      {topic.slidesPdfName || (topic.slideCount ? `Presentación oficial con esquemas SAR (${topic.slideCount} diapositivas).` : 'Presentación oficial de diapositivas.')}
-                    </p>
-                    {topic.slidesPdfUrl && topic.slidesPdfUrl.startsWith('http') ? (
-                      <a 
-                        href={topic.slidesPdfUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="btn btn-sm btn-outline" 
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                      >
-                        <ExternalLink size={13} /> {topic.slidesPdfUrl.includes('drive.google.com') ? 'Ver en Google Drive' : 'Ver Diapositivas'}
-                      </a>
-                    ) : (
-                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                        Próximamente disponible
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 3. Gemini Notebook */}
-                  <div className="qfdos-card card-mint" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <Sparkles size={18} color="var(--teal-ink)" />
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>3. Gemini NotebookLM</strong>
-                    </div>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      Cuaderno interactivo de estudio para consultar dudas con IA.
-                    </p>
-                    {topic.geminiNotebookUrl && topic.geminiNotebookUrl.startsWith('http') ? (
-                      <a 
-                        href={topic.geminiNotebookUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="btn btn-sm btn-mint" 
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                      >
-                        <ExternalLink size={13} /> Abrir NotebookLM
-                      </a>
-                    ) : (
-                      <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                        Próximamente disponible
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 4. Spotify Podcast (Omitido en Presentación del Curso) */}
-                  {topic.id !== 'tema-00' && (
-                    <div className="qfdos-card" style={{ padding: '1rem', background: 'var(--surface)', borderTop: '4px solid #1db954' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <Radio size={18} color="#1db954" />
-                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>4. Podcast en Spotify</strong>
+                  return (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                      
+                      {/* 1. Apuntes PDF */}
+                      <div className={`qfdos-card card-teal resource-card ${hasNotes ? 'is-active' : 'is-inactive'}`}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '8px',
+                                background: hasNotes ? 'rgba(13, 148, 136, 0.14)' : 'var(--surface-alt)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                <FileText size={17} color={hasNotes ? 'var(--teal-ink)' : 'var(--text-muted)'} />
+                              </div>
+                              <strong style={{ fontSize: '0.88rem', color: hasNotes ? 'var(--text-title)' : 'var(--text-muted)' }}>
+                                1. Apuntes Oficiales (PDF)
+                              </strong>
+                            </div>
+                            {hasNotes && (
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                ✓ Disponible
+                              </span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.78rem', color: hasNotes ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                            {topic.notesPdfName || 'Apuntes magistrales estructurados con notas para examen.'}
+                          </p>
+                        </div>
+                        {hasNotes ? (
+                          <a 
+                            href={topic.notesPdfUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="btn btn-sm btn-secondary" 
+                            style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
+                          >
+                            <ExternalLink size={13} /> {topic.notesPdfUrl!.includes('drive.google.com') ? 'Abrir en Google Drive' : 'Descargar Apuntes'}
+                          </a>
+                        ) : (
+                          <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                            Próximamente disponible
+                          </span>
+                        )}
                       </div>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        Episodio de audio/vídeo oficial con explicaciones del profesor.
-                      </p>
-                      {topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http') ? (
-                        <button 
-                          onClick={handlePlayPodcast}
-                          className="btn btn-sm btn-outline" 
-                          style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', borderColor: '#1db954', color: '#1db954' }}
-                        >
-                          <Play size={13} /> Reproducir Episodio
-                        </button>
-                      ) : (
-                        <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                          Próximamente disponible
-                        </span>
+
+                      {/* 2. Diapositivas PDF */}
+                      <div className={`qfdos-card card-navy resource-card ${hasSlides ? 'is-active' : 'is-inactive'}`}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '8px',
+                                background: hasSlides ? 'rgba(30, 58, 138, 0.12)' : 'var(--surface-alt)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                <FileText size={17} color={hasSlides ? 'var(--navy-ink)' : 'var(--text-muted)'} />
+                              </div>
+                              <strong style={{ fontSize: '0.88rem', color: hasSlides ? 'var(--text-title)' : 'var(--text-muted)' }}>
+                                2. Diapositivas (PDF)
+                              </strong>
+                            </div>
+                            {hasSlides && (
+                              <span className="qfdos-badge badge-navy" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                ✓ Disponible
+                              </span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.78rem', color: hasSlides ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                            {topic.slidesPdfName || (topic.slideCount ? `Presentación oficial con esquemas SAR (${topic.slideCount} diapositivas).` : 'Presentación oficial de diapositivas.')}
+                          </p>
+                        </div>
+                        {hasSlides ? (
+                          <a 
+                            href={topic.slidesPdfUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="btn btn-sm btn-primary" 
+                            style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
+                          >
+                            <ExternalLink size={13} /> {topic.slidesPdfUrl!.includes('drive.google.com') ? 'Ver en Google Drive' : 'Ver Diapositivas'}
+                          </a>
+                        ) : (
+                          <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                            Próximamente disponible
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 3. Gemini Notebook */}
+                      <div className={`qfdos-card card-mint resource-card ${hasNotebook ? 'is-active' : 'is-inactive'}`}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '8px',
+                                background: hasNotebook ? 'rgba(45, 212, 191, 0.22)' : 'var(--surface-alt)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                <Sparkles size={17} color={hasNotebook ? 'var(--teal-ink)' : 'var(--text-muted)'} />
+                              </div>
+                              <strong style={{ fontSize: '0.88rem', color: hasNotebook ? 'var(--text-title)' : 'var(--text-muted)' }}>
+                                3. Gemini NotebookLM
+                              </strong>
+                            </div>
+                            {hasNotebook && (
+                              <span className="qfdos-badge badge-mint" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                ✨ IA Activa
+                              </span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.78rem', color: hasNotebook ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                            Cuaderno interactivo de estudio para consultar dudas con IA.
+                          </p>
+                        </div>
+                        {hasNotebook ? (
+                          <a 
+                            href={topic.geminiNotebookUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="btn btn-sm btn-secondary" 
+                            style={{
+                              width: '100%',
+                              justifyContent: 'center',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                              color: '#ffffff',
+                              border: 'none',
+                              boxShadow: '0 2px 8px rgba(13, 148, 136, 0.25)'
+                            }}
+                          >
+                            <ExternalLink size={13} /> Abrir NotebookLM
+                          </a>
+                        ) : (
+                          <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                            Próximamente disponible
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 4. Spotify Podcast (Omitido en Presentación del Curso) */}
+                      {topic.id !== 'tema-00' && (
+                        <div className={`qfdos-card card-spotify resource-card ${hasSpotify ? 'is-active' : 'is-inactive'}`}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: hasSpotify ? 'rgba(29, 185, 84, 0.14)' : 'var(--surface-alt)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Radio size={17} color={hasSpotify ? '#1db954' : 'var(--text-muted)'} />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: hasSpotify ? 'var(--text-title)' : 'var(--text-muted)' }}>
+                                  4. Podcast en Spotify
+                                </strong>
+                              </div>
+                              {hasSpotify && (
+                                <span className="qfdos-badge" style={{ background: 'rgba(29,185,84,0.15)', color: '#1db954', fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                  🎙️ Audio
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: hasSpotify ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              Episodio de audio/vídeo oficial con explicaciones del profesor.
+                            </p>
+                          </div>
+                          {hasSpotify ? (
+                            <button 
+                              onClick={handlePlayPodcast}
+                              className="btn btn-sm" 
+                              style={{
+                                width: '100%',
+                                justifyContent: 'center',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                background: '#1db954',
+                                color: '#ffffff',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(29, 185, 84, 0.25)'
+                              }}
+                            >
+                              <Play size={13} /> Reproducir Episodio
+                            </button>
+                          ) : (
+                            <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
+                              Próximamente disponible
+                            </span>
+                          )}
+                        </div>
                       )}
-                    </div>
-                  )}                 </div>
 
-                  {/* 5. Cuestionario Test con Moléculas */}
-                  {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
-                    <div className="qfdos-card card-amber" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <HelpCircle size={18} color="var(--accent-amber)" />
-                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
-                      </div>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        {topic.testQuestions.length} preguntas con estructuras químicas y corrección razonada.
-                      </p>
-                      <button 
-                        onClick={() => onOpenQuiz(topic)}
-                        className="btn btn-sm btn-primary" 
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                      >
-                        <HelpCircle size={13} /> Realizar Test
-                      </button>
-                    </div>
-                  )}
+                      {/* 5. Cuestionario Test con Moléculas */}
+                      {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
+                        <div className="qfdos-card card-amber resource-card is-active">
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(245, 158, 11, 0.14)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <HelpCircle size={17} color="var(--accent-amber)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
+                              </div>
+                              <span className="qfdos-badge badge-amber" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                Interactivo
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              {topic.testQuestions.length} preguntas con estructuras químicas y corrección razonada.
+                            </p>
+                          </div>
+                          <button 
+                            onClick={() => onOpenQuiz(topic)}
+                            className="btn btn-sm btn-primary" 
+                            style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
+                          >
+                            <HelpCircle size={13} /> Realizar Test
+                          </button>
+                        </div>
+                      )}
 
-                  {/* 6. Flashcards Interactivas */}
-                  {topic.id !== 'tema-00' && topic.flashcards && topic.flashcards.length > 0 && (
-                    <div className="qfdos-card card-teal" style={{ padding: '1rem', background: 'var(--surface)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <Award size={18} color="var(--teal-ink)" />
-                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>6. Flashcards Interactivas</strong>
-                      </div>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        {topic.flashcards.length} tarjetas de memorización con estructuras 2D.
-                      </p>
-                      <button 
-                        onClick={() => onOpenFlashcards(topic)}
-                        className="btn btn-sm btn-secondary" 
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
-                      >
-                        <Award size={13} /> Repasar Flashcards
-                      </button>
-                    </div>
-                  )}
+                      {/* 6. Flashcards Interactivas */}
+                      {topic.id !== 'tema-00' && topic.flashcards && topic.flashcards.length > 0 && (
+                        <div className="qfdos-card card-teal resource-card is-active">
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(13, 148, 136, 0.14)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Award size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>6. Flashcards Interactivas</strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                Memoria SAR
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              {topic.flashcards.length} tarjetas de memorización con estructuras 2D.
+                            </p>
+                          </div>
+                          <button 
+                            onClick={() => onOpenFlashcards(topic)}
+                            className="btn btn-sm btn-secondary" 
+                            style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
+                          >
+                            <Award size={13} /> Repasar Flashcards
+                          </button>
+                        </div>
+                      )}
 
-                </div>
+                    </div>
+                  );
+                })()}
+              </div>
               </div>
 
               {/* Key Concepts List */}
