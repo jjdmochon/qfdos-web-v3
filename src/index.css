@@ -1074,6 +1074,30 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   transform: none;
 }
 
+/* Simulador FIR: botón destacado de examen con identidad cromática clara y legible */
+.btn-header-fir {
+  background: var(--hdr-chip-bg);
+  color: var(--hdr-chip-ink);
+  border: 1px solid var(--hdr-chip-edge);
+  font-weight: 700;
+  font-size: 0.79rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(13, 148, 136, 0.08);
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+}
+.btn-header-fir:hover {
+  background: var(--teal);
+  color: #ffffff;
+  border-color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
 .btn-ghost-clean {
   background: transparent;
   border: 1px solid transparent;
@@ -3582,7 +3606,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     display: none;
   }
 
-  .btn-header-action, .btn-header-admin {
+  .btn-header-action, .btn-header-admin, .btn-header-fir {
     padding: 7px 9px;
   }
 

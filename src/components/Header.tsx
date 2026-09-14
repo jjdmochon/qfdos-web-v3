@@ -137,8 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Simulador FIR */}
             <button
               onClick={onOpenFirSimulator}
-              className="btn btn-sm btn-header-action"
-              style={{ borderColor: 'rgba(45, 212, 191, 0.4)', color: 'var(--teal-ink)' }}
+              className="btn btn-sm btn-header-fir"
               title="Simulador Oficial Examen FIR (2020-2025)"
             >
               <Award size={14} /><span className="tool-label">Simulador FIR</span>
