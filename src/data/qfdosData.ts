@@ -337,7 +337,7 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.2.1';
+export const COURSE_DATA_VERSION = '3.2.5';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -393,7 +393,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
   {
     id: 'tema-00',
     number: 'Tema 00',
-    title: 'Presentación del curso',
+    title: 'Presentación del Curso',
     subtitle: 'Guía Docente Oficial, Evaluación Continua y Ecosistema de Aprendizaje',
     description: 'Sesión inaugural de Química Farmacéutica II (Grupo E). Presentación de la guía docente oficial aprobada por la UGR, criterios de evaluación continua (70% examen final, 20% parcial, 5% prácticas de laboratorio, 5% seminarios y trabajos), calendario de clases magistrales y prácticas, cuaderno de laboratorio y ecosistema digital de aprendizaje interactivo.',
     keyConcepts: [
@@ -1516,7 +1516,7 @@ export const INITIAL_STUDENT_QUESTIONS: StudentQuestion[] = [
   {
     id: 'sq-1',
     topicId: 'tema-00',
-    topicTitle: 'Tema 00: Presentación del curso',
+    topicTitle: 'Tema 00: Presentación del Curso',
     studentName: 'Elena García Pérez',
     studentEmail: 'alumno.demo@correo.ugr.es',
     question: 'Profesor Mochón, respecto a la evaluación continua, ¿la nota mínima de 5 sobre 10 en el examen final es indispensable para que sumen el parcial (20%) y las prácticas (5%)?',
