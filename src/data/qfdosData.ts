@@ -396,8 +396,8 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
       'Fármacos para la enfermedad de Alzheimer (Donepezilo, Rivastigmina)'
     ],
     slideCount: 56,
-    pdbTargetId: '1UZF',
-    targetName: 'Acetilcolinesterasa Recombinant Human (AChE)',
+    pdbTargetId: '4EY7',
+    targetName: 'Acetilcolinesterasa Humana Recombinante (hAChE)',
     status: 'Publicado',
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 01: Diapositivas Oficiales Sistema Colinérgico.pdf',
@@ -406,6 +406,18 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     geminiNotebookUrl: '',
     spotifyPodcastUrl: '',
     drugs: [
+      {
+        name: 'Acetilcolina',
+        smiles: 'CC(=O)OCC[N+](C)(C)C',
+        role: 'Neurotransmisor colinérgico endógeno (agonista nAChR y mAChR)',
+        mw: 146.21,
+        logP: -3.16,
+        hbd: 0,
+        hba: 2,
+        tpsa: 26.3,
+        rotBonds: 3,
+        pdbId: '2HA4'
+      },
       {
         name: 'Donepezilo',
         smiles: 'COC1=C(C=C2C(=C1)CC(C2=O)CC3CCN(CC3)CC4=CC=CC=C4)OC',
@@ -416,7 +428,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         hba: 4,
         tpsa: 38.8,
         rotBonds: 6,
-        pdbId: '1EVE'
+        pdbId: '4EY7'
       },
       {
         name: 'Rivastigmina',

@@ -812,11 +812,11 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                       <div>
                         <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '3px' }}>
-                          Código PDB Diana (ej: 1UZF, 2RH1)
+                          Código PDB Diana (ej: 4EY7, 2RH1)
                         </label>
                         <input
                           type="text"
-                          placeholder="Ej: 1UZF"
+                          placeholder="Ej: 4EY7"
                           value={modPdbTargetId}
                           onChange={e => setModPdbTargetId(e.target.value)}
                           className="form-input"
