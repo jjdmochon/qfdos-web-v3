@@ -146,6 +146,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     {topic.category.toUpperCase()}
                   </span>
                 )}
+                {topic.pdbTargetId && (
+                  <a
+                    href={`https://www.rcsb.org/structure/${topic.pdbTargetId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="qfdos-badge badge-teal"
+                    style={{ fontSize: '0.7rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px', cursor: 'pointer' }}
+                    title={`Ver estructura ${topic.pdbTargetId} en RCSB PDB`}
+                  >
+                    PDB: {topic.pdbTargetId}
+                    <ExternalLink size={10} />
+                  </a>
+                )}
               </div>
               <span style={{ fontSize: '0.82rem', color: 'var(--teal-ink)', fontWeight: 600 }}>
                 {topic.subtitle}

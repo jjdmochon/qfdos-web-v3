@@ -285,8 +285,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.3.5';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-14T19:45:00.000Z';
+export const COURSE_DATA_VERSION = '3.3.6';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-15T12:15:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -396,8 +396,8 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
       'Fármacos para la enfermedad de Alzheimer (Donepezilo, Rivastigmina)'
     ],
     slideCount: 56,
-    pdbTargetId: '4EY7',
-    targetName: 'Acetilcolinesterasa Humana Recombinante (hAChE)',
+    pdbTargetId: '2HA4',
+    targetName: 'Acetilcolinesterasa en complejo con Acetilcolina (AChE · ACh)',
     status: 'Publicado',
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 01: Diapositivas Oficiales Sistema Colinérgico.pdf',

@@ -15,7 +15,8 @@ import {
   Award,
   FileText,
   Calendar,
-  Filter
+  Filter,
+  ExternalLink
 } from 'lucide-react';
 
 interface TemasSectionProps {
@@ -157,9 +158,25 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                   <div style={{ display: 'flex', gap: '5px' }}>
                     {topic.pdbTargetId && (
-                      <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>
+                      <a
+                        href={`https://www.rcsb.org/structure/${topic.pdbTargetId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="qfdos-badge badge-teal"
+                        style={{
+                          fontSize: '0.68rem',
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          cursor: 'pointer'
+                        }}
+                        title={`Ver estructura PDB ${topic.pdbTargetId} en RCSB PDB`}
+                      >
                         PDB: {topic.pdbTargetId}
-                      </span>
+                        <ExternalLink size={9} />
+                      </a>
                     )}
                     <span
                       className={`qfdos-badge ${esProximamente ? 'badge-muted' : 'badge-emerald'}`}
