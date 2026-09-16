@@ -643,41 +643,44 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               
               {/* Barra de Búsqueda y Filtro de Fármacos dentro del Tema */}
               <div
-                className="qfdos-card"
                 style={{
-                  padding: '0.85rem 1.25rem',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: '12px',
+                  padding: '10px 14px',
                   background: 'var(--surface-raised)',
-                  border: '1px solid var(--border-color)'
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-lg)'
                 }}
               >
-                <div style={{ position: 'relative', flex: '1 1 280px', maxWidth: '520px' }}>
+                <div style={{ position: 'relative', width: '100%', maxWidth: '440px', display: 'flex', alignItems: 'center' }}>
                   <Search
-                    size={16}
+                    size={15}
+                    color="var(--text-muted)"
                     style={{
                       position: 'absolute',
                       left: '12px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      color: 'var(--text-muted)',
                       pointerEvents: 'none'
                     }}
                   />
                   <input
                     type="text"
-                    placeholder="Buscar fármaco por nombre, mecanismo, fórmula, SMILES..."
+                    placeholder="Buscar fármaco por nombre, mecanismo, SMILES, PDB..."
                     value={drugSearchTerm}
                     onChange={e => setDrugSearchTerm(e.target.value)}
                     className="form-input"
                     style={{
+                      width: '100%',
+                      height: '38px',
                       paddingLeft: '36px',
-                      paddingRight: drugSearchTerm ? '34px' : '12px',
-                      fontSize: '0.85rem',
-                      width: '100%'
+                      paddingRight: drugSearchTerm ? '32px' : '12px',
+                      fontSize: '0.84rem',
+                      background: 'var(--surface)',
+                      borderRadius: 'var(--radius-md)'
                     }}
                   />
                   {drugSearchTerm && (
@@ -691,12 +694,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         background: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
+                        padding: '4px',
                         color: 'var(--text-muted)',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '4px',
-                        borderRadius: '4px'
+                        justifyContent: 'center'
                       }}
                       title="Limpiar búsqueda"
                     >
@@ -707,13 +709,22 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span
-                    className={`qfdos-badge ${filteredDrugs.length > 0 ? 'badge-teal' : 'badge-neutral'}`}
-                    style={{ fontSize: '0.75rem', fontWeight: 600, padding: '5px 12px' }}
+                    className={`qfdos-badge ${drugSearchTerm.trim() ? 'badge-teal' : 'badge-neutral'}`}
+                    style={{ fontSize: '0.74rem', fontWeight: 600, padding: '5px 12px', borderRadius: 'var(--radius-sm)' }}
                   >
                     {drugSearchTerm.trim()
                       ? `Mostrando ${filteredDrugs.length} de ${topic.drugs?.length || 0} fármacos`
                       : `${topic.drugs?.length || 0} fármacos registrados`}
                   </span>
+                  {drugSearchTerm.trim() && (
+                    <button
+                      onClick={() => setDrugSearchTerm('')}
+                      className="btn btn-sm btn-outline"
+                      style={{ fontSize: '0.72rem', padding: '3px 8px', height: '26px' }}
+                    >
+                      Restablecer
+                    </button>
+                  )}
                 </div>
               </div>
 
