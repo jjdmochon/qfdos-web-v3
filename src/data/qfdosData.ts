@@ -855,36 +855,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     ],
     attachments: [],
     testQuestions: [
-      {
-        id: 't01-q1',
-        topicId: 'tema-01',
-        block: 'Enzimología & Mecanismos',
-        question: '¿Por qué los carbamatos como la rivastigmina presentan una inhibición de la AChE mucho más duradera (pseudoirreversible) que los ésteres de acetilcolina?',
-        options: [
-          'Porque forman un enlace covalente carbono-carbono con el bolsillo aniónico.',
-          'Porque la velocidad de hidrólisis por agua de la enzima carbamilada (Ser200-O-CO-NR2) es órdenes de magnitud más lenta que la enzima acetilada.',
-          'Porque destruyen irreversiblemente la histidina catalítica de la tríada.',
-          'Porque bloquean de forma exclusiva la entrada del canal colinérgico periférico.'
-        ],
-        correctIndex: 1,
-        explanation: 'El ataque del residuo catalítico de serina sobre el grupo carbamato genera un intermedio carbamil-enzima cuya descarbamilación hidrolítica por agua requiere horas, a diferencia del intermedio acetil-enzima que se hidroliza en microsegundos.',
-        difficulty: 'Medio'
-      },
-      {
-        id: 't01-q2',
-        topicId: 'tema-01',
-        block: 'Reactivación Química de AChE',
-        question: '¿Cuál es la estructura del reactivador nucleofílico 2-PAM capaz de desfosforilar la serina catalítica de la AChE?',
-        options: [
-          { text: 'Pralidoxima (2-PAM: catión piridinio con oxima orto)', smiles: 'C[N+]1=CC=CC=C1/C=N/O' },
-          { text: 'Acetilcolina (éster cuaternario)', smiles: 'CC(=O)OCC[N+](C)(C)C' },
-          { text: 'Fisostigmina (alcaloide indol-carbamato)', smiles: 'CNC(=O)Oc1ccc2c(c1)C3(C)CCN(C)C3N2C' },
-          { text: 'Atropina (alcaloide tropánico éster)', smiles: 'CN1C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3' }
-        ],
-        correctIndex: 0,
-        explanation: 'La pralidoxima posee un nitrógeno piridínico cuaternario que se ancla en el subsitio aniónico y orienta con precisión angular el grupo oxima (=N-OH) para efectuar el ataque nucleofílico sobre el átomo de fósforo electrofílico del organofosforado.',
-        difficulty: 'Avanzado'
-      },
+
       {
         id: 't01-retro-01',
         topicId: 'tema-01',

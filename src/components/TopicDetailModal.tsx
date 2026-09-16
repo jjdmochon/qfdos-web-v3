@@ -3,6 +3,7 @@ import { QfdosTopic, CourseAttachment, MoleculeDrug } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
+import { RetrosintesisWorkshop } from './RetrosintesisWorkshop';
 import { 
   X, 
   Search,
@@ -29,7 +30,8 @@ import {
   Database,
   Activity,
   Upload,
-  Settings
+  Settings,
+  GitBranch
 } from 'lucide-react';
 
 interface TopicDetailModalProps {
@@ -51,7 +53,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onOpenAdmet,
   onUpdateTopic
 }) => {
-  const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs'>('sar');
+  const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis'>('sar');
   const { isProfesor } = useAuth();
 
   const [isEditingDriveLinks, setIsEditingDriveLinks] = useState(false);
@@ -288,6 +290,18 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`}
               >
                 <Layers size={14} /> Fármacos & Quimioinformática ({drugSearchTerm.trim() ? `${filteredDrugs.length}/${topic.drugs.length}` : topic.drugs.length})
+              </button>
+            )}
+            {topic.id === 'tema-01' && (
+              <button
+                onClick={() => setActiveTab('retrosintesis')}
+                className={`tab-btn ${activeTab === 'retrosintesis' ? 'active' : ''}`}
+                style={{ fontWeight: 700 }}
+              >
+                <GitBranch size={14} /> Taller de Retrosíntesis
+                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px' }}>
+                  Slides 28-35
+                </span>
               </button>
             )}
           </div>
@@ -1127,19 +1141,35 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             </div>
           )}
 
+          {/* TAB 4: Taller de Retrosíntesis & Desconexiones */}
+          {activeTab === 'retrosintesis' && (
+            <RetrosintesisWorkshop isProfesor={isProfesor} />
+          )}
+
         </div>
 
         {/* Modal Footer */}
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.75rem' }}>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {topic.id !== 'tema-00' && (
               <>
-                <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
-                  <HelpCircle size={14} /> Test ({topic.testQuestions?.length || 0})
-                </button>
+                {isProfesor && (
+                  <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
+                    <HelpCircle size={14} /> Test ({topic.testQuestions?.length || 0})
+                  </button>
+                )}
                 <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">
                   <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
                 </button>
+                {topic.id === 'tema-01' && (
+                  <button 
+                    onClick={() => setActiveTab('retrosintesis')} 
+                    className={`btn btn-sm ${activeTab === 'retrosintesis' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ fontWeight: 700 }}
+                  >
+                    <GitBranch size={14} /> Taller Retrosíntesis
+                  </button>
+                )}
               </>
             )}
           </div>
