@@ -111,23 +111,64 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     setTimeout(() => setCopiedSmiles(null), 2000);
   };
 
-  const handleDownloadSvg = async (drug: MoleculeDrug) => {
+  const handleDownloadPng = async (drug: MoleculeDrug) => {
     if (!drug.smiles) return;
     try {
-      const svg = await renderMoleculeSvg(drug.smiles, { width: 600, height: 450, dark: false });
+      // 1000x750 px para una exportación nítida en alta resolución
+      const svg = await renderMoleculeSvg(drug.smiles, { width: 1000, height: 750, dark: false });
       if (!svg) return;
-      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      const safeName = drug.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9_-]/gi, '_');
-      a.download = `${safeName}_2d.svg`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+
+      let cleanSvg = svg;
+      if (!cleanSvg.includes('xmlns=')) {
+        cleanSvg = cleanSvg.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+      }
+
+      const svgBlob = new Blob([cleanSvg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      const img = new Image();
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 1000;
+          canvas.height = 750;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            // Fondo blanco sólido para que no quede transparente al pegarlo en Word, PPT o informes
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, 1000, 750);
+
+            canvas.toBlob((blob) => {
+              if (!blob) return;
+              const pngUrl = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = pngUrl;
+              const safeName = drug.name
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9_-]/gi, '_');
+              a.download = `${safeName}_2d.png`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+            }, 'image/png');
+          }
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        console.error('Error al procesar la imagen para exportar a PNG');
+      };
+
+      img.src = url;
     } catch (err) {
-      console.error('Error downloading SVG:', err);
+      console.error('Error downloading PNG:', err);
     }
   };
 
@@ -769,7 +810,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               {filteredDrugs.length > 0 ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
                   {filteredDrugs.map((drug, i) => (
-                    <div key={drug.name + '-' + i} className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
+                    <div key={drug.name + '-' + i} className="qfdos-card card-teal" style={{ padding: '1.25rem', overflow: 'hidden', boxSizing: 'border-box' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                         <div>
                           <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
@@ -800,7 +841,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '8px',
-                        marginBottom: '8px'
+                        marginBottom: '8px',
+                        width: '100%',
+                        boxSizing: 'border-box'
                       }}>
                         <div style={{
                           fontFamily: 'var(--font-mono)',
@@ -846,30 +889,35 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </button>
                       </div>
 
-                      {/* Herramientas de Estructura: Descargar 2D SVG & Visualizar en 3D */}
+                      {/* Herramientas de Estructura: Descargar PNG & Visualizar en 3D */}
                       <div style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
+                        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
                         gap: '6px',
-                        marginBottom: '10px'
+                        marginBottom: '10px',
+                        width: '100%',
+                        boxSizing: 'border-box'
                       }}>
                         <button
                           type="button"
-                          onClick={() => handleDownloadSvg(drug)}
+                          onClick={() => handleDownloadPng(drug)}
                           className="btn btn-sm"
                           style={{
                             background: 'rgba(13, 148, 136, 0.08)',
                             color: 'var(--teal-ink)',
                             border: '1px solid rgba(13, 148, 136, 0.25)',
                             fontSize: '0.72rem',
-                            padding: '4px 6px',
+                            padding: '5px 6px',
                             justifyContent: 'center',
-                            gap: '5px'
+                            gap: '4px',
+                            minWidth: 0,
+                            width: '100%',
+                            boxSizing: 'border-box'
                           }}
-                          title={`Descargar estructura 2D de ${drug.name} en vector SVG`}
+                          title={`Descargar estructura 2D de ${drug.name} en imagen PNG`}
                         >
-                          <Download size={12} />
-                          <span>Descargar 2D (SVG)</span>
+                          <Download size={12} style={{ flexShrink: 0 }} />
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Descargar PNG</span>
                         </button>
 
                         <button
@@ -881,15 +929,18 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             color: '#4f46e5',
                             border: '1px solid rgba(99, 102, 241, 0.25)',
                             fontSize: '0.72rem',
-                            padding: '4px 6px',
+                            padding: '5px 6px',
                             justifyContent: 'center',
-                            gap: '5px'
+                            gap: '4px',
+                            minWidth: 0,
+                            width: '100%',
+                            boxSizing: 'border-box'
                           }}
                           title={`Abrir visor 3D interactivo de ${drug.name} en MolView`}
                         >
-                          <Box size={12} />
-                          <span>Ver en 3D (MolView)</span>
-                          <ExternalLink size={10} style={{ opacity: 0.6 }} />
+                          <Box size={12} style={{ flexShrink: 0 }} />
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Ver en 3D</span>
+                          <ExternalLink size={10} style={{ opacity: 0.6, flexShrink: 0 }} />
                         </button>
                       </div>
 
@@ -910,8 +961,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       </div>
 
                       {/* External DB Links: PubChem, DrugBank, PDB & ADMET */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: drug.pdbId ? '1fr 1fr 1fr' : '1fr 1fr', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--border-color)', paddingTop: '8px', width: '100%', boxSizing: 'border-box' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: drug.pdbId ? 'repeat(3, minmax(0, 1fr))' : 'repeat(2, minmax(0, 1fr))', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                           <button
                             onClick={() => window.open(`https://pubchem.ncbi.nlm.nih.gov/#query=${encodeURIComponent(drug.name)}`, '_blank', 'noopener,noreferrer')}
                             className="btn btn-sm"
@@ -922,13 +973,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               fontSize: '0.74rem',
                               padding: '4px 6px',
                               justifyContent: 'center',
-                              gap: '4px'
+                              gap: '4px',
+                              minWidth: 0,
+                              width: '100%',
+                              boxSizing: 'border-box'
                             }}
                             title={`Buscar ${drug.name} en PubChem`}
                           >
-                            <Globe size={12} />
-                            <span>PubChem</span>
-                            <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                            <Globe size={12} style={{ flexShrink: 0 }} />
+                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>PubChem</span>
+                            <ExternalLink size={10} style={{ opacity: 0.7, flexShrink: 0 }} />
                           </button>
 
                           <button
@@ -941,13 +995,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               fontSize: '0.74rem',
                               padding: '4px 6px',
                               justifyContent: 'center',
-                              gap: '4px'
+                              gap: '4px',
+                              minWidth: 0,
+                              width: '100%',
+                              boxSizing: 'border-box'
                             }}
                             title={`Buscar ${drug.name} en DrugBank`}
                           >
-                            <Database size={12} />
-                            <span>DrugBank</span>
-                            <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                            <Database size={12} style={{ flexShrink: 0 }} />
+                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>DrugBank</span>
+                            <ExternalLink size={10} style={{ opacity: 0.7, flexShrink: 0 }} />
                           </button>
 
                           {drug.pdbId && (
@@ -961,13 +1018,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 fontSize: '0.74rem',
                                 padding: '4px 6px',
                                 justifyContent: 'center',
-                                gap: '4px'
+                                gap: '4px',
+                                minWidth: 0,
+                                width: '100%',
+                                boxSizing: 'border-box'
                               }}
                               title={`Ver complejo macromolecular ${drug.pdbId} en 3D (RCSB PDB)`}
                             >
-                              <Atom size={12} />
-                              <span>PDB 3D</span>
-                              <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                              <Atom size={12} style={{ flexShrink: 0 }} />
+                              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>PDB 3D</span>
+                              <ExternalLink size={10} style={{ opacity: 0.7, flexShrink: 0 }} />
                             </button>
                           )}
                         </div>

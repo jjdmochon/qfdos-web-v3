@@ -884,6 +884,149 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         correctIndex: 0,
         explanation: 'La pralidoxima posee un nitrógeno piridínico cuaternario que se ancla en el subsitio aniónico y orienta con precisión angular el grupo oxima (=N-OH) para efectuar el ataque nucleofílico sobre el átomo de fósforo electrofílico del organofosforado.',
         difficulty: 'Avanzado'
+      },
+      {
+        id: 't01-retro-01',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'En el análisis retrosintético del bencilmalonato de dietilo (precursor de análogos anticolinérgicos), se descarta el corte "b" (enlace Ph-CH2) frente al corte "a" (enlace PhCH2-CH). ¿Cuál es la justificación electrónica y orbital que invalida el corte "b"?',
+        questionSmiles: 'CCOC(=O)C(Cc1ccccc1)C(=O)OCC',
+        imagePath: '/retrosintesis/slide29_bencilmalonato_desconexion.png',
+        options: [
+          { text: 'El sintón bencilo [PhCH2]+ derivado de "b" experimenta una transposición sigmatrópica irreversible a ión tropilio inerte.', smiles: 'c1ccccc1C=Cc2ccccc2' },
+          { text: 'El sintón fenilo [Ph]+ posee la vacante electrónica en un orbital sp2 ortogonal al sistema pi, resultando inaccesible.', smiles: 'c1ccccc1[CH2+]' },
+          { text: 'El bromobenceno resultante como equivalente de "b" actúa como base de Brønsted desprotonando al malonato por vía E2.', smiles: 'c1ccccc1Br' },
+          { text: 'El fragmento malonato aniónico derivado de "b" pierde la capacidad de quelación bidentada con el contracatión metálico.', smiles: 'CCOC(=O)[CH-]C(=O)OCC' }
+        ],
+        correctIndex: 1,
+        explanation: 'El catión fenilo [Ph]+ posee la vacante en un orbital híbrido sp2 en el plano del anillo, perpendicular a los orbitales p del sistema pi aromático, por lo que no puede estabilizarse por resonancia y su formación es energéticamente inviable. En cambio, el corte "a" genera el catión bencilo [PhCH2]+, fuertemente estabilizado por deslocalización en el anillo, y el carbanión malonato estabilizado por dos carbonilos.',
+        difficulty: 'Medio'
+      },
+      {
+        id: 't01-retro-02',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'En la síntesis de Ciclopentolato (midriático oftálmico), la adición organometálica directa sobre ciclopentanona fracasa con bajos rendimientos. ¿Qué factor mecanístico hace indispensable el reactivo de Ivanov (dianión de fenilacetato)?',
+        questionSmiles: 'CN(C)CCOC(=O)C(c1ccccc1)C1(O)CCCC1',
+        imagePath: '/retrosintesis/slide32_ciclopentolato_ivanov.png',
+        options: [
+          { text: 'La ciclopentanona sufre apertura electrocíclica por tensión angular de anillo frente a carbaniones monodesprotonados.', smiles: 'O=C1CCCC1' },
+          { text: 'El reactivo de Grignard oxida competitivamente el alcohol terciario recién formado hacia una dicetona bicíclica inestable.', smiles: 'O=C(c1ccccc1)C1(=O)CCCC1' },
+          { text: 'La ciclopentanona se enoliza frente a bases duras, mientras que el dianión de Ivanov actúa como nucleófilo blando eficaz.', smiles: 'O=C(O)C(c1ccccc1)C1(O)CCCC1' },
+          { text: 'El fenilacetato de etilo monovalente experimenta autocondensación de Claisen irreversible antes de atacar a la cetona.', smiles: 'CCOC(=O)Cc1ccccc1' }
+        ],
+        correctIndex: 2,
+        explanation: 'La ciclopentanona posee protones alfa accesibles y un ángulo de enlace en el ciclo de 5 miembros que favorece la enolización competitiva frente a bases carbaniónicas duras. El dianión de Ivanov (generado a partir de ácido fenilacético y 2 equivalentes de i-PrMgCl) actúa como un nucleófilo blando con reducida basicidad libre, adicionándose regioselectivamente en 1,2 al carbonilo para rendir el hidroxiácido con rendimientos superiores al 80%.',
+        difficulty: 'Avanzado'
+      },
+      {
+        id: 't01-retro-03',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'El antiespasmódico Piperidolato contiene el fragmento heterocíclico 1-etilpiperidin-3-ol. En su preparación a partir de furfural agroindustrial, ¿cuál es la secuencia sintética que expande el anillo furánico al ciclo piperidínico?',
+        questionSmiles: 'CCN1CCCC(C1)OC(=O)C(c1ccccc1)c1ccccc1',
+        imagePath: '/retrosintesis/slide33_aminoesteres_piperidolato.png',
+        options: [
+          { text: 'Aminación reductiva con etilamina, transposición furan-piridina con HBr/AcOH caliente e hidrogenación catalítica.', smiles: 'CCN1CCCC(O)C1' },
+          { text: 'Condensación aldólica con nitrometano, reducción a amina primaria y dialquilación con 1,3-dibromopropano a reflujo.', smiles: 'CCN1CCCCC1' },
+          { text: 'Oxidación de Baeyer-Villiger a tetrahidrofurano-2-ona, aminólisis con etilamina y reducción exhaustiva con hidruro de litio.', smiles: 'O=C1CCCCO1' },
+          { text: 'Ozonólisis oxidativa a ácido dicarboxílico alifático, condensación a imida con etilamina y reducción con diborano.', smiles: 'O=C1CCCNC1=O' }
+        ],
+        correctIndex: 0,
+        explanation: 'La aminación reductiva del furfural con etilamina rinde N-(furfuril)etilamina. El tratamiento posterior con HBr al 48% en ácido acético glacial provoca la apertura hidrolítica del furano y la posterior reciclación intramolecular del grupo amino sobre el centro carbonílico terminal, transponiéndose a bromuro de 1-etil-3-hidroxipiridinio. Su hidrogenación catalítica sobre PtO2 satura el anillo aromático produciendo 1-etilpiperidin-3-ol racémico.',
+        difficulty: 'Avanzado'
+      },
+      {
+        id: 't01-retro-04',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'La retrosíntesis del Trihexifenidilo (antiparkinsoniano central) desconecta el carbinol terciario a una beta-aminocetona aromática. ¿Qué proceso multicomponente permite la construcción directa de este intermedio?',
+        questionSmiles: 'OC(CCN1CCCCC1)(c1ccccc1)C1CCCCC1',
+        imagePath: '/retrosintesis/slide34_trihexifenidilo_aminopropanol.png',
+        options: [
+          { text: 'Adición conjugada de Michael entre fenil vinil cetona y piperidina libre catalizada por fluoruro de tetrabutilamonio.', smiles: 'O=C(c1ccccc1)C=C' },
+          { text: 'Acilación de Friedel-Crafts de benceno con cloruro de 3-(piperidin-1-il)propanoilo y tricloruro de aluminio anhidro.', smiles: 'ClC(=O)CCN1CCCCC1' },
+          { text: 'Reacción organozíncica de Reformatsky entre 2-bromoacetofenona, piperidina y polvo de zinc en tetrahidrofurano seco.', smiles: 'O=C(c1ccccc1)CBr' },
+          { text: 'Condensación de Mannich en medio ácido acuoso entre acetofenona, formaldehído y clorhidrato de piperidina a reflujo.', smiles: 'O=C(c1ccccc1)CCN2CCCCC2' }
+        ],
+        correctIndex: 3,
+        explanation: 'La reacción de Mannich condensa la acetofenona (componente enolizable), el formaldehído (fuente electrofílica no enolizable) y el clorhidrato de piperidina (amina secundaria) en presencia de una cantidad catalítica de ácido clorhídrico, generando directamente la base de Mannich 1-fenil-3-(piperidin-1-il)propan-1-ona con excelente rendimiento, lista para la adición de bromuro de ciclohexilmagnesio.',
+        difficulty: 'Medio'
+      },
+      {
+        id: 't01-retro-05',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'En la preparación sintética de la Isopropamida (antimuscarínico periférico), ¿cuál es la estrategia química idónea para introducir la función carbamoilo (-CONH2) sobre el centro cuaternario altamente impedido?',
+        questionSmiles: 'CC(C)[N+](C)(CCC(C(N)=O)(c1ccccc1)c1ccccc1)C(C)C',
+        imagePath: '/retrosintesis/slide35_isopropamida_amidoamonio.png',
+        options: [
+          { text: 'Acoplamiento directo del ácido carboxílico precursor con cloruro amónico usando carbodiimida como deshidratante.', smiles: 'NC(=O)C(c1ccccc1)(c1ccccc1)CC[N+](C)(C(C)C)C(C)C' },
+          { text: 'Alquilación de 2,2-difenilacetonitrilo con 2-(diisopropilamino)cloroetano e hidrólisis ácida parcial con ácido sulfúrico.', smiles: 'N#CC(c1ccccc1)(c1ccccc1)CCN(C(C)C)C(C)C' },
+          { text: 'Carboxilación de difenilmetano con cloroformiato de etilo, aminólisis en amoníaco gas y dialquilación con bromoisopropano.', smiles: 'CCOC(=O)C(c1ccccc1)c1ccccc1' },
+          { text: 'Transposición de Hofmann sobre el intermedio difenilsuccinimida seguida de monoalquilación con óxido de propileno anhidro.', smiles: 'O=C1CC(c2ccccc2)(c2ccccc2)C(=O)N1' }
+        ],
+        correctIndex: 1,
+        explanation: 'La desprotonación del 2,2-difenilacetonitrilo con amida sódica (NaNH2) en tolueno genera un carbanión alfa muy reactivo que alquila con limpieza al 2-(diisopropilamino)cloroetano. El nitrilo terciario resultante se hidrata de forma altamente quimioselectiva a amida primaria mediante tratamiento con H2SO4 al 85% a 90 °C, deteniéndose en la amida gracias al impedimento estérico que previene la hidrólisis completa a ácido.',
+        difficulty: 'Medio'
+      },
+      {
+        id: 't01-retro-06',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'SAR & Farmacocinética',
+        question: 'Al comparar la farmacocinética de Trihexifenidilo e Isopropamida, ¿qué rasgo estructural diferencial justifica que el primero penetre en SNC (Parkinson) mientras que el segundo ejerza una acción exclusivamente periférica?',
+        questionSmiles: 'OC(CCN1CCCCC1)(c1ccccc1)C1CCCCC1',
+        options: [
+          { text: 'Trihexifenidilo posee una amina 3ª lipófila que cruza la BHE; Isopropamida un amonio 4º con exclusión de paso al SNC.', smiles: 'OC(CCN1CCCCC1)(c1ccccc1)C1CCCCC1' },
+          { text: 'Trihexifenidilo se inactiva por esterasas séricas en plasma; Isopropamida se metaboliza por monoamino oxidasa hepática.', smiles: 'CCN(CC)CCOC(=O)C(c1ccccc1)c1ccccc1' },
+          { text: 'Trihexifenidilo se une covalentemente a la albúmina humana; Isopropamida polimeriza por el pH ácido gástrico en estómago.', smiles: 'CC(C)[N+](C)(CCC(C(N)=O)(c1ccccc1)c1ccccc1)C(C)C' },
+          { text: 'Trihexifenidilo carece de grupos aromáticos lipófilos; Isopropamida contiene tres núcleos bencénicos con quelación metálica.', smiles: 'CCN1CCCC(C1)OC(=O)C(c1ccccc1)c1ccccc1' }
+        ],
+        correctIndex: 0,
+        explanation: 'El Trihexifenidilo presenta una amina terciaria alifática básica (pKa ≈ 9.3) y un carbinol terciario lipófilo (logP = 4.33, TPSA = 23.5 Å²), lo que le permite atravesar pasivamente la barrera hematoencefálica (BHE) para actuar en el cuerpo estriado. Por el contrario, la Isopropamida posee un catión amonio cuaternario permanente que confiere una carga formal neta positiva a cualquier pH fisiológico, impidiendo su difusión a través de las membranas endoteliales de la BHE y confinándola a receptores muscarínicos periféricos (aparato digestivo).',
+        difficulty: 'Medio'
+      },
+      {
+        id: 't01-retro-07',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'En la desconexión del enlace éster acilo-oxígeno (C(=O)-O) del antiespasmódico Adifenina, ¿cuáles son los sintones idealizados resultantes y sus correspondientes equivalentes sintéticos comerciales?',
+        questionSmiles: 'CCN(CC)CCOC(=O)C(c1ccccc1)c1ccccc1',
+        imagePath: '/retrosintesis/slide30_difenilmetano_carbonatacion.png',
+        options: [
+          { text: 'Sintón acilo nucleófilo [Ph2CH-CO]- (reactivo: difenilcetena) y sintón catiónico [OCH2CH2NEt2]+ (reactivo: cloroamina terciaria).', smiles: 'O=C=C(c1ccccc1)c1ccccc1' },
+          { text: 'Sintón carbenoide [Ph2C=C=O] (reactivo: diazocetona) y sintón aniónico [CH2CH2NEt2]- (reactivo: organolítico alifático).', smiles: 'CCN(CC)CC' },
+          { text: 'Sintón catión acilio [Ph2CH-CO]+ (reactivo: cloruro de difenilacetilo) y sintón alcóxido [OCH2CH2NEt2]- (reactivo: dietilaminoetanol).', smiles: 'ClC(=O)C(c1ccccc1)c1ccccc1' },
+          { text: 'Sintón radical [Ph2CH-CO]· (reactivo: perácido difenílico) y sintón oxonio [HO-CH2CH2NEt2]+ (reactivo: sal de pirilio cíclica).', smiles: 'CCN(CC)CCO' }
+        ],
+        correctIndex: 2,
+        explanation: 'La ruptura heterolítica estándar del enlace éster acilo-oxígeno asigna la carga positiva al carbono carbonílico (sintón catión acilio [R-CO]+) debido a la mayor electronegatividad del oxígeno, que retiene el par electrónico convirtiéndose en el sintón alcóxido [RO]-. Los equivalentes sintéticos comerciales son el cloruro de difenilacetilo (Ph2CH-COCl, electrófilo) y el 2-(dietilamino)etanol (HOCH2CH2NEt2, nucleófilo).',
+        difficulty: 'Fácil'
+      },
+      {
+        id: 't01-retro-08',
+        topicId: 'tema-01',
+        block: 'Retrosíntesis & Desconexiones',
+        badge: 'Retrosíntesis',
+        question: 'Para la síntesis del fragmento ácido de la Benactizina (ácido bencílico o difenilglicólico), ¿qué reacción clásica de química orgánica transforma una 1,2-dicetona simétrica en este alfa-hidroxiácido?',
+        questionSmiles: 'CCN(CC)CCOC(=O)C(O)(c1ccccc1)c1ccccc1',
+        imagePath: '/retrosintesis/slide31_alcoholes_cianhidrinas_acetilenicos.png',
+        options: [
+          { text: 'Condensación benzoínica entre dos moléculas de benzaldehído catalizada por cianuro potásico en etanol acuoso a reflujo.', smiles: 'O=C(c1ccccc1)C(O)c2ccccc2' },
+          { text: 'Reacción de Cannizzaro cruzada entre benzofenona y formaldehído anhidro empleando hidróxido potásico en medio no polar.', smiles: 'O=C(c1ccccc1)c2ccccc2' },
+          { text: 'Oxidación de Oppenauer de 1,2-difeniletanol empleando isopropóxido de aluminio y ciclopentanona como aceptor de hidruro.', smiles: 'OC(Cc1ccccc1)c2ccccc2' },
+          { text: 'Transposición del ácido bencílico a partir de bencilo (1,2-difeniletano-1,2-diona) inducida por hidróxido potásico acuoso.', smiles: 'O=C(c1ccccc1)C(=O)c2ccccc2' }
+        ],
+        correctIndex: 3,
+        explanation: 'La transposición del ácido bencílico consiste en el ataque nucleófilo del ión hidróxido (OH-) a uno de los carbonilos del bencilo (Ph-CO-CO-Ph), seguido de una migración 1,2 intramolecular concertada del grupo fenilo con su par de electrones al carbonilo vecino adyacente. La posterior transferencia protónica rinde el anión difenilglicolato (ácido bencílico) con rendimiento prácticamente cuantitativo.',
+        difficulty: 'Medio'
       }
     ],
     flashcards: [
