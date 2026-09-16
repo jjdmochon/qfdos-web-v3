@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { QfdosTopic, CourseAttachment, MoleculeDrug } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { useAuth } from '../context/AuthContext';
 import { 
   X, 
+  Search,
   BookOpen, 
   Layers, 
   Radio, 
@@ -53,13 +54,37 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   const [editSlidesUrl, setEditSlidesUrl] = useState(topic.slidesPdfUrl || '');
   const [editNotesUrl, setEditNotesUrl] = useState(topic.notesPdfUrl || '');
   const [editNotebookUrl, setEditNotebookUrl] = useState(topic.geminiNotebookUrl || '');
+  const [drugSearchTerm, setDrugSearchTerm] = useState('');
 
   useEffect(() => {
     setEditSlidesUrl(topic.slidesPdfUrl || '');
     setEditNotesUrl(topic.notesPdfUrl || '');
     setEditNotebookUrl(topic.geminiNotebookUrl || '');
     setIsEditingDriveLinks(false);
+    setDrugSearchTerm('');
   }, [topic]);
+
+  const filteredDrugs = useMemo(() => {
+    if (!topic.drugs || topic.drugs.length === 0) return [];
+    const term = drugSearchTerm.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (!term) return topic.drugs;
+
+    return topic.drugs.filter(drug => {
+      const name = (drug.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const role = (drug.role || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const formula = (drug.formula || '').toLowerCase();
+      const smiles = (drug.smiles || '').toLowerCase();
+      const pdbId = (drug.pdbId || '').toLowerCase();
+
+      return (
+        name.includes(term) ||
+        role.includes(term) ||
+        formula.includes(term) ||
+        smiles.includes(term) ||
+        pdbId.includes(term)
+      );
+    });
+  }, [topic.drugs, drugSearchTerm]);
 
   const handleSaveDriveLinks = (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,7 +209,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 onClick={() => setActiveTab('drugs')}
                 className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`}
               >
-                <Layers size={14} /> Fármacos & Quimioinformática ({topic.drugs.length})
+                <Layers size={14} /> Fármacos & Quimioinformática ({drugSearchTerm.trim() ? `${filteredDrugs.length}/${topic.drugs.length}` : topic.drugs.length})
               </button>
             )}
           </div>
@@ -615,120 +640,240 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           {/* TAB 3: Fármacos Prototipo & SAR */}
           {activeTab === 'drugs' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
-                {topic.drugs?.map((drug, i) => (
-                  <div key={i} className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                      <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                          {drug.name}
-                        </h4>
-                        <span style={{ fontSize: '0.78rem', color: 'var(--teal-ink)', fontWeight: 600 }}>
-                          {drug.role}
-                        </span>
-                      </div>
-                      {drug.pdbId && (
-                        <span className="qfdos-badge badge-mint" style={{ fontSize: '0.68rem' }}>
-                          PDB: {drug.pdbId}
-                        </span>
-                      )}
-                    </div>
+              
+              {/* Barra de Búsqueda y Filtro de Fármacos dentro del Tema */}
+              <div
+                className="qfdos-card"
+                style={{
+                  padding: '0.85rem 1.25rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  background: 'var(--surface-raised)',
+                  border: '1px solid var(--border-color)'
+                }}
+              >
+                <div style={{ position: 'relative', flex: '1 1 280px', maxWidth: '520px' }}>
+                  <Search
+                    size={16}
+                    style={{
+                      position: 'absolute',
+                      left: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--text-muted)',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Buscar fármaco por nombre, mecanismo, fórmula, SMILES..."
+                    value={drugSearchTerm}
+                    onChange={e => setDrugSearchTerm(e.target.value)}
+                    className="form-input"
+                    style={{
+                      paddingLeft: '36px',
+                      paddingRight: drugSearchTerm ? '34px' : '12px',
+                      fontSize: '0.85rem',
+                      width: '100%'
+                    }}
+                  />
+                  {drugSearchTerm && (
+                    <button
+                      onClick={() => setDrugSearchTerm('')}
+                      style={{
+                        position: 'absolute',
+                        right: '8px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--text-muted)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px',
+                        borderRadius: '4px'
+                      }}
+                      title="Limpiar búsqueda"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
 
-                    {/* 2D Molecular Drawer */}
-                    <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
-                      <Chem2DDrawer smiles={drug.smiles} name={drug.name} width={260} height={130} />
-                    </div>
-
-                    {/* SMILES code */}
-                    <div style={{
-                      background: 'var(--surface-alt)',
-                      padding: '6px 10px',
-                      borderRadius: 'var(--radius-sm)',
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '0.72rem',
-                      color: 'var(--navy-ink)',
-                      wordBreak: 'break-all',
-                      marginBottom: '10px'
-                    }}>
-                      SMILES: {drug.smiles}
-                    </div>
-
-                    {/* Molecular Properties (Lipinski / Veber) */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', fontSize: '0.74rem', marginBottom: '10px' }}>
-                      <div style={{ background: 'var(--surface-alt)', padding: '4px 6px', borderRadius: '4px', textAlign: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', display: 'block' }}>PM (Da)</span>
-                        <strong>{drug.mw || 'N/A'}</strong>
-                      </div>
-                      <div style={{ background: 'var(--surface-alt)', padding: '4px 6px', borderRadius: '4px', textAlign: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', display: 'block' }}>LogP</span>
-                        <strong>{drug.logP || 'N/A'}</strong>
-                      </div>
-                      <div style={{ background: 'var(--surface-alt)', padding: '4px 6px', borderRadius: '4px', textAlign: 'center' }}>
-                        <span style={{ color: 'var(--text-muted)', display: 'block' }}>TPSA (Å²)</span>
-                        <strong>{drug.tpsa || 'N/A'}</strong>
-                      </div>
-                    </div>
-
-                    {/* External DB Links: PubChem, DrugBank & ADMET */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-                        <button
-                          onClick={() => window.open(`https://pubchem.ncbi.nlm.nih.gov/#query=${encodeURIComponent(drug.name)}`, '_blank', 'noopener,noreferrer')}
-                          className="btn btn-sm"
-                          style={{
-                            background: 'rgba(30, 58, 138, 0.08)',
-                            color: 'var(--navy-ink)',
-                            border: '1px solid rgba(30, 58, 138, 0.2)',
-                            fontSize: '0.74rem',
-                            padding: '4px 6px',
-                            justifyContent: 'center',
-                            gap: '4px'
-                          }}
-                          title={`Buscar ${drug.name} en PubChem`}
-                        >
-                          <Globe size={12} />
-                          <span>PubChem</span>
-                          <ExternalLink size={11} style={{ opacity: 0.7 }} />
-                        </button>
-
-                        <button
-                          onClick={() => window.open(`https://go.drugbank.com/unearth/q?searcher=drugs&query=${encodeURIComponent(drug.name)}`, '_blank', 'noopener,noreferrer')}
-                          className="btn btn-sm"
-                          style={{
-                            background: 'rgba(13, 148, 136, 0.08)',
-                            color: 'var(--teal-ink)',
-                            border: '1px solid rgba(13, 148, 136, 0.2)',
-                            fontSize: '0.74rem',
-                            padding: '4px 6px',
-                            justifyContent: 'center',
-                            gap: '4px'
-                          }}
-                          title={`Buscar ${drug.name} en DrugBank`}
-                        >
-                          <Database size={12} />
-                          <span>DrugBank</span>
-                          <ExternalLink size={11} style={{ opacity: 0.7 }} />
-                        </button>
-                      </div>
-
-                      {onOpenAdmet && (
-                        <button
-                          onClick={() => {
-                            onClose();
-                            onOpenAdmet(drug);
-                          }}
-                          className="btn btn-sm btn-outline"
-                          style={{ width: '100%', fontSize: '0.74rem', padding: '4px 6px', justifyContent: 'center', gap: '5px' }}
-                          title={`Evaluar propiedades ADMET y Lipinski de ${drug.name}`}
-                        >
-                          <Activity size={12} />
-                          <span>Evaluar en ADMET & Lipinski</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    className={`qfdos-badge ${filteredDrugs.length > 0 ? 'badge-teal' : 'badge-neutral'}`}
+                    style={{ fontSize: '0.75rem', fontWeight: 600, padding: '5px 12px' }}
+                  >
+                    {drugSearchTerm.trim()
+                      ? `Mostrando ${filteredDrugs.length} de ${topic.drugs?.length || 0} fármacos`
+                      : `${topic.drugs?.length || 0} fármacos registrados`}
+                  </span>
+                </div>
               </div>
+
+              {/* Grid de Fármacos Filtrados */}
+              {filteredDrugs.length > 0 ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+                  {filteredDrugs.map((drug, i) => (
+                    <div key={drug.name + '-' + i} className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                        <div>
+                          <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                            {drug.name}
+                          </h4>
+                          <span style={{ fontSize: '0.78rem', color: 'var(--teal-ink)', fontWeight: 600 }}>
+                            {drug.role}
+                          </span>
+                        </div>
+                        {drug.pdbId && (
+                          <span className="qfdos-badge badge-mint" style={{ fontSize: '0.68rem' }}>
+                            PDB: {drug.pdbId}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 2D Molecular Drawer */}
+                      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0' }}>
+                        <Chem2DDrawer smiles={drug.smiles} name={drug.name} width={260} height={130} />
+                      </div>
+
+                      {/* SMILES code */}
+                      <div style={{
+                        background: 'var(--surface-alt)',
+                        padding: '6px 10px',
+                        borderRadius: 'var(--radius-sm)',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.72rem',
+                        color: 'var(--navy-ink)',
+                        wordBreak: 'break-all',
+                        marginBottom: '10px'
+                      }}>
+                        SMILES: {drug.smiles}
+                      </div>
+
+                      {/* Molecular Properties (Lipinski / Veber) */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', fontSize: '0.74rem', marginBottom: '10px' }}>
+                        <div style={{ background: 'var(--surface-alt)', padding: '4px 6px', borderRadius: '4px', textAlign: 'center' }}>
+                          <span style={{ color: 'var(--text-muted)', display: 'block' }}>PM (Da)</span>
+                          <strong>{drug.mw || 'N/A'}</strong>
+                        </div>
+                        <div style={{ background: 'var(--surface-alt)', padding: '4px 6px', borderRadius: '4px', textAlign: 'center' }}>
+                          <span style={{ color: 'var(--text-muted)', display: 'block' }}>LogP</span>
+                          <strong>{drug.logP || 'N/A'}</strong>
+                        </div>
+                        <div style={{ background: 'var(--surface-alt)', padding: '4px 6px', borderRadius: '4px', textAlign: 'center' }}>
+                          <span style={{ color: 'var(--text-muted)', display: 'block' }}>TPSA (Å²)</span>
+                          <strong>{drug.tpsa || 'N/A'}</strong>
+                        </div>
+                      </div>
+
+                      {/* External DB Links: PubChem, DrugBank & ADMET */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                          <button
+                            onClick={() => window.open(`https://pubchem.ncbi.nlm.nih.gov/#query=${encodeURIComponent(drug.name)}`, '_blank', 'noopener,noreferrer')}
+                            className="btn btn-sm"
+                            style={{
+                              background: 'rgba(30, 58, 138, 0.08)',
+                              color: 'var(--navy-ink)',
+                              border: '1px solid rgba(30, 58, 138, 0.2)',
+                              fontSize: '0.74rem',
+                              padding: '4px 6px',
+                              justifyContent: 'center',
+                              gap: '4px'
+                            }}
+                            title={`Buscar ${drug.name} en PubChem`}
+                          >
+                            <Globe size={12} />
+                            <span>PubChem</span>
+                            <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                          </button>
+
+                          <button
+                            onClick={() => window.open(`https://go.drugbank.com/unearth/q?searcher=drugs&query=${encodeURIComponent(drug.name)}`, '_blank', 'noopener,noreferrer')}
+                            className="btn btn-sm"
+                            style={{
+                              background: 'rgba(13, 148, 136, 0.08)',
+                              color: 'var(--teal-ink)',
+                              border: '1px solid rgba(13, 148, 136, 0.2)',
+                              fontSize: '0.74rem',
+                              padding: '4px 6px',
+                              justifyContent: 'center',
+                              gap: '4px'
+                            }}
+                            title={`Buscar ${drug.name} en DrugBank`}
+                          >
+                            <Database size={12} />
+                            <span>DrugBank</span>
+                            <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                          </button>
+                        </div>
+
+                        {onOpenAdmet && (
+                          <button
+                            onClick={() => {
+                              onClose();
+                              onOpenAdmet(drug);
+                            }}
+                            className="btn btn-sm btn-outline"
+                            style={{ width: '100%', fontSize: '0.74rem', padding: '4px 6px', justifyContent: 'center', gap: '5px' }}
+                            title={`Evaluar propiedades ADMET y Lipinski de ${drug.name}`}
+                          >
+                            <Activity size={12} />
+                            <span>Evaluar en ADMET & Lipinski</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  className="qfdos-card"
+                  style={{
+                    padding: '3rem 2rem',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '12px',
+                    background: 'var(--surface-raised)'
+                  }}
+                >
+                  <div style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    background: 'var(--surface-alt)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--text-muted)'
+                  }}>
+                    <Search size={22} />
+                  </div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-title)', margin: 0 }}>
+                    No se encontraron fármacos
+                  </h4>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, maxWidth: '42ch', lineHeight: 1.5 }}>
+                    No hay ningún principio activo en este tema que coincida con «<strong style={{ color: 'var(--text-main)' }}>{drugSearchTerm}</strong>».
+                  </p>
+                  <button
+                    onClick={() => setDrugSearchTerm('')}
+                    className="btn btn-sm btn-secondary"
+                    style={{ marginTop: '4px', fontWeight: 700 }}
+                  >
+                    Limpiar búsqueda
+                  </button>
+                </div>
+              )}
+
             </div>
           )}
 

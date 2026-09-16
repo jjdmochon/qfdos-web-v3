@@ -58,7 +58,11 @@ cuentas institucionales administradas. En Google Cloud Console hay que añadir
 
 ---
 
-## Subir materiales
+## Política de publicación de temas (Regla Docente Obligatoria)
+
+> **AVISO OBLIGATORIO:** Los temas configurados como `Próximamente` (Temas 02 a 10 en `qfdosData.ts`) **NUNCA** deben cambiarse a `Publicado` en el repositorio ni durante el push a GitHub. La publicación y desbloqueo de contenidos para el alumnado la gestiona exclusivamente el profesor Juanjo desde su perfil docente autenticado (`juandiaz@ugr.es` / `juandiaz@go.ugr.es`).
+
+---
 
 Como profesor, hay dos accesos: el botón **Gestionar curso** de la cabecera y
 **Subir materiales** en el panel azul del inicio. Ambos abren el CMS en la
