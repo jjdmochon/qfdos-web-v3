@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { QfdosTopic, CourseAttachment, MoleculeDrug } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
 import { 
   X, 
   Search,
   BookOpen, 
   Layers, 
+  Copy,
+  Check,
+  Box,
   Radio, 
   HelpCircle, 
   Award, 
@@ -97,6 +101,39 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     };
     onUpdateTopic(updated);
     setIsEditingDriveLinks(false);
+  };
+
+  const [copiedSmiles, setCopiedSmiles] = useState<string | null>(null);
+
+  const handleCopySmiles = (smiles: string, drugName: string) => {
+    navigator.clipboard.writeText(smiles);
+    setCopiedSmiles(drugName);
+    setTimeout(() => setCopiedSmiles(null), 2000);
+  };
+
+  const handleDownloadSvg = async (drug: MoleculeDrug) => {
+    if (!drug.smiles) return;
+    try {
+      const svg = await renderMoleculeSvg(drug.smiles, { width: 600, height: 450, dark: false });
+      if (!svg) return;
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = drug.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9_-]/gi, '_');
+      a.download = `${safeName}_2d.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error downloading SVG:', err);
+    }
+  };
+
+  const handleOpen3D = (drug: MoleculeDrug) => {
+    if (!drug.smiles) return;
+    window.open(`https://molview.org/?smiles=${encodeURIComponent(drug.smiles)}`, '_blank', 'noopener,noreferrer');
   };
 
   // Última barrera: aquí convergen el temario, el panel de inicio y la búsqueda
@@ -754,18 +791,106 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         <Chem2DDrawer smiles={drug.smiles} name={drug.name} width={260} height={130} />
                       </div>
 
-                      {/* SMILES code */}
+                      {/* SMILES code with 1-click copy */}
                       <div style={{
                         background: 'var(--surface-alt)',
                         padding: '6px 10px',
                         borderRadius: 'var(--radius-sm)',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.72rem',
-                        color: 'var(--navy-ink)',
-                        wordBreak: 'break-all',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                        marginBottom: '8px'
+                      }}>
+                        <div style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '0.70rem',
+                          color: 'var(--navy-ink)',
+                          wordBreak: 'break-all',
+                          lineHeight: 1.3
+                        }}>
+                          <span style={{ fontWeight: 700, color: 'var(--text-muted)', marginRight: '4px' }}>SMILES:</span>
+                          {drug.smiles}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopySmiles(drug.smiles, drug.name)}
+                          className="btn btn-sm"
+                          style={{
+                            flexShrink: 0,
+                            padding: '3px 7px',
+                            fontSize: '0.68rem',
+                            height: 'auto',
+                            background: copiedSmiles === drug.name ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-card)',
+                            color: copiedSmiles === drug.name ? '#059669' : 'var(--text-body)',
+                            border: '1px solid ' + (copiedSmiles === drug.name ? '#10b981' : 'var(--border-color)'),
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          title="Copiar código SMILES al portapapeles"
+                        >
+                          {copiedSmiles === drug.name ? (
+                            <>
+                              <Check size={11} />
+                              <span>Copiado</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={11} />
+                              <span>Copiar</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Herramientas de Estructura: Descargar 2D SVG & Visualizar en 3D */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '6px',
                         marginBottom: '10px'
                       }}>
-                        SMILES: {drug.smiles}
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadSvg(drug)}
+                          className="btn btn-sm"
+                          style={{
+                            background: 'rgba(13, 148, 136, 0.08)',
+                            color: 'var(--teal-ink)',
+                            border: '1px solid rgba(13, 148, 136, 0.25)',
+                            fontSize: '0.72rem',
+                            padding: '4px 6px',
+                            justifyContent: 'center',
+                            gap: '5px'
+                          }}
+                          title={`Descargar estructura 2D de ${drug.name} en vector SVG`}
+                        >
+                          <Download size={12} />
+                          <span>Descargar 2D (SVG)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleOpen3D(drug)}
+                          className="btn btn-sm"
+                          style={{
+                            background: 'rgba(99, 102, 241, 0.08)',
+                            color: '#4f46e5',
+                            border: '1px solid rgba(99, 102, 241, 0.25)',
+                            fontSize: '0.72rem',
+                            padding: '4px 6px',
+                            justifyContent: 'center',
+                            gap: '5px'
+                          }}
+                          title={`Abrir visor 3D interactivo de ${drug.name} en MolView`}
+                        >
+                          <Box size={12} />
+                          <span>Ver en 3D (MolView)</span>
+                          <ExternalLink size={10} style={{ opacity: 0.6 }} />
+                        </button>
                       </div>
 
                       {/* Molecular Properties (Lipinski / Veber) */}
@@ -784,9 +909,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       </div>
 
-                      {/* External DB Links: PubChem, DrugBank & ADMET */}
+                      {/* External DB Links: PubChem, DrugBank, PDB & ADMET */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--border-color)', paddingTop: '8px' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: drug.pdbId ? '1fr 1fr 1fr' : '1fr 1fr', gap: '6px' }}>
                           <button
                             onClick={() => window.open(`https://pubchem.ncbi.nlm.nih.gov/#query=${encodeURIComponent(drug.name)}`, '_blank', 'noopener,noreferrer')}
                             className="btn btn-sm"
@@ -824,6 +949,27 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             <span>DrugBank</span>
                             <ExternalLink size={11} style={{ opacity: 0.7 }} />
                           </button>
+
+                          {drug.pdbId && (
+                            <button
+                              onClick={() => window.open(`https://www.rcsb.org/3d-view/${drug.pdbId}`, '_blank', 'noopener,noreferrer')}
+                              className="btn btn-sm"
+                              style={{
+                                background: 'rgba(16, 185, 129, 0.08)',
+                                color: '#047857',
+                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                fontSize: '0.74rem',
+                                padding: '4px 6px',
+                                justifyContent: 'center',
+                                gap: '4px'
+                              }}
+                              title={`Ver complejo macromolecular ${drug.pdbId} en 3D (RCSB PDB)`}
+                            >
+                              <Atom size={12} />
+                              <span>PDB 3D</span>
+                              <ExternalLink size={11} style={{ opacity: 0.7 }} />
+                            </button>
+                          )}
                         </div>
 
                         {onOpenAdmet && (
