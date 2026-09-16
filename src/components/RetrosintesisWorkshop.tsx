@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { RETROSINTHESIS_CASE_STUDIES, RetrosynthesisCaseStudy } from '../data/retrosintesisExercisesData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 
 interface RetrosintesisWorkshopProps {
   isProfesor: boolean;
@@ -83,7 +84,8 @@ const SLIDE_CARDS = [
 export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ isProfesor }) => {
   const [subTab, setSubTab] = useState<'cases' | 'slides'>('cases');
   const [selectedCaseId, setSelectedCaseId] = useState<string>(RETROSINTHESIS_CASE_STUDIES[0].id);
-  const [activeSlideModal, setActiveSlideModal] = useState<typeof SLIDE_CARDS[0] | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
+  const [isHoveredScheme, setIsHoveredScheme] = useState(false);
 
   const currentCase = RETROSINTHESIS_CASE_STUDIES.find(c => c.id === selectedCaseId) || RETROSINTHESIS_CASE_STUDIES[0];
 
@@ -225,17 +227,91 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
               </div>
             </div>
 
-            {/* Figura Esquema RDKit si existe */}
+            {/* Figura Esquema RDKit si existe con interacción hover y click full screen */}
             {currentCase.imagePath && (
-              <div style={{ background: '#ffffff', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', textAlign: 'center' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-                  Esquema Químico Vectorial RDKit (Oficial Diapositivas)
-                </span>
-                <img 
-                  src={currentCase.imagePath.startsWith('http') ? currentCase.imagePath : `${import.meta.env.BASE_URL || '/'}${currentCase.imagePath.replace(/^\//, '')}`} 
-                  alt={currentCase.title}
-                  style={{ maxHeight: '280px', maxWidth: '100%', objectFit: 'contain' }}
-                />
+              <div 
+                style={{ 
+                  background: '#ffffff', 
+                  padding: '12px 14px', 
+                  borderRadius: 'var(--radius-md)', 
+                  border: isHoveredScheme ? '1.5px solid var(--teal-ink)' : '1px solid var(--border-color)', 
+                  textAlign: 'center',
+                  position: 'relative',
+                  cursor: 'zoom-in',
+                  boxShadow: isHoveredScheme ? '0 12px 28px -6px rgba(13, 148, 136, 0.2)' : '0 2px 6px rgba(0, 0, 0, 0.04)',
+                  transition: 'all 0.25s ease',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={() => setIsHoveredScheme(true)}
+                onMouseLeave={() => setIsHoveredScheme(false)}
+                onClick={() => {
+                  const src = currentCase.imagePath!.startsWith('http') 
+                    ? currentCase.imagePath! 
+                    : `${import.meta.env.BASE_URL || '/'}${currentCase.imagePath!.replace(/^\//, '')}`;
+                  setLightboxImage({
+                    src,
+                    title: `Esquema Retrosintético: ${currentCase.title}`,
+                    subtitle: `Caso Práctico — Desconexión heterolítica y síntesis RDKit`,
+                    tag: 'Caso Práctico'
+                  });
+                }}
+                title="Haz clic para ampliar a pantalla completa"
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    Esquema Químico Vectorial RDKit (Oficial Diapositivas)
+                  </span>
+                  <span 
+                    className="qfdos-badge badge-teal"
+                    style={{ 
+                      fontSize: '0.64rem', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Maximize2 size={10} /> Clic para Pantalla Completa
+                  </span>
+                </div>
+
+                <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--radius-sm)' }}>
+                  <img 
+                    src={currentCase.imagePath.startsWith('http') ? currentCase.imagePath : `${import.meta.env.BASE_URL || '/'}${currentCase.imagePath.replace(/^\//, '')}`} 
+                    alt={currentCase.title}
+                    style={{ 
+                      maxHeight: '300px', 
+                      maxWidth: '100%', 
+                      objectFit: 'contain',
+                      transform: isHoveredScheme ? 'scale(1.025)' : 'scale(1)',
+                      transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  />
+                  
+                  {/* Floating Action Badge on Hover */}
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      bottom: '12px',
+                      background: isHoveredScheme ? 'rgba(15, 23, 42, 0.92)' : 'rgba(15, 23, 42, 0.7)',
+                      color: '#ffffff',
+                      padding: '5px 12px',
+                      borderRadius: '20px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      backdropFilter: 'blur(4px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                      transform: isHoveredScheme ? 'translateY(-2px)' : 'translateY(0)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Maximize2 size={12} /> Ampliar a Pantalla Completa
+                  </div>
+                </div>
               </div>
             )}
 
@@ -371,7 +447,12 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
                   cursor: 'pointer',
                   transition: 'all var(--transition-fast)'
                 }}
-                onClick={() => setActiveSlideModal(slide)}
+                onClick={() => setLightboxImage({
+                  src: `${import.meta.env.BASE_URL || '/'}${slide.image.replace(/^\//, '')}`,
+                  title: slide.title,
+                  subtitle: slide.subtitle,
+                  tag: `Slide ${slide.slideNum} • ${slide.tag}`
+                })}
               >
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -390,14 +471,33 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
                   </p>
                 </div>
 
-                <div style={{ background: '#ffffff', padding: '6px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', textAlign: 'center', position: 'relative' }}>
+                <div 
+                  style={{ 
+                    background: '#ffffff', 
+                    padding: '6px', 
+                    borderRadius: 'var(--radius-sm)', 
+                    border: '1px solid var(--border-color)', 
+                    textAlign: 'center', 
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxImage({
+                      src: `${import.meta.env.BASE_URL || '/'}${slide.image.replace(/^\//, '')}`,
+                      title: slide.title,
+                      subtitle: slide.subtitle,
+                      tag: `Slide ${slide.slideNum} • ${slide.tag}`
+                    });
+                  }}
+                >
                   <img 
                     src={`${import.meta.env.BASE_URL || '/'}${slide.image.replace(/^\//, '')}`} 
                     alt={slide.title}
                     style={{ maxHeight: '140px', maxWidth: '100%', objectFit: 'contain' }}
                   />
-                  <span style={{ position: 'absolute', right: '8px', bottom: '8px', background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '3px 6px', borderRadius: '4px', fontSize: '0.64rem', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                    <Maximize2 size={10} /> Ampliar
+                  <span style={{ position: 'absolute', right: '8px', bottom: '8px', background: 'rgba(15, 23, 42, 0.85)', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.66rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', backdropFilter: 'blur(4px)' }}>
+                    <Maximize2 size={11} /> Pantalla Completa
                   </span>
                 </div>
               </div>
@@ -406,37 +506,11 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
         </div>
       )}
 
-      {/* Modal de Zoom para Diapositiva */}
-      {activeSlideModal && (
-        <div className="modal-overlay" onClick={() => setActiveSlideModal(null)}>
-          <div 
-            className="modal-container" 
-            style={{ maxWidth: '900px', maxHeight: '90vh' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0 }}>
-                  {activeSlideModal.title}
-                </h3>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  {activeSlideModal.subtitle}
-                </span>
-              </div>
-              <button onClick={() => setActiveSlideModal(null)} className="btn btn-sm btn-outline">
-                ✕
-              </button>
-            </div>
-            <div className="modal-body" style={{ padding: '1rem', textAlign: 'center', background: '#ffffff', overflowY: 'auto' }}>
-              <img 
-                src={`${import.meta.env.BASE_URL || '/'}${activeSlideModal.image.replace(/^\//, '')}`} 
-                alt={activeSlideModal.title}
-                style={{ maxHeight: '70vh', maxWidth: '100%', objectFit: 'contain' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal de Zoom Lightbox a Pantalla Completa */}
+      <ImageLightboxModal
+        image={lightboxImage}
+        onClose={() => setLightboxImage(null)}
+      />
 
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { QfdosTopic, TestQuestion, QuizAttempt } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { 
   X, 
   HelpCircle, 
@@ -10,7 +11,8 @@ import {
   ArrowRight, 
   RotateCcw, 
   Award,
-  BookOpen
+  BookOpen,
+  Maximize2
 } from 'lucide-react';
 
 interface QuizModalProps {
@@ -32,6 +34,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [showExplanation, setShowExplanation] = useState(false);
   const [answers, setAnswers] = useState<{ [key: number]: number }>({});
   const [isCompleted, setIsCompleted] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
 
   if (!isProfesor) {
     return (
@@ -202,12 +205,42 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
               {/* Optional Figure / Image for Question */}
               {currentQ.imagePath && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', background: '#ffffff', padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    marginBottom: '1rem', 
+                    background: '#ffffff', 
+                    padding: '10px 14px', 
+                    borderRadius: 'var(--radius-md)', 
+                    border: '1.5px solid var(--border-color)',
+                    cursor: 'zoom-in',
+                    position: 'relative',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                  }}
+                  onClick={() => {
+                    const src = currentQ.imagePath!.startsWith('http') 
+                      ? currentQ.imagePath! 
+                      : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath!.replace(/^\//, '')}`;
+                    setLightboxImage({
+                      src,
+                      title: `Pregunta ${currentIndex + 1}: ${currentQ.block || 'Retrosíntesis'}`,
+                      subtitle: currentQ.question,
+                      tag: currentQ.badge || 'Figura de Examen'
+                    });
+                  }}
+                  title="Haz clic para ver la figura a pantalla completa"
+                >
                   <img 
                     src={currentQ.imagePath.startsWith('http') ? currentQ.imagePath : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath.replace(/^\//, '')}`}
                     alt="Figura de la pregunta" 
                     style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain' }} 
                   />
+                  <span style={{ marginTop: '6px', fontSize: '0.72rem', color: 'var(--teal-ink)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Maximize2 size={12} /> Clic para ampliar a pantalla completa
+                  </span>
                 </div>
               )}
 
@@ -383,6 +416,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         )}
 
       </div>
+
+      {/* Visor Lightbox a Pantalla Completa */}
+      <ImageLightboxModal
+        image={lightboxImage}
+        onClose={() => setLightboxImage(null)}
+      />
     </div>
   );
 };
