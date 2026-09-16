@@ -24,7 +24,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   onClose,
   onAttemptCompleted
 }) => {
-  const { user } = useAuth();
+  const { user, isProfesor } = useAuth();
   const questions = topic.testQuestions || [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,6 +32,27 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [showExplanation, setShowExplanation] = useState(false);
   const [answers, setAnswers] = useState<{ [key: number]: number }>({});
   const [isCompleted, setIsCompleted] = useState(false);
+
+  if (!isProfesor) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-container" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Cuestionario en Revisión Docente</h3>
+            <button onClick={onClose} className="btn btn-sm btn-outline"><X size={18} /></button>
+          </div>
+          <div className="modal-body" style={{ textAlign: 'center', padding: '2rem' }}>
+            <p style={{ color: 'var(--text-main)', lineHeight: 1.5, fontSize: '0.9rem' }}>
+              Este cuestionario oficial con estructuras químicas se encuentra en fase de validación por el profesorado y estará disponible próximamente para el alumnado.
+            </p>
+          </div>
+          <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px' }}>
+            <button onClick={onClose} className="btn btn-sm btn-primary">Entendido</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (questions.length === 0) {
     return (
