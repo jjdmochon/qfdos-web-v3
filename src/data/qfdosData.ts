@@ -285,8 +285,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.4.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-15T18:35:00.000Z';
+export const COURSE_DATA_VERSION = '3.4.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-16T11:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -743,6 +743,114 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         tpsa: 32.8,
         rotBonds: 4,
         role: 'Inhibidor carbamato de acción pseudoirreversible en SNC (Alzheimer)'
+      },
+      {
+        name: 'Acetil coenzima A',
+        smiles: 'CC(=O)SCCNC(=O)CCNC(=O)[C@H](O)C(C)(C)COP(=O)(O)OP(=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1OP(=O)(O)O',
+        formula: 'C23H38N7O17P3S',
+        mw: 809.58,
+        logP: -1.32,
+        hbd: 9,
+        hba: 18,
+        tpsa: 363.63,
+        rotBonds: 19,
+        role: 'Donante de acetilo en la biosíntesis presináptica de acetilcolina vía ChAT (tioéster activo de alta energía)'
+      },
+      {
+        name: 'Adifenina',
+        smiles: 'CCN(CC)CCOC(=O)C(c1ccccc1)c1ccccc1',
+        formula: 'C20H25NO2',
+        mw: 311.43,
+        logP: 3.70,
+        hbd: 0,
+        hba: 3,
+        tpsa: 29.54,
+        rotBonds: 8,
+        role: 'Aminoéster sintético; simplificación del tropano a dietilaminoetilo y éster de difenilacetato'
+      },
+      {
+        name: 'Benactizina',
+        smiles: 'CCN(CC)CCOC(=O)C(O)(c1ccccc1)c1ccccc1',
+        formula: 'C20H25NO3',
+        mw: 327.42,
+        logP: 2.81,
+        hbd: 1,
+        hba: 4,
+        tpsa: 49.77,
+        rotBonds: 8,
+        role: 'Éster del ácido bencílico (difenilglicolato); hidroxilo en alfa que incrementa la afinidad muscarínica y penetración en SNC'
+      },
+      {
+        name: 'Propantelina',
+        smiles: 'CC(C)[N+](C)(CCOC(=O)C1c2ccccc2Oc2ccccc21)C(C)C',
+        formula: 'C23H30NO3+',
+        mw: 368.50,
+        logP: 4.73,
+        hbd: 0,
+        hba: 3,
+        tpsa: 35.53,
+        rotBonds: 6,
+        role: 'Aminoéster cuaternario con puente tricíclico xanteno rígido; antiespasmódico periférico sin efectos centrales'
+      },
+      {
+        name: 'Piperidolato',
+        smiles: 'CCN1CCCC(C1)OC(=O)C(c1ccccc1)c1ccccc1',
+        formula: 'C21H25NO2',
+        mw: 323.44,
+        logP: 3.85,
+        hbd: 0,
+        hba: 3,
+        tpsa: 29.54,
+        rotBonds: 5,
+        role: 'Aminoéster con ciclo piperidínico (1-etilpiperidin-3-ilo); rigidez conformacional entre nitrógeno básico y éster'
+      },
+      {
+        name: 'Ciclopentolato',
+        smiles: 'CN(C)CCOC(=O)C(c1ccccc1)C1(O)CCCC1',
+        formula: 'C17H25NO3',
+        mw: 291.39,
+        logP: 2.18,
+        hbd: 1,
+        hba: 4,
+        tpsa: 49.77,
+        rotBonds: 6,
+        role: 'Patrón mandélico con ciclopentilo e hidroxilo terciario; midriático y ciclopléjico oftálmico de acción breve'
+      },
+      {
+        name: 'Trihexifenidilo',
+        smiles: 'OC(CCN1CCCCC1)(c1ccccc1)C1CCCCC1',
+        formula: 'C20H31NO',
+        mw: 301.47,
+        logP: 4.33,
+        hbd: 1,
+        hba: 2,
+        tpsa: 23.47,
+        rotBonds: 5,
+        role: 'Aminopropanol carbinólico sin función éster (resistente a esterasas); antiparkinsoniano anticolinérgico central'
+      },
+      {
+        name: 'Isopropamida',
+        smiles: 'CC(C)[N+](C)(CCC(C(N)=O)(c1ccccc1)c1ccccc1)C(C)C',
+        formula: 'C23H33N2O+',
+        mw: 353.53,
+        logP: 4.11,
+        hbd: 1,
+        hba: 1,
+        tpsa: 43.09,
+        rotBonds: 8,
+        role: 'Amidoamonio cuaternario (butanamida); catión periférico no hidrolizable por esterasas y acción antimuscarínica prolongada'
+      },
+      {
+        name: 'Yoduro de isopropamida',
+        smiles: 'CC(C)[N+](C)(CCC(C(N)=O)(c1ccccc1)c1ccccc1)C(C)C.[I-]',
+        formula: 'C23H33IN2O',
+        mw: 480.43,
+        logP: 1.12,
+        hbd: 1,
+        hba: 1,
+        tpsa: 43.09,
+        rotBonds: 8,
+        role: 'Forma farmacéutica en sal de yoduro comercial de la isopropamida'
       }
     ],
     attachments: [],
