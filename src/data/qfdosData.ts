@@ -7,7 +7,7 @@
 export interface CourseAttachment {
   id: string;
   title: string;
-  type: 'pdf' | 'audio' | 'video' | 'spotify' | 'notebook' | 'drive' | 'model3d';
+  type: 'pdf' | 'audio' | 'video' | 'spotify' | 'notebook' | 'drive' | 'model3d' | 'data';
   url: string;
   driveId?: string;
   size?: string;
@@ -176,6 +176,18 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-estructuras-qfdos-db',
+    title: 'Base de Datos Oficial de Estructuras QFDOS (40 Moléculas · XLSX y CSV)',
+    url: 'estructuras/estructuras_qfdos.xlsx',
+    summary:
+      'Repositorio maestro de estructuras químicas del curso de Química Farmacéutica II (Bloques 1 a 8: Neurotransmisores, Agonistas colinérgicos, Antagonistas muscarínicos, Anticolinesterásicos y Reactivadores, Biosíntesis colinérgica, Antimuscarínicos sintéticos y centrales, y Placa motora). Incluye hojas de propiedades fisicoquímicas, descriptores Lipinski, estereocentros CIP y estructuras en alta resolución.',
+    category: 'Descubrimiento de fármacos',
+    source: 'Cátedra de Química Farmacéutica (UGR)',
+    relatedTopic: 'Tema 01',
+    featured: true,
+    addedAt: '2026-09-17'
+  },
+  {
     id: 'link-nachr-3d-model',
     title: 'Estructura 3D del Receptor Nicotínico de Acetilcolina (nAChR)',
     url: 'https://skfb.ly/6zvJE',
@@ -297,8 +309,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.5.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-17T12:45:00.000Z';
+export const COURSE_DATA_VERSION = '3.6.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-17T13:45:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -327,6 +339,13 @@ export const QFDOS_INFO = {
 };
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-estructuras-qfdos-update',
+    title: '🔬 Base de Datos de Estructuras QFDOS Actualizada: 40 Fármacos Oficiales (Bloques 1 a 8)',
+    content: 'Incorporadas al Tema 01 las nuevas estructuras oficiales del curso (Benztropina, Succinilcolina, Pilocarpina, Biperideno y Prociclidina), completando 40 moléculas con renderizado 2D RDKit interactivo, descriptores fisicoquímicos completos (logP, TPSA, QED, estereocentros CIP) y calculadora ADMET.',
+    date: '17 Septiembre 2026',
+    priority: 'alta'
+  },
   {
     id: 'ann-receptor-3d-t01',
     title: '🧬 Nuevo Modelo 3D Interactivo: Receptor Nicotínico de Acetilcolina (nAChR)',
@@ -870,6 +889,66 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         tpsa: 43.09,
         rotBonds: 8,
         role: 'Forma farmacéutica en sal de yoduro comercial de la isopropamida'
+      },
+      {
+        name: 'Benztropina',
+        smiles: 'CN1[C@@H]2CC[C@H]1C[C@@H](OC(c1ccccc1)c1ccccc1)C2',
+        formula: 'C21H25NO',
+        mw: 307.44,
+        logP: 4.42,
+        hbd: 0,
+        hba: 2,
+        tpsa: 12.47,
+        rotBonds: 4,
+        role: 'Éter tropánico con benzhidrilo (híbrido atropina-difenhidramina); TPSA mínima (12.47), antiparkinsoniano central e inhibidor de DAT'
+      },
+      {
+        name: 'Succinilcolina',
+        smiles: 'C[N+](C)(C)CCOC(=O)CCC(=O)OCC[N+](C)(C)C',
+        formula: 'C14H30N2O4+2',
+        mw: 290.40,
+        logP: 0.27,
+        hbd: 0,
+        hba: 4,
+        tpsa: 52.60,
+        rotBonds: 9,
+        role: 'Suxametonio (dímero éster succínico de acetilcolina); bloqueante neuromuscular despolarizante de acción ultracorta (hidrólisis por BChE)'
+      },
+      {
+        name: 'Pilocarpina',
+        smiles: 'CC[C@@H]1C(=O)OC[C@@H]1Cc1cncn1C',
+        formula: 'C11H16N2O2',
+        mw: 208.26,
+        logP: 1.16,
+        hbd: 0,
+        hba: 3,
+        tpsa: 44.12,
+        rotBonds: 3,
+        role: 'Alcaloide de Pilocarpus jaborandi; agonista muscarínico no cuaternario con γ-butirolactona e imidazol (glaucoma y xerostomía)'
+      },
+      {
+        name: 'Biperideno',
+        smiles: 'OC(CCN1CCCCC1)(c1ccccc1)C1CC2C=CC1C2',
+        formula: 'C21H29NO',
+        mw: 311.47,
+        logP: 3.96,
+        hbd: 1,
+        hba: 2,
+        tpsa: 23.47,
+        rotBonds: 5,
+        role: 'Aminopropanol con norbornenilo rígido y piperidina; antiparkinsoniano central y corrector de extrapiramidalismos por neurolépticos'
+      },
+      {
+        name: 'Prociclidina',
+        smiles: 'OC(CCN1CCCC1)(c1ccccc1)C1CCCCC1',
+        formula: 'C19H29NO',
+        mw: 287.45,
+        logP: 3.94,
+        hbd: 1,
+        hba: 2,
+        tpsa: 23.47,
+        rotBonds: 5,
+        role: 'Aminopropanol con pirrolidina en vez de piperidina; antiparkinsoniano antimuscarínico con idéntica firma polar a trihexifenidilo'
       }
     ],
     attachments: [
@@ -879,6 +958,22 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         type: 'model3d',
         url: 'models/nicotinic_acetylcholine_receptor.glb',
         size: '7.0 MB',
+        date: '17/09/2026'
+      },
+      {
+        id: 'att-t01-estructuras-xlsx',
+        title: 'Base de Datos Oficial de Estructuras QFDOS (40 estructuras · Bloques 1-8)',
+        type: 'data',
+        url: 'estructuras/estructuras_qfdos.xlsx',
+        size: '722 KB',
+        date: '17/09/2026'
+      },
+      {
+        id: 'att-t01-propiedades-csv',
+        title: 'Tabla de Descriptores Fisicoquímicos y SAR QFDOS (CSV RDKit)',
+        type: 'data',
+        url: 'estructuras/propiedades_qfdos.csv',
+        size: '42 KB',
         date: '17/09/2026'
       }
     ],

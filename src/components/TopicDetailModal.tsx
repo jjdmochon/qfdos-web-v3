@@ -893,6 +893,77 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
+                      {/* 9. Base de Datos Oficial de Estructuras QFDOS */}
+                      {topic.id === 'tema-01' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--border-color)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(13, 148, 136, 0.16)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Database size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  9. Base de Datos de Estructuras QFDOS
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                40 Fármacos · RDKit
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              Fichero maestro con 40 estructuras del curso (Bloques 1-8). Incluye imágenes 2D, descriptores fisicoquímicos, Lipinski, estereocentros CIP y notas docentes.
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <a
+                              href={`${import.meta.env.BASE_URL}estructuras/estructuras_qfdos.xlsx`}
+                              download="estructuras_qfdos.xlsx"
+                              className="btn btn-sm btn-primary"
+                              style={{
+                                flex: 1.2,
+                                justifyContent: 'center',
+                                fontSize: '0.76rem',
+                                fontWeight: 700,
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar Excel con hojas de propiedades y estructuras integradas (722 KB)"
+                            >
+                              <Download size={12} /> Descargar .XLSX
+                            </a>
+                            <a
+                              href={`${import.meta.env.BASE_URL}estructuras/propiedades_qfdos.csv`}
+                              download="propiedades_qfdos.csv"
+                              className="btn btn-sm btn-outline"
+                              style={{
+                                flex: 0.8,
+                                justifyContent: 'center',
+                                fontSize: '0.74rem',
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar tabla de descriptores CSV (42 KB)"
+                            >
+                              <Download size={12} /> .CSV
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
                   );
                 })()}
