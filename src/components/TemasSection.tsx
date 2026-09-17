@@ -16,7 +16,8 @@ import {
   FileText,
   Calendar,
   Filter,
-  ExternalLink
+  ExternalLink,
+  GitBranch
 } from 'lucide-react';
 
 interface TemasSectionProps {
@@ -228,6 +229,21 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? '#1db954' : 'var(--text-muted)' }}>
                     🎙️ Video Podcast {topic.spotifyPodcastUrl ? '✓' : ''}
                   </span>
+                  {topic.id === 'tema-01' && (
+                    <span 
+                      style={{ 
+                        fontSize: '0.66rem', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px', 
+                        background: 'linear-gradient(135deg, rgba(13,148,136,0.2) 0%, rgba(30,58,138,0.15) 100%)', 
+                        color: 'var(--teal-ink)', 
+                        border: '1px solid var(--teal)',
+                        fontWeight: 800 
+                      }}
+                    >
+                      🧬 Taller Retrosíntesis ✓
+                    </span>
+                  )}
                 </div>
 
                 {/* Key Concepts Badges */}
@@ -268,6 +284,24 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   >
                     {bloqueado ? <><Lock size={12} /> No disponible</> : <>Guía & Materiales <ArrowRight size={12} /></>}
                   </button>
+
+                  {topic.id === 'tema-01' && (
+                    <button
+                      onClick={() => onSelectTopic(topic)}
+                      className="btn btn-sm"
+                      style={{ 
+                        fontSize: '0.75rem', 
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        boxShadow: '0 2px 8px rgba(13,148,136,0.25)'
+                      }}
+                      title="Acceso directo al Taller de Retrosíntesis (Slides 28-35)"
+                    >
+                      <GitBranch size={13} /> Retrosíntesis
+                    </button>
+                  )}
 
                   {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
                     <button

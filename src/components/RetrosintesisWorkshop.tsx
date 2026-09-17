@@ -92,13 +92,14 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       
-      {/* Banner de Presentación */}
+      {/* Banner de Presentación Destacado */}
       <div 
         className="qfdos-card" 
         style={{ 
           padding: '1.5rem', 
-          background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(13, 148, 136, 0.08) 100%)',
-          border: '1.5px solid var(--border-color)',
+          background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.12) 0%, rgba(30, 58, 138, 0.08) 100%)',
+          border: '2px solid var(--teal)',
+          boxShadow: '0 8px 24px -4px rgba(13, 148, 136, 0.22)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',

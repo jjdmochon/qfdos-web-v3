@@ -31,7 +31,8 @@ import {
   Activity,
   Upload,
   Settings,
-  GitBranch
+  GitBranch,
+  ArrowRight
 } from 'lucide-react';
 
 interface TopicDetailModalProps {
@@ -296,10 +297,18 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               <button
                 onClick={() => setActiveTab('retrosintesis')}
                 className={`tab-btn ${activeTab === 'retrosintesis' ? 'active' : ''}`}
-                style={{ fontWeight: 700 }}
+                style={{ 
+                  fontWeight: 800,
+                  background: activeTab === 'retrosintesis' 
+                    ? 'var(--surface-raised)' 
+                    : 'linear-gradient(135deg, rgba(13, 148, 136, 0.15) 0%, rgba(30, 58, 138, 0.1) 100%)',
+                  border: '1.5px solid var(--teal)',
+                  color: 'var(--teal-ink)',
+                  boxShadow: '0 2px 8px rgba(13, 148, 136, 0.15)'
+                }}
               >
                 <GitBranch size={14} /> Taller de Retrosíntesis
-                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px' }}>
+                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px', fontWeight: 800 }}>
                   Slides 28-35
                 </span>
               </button>
@@ -738,6 +747,66 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
+                      {/* 7. Taller de Retrosíntesis & Desconexiones (Card Destacada para Tema 01) */}
+                      {topic.id === 'tema-01' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '2px solid var(--teal)',
+                            boxShadow: '0 6px 20px -3px rgba(13, 148, 136, 0.28)',
+                            background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(30, 58, 138, 0.08) 100%)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)', color: '#ffffff', fontSize: '0.6rem', fontWeight: 800, padding: '3px 10px', borderBottomLeftRadius: '8px', letterSpacing: '0.5px' }}>
+                            ✨ DESTACADO
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', marginTop: '4px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(13, 148, 136, 0.22)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <GitBranch size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  7. Taller de Retrosíntesis
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                Slides 28-35
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              4 casos prácticos guiados de desconexión (⇒) y 8 diapositivas vectoriales RDKit con visor a pantalla completa.
+                            </p>
+                          </div>
+                          <button 
+                            onClick={() => setActiveTab('retrosintesis')}
+                            className="btn btn-sm btn-primary" 
+                            style={{ 
+                              width: '100%', 
+                              justifyContent: 'center', 
+                              fontSize: '0.8rem', 
+                              fontWeight: 800,
+                              background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                              border: 'none',
+                              boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)'
+                            }}
+                          >
+                            <GitBranch size={14} /> Abrir Taller de Retrosíntesis <ArrowRight size={13} />
+                          </button>
+                        </div>
+                      )}
+
                     </div>
                   );
                 })()}
@@ -1164,8 +1233,12 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 {topic.id === 'tema-01' && (
                   <button 
                     onClick={() => setActiveTab('retrosintesis')} 
-                    className={`btn btn-sm ${activeTab === 'retrosintesis' ? 'btn-primary' : 'btn-outline'}`}
-                    style={{ fontWeight: 700 }}
+                    className={`btn btn-sm ${activeTab === 'retrosintesis' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ 
+                      fontWeight: 800,
+                      border: '1.5px solid var(--teal)',
+                      boxShadow: '0 2px 8px rgba(13, 148, 136, 0.2)'
+                    }}
                   >
                     <GitBranch size={14} /> Taller Retrosíntesis
                   </button>
