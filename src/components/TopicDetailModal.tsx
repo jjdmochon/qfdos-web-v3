@@ -37,6 +37,7 @@ import {
 
 interface TopicDetailModalProps {
   topic: QfdosTopic;
+  initialTab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis';
   onClose: () => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
@@ -47,6 +48,7 @@ interface TopicDetailModalProps {
 
 export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   topic,
+  initialTab,
   onClose,
   onOpenQuiz,
   onOpenFlashcards,
@@ -54,8 +56,14 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onOpenAdmet,
   onUpdateTopic
 }) => {
-  const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis'>('sar');
+  const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis'>(initialTab || 'sar');
   const { isProfesor } = useAuth();
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const [isEditingDriveLinks, setIsEditingDriveLinks] = useState(false);
   const [editSlidesUrl, setEditSlidesUrl] = useState(topic.slidesPdfUrl || '');

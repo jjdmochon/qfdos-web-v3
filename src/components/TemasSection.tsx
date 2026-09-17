@@ -22,7 +22,7 @@ import {
 
 interface TemasSectionProps {
   topics: QfdosTopic[];
-  onSelectTopic: (topic: QfdosTopic) => void;
+  onSelectTopic: (topic: QfdosTopic, tab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis') => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
 }
@@ -273,60 +273,104 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
-                <div style={{ display: 'flex', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--border-color)', marginTop: 'auto', width: '100%' }}>
+                {/* Fila 1: Materiales y Taller de Retrosíntesis */}
+                <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
                   <button
-                    onClick={() => onSelectTopic(topic)}
+                    onClick={() => onSelectTopic(topic, 'sar')}
                     disabled={bloqueado}
                     title={bloqueado ? 'Este tema aún no está publicado' : undefined}
                     className="btn btn-sm btn-primary"
-                    style={{ flex: 1, fontSize: '0.75rem' }}
+                    style={{ 
+                      flex: 1, 
+                      minWidth: 0,
+                      fontSize: '0.76rem', 
+                      padding: '7px 8px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '5px',
+                      whiteSpace: 'nowrap'
+                    }}
                   >
                     {bloqueado ? <><Lock size={12} /> No disponible</> : <>Guía & Materiales <ArrowRight size={12} /></>}
                   </button>
 
                   {topic.id === 'tema-01' && (
                     <button
-                      onClick={() => onSelectTopic(topic)}
+                      onClick={() => onSelectTopic(topic, 'retrosintesis')}
                       className="btn btn-sm"
                       style={{ 
-                        fontSize: '0.75rem', 
+                        flex: 1, 
+                        minWidth: 0,
+                        fontSize: '0.76rem', 
                         fontWeight: 800,
                         background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
                         color: '#ffffff',
                         border: 'none',
-                        boxShadow: '0 2px 8px rgba(13,148,136,0.25)'
+                        boxShadow: '0 2px 8px rgba(13,148,136,0.25)',
+                        padding: '7px 8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '5px',
+                        whiteSpace: 'nowrap'
                       }}
                       title="Acceso directo al Taller de Retrosíntesis (Slides 28-35)"
                     >
                       <GitBranch size={13} /> Retrosíntesis
                     </button>
                   )}
-
-                  {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
-                    <button
-                      onClick={() => onOpenQuiz(topic)}
-                      disabled={bloqueado}
-                      className="btn btn-sm btn-secondary"
-                      style={{ fontSize: '0.75rem' }}
-                      title="Realizar autoevaluación tipo test"
-                    >
-                      <HelpCircle size={13} /> Test ({topic.testQuestions.length})
-                    </button>
-                  )}
-
-                  {topic.id !== 'tema-00' && topic.flashcards && topic.flashcards.length > 0 && (
-                    <button
-                      onClick={() => onOpenFlashcards(topic)}
-                      disabled={bloqueado}
-                      className="btn btn-sm btn-mint"
-                      style={{ fontSize: '0.75rem' }}
-                      title="Repasar flashcards de memoria activa"
-                    >
-                      <Award size={13} /> ({topic.flashcards.length})
-                    </button>
-                  )}
                 </div>
+
+                {/* Fila 2: Herramientas de Estudio (Test y Flashcards) */}
+                {topic.id !== 'tema-00' && !bloqueado && ((topic.testQuestions && topic.testQuestions.length > 0) || (topic.flashcards && topic.flashcards.length > 0)) && (
+                  <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                    {topic.testQuestions && topic.testQuestions.length > 0 && (
+                      <button
+                        onClick={() => onOpenQuiz(topic)}
+                        disabled={bloqueado}
+                        className="btn btn-sm btn-secondary"
+                        style={{ 
+                          flex: 1, 
+                          minWidth: 0,
+                          fontSize: '0.74rem', 
+                          padding: '6px 8px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title="Realizar autoevaluación tipo test"
+                      >
+                        <HelpCircle size={13} /> Test ({topic.testQuestions.length})
+                      </button>
+                    )}
+
+                    {topic.flashcards && topic.flashcards.length > 0 && (
+                      <button
+                        onClick={() => onOpenFlashcards(topic)}
+                        disabled={bloqueado}
+                        className="btn btn-sm btn-mint"
+                        style={{ 
+                          flex: 1, 
+                          minWidth: 0,
+                          fontSize: '0.74rem', 
+                          padding: '6px 8px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title="Repasar flashcards de memoria activa"
+                      >
+                        <Award size={13} /> Flashcards ({topic.flashcards.length})
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
             </div>

@@ -238,6 +238,7 @@ export const App: React.FC = () => {
 
   // Modal states
   const [selectedTopicDetail, setSelectedTopicDetail] = useState<QfdosTopic | null>(null);
+  const [topicInitialTab, setTopicInitialTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | undefined>();
   const [selectedQuizTopic, setSelectedQuizTopic] = useState<QfdosTopic | null>(null);
   const [selectedFlashcardsTopic, setSelectedFlashcardsTopic] = useState<QfdosTopic | null>(null);
   const [selectedSpotifyAttachment, setSelectedSpotifyAttachment] = useState<CourseAttachment | null>(null);
@@ -404,7 +405,11 @@ export const App: React.FC = () => {
         {activeTab === 'temas' && (
           <TemasSection
             topics={topics}
-            onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
+            onSelectTopic={(topic, tab) => { 
+              setTopicInitialTab(tab);
+              setSelectedTopicDetail(topic); 
+              navigateTo('temas', topic.id); 
+            }}
             onOpenQuiz={setSelectedQuizTopic}
             onOpenFlashcards={setSelectedFlashcardsTopic}
           />
@@ -435,8 +440,10 @@ export const App: React.FC = () => {
       {selectedTopicDetail && (
         <TopicDetailModal
           topic={selectedTopicDetail}
+          initialTab={topicInitialTab}
           onClose={() => {
             setSelectedTopicDetail(null);
+            setTopicInitialTab(undefined);
             if (window.location.hash.includes('tema-')) {
               navigateTo('temas', undefined, true);
             }
