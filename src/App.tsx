@@ -43,6 +43,7 @@ import { DrugSearchModal } from './components/DrugSearchModal';
 import { ExamGeneratorModal } from './components/ExamGeneratorModal';
 import { FirSimulatorModal } from './components/FirSimulatorModal';
 import { AdminCmsModal } from './components/AdminCmsModal';
+import { Model3DViewerModal } from './components/Model3DViewerModal';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -160,16 +161,19 @@ const HASH_TO_TAB: Record<string, TabType> = {
   admet: 'admet',
   glosario: 'glosario',
   enlaces: 'enlaces',
-  evaluacion: 'evaluacion'
+  evaluacion: 'evaluacion',
+  '3d': 'temas',
+  'nachr-3d': 'temas',
+  'modelo-3d': 'temas'
 };
 
-function parseUrlHash(): { tab: TabType; sub?: string } {
+function parseUrlHash(): { tab: TabType; sub?: string; action?: string } {
   try {
     const raw = window.location.hash.replace(/^#\/?/, '').trim();
     if (!raw) return { tab: 'hub' };
-    const [main, sub] = raw.split('/');
+    const [main, sub, action] = raw.split('/');
     const tab = HASH_TO_TAB[main.toLowerCase()] || 'hub';
-    return { tab, sub };
+    return { tab, sub, action };
   } catch {
     return { tab: 'hub' };
   }
@@ -249,6 +253,7 @@ export const App: React.FC = () => {
   const [isFirModalOpen, setIsFirModalOpen] = useState(false);
   const [isStudentQuestionOpen, setIsStudentQuestionOpen] = useState(false);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
+  const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
 
   const handleOpenAdmet = (drug: MoleculeDrug) => {
@@ -313,19 +318,26 @@ export const App: React.FC = () => {
   // Sincronización bidireccional con el historial del navegador (Back / Forward)
   useEffect(() => {
     const handleHashSync = () => {
-      const { tab, sub } = parseUrlHash();
+      const { tab, sub, action } = parseUrlHash();
       const raw = window.location.hash.replace(/^#\/?/, '').trim().toLowerCase();
       if (raw === 'fir' || raw === 'simulador-fir') {
         setIsFirModalOpen(true);
+      }
+      if (raw === '3d' || raw === 'nachr-3d' || raw === 'modelo-3d' || action === '3d' || sub === '3d') {
+        setIsDirect3DModalOpen(true);
+        const tema1 = topics.find(t => t.id === 'tema-01');
+        if (tema1) setSelectedTopicDetail(tema1);
+      } else {
+        setIsDirect3DModalOpen(false);
       }
       setActiveTab(tab);
       if (tab === 'practicas') {
         setPracticasSubTab(sub);
       } else if (tab === 'temas') {
-        if (sub) {
+        if (sub && sub !== '3d') {
           const topic = topics.find(t => t.id === sub);
           if (topic) setSelectedTopicDetail(topic);
-        } else {
+        } else if (!sub) {
           setSelectedTopicDetail(null);
         }
       }
@@ -466,6 +478,17 @@ export const App: React.FC = () => {
       )}
       {selectedSpotifyAttachment && (
         <SpotifyPlayerModal attachment={selectedSpotifyAttachment} onClose={() => setSelectedSpotifyAttachment(null)} />
+      )}
+      {isDirect3DModalOpen && (
+        <Model3DViewerModal
+          onClose={() => {
+            setIsDirect3DModalOpen(false);
+            if (window.location.hash.includes('3d') || window.location.hash.includes('nachr') || window.location.hash.includes('modelo')) {
+              window.history.pushState(null, '', '#/temario/tema-01');
+            }
+          }}
+          modelTitle="Receptor Nicotínico de Acetilcolina (nAChR)"
+        />
       )}
 
       <SearchModal

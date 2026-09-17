@@ -9,7 +9,9 @@ import {
   Info, 
   Atom, 
   ExternalLink,
-  RefreshCw
+  RefreshCw,
+  Share2,
+  Check
 } from 'lucide-react';
 
 // Componente web para el Web Component <model-viewer> de Google
@@ -27,10 +29,25 @@ export const Model3DViewerModal: React.FC<Model3DViewerModalProps> = ({
   modelTitle = 'Receptor Nicotínico de Acetilcolina (nAChR)'
 }) => {
   const [isAutoRotate, setIsAutoRotate] = useState(true);
+  const [copiedLink, setCopiedLink] = useState(false);
   const modelViewerRef = useRef<any>(null);
 
   // Resolver URL del modelo respetando la ruta base de Vite / GitHub Pages
   const finalModelUrl = modelUrl || `${import.meta.env.BASE_URL}models/nicotinic_acetylcholine_receptor.glb`;
+
+  const handleCopyDirectLink = () => {
+    const origin = window.location.origin;
+    const pathname = window.location.pathname.replace(/\/+$/, '');
+    const directUrl = `${origin}${pathname}/#/3d`;
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(directUrl).then(() => {
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2500);
+      });
+    } else {
+      prompt('Enlace directo al modelo 3D:', directUrl);
+    }
+  };
 
   const handleResetCamera = () => {
     if (modelViewerRef.current) {
@@ -120,14 +137,34 @@ export const Model3DViewerModal: React.FC<Model3DViewerModalProps> = ({
             </div>
           </div>
 
-          <button 
-            onClick={onClose} 
-            className="btn btn-icon" 
-            style={{ color: 'var(--text-muted)' }}
-            title="Cerrar visor 3D"
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={handleCopyDirectLink}
+              className="btn btn-sm btn-outline"
+              style={{
+                fontSize: '0.74rem',
+                padding: '5px 11px',
+                borderColor: copiedLink ? 'var(--emerald)' : 'var(--border-color)',
+                color: copiedLink ? 'var(--emerald)' : 'var(--text-title)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                transition: 'all 0.2s ease'
+              }}
+              title="Copiar enlace web directo a este modelo 3D"
+            >
+              {copiedLink ? <><Check size={13} /> ¡Enlace copiado!</> : <><Share2 size={13} /> Compartir enlace</>}
+            </button>
+
+            <button 
+              onClick={onClose} 
+              className="btn btn-icon" 
+              style={{ color: 'var(--text-muted)' }}
+              title="Cerrar visor 3D"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Cuerpo: Visor 3D y Controles flotantes */}
@@ -201,6 +238,23 @@ export const Model3DViewerModal: React.FC<Model3DViewerModalProps> = ({
               title="Ver a pantalla completa"
             >
               <Maximize2 size={12} /> Pantalla completa
+            </button>
+
+            <button
+              onClick={handleCopyDirectLink}
+              className="btn btn-sm btn-outline"
+              style={{
+                fontSize: '0.72rem',
+                padding: '4px 8px',
+                borderColor: copiedLink ? 'var(--emerald)' : undefined,
+                color: copiedLink ? 'var(--emerald)' : undefined,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Copiar enlace web directo"
+            >
+              {copiedLink ? <><Check size={12} /> ¡Copiado!</> : <><Share2 size={12} /> Compartir</>}
             </button>
 
             <a
