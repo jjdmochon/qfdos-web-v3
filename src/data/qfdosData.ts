@@ -178,11 +178,11 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
     id: 'link-nachr-3d-model',
     title: 'Estructura 3D del Receptor Nicotínico de Acetilcolina (nAChR)',
-    url: 'models/nicotinic_acetylcholine_receptor.glb',
+    url: 'https://skfb.ly/6zvJE',
     summary:
-      'Modelo macromolecular tridimensional del canal iónico pentamérico nAChR (British Pharmacological Society / QFDOS) en formato GLB. Permite explorar el poro central y la arquitectura de subunidades transmembrana diana de agonistas y bloqueantes colinérgicos.',
+      'Modelo macromolecular tridimensional del canal iónico pentamérico ("Nicotinic Acetylcholine Receptor" por British Pharmacological Society bajo licencia Creative Commons Attribution CC BY 4.0). Permite explorar el poro central y la arquitectura de subunidades transmembrana diana de agonistas y bloqueantes colinérgicos.',
     category: 'Descubrimiento de fármacos',
-    source: 'British Pharmacological Society',
+    source: 'British Pharmacological Society (CC BY 4.0)',
     relatedTopic: 'Tema 01',
     featured: true,
     addedAt: '2026-09-17'
@@ -297,8 +297,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.5.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-17T12:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.5.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-17T12:45:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -330,7 +330,7 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-receptor-3d-t01',
     title: '🧬 Nuevo Modelo 3D Interactivo: Receptor Nicotínico de Acetilcolina (nAChR)',
-    content: 'Disponible en el Tema 01 (Sistema Colinérgico) la estructura tridimensional interactiva del receptor nicotínico (nAChR, formato GLB de alta definición). Podéis explorar la simetría pentamérica, el poro iónico central y los sitios de unión ortostéricos de la acetilcolina directamente en 3D con rotación orbital y zoom.',
+    content: 'Disponible en el Tema 01 (Sistema Colinérgico) la estructura tridimensional interactiva del receptor nicotínico (nAChR, formato GLB, modelo "Nicotinic Acetylcholine Receptor" por British Pharmacological Society bajo licencia CC BY 4.0). Podéis explorar la simetría pentamérica, el poro iónico central y los sitios de unión ortostéricos de la acetilcolina directamente en 3D con rotación orbital y zoom.',
     date: '17 Septiembre 2026',
     priority: 'alta'
   },
@@ -875,7 +875,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     attachments: [
       {
         id: 'att-t01-nachr-3d',
-        title: 'Modelo 3D Interactivo: Receptor Nicotínico de Acetilcolina (nAChR)',
+        title: 'Modelo 3D: "Nicotinic Acetylcholine Receptor" (British Pharmacological Society · CC BY 4.0)',
         type: 'model3d',
         url: 'models/nicotinic_acetylcholine_receptor.glb',
         size: '7.0 MB',

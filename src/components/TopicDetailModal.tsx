@@ -850,8 +850,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 3D GLB · 7.0 MB
                               </span>
                             </div>
-                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              Canal iónico pentamérico interactivo (British Pharmacological Society). Rotación orbital 360°, zoom y detalle de sitios de unión de acetilcolina y bloqueantes.
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '8px', lineHeight: 1.45 }}>
+                              Canal iónico pentamérico interactivo. Rotación orbital 360°, zoom y detalle de sitios de unión de acetilcolina y bloqueantes.
+                            </p>
+                            <p style={{ fontSize: '0.69rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.35 }}>
+                              <a href="https://skfb.ly/6zvJE" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', textDecoration: 'underline' }}>"Nicotinic Acetylcholine Receptor"</a> by <strong style={{ color: 'var(--text-title)' }}>British Pharmacological Society</strong> (licencia <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', textDecoration: 'underline' }}>CC BY 4.0</a>).
                             </p>
                           </div>
                           <div style={{ display: 'flex', gap: '6px', width: '100%' }}>

@@ -107,12 +107,15 @@ export const Model3DViewerModal: React.FC<Model3DViewerModalProps> = ({
                 <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem', fontWeight: 700 }}>
                   GLB 3D · 7.0 MB
                 </span>
+                <span className="qfdos-badge badge-mint" style={{ fontSize: '0.68rem', fontWeight: 700 }}>
+                  CC BY 4.0
+                </span>
                 <span className="qfdos-badge badge-navy" style={{ fontSize: '0.68rem' }}>
                   Tema 01 · Sistema Colinérgico
                 </span>
               </div>
               <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Estructura tridimensional interactiva · British Pharmacological Society
+                Estructura tridimensional interactiva · British Pharmacological Society (CC BY 4.0)
               </p>
             </div>
           </div>
@@ -261,6 +264,59 @@ export const Model3DViewerModal: React.FC<Model3DViewerModalProps> = ({
               </p>
             </div>
 
+          </div>
+
+          {/* Créditos de Licencia y Atribución Obligatoria Creative Commons CC-BY 4.0 */}
+          <div 
+            style={{ 
+              marginTop: '12px',
+              padding: '9px 14px', 
+              background: 'rgba(255, 255, 255, 0.03)',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '8px',
+              fontSize: '0.74rem',
+              color: 'var(--text-muted)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 700, color: 'var(--text-title)' }}>Atribución de Licencia:</span>
+              <span>
+                <a 
+                  href="https://skfb.ly/6zvJE" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--teal-ink)', textDecoration: 'underline', fontWeight: 600 }}
+                >
+                  "Nicotinic Acetylcholine Receptor"
+                </a>{' '}
+                by{' '}
+                <strong style={{ color: 'var(--text-title)' }}>British Pharmacological Society</strong>{' '}
+                is licensed under{' '}
+                <a 
+                  href="http://creativecommons.org/licenses/by/4.0/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--teal-ink)', textDecoration: 'underline', fontWeight: 600 }}
+                >
+                  Creative Commons Attribution (CC BY 4.0)
+                </a>.
+              </span>
+            </div>
+            <a 
+              href="https://skfb.ly/6zvJE" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-outline"
+              style={{ fontSize: '0.7rem', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+              title="Ver modelo original en Sketchfab"
+            >
+              <ExternalLink size={11} /> Sketchfab
+            </a>
           </div>
         </div>
 
