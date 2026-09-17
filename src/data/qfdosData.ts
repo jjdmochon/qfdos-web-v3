@@ -7,7 +7,7 @@
 export interface CourseAttachment {
   id: string;
   title: string;
-  type: 'pdf' | 'audio' | 'video' | 'spotify' | 'notebook' | 'drive';
+  type: 'pdf' | 'audio' | 'video' | 'spotify' | 'notebook' | 'drive' | 'model3d';
   url: string;
   driveId?: string;
   size?: string;
@@ -176,6 +176,18 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-nachr-3d-model',
+    title: 'Estructura 3D del Receptor Nicotínico de Acetilcolina (nAChR)',
+    url: 'models/nicotinic_acetylcholine_receptor.glb',
+    summary:
+      'Modelo macromolecular tridimensional del canal iónico pentamérico nAChR (British Pharmacological Society / QFDOS) en formato GLB. Permite explorar el poro central y la arquitectura de subunidades transmembrana diana de agonistas y bloqueantes colinérgicos.',
+    category: 'Descubrimiento de fármacos',
+    source: 'British Pharmacological Society',
+    relatedTopic: 'Tema 01',
+    featured: true,
+    addedAt: '2026-09-17'
+  },
+  {
     id: 'link-acs-fall-2026-disclosures',
     title: 'ACS Otoño 2026: 13 nuevas estructuras y candidatos clínicos',
     url: 'https://drughunter.com/articles/acs-fall-2026-first-time-disclosures?utm_term=fall%202026%20disclosures&utm_campaign=33777960-2026_Articles_Social&utm_content=384911386&utm_medium=social&utm_source=twitter&hss_channel=tw-1366500304867401729',
@@ -285,8 +297,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.4.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-16T11:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.5.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-17T12:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -315,6 +327,13 @@ export const QFDOS_INFO = {
 };
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-receptor-3d-t01',
+    title: '🧬 Nuevo Modelo 3D Interactivo: Receptor Nicotínico de Acetilcolina (nAChR)',
+    content: 'Disponible en el Tema 01 (Sistema Colinérgico) la estructura tridimensional interactiva del receptor nicotínico (nAChR, formato GLB de alta definición). Podéis explorar la simetría pentamérica, el poro iónico central y los sitios de unión ortostéricos de la acetilcolina directamente en 3D con rotación orbital y zoom.',
+    date: '17 Septiembre 2026',
+    priority: 'alta'
+  },
   {
     id: 'ann-presentacion-disp',
     title: '📢 Material de la Presentación del Curso ya Disponible',
@@ -853,7 +872,16 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         role: 'Forma farmacéutica en sal de yoduro comercial de la isopropamida'
       }
     ],
-    attachments: [],
+    attachments: [
+      {
+        id: 'att-t01-nachr-3d',
+        title: 'Modelo 3D Interactivo: Receptor Nicotínico de Acetilcolina (nAChR)',
+        type: 'model3d',
+        url: 'models/nicotinic_acetylcholine_receptor.glb',
+        size: '7.0 MB',
+        date: '17/09/2026'
+      }
+    ],
     testQuestions: [
 
       {

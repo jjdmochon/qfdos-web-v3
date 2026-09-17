@@ -4,6 +4,7 @@ import { Chem2DDrawer } from './Chem2DDrawer';
 import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
 import { RetrosintesisWorkshop } from './RetrosintesisWorkshop';
+import { Model3DViewerModal } from './Model3DViewerModal';
 import { 
   X, 
   Search,
@@ -65,6 +66,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     }
   }, [initialTab]);
 
+  const [is3DViewerOpen, setIs3DViewerOpen] = useState(false);
   const [isEditingDriveLinks, setIsEditingDriveLinks] = useState(false);
   const [editSlidesUrl, setEditSlidesUrl] = useState(topic.slidesPdfUrl || '');
   const [editNotesUrl, setEditNotesUrl] = useState(topic.notesPdfUrl || '');
@@ -815,6 +817,79 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
+                      {/* 8. Modelo 3D: Receptor Nicotínico de Acetilcolina (nAChR) */}
+                      {topic.id === 'tema-01' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--teal)',
+                            boxShadow: '0 4px 16px rgba(13,148,136,0.18)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(30,58,138,0.3) 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Box size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  8. Estructura 3D: Receptor Nicotínico (nAChR)
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                3D GLB · 7.0 MB
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              Canal iónico pentamérico interactivo (British Pharmacological Society). Rotación orbital 360°, zoom y detalle de sitios de unión de acetilcolina y bloqueantes.
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <button 
+                              onClick={() => setIs3DViewerOpen(true)}
+                              className="btn btn-sm btn-primary" 
+                              style={{ 
+                                flex: 1.2, 
+                                justifyContent: 'center', 
+                                fontSize: '0.78rem', 
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
+                                padding: '7px 8px'
+                              }}
+                            >
+                              <Box size={13} /> Explorar en 3D
+                            </button>
+                            <a
+                              href={`${import.meta.env.BASE_URL}models/nicotinic_acetylcholine_receptor.glb`}
+                              download="receptor_nicotinico_nachr.glb"
+                              className="btn btn-sm btn-outline"
+                              style={{ 
+                                flex: 0.8,
+                                justifyContent: 'center', 
+                                fontSize: '0.74rem',
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar archivo GLB nativo (7 MB)"
+                            >
+                              <Download size={12} /> .GLB
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
                   );
                 })()}
@@ -1239,17 +1314,34 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
                 </button>
                 {topic.id === 'tema-01' && (
-                  <button 
-                    onClick={() => setActiveTab('retrosintesis')} 
-                    className={`btn btn-sm ${activeTab === 'retrosintesis' ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ 
-                      fontWeight: 800,
-                      border: '1.5px solid var(--teal)',
-                      boxShadow: '0 2px 8px rgba(13, 148, 136, 0.2)'
-                    }}
-                  >
-                    <GitBranch size={14} /> Taller Retrosíntesis
-                  </button>
+                  <>
+                    <button 
+                      onClick={() => setActiveTab('retrosintesis')} 
+                      className={`btn btn-sm ${activeTab === 'retrosintesis' ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{ 
+                        fontWeight: 800,
+                        border: '1.5px solid var(--teal)',
+                        boxShadow: '0 2px 8px rgba(13, 148, 136, 0.2)'
+                      }}
+                    >
+                      <GitBranch size={14} /> Taller Retrosíntesis
+                    </button>
+                    <button 
+                      onClick={() => setIs3DViewerOpen(true)}
+                      className="btn btn-sm btn-outline"
+                      style={{ 
+                        fontWeight: 700,
+                        borderColor: 'var(--teal)',
+                        color: 'var(--teal-ink)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                      title="Abrir visor 3D interactivo del receptor nicotínico"
+                    >
+                      <Box size={14} /> Visor 3D nAChR
+                    </button>
+                  </>
                 )}
               </>
             )}
@@ -1261,6 +1353,13 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         </div>
 
       </div>
+
+      {is3DViewerOpen && (
+        <Model3DViewerModal 
+          onClose={() => setIs3DViewerOpen(false)} 
+          modelTitle="Receptor Nicotínico de Acetilcolina (nAChR)"
+        />
+      )}
     </div>
   );
 };

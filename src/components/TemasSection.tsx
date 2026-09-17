@@ -230,19 +230,34 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     🎙️ Video Podcast {topic.spotifyPodcastUrl ? '✓' : ''}
                   </span>
                   {topic.id === 'tema-01' && (
-                    <span 
-                      style={{ 
-                        fontSize: '0.66rem', 
-                        padding: '2px 8px', 
-                        borderRadius: '4px', 
-                        background: 'linear-gradient(135deg, rgba(13,148,136,0.2) 0%, rgba(30,58,138,0.15) 100%)', 
-                        color: 'var(--teal-ink)', 
-                        border: '1px solid var(--teal)',
-                        fontWeight: 800 
-                      }}
-                    >
-                      🧬 Taller Retrosíntesis ✓
-                    </span>
+                    <>
+                      <span 
+                        style={{ 
+                          fontSize: '0.66rem', 
+                          padding: '2px 8px', 
+                          borderRadius: '4px', 
+                          background: 'linear-gradient(135deg, rgba(13,148,136,0.2) 0%, rgba(30,58,138,0.15) 100%)', 
+                          color: 'var(--teal-ink)', 
+                          border: '1px solid var(--teal)',
+                          fontWeight: 800 
+                        }}
+                      >
+                        🧬 Taller Retrosíntesis ✓
+                      </span>
+                      <span 
+                        style={{ 
+                          fontSize: '0.66rem', 
+                          padding: '2px 8px', 
+                          borderRadius: '4px', 
+                          background: 'linear-gradient(135deg, rgba(45,212,191,0.2) 0%, rgba(13,148,136,0.15) 100%)', 
+                          color: 'var(--teal-ink)', 
+                          border: '1px solid var(--teal)',
+                          fontWeight: 800 
+                        }}
+                      >
+                        🧊 Modelo 3D (nAChR) ✓
+                      </span>
+                    </>
                   )}
                 </div>
 
