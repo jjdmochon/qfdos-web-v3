@@ -287,7 +287,7 @@ CRITERIOS DOCENTES (INSPIRADOS EN EL RIGOR OFICIAL DEL EXAMEN FIR - MINISTERIO D
   } catch (e) {
     console.warn('Gemini exam generation failed, using fallback:', e);
   }
-  return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea);
+  return generateFallbackExamQuestions(topicId, topicTitle, questionCount, difficulty, focusArea, topic);
 };
 
 export interface SmartExamParams {
@@ -508,7 +508,7 @@ export const SYNTHESIS_REACTIVITY_QUESTIONS: TestQuestion[] = [
   },
   {
     id: 'syn-react-diazepam',
-    topicId: 'tema-01',
+    topicId: 'tema-03',
     question: 'En la síntesis de 1,4-benzodiazepinas como el Diazepam según la ruta clásica de Sternbach, ¿qué reactivo bifuncional permite acilar y ciclar sobre la 5-cloro-2-(metilamino)benzofenona?',
     questionSmiles: 'CN1C(=O)CN=C(C2=C1C=CC(=C2)Cl)C3=CC=CC=C3',
     options: [
@@ -572,7 +572,7 @@ export const SYNTHESIS_REACTIVITY_QUESTIONS: TestQuestion[] = [
   },
   {
     id: 'syn-react-salification',
-    topicId: 'tema-01',
+    topicId: 'tema-02',
     question: 'En la formulación química de neurolépticos fenotiazínicos como la Clorpromazina para administración parenteral acuosa, ¿qué centro nucleófilo/básico de la estructura molecular reacciona estequiométricamente con ácido clorhídrico para formar el monoclorhidrato soluble?',
     questionSmiles: 'CN(C)CCCN1c2ccccc2Sc3ccc(Cl)cc13',
     options: [
@@ -739,10 +739,9 @@ function generateFallbackExamQuestions(
   focusArea: ExamFocusArea = 'sintesis_reactividad',
   topic?: QfdosTopic
 ): TestQuestion[] {
-  // 1. Preguntas especializadas de Reactividad y Síntesis Química con estructuras
+  // 1. Preguntas especializadas de Reactividad y Síntesis Química con estructuras exclusivas del tema
   const synthesisForTopic = SYNTHESIS_REACTIVITY_QUESTIONS.filter(q => q.topicId === topicId);
-  const otherSynthesis = SYNTHESIS_REACTIVITY_QUESTIONS.filter(q => q.topicId !== topicId);
-  const prioritizedSynthesis = [...synthesisForTopic, ...otherSynthesis];
+  const prioritizedSynthesis = synthesisForTopic;
 
   // 2. Preguntas oficiales del FIR específicas para este tema de QFDOS
   const firForTopic = getFirQuestionsByTopic(topicId).map(convertFirToTestQuestion);
