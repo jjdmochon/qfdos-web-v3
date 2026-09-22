@@ -183,8 +183,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     const locales = leerRegistrosLocales();
     const correo = (user?.email || studentEmail || '').trim();
 
-    // El profesor consulta la hoja entera, no su propia fila.
-    if (isProfesor || !correo) {
+    if (!correo) {
       setRecords(locales);
       setEstadoHistorial('local');
       return;
@@ -1475,7 +1474,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                 </div>
               </div>
 
-              {!isProfesor && estadoHistorial !== 'local' && (
+              {estadoHistorial !== 'local' && (
                 <div
                   style={{
                     marginBottom: '1rem',
