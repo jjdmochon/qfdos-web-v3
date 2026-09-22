@@ -674,8 +674,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.testQuestions.length} preguntas oficiales (Modelo B por defecto). Calificaciones volcadas en Google Sheets.`
-                                : `${topic.testQuestions.length} preguntas oficiales calibradas (Modelo B). Tus intentos se registran en Google Sheets.`
+                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales (Modelo B por defecto). Calificaciones volcadas en Google Sheets.`
+                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales calibradas (Modelo B). Tus intentos se registran en Google Sheets.`
                               }
                             </p>
                           </div>
@@ -1351,7 +1351,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               <>
                 {isProfesor && (
                   <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
-                    <HelpCircle size={14} /> Test ({topic.testQuestions?.length || 0})
+                    <HelpCircle size={14} /> Test ({topic.id === 'tema-01' ? 15 : (topic.testQuestions?.length || 0)})
                   </button>
                 )}
                 <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">

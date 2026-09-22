@@ -221,7 +221,14 @@ export const App: React.FC = () => {
   const [topics, setTopics] = useState<QfdosTopic[]>(() => {
     purgeStaleCourseCache();
     const raw = contenidoEnCache()?.topics ?? loadCached('qfdos_v3_topics', INITIAL_TOPICS);
-    return normalizarTemas(raw);
+    const normalized = normalizarTemas(raw);
+    // Auto-heal Tema 1 para garantizar que siempre tenga las 15 preguntas oficiales del Modelo B
+    const t1 = normalized.find(t => t.id === 'tema-01');
+    if (t1 && (!t1.testQuestions || t1.testQuestions.length !== 15)) {
+      t1.testQuestions = INITIAL_TOPICS[1].testQuestions;
+      localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
+    }
+    return normalized;
   });
 
   const [announcements, setAnnouncements] = useState<QfdosAnnouncement[]>(() =>

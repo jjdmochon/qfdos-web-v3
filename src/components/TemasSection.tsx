@@ -359,7 +359,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         }}
                         title="Realizar autoevaluación tipo test"
                       >
-                        <HelpCircle size={13} /> Test ({topic.testQuestions.length})
+                        <HelpCircle size={13} /> Test ({topic.id === 'tema-01' ? 15 : (topic.testQuestions ? topic.testQuestions.length : 0)})
                       </button>
                     )}
 

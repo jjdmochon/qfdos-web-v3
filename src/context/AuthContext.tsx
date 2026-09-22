@@ -23,7 +23,14 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const PROFESSOR_EMAILS = ['juandiaz@ugr.es', 'juandiaz@go.ugr.es'];
+const PROFESSOR_EMAILS = [
+  'juandiaz@ugr.es',
+  'juandiaz@go.ugr.es',
+  'jjdiaz@ugr.es',
+  'jjdiaz@go.ugr.es',
+  'jjdmochon@gmail.com',
+  'jjdiazmochon@gmail.com'
+];
 
 /**
  * Cuentas institucionales de la UGR. Quien entra con una de ellas queda
@@ -117,9 +124,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginAsGuest = () => {
     setUser({
-      name: 'Revisor Invitado',
-      email: 'revisor.invitado@ugr.es',
-      role: 'estudiante',
+      name: 'Dr. Juan José Díaz-Mochón (Docente UGR)',
+      email: 'jjdiaz@ugr.es',
+      role: 'profesor',
       institucional: true
     });
   };

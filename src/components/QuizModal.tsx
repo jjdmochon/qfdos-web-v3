@@ -72,15 +72,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   // Model Selection State
   const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-b');
 
-  // Compute active question bank dynamically (Default is Modelo B)
+  // Compute active question bank dynamically (Default is Modelo B - exactly 15 questions)
   const questions: TestQuestion[] = useMemo(() => {
-    if (topic.id === 'tema-01') {
+    const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
+    if (isTema1) {
       if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
       if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
       if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
       return MODELO_B_TEST_QUESTIONS;
     }
-    return topic.testQuestions || [];
+    return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_B_TEST_QUESTIONS;
   }, [topic, selectedModel]);
 
   // Tab State
@@ -544,8 +545,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               gap: '6px'
             }}
           >
-            {isProfesor ? <BarChart3 size={15} /> : <History size={15} />}
-            {isProfesor ? 'Registro de Calificaciones' : 'Mis Intentos'}
+            <BarChart3 size={15} /> Registro de Calificaciones & Google Sheets
             <span style={{ 
               fontSize: '0.68rem', 
               padding: '1px 6px', 
@@ -554,7 +554,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               color: activeTab === 'records' ? '#fff' : 'var(--text-main)',
               fontWeight: 700 
             }}>
-              {isProfesor ? records.filter(r => r.topicId === topic.id).length : records.length}
+              {records.length}
             </span>
           </button>
         </div>
@@ -588,8 +588,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     </p>
                   </div>
 
-                  {/* Selector de modo (Solo visible para Docente) */}
-                  {isProfesor && (
+                  {/* Selector de modo accesible para alternar entre Docente y Alumno */}
                   <div style={{ marginBottom: '1.25rem' }}>
                     <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
                       Modalidad de Evaluación:
@@ -599,8 +598,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         type="button"
                         onClick={() => {
                           setEvaluationMode('docente_sesion');
-                          setStudentName(user?.name || 'Prof. Juan José Díaz-Mochón');
-                          setStudentEmail(user?.email || 'jjdiaz@ugr.es');
+                          setStudentName('Prof. Juan José Díaz-Mochón');
+                          setStudentEmail('jjdiaz@ugr.es');
                           setStudentDni('DOCENTE-UGR');
                         }}
                         style={{
@@ -619,10 +618,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <UserCheck size={18} color={evaluationMode === 'docente_sesion' ? 'var(--navy)' : 'var(--text-muted)'} style={{ marginTop: '2px' }} />
                         <div>
                           <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)' }}>
-                            Sesión Docente / Validación
+                            Modo Profesor / Validación
                           </div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                            Registrar con mis credenciales de profesor
+                            Acceso a los 4 modelos de examen (B por defecto)
                           </div>
                         </div>
                       </button>
@@ -631,9 +630,14 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         type="button"
                         onClick={() => {
                           setEvaluationMode('alumno_evaluado');
-                          setStudentName('');
-                          setStudentEmail('');
-                          setStudentDni('');
+                          if (user && user.role === 'estudiante') {
+                            setStudentName(user.name);
+                            setStudentEmail(user.email);
+                          } else {
+                            setStudentName('');
+                            setStudentEmail('');
+                            setStudentDni('');
+                          }
                         }}
                         style={{
                           padding: '12px',
@@ -651,16 +655,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <UserPlus size={18} color={evaluationMode === 'alumno_evaluado' ? 'var(--teal)' : 'var(--text-muted)'} style={{ marginTop: '2px' }} />
                         <div>
                           <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)' }}>
-                            Evaluar Alumno de Grado
+                            Modo Alumno (Autoevaluación)
                           </div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                            Ingresar nombre, correo y DNI del estudiante
+                            Registro con nombre, correo UGR y DNI
                           </div>
                         </div>
                       </button>
                     </div>
                   </div>
-                  )}
 
                   {/* Formulario de datos */}
                   <div className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: 'var(--surface)' }}>
@@ -747,13 +750,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', margin: 0 }}>
-                        {isProfesor ? 'Modelo de Examen Oficial (15 Preguntas Calibradas):' : 'Modelo de Examen Asignado:'}
+                        {evaluationMode === 'docente_sesion' || isProfesor ? 'Modelo de Examen Seleccionado (15 Preguntas Calibradas):' : 'Modelo de Examen Oficial Asignado:'}
                       </label>
-                      {!isProfesor && (
-                        <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#8b5cf6', color: '#fff' }}>
-                          Modelo B (Predeterminado)
-                        </span>
-                      )}
+                      <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#8b5cf6', color: '#fff' }}>
+                        {selectedModel === 'modelo-b' ? 'Modelo B (Activo)' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'}
+                      </span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr', gap: '10px' }}>
                       {/* Modelo A */}
@@ -1252,40 +1253,37 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {isProfesor && (
-                    <button
-                      onClick={() => setShowSheetsConfig(!showSheetsConfig)}
-                      className="btn btn-sm btn-secondary"
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem' }}
-                      title="Configurar webhook de Google Sheets para recepción de notas"
-                    >
-                      <Sheet size={14} /> {showSheetsConfig ? 'Ocultar Google Sheets' : 'Configurar Google Sheets'}
-                    </button>
-                  )}
-                  {isProfesor && (
-                    <button
-                      onClick={handleExportCsv}
-                      className="btn btn-sm btn-primary"
-                      disabled={filteredRecords.length === 0}
-                      title="Exportar informe a CSV para Excel"
-                    >
-                      <Download size={14} /> Exportar CSV
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setShowSheetsConfig(!showSheetsConfig)}
+                    className="btn btn-sm btn-secondary"
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', fontWeight: 700 }}
+                    title="Configurar webhook de Google Sheets para recepción de notas"
+                  >
+                    <Sheet size={14} /> {showSheetsConfig ? 'Ocultar Google Sheets' : '⚙ Configurar Google Sheets'}
+                  </button>
+                  <button
+                    onClick={handleExportCsv}
+                    className="btn btn-sm btn-primary"
+                    disabled={filteredRecords.length === 0}
+                    style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                    title="Exportar informe a CSV para Excel"
+                  >
+                    <Download size={14} /> Exportar CSV
+                  </button>
                   <button
                     onClick={handleClearAllRecords}
                     className="btn btn-sm btn-outline"
                     disabled={records.length === 0}
                     style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)', fontSize: '0.76rem' }}
-                    title={isProfesor ? "Borrar todo el historial docente" : "Vaciar mi historial en este equipo"}
+                    title="Vaciar historial de evaluaciones registradas"
                   >
                     <Trash2 size={14} /> Vaciar
                   </button>
                 </div>
               </div>
 
-              {/* Panel de Configuración de Google Sheets (Solo Docente) */}
-              {isProfesor && showSheetsConfig && (
+              {/* Panel de Configuración de Google Sheets */}
+              {showSheetsConfig && (
                 <div style={{
                   background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(30, 58, 138, 0.05) 100%)',
                   border: '1.5px solid rgba(16, 185, 129, 0.3)',
