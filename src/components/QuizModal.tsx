@@ -203,6 +203,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     remotos: QuizRegistrationRecord[],
     locales: QuizRegistrationRecord[]
   ): QuizRegistrationRecord[] => {
+    // Si la hoja oficial responde, la fuente de verdad es la hoja remota.
+    // Enriquecemos los registros remotos con el answersDetail que tengamos en local.
     const remotosEnriquecidos = remotos.map(rem => {
       const matchLocal = locales.find(loc => sonMismoIntento(rem, loc));
       if (matchLocal && (!rem.answersDetail || rem.answersDetail.length === 0) && matchLocal.answersDetail && matchLocal.answersDetail.length > 0) {
@@ -211,11 +213,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       return rem;
     });
 
-    const localesUnicos = locales.filter(
-      loc => !remotos.some(rem => sonMismoIntento(rem, loc))
-    );
+    // Actualizamos localStorage para limpiar huérfanos obsoletos y asegurar paridad entre navegadores
+    try {
+      localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(remotosEnriquecidos));
+      localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(remotosEnriquecidos));
+    } catch {
+      // cuota del navegador
+    }
 
-    return [...remotosEnriquecidos, ...localesUnicos];
+    return remotosEnriquecidos;
   };
 
   const loadStoredRecords = () => {
@@ -509,14 +515,21 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   };
 
   const handleClearAllRecords = () => {
-    if (!window.confirm('¿Deseas eliminar todo el historial de calificaciones registradas? Esta acción no se puede deshacer.')) return;
-    setRecords([]);
+    const msg = isProfesor
+      ? '¿Deseas vaciar el historial de calificaciones en este navegador? Las notas oficiales de la hoja de Google no se borrarán.'
+      : '¿Deseas limpiar la caché local de este navegador y resincronizar con la hoja oficial?';
+    if (!window.confirm(msg)) return;
     try {
       localStorage.removeItem(REGISTRATION_STORAGE_KEY);
       localStorage.removeItem(LEGACY_STORAGE_KEY);
+      const correo = (user?.email || studentEmail || '').trim().toLowerCase();
+      if (correo) {
+        localStorage.removeItem(`qfdos_calificaciones_remotas_${correo}`);
+      }
     } catch (err) {
       console.error('Error clearing records', err);
     }
+    sincronizarRegistros();
   };
 
   const handleExportCsv = () => {
@@ -1510,17 +1523,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   >
                     <Download size={14} /> Exportar CSV
                   </button>
-                  {isProfesor && (
-                    <button
-                      onClick={handleClearAllRecords}
-                      className="btn btn-sm btn-outline"
-                      disabled={records.length === 0}
-                      style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)', fontSize: '0.76rem' }}
-                      title="Vaciar historial de evaluaciones registradas"
-                    >
-                      <Trash2 size={14} /> Vaciar
-                    </button>
-                  )}
+                  <button
+                    onClick={handleClearAllRecords}
+                    className="btn btn-sm btn-outline"
+                    disabled={records.length === 0}
+                    style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)', fontSize: '0.76rem' }}
+                    title={isProfesor ? "Vaciar historial de evaluaciones registradas en este equipo" : "Limpiar caché local y resincronizar con la hoja oficial"}
+                  >
+                    <Trash2 size={14} /> {isProfesor ? 'Vaciar' : 'Limpiar Caché'}
+                  </button>
                 </div>
               </div>
 
