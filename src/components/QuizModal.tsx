@@ -149,23 +149,73 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     }
   };
 
+  const parseTimestampDate = (ts?: string): Date | null => {
+    if (!ts) return null;
+    const match = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+    if (match) {
+      const [, d, m, y, h, min, s] = match;
+      return new Date(Number(y), Number(m) - 1, Number(d), Number(h || 0), Number(min || 0), Number(s || 0));
+    }
+    const parsed = Date.parse(ts);
+    if (!isNaN(parsed)) return new Date(parsed);
+    return null;
+  };
+
+  const parseTimestampMinutes = (ts?: string): number => {
+    const d = parseTimestampDate(ts);
+    return d ? Math.floor(d.getTime() / 60000) : 0;
+  };
+
+  const formatearFechaVisual = (ts?: string): string => {
+    if (!ts) return '';
+    const d = parseTimestampDate(ts);
+    if (!d) return ts;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
   /**
-   * Dos intentos son el mismo si coinciden correo, tema y marca temporal.
-   *
-   * La hoja y el navegador asignan identificadores distintos al mismo examen,
-   * así que comparar por `id` duplicaría cada intento hecho en este equipo.
+   * Dos intentos son el mismo si coinciden correo, tema y marca temporal
+   * (independientemente de si Google Sheets la devuelve como Date o string dd/mm/yyyy).
    */
-  const huella = (r: QuizRegistrationRecord) =>
-    `${(r.studentEmail || '').toLowerCase().trim()}|${r.topicId}|${(r.timestamp || '').trim()}`;
+  const sonMismoIntento = (a: QuizRegistrationRecord, b: QuizRegistrationRecord): boolean => {
+    const emailA = (a.studentEmail || '').toLowerCase().trim();
+    const emailB = (b.studentEmail || '').toLowerCase().trim();
+    if (emailA && emailB && emailA !== emailB) return false;
+    if (a.topicId !== b.topicId) return false;
+
+    // Si coinciden en texto literal
+    if (a.timestamp && b.timestamp && a.timestamp.trim() === b.timestamp.trim()) return true;
+
+    // Comparación robusta por minutos (con tolerancia de 1 min por desfase horario/servidor)
+    const tA = parseTimestampMinutes(a.timestamp);
+    const tB = parseTimestampMinutes(b.timestamp);
+    if (tA > 0 && tB > 0 && Math.abs(tA - tB) <= 1) {
+      if (a.correctCount !== undefined && b.correctCount !== undefined) {
+        return a.correctCount === b.correctCount;
+      }
+      return true;
+    }
+    return false;
+  };
 
   const fusionar = (
     remotos: QuizRegistrationRecord[],
     locales: QuizRegistrationRecord[]
   ): QuizRegistrationRecord[] => {
-    const vistos = new Set(remotos.map(huella));
-    // Los locales que ya constan en la hoja se descartan: gana la versión
-    // remota, que es la que ve el profesor.
-    return [...remotos, ...locales.filter(r => !vistos.has(huella(r)))];
+    const remotosEnriquecidos = remotos.map(rem => {
+      const matchLocal = locales.find(loc => sonMismoIntento(rem, loc));
+      if (matchLocal && (!rem.answersDetail || rem.answersDetail.length === 0) && matchLocal.answersDetail && matchLocal.answersDetail.length > 0) {
+        return { ...rem, answersDetail: matchLocal.answersDetail };
+      }
+      return rem;
+    });
+
+    const localesUnicos = locales.filter(
+      loc => !remotos.some(rem => sonMismoIntento(rem, loc))
+    );
+
+    return [...remotosEnriquecidos, ...localesUnicos];
   };
 
   const loadStoredRecords = () => {
@@ -1747,7 +1797,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 )}
                                 <span>{rec.studentEmail}</span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                  <Clock size={12} /> {rec.timestamp}
+                                  <Clock size={12} /> {formatearFechaVisual(rec.timestamp)}
                                 </span>
                               </div>
                             </div>

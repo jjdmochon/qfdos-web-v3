@@ -116,9 +116,25 @@ export async function submitAttemptToGoogleSheets(
 
     // La confirmación se obtiene releyendo, que no escribe nada.
     const registrados = await misCalificaciones(attempt.studentEmail);
-    const consta = registrados?.some(
-      r => r.timestamp === attempt.timestamp && r.topicId === attempt.topicId
-    );
+    const parseMinutos = (ts?: string): number => {
+      if (!ts) return 0;
+      const match = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+      if (match) {
+        const [, d, m, y, h, min, s] = match;
+        const dt = new Date(Number(y), Number(m) - 1, Number(d), Number(h || 0), Number(min || 0), Number(s || 0));
+        return Math.floor(dt.getTime() / 60000);
+      }
+      const parsed = Date.parse(ts);
+      return !isNaN(parsed) ? Math.floor(parsed / 60000) : 0;
+    };
+
+    const tAttempt = parseMinutos(attempt.timestamp);
+    const consta = registrados?.some(r => {
+      if (r.topicId !== attempt.topicId) return false;
+      if (r.timestamp === attempt.timestamp) return true;
+      const tR = parseMinutos(r.timestamp);
+      return tR > 0 && tAttempt > 0 && Math.abs(tR - tAttempt) <= 1;
+    });
 
     if (consta) {
       return {
