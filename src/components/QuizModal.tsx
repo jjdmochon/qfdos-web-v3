@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { QfdosTopic, TestQuestion, QuizAttempt } from '../data/qfdosData';
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  QfdosTopic, 
+  TestQuestion, 
+  QuizAttempt, 
+  QuizAnswerDetail, 
+  QuizRegistrationRecord,
+  RETROSINTESIS_TEST_QUESTIONS 
+} from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
@@ -12,8 +19,22 @@ import {
   RotateCcw, 
   Award,
   BookOpen,
-  Maximize2
+  Maximize2,
+  UserCheck,
+  User,
+  Download,
+  Trash2,
+  Clock,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  GraduationCap,
+  BarChart3,
+  UserPlus
 } from 'lucide-react';
+
+const REGISTRATION_STORAGE_KEY = 'qfdos_test_registration_records';
+const LEGACY_STORAGE_KEY = 'qfdos_v2_quiz_attempts';
 
 interface QuizModalProps {
   topic: QfdosTopic;
@@ -21,14 +42,37 @@ interface QuizModalProps {
   onAttemptCompleted?: (attempt: QuizAttempt) => void;
 }
 
+export type QuizModelType = 'modelo-a' | 'retrosintesis';
+
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
   onClose,
   onAttemptCompleted
 }) => {
   const { user, isProfesor } = useAuth();
-  const questions = topic.testQuestions || [];
 
+  // Model Selection State
+  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-a');
+
+  // Compute active question bank dynamically
+  const questions: TestQuestion[] = useMemo(() => {
+    if (topic.id === 'tema-01' && selectedModel === 'retrosintesis') {
+      return RETROSINTESIS_TEST_QUESTIONS;
+    }
+    return topic.testQuestions || [];
+  }, [topic, selectedModel]);
+
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'quiz' | 'records'>('quiz');
+
+  // Registration State
+  const [evaluationMode, setEvaluationMode] = useState<'docente_sesion' | 'alumno_evaluado'>('docente_sesion');
+  const [studentName, setStudentName] = useState<string>(user?.name || 'Prof. Juan José Díaz-Mochón');
+  const [studentEmail, setStudentEmail] = useState<string>(user?.email || 'jjdiaz@ugr.es');
+  const [studentDni, setStudentDni] = useState<string>('');
+  const [isStarted, setIsStarted] = useState<boolean>(false);
+
+  // Quiz Navigation State
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -36,6 +80,46 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [isCompleted, setIsCompleted] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
 
+  // Records / Grading Dashboard State
+  const [records, setRecords] = useState<QuizRegistrationRecord[]>([]);
+  const [recordsFilterTopic, setRecordsFilterTopic] = useState<'current' | 'all'>('current');
+  const [recordsSearchQuery, setRecordsSearchQuery] = useState<string>('');
+  const [expandedRecordId, setExpandedRecordId] = useState<string | null>(null);
+
+  // Load records from localStorage
+  const loadStoredRecords = () => {
+    try {
+      const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY);
+      if (raw) {
+        setRecords(JSON.parse(raw) as QuizRegistrationRecord[]);
+      } else {
+        const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacy) {
+          setRecords(JSON.parse(legacy) as QuizRegistrationRecord[]);
+        } else {
+          setRecords([]);
+        }
+      }
+    } catch (e) {
+      console.error('Error loading quiz records', e);
+      setRecords([]);
+    }
+  };
+
+  useEffect(() => {
+    loadStoredRecords();
+  }, []);
+
+  // Set default respondent based on user when in teacher mode
+  useEffect(() => {
+    if (evaluationMode === 'docente_sesion') {
+      setStudentName(user?.name || 'Prof. Juan José Díaz-Mochón');
+      setStudentEmail(user?.email || 'jjdiaz@ugr.es');
+      setStudentDni('DOCENTE-UGR');
+    }
+  }, [evaluationMode, user]);
+
+  // Mandatory teacher guard
   if (!isProfesor) {
     return (
       <div className="modal-overlay" onClick={onClose}>
@@ -95,37 +179,85 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       setSelectedOption(null);
       setShowExplanation(false);
     } else {
-      // Quiz Finished! Calculate score
+      // Quiz Finished! Calculate score and detail
+      const finalAnswersMap = { ...answers, [currentIndex]: selectedOption ?? -1 };
       let correct = 0;
-      questions.forEach((q, idx) => {
-        if (answers[idx] === q.correctIndex || (idx === currentIndex && selectedOption === q.correctIndex)) {
-          correct++;
-        }
+
+      const answersDetail: QuizAnswerDetail[] = questions.map((q, idx) => {
+        const selectedIdx = finalAnswersMap[idx] ?? -1;
+        const isOptCorrect = selectedIdx === q.correctIndex;
+        if (isOptCorrect) correct++;
+
+        const getOptText = (optIndex: number) => {
+          if (optIndex < 0 || optIndex >= q.options.length) return 'Sin respuesta';
+          const opt = q.options[optIndex];
+          return typeof opt === 'string' ? opt : opt.text;
+        };
+
+        return {
+          questionId: q.id,
+          questionNumber: idx + 1,
+          questionText: q.question,
+          selectedOptionIndex: selectedIdx,
+          selectedOptionText: getOptText(selectedIdx),
+          correctOptionIndex: q.correctIndex,
+          correctOptionText: getOptText(q.correctIndex),
+          isCorrect: isOptCorrect,
+          explanation: q.explanation
+        };
       });
 
       const finalScore = Number(((correct / questions.length) * 10).toFixed(1));
-      const attempt: QuizAttempt = {
-        id: `att_${Date.now()}`,
-        studentEmail: user?.email ?? '',
-        studentName: user?.name ?? '',
+      const now = new Date();
+      const formattedTimestamp = now.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }) + ' ' + now.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const modelDisplayName = (topic.id === 'tema-01' && selectedModel === 'retrosintesis')
+        ? 'Modelo Retrosíntesis: Desconexiones y Sintones (15P)'
+        : 'Modelo A: Farmacología, MoA y Síntesis (15P)';
+
+      const finalAttempt: QuizRegistrationRecord = {
+        id: `rec_${Date.now()}`,
+        studentName: studentName.trim() || 'Evaluado sin registrar',
+        studentEmail: studentEmail.trim() || (user?.email ?? 'sin-email@ugr.es'),
+        studentDni: studentDni.trim() || '-',
+        evaluator: user?.name ? `${user.name} (Docente)` : 'Dr. Juan José Díaz-Mochón (Docente)',
+        evaluationMode: evaluationMode,
         topicId: topic.id,
+        topicNumber: topic.number,
+        topicTitle: topic.title,
+        modelName: modelDisplayName,
         score: finalScore,
         correctCount: correct,
         totalQuestions: questions.length,
-        timestamp: new Date().toLocaleDateString('es-ES')
+        timestamp: formattedTimestamp,
+        answersDetail: answersDetail
       };
 
-      // Save to localStorage
+      // Save to localStorage under both keys
       try {
-        const savedAttempts: QuizAttempt[] = JSON.parse(localStorage.getItem('qfdos_v2_quiz_attempts') || '[]');
-        savedAttempts.push(attempt);
-        localStorage.setItem('qfdos_v2_quiz_attempts', JSON.stringify(savedAttempts));
+        const existingRecords: QuizRegistrationRecord[] = JSON.parse(
+          localStorage.getItem(REGISTRATION_STORAGE_KEY) || '[]'
+        );
+        const updatedRecords = [finalAttempt, ...existingRecords];
+        localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(updatedRecords));
+
+        // Legacy compatibility
+        localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(updatedRecords));
+
+        setRecords(updatedRecords);
       } catch (e) {
-        console.error('Error saving quiz attempt', e);
+        console.error('Error saving registration record', e);
       }
 
       if (onAttemptCompleted) {
-        onAttemptCompleted(attempt);
+        onAttemptCompleted(finalAttempt);
       }
 
       setIsCompleted(true);
@@ -140,6 +272,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     setIsCompleted(false);
   };
 
+  const handleNewStudentEvaluation = () => {
+    handleRestart();
+    setEvaluationMode('alumno_evaluado');
+    setStudentName('');
+    setStudentEmail('');
+    setStudentDni('');
+    setIsStarted(false);
+    setActiveTab('quiz');
+  };
+
   const calculateFinalScore = () => {
     let correct = 0;
     questions.forEach((q, idx) => {
@@ -152,266 +294,1124 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     };
   };
 
+  const handleDeleteRecord = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm('¿Confirmas que deseas eliminar este registro de evaluación?')) return;
+    const updated = records.filter(r => r.id !== id);
+    setRecords(updated);
+    try {
+      localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(updated));
+      localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(updated));
+    } catch (err) {
+      console.error('Error deleting record', err);
+    }
+  };
+
+  const handleClearAllRecords = () => {
+    if (!window.confirm('¿Deseas eliminar todo el historial de calificaciones registradas? Esta acción no se puede deshacer.')) return;
+    setRecords([]);
+    try {
+      localStorage.removeItem(REGISTRATION_STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    } catch (err) {
+      console.error('Error clearing records', err);
+    }
+  };
+
+  const handleExportCsv = () => {
+    if (filteredRecords.length === 0) {
+      alert('No hay registros disponibles para exportar.');
+      return;
+    }
+
+    const headers = [
+      'ID Registro',
+      'Fecha y Hora',
+      'Tema ID',
+      'Tema Título',
+      'Modelo',
+      'Modo Evaluación',
+      'Estudiante',
+      'DNI / Identificador',
+      'Correo Electrónico',
+      'Docente Evaluador',
+      'Calificación (/10)',
+      'Aciertos',
+      'Total Preguntas'
+    ];
+
+    const rows = filteredRecords.map(r => [
+      `"${r.id}"`,
+      `"${r.timestamp}"`,
+      `"${r.topicId}"`,
+      `"${r.topicTitle || topic.title}"`,
+      `"${r.modelName || 'Modelo A'}"`,
+      `"${r.evaluationMode === 'docente_sesion' ? 'Sesión Docente' : 'Alumno Evaluado'}"`,
+      `"${r.studentName.replace(/"/g, '""')}"`,
+      `"${(r.studentDni || '-').replace(/"/g, '""')}"`,
+      `"${r.studentEmail.replace(/"/g, '""')}"`,
+      `"${(r.evaluator || user?.name || 'Profesor').replace(/"/g, '""')}"`,
+      r.score.toFixed(1),
+      r.correctCount,
+      r.totalQuestions
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `QFDOS_Calificaciones_${topic.id}_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Filtered records for dashboard
+  const filteredRecords = useMemo(() => {
+    return records.filter(r => {
+      if (recordsFilterTopic === 'current' && r.topicId !== topic.id) {
+        return false;
+      }
+      if (recordsSearchQuery.trim()) {
+        const q = recordsSearchQuery.toLowerCase();
+        const matchName = r.studentName?.toLowerCase().includes(q);
+        const matchEmail = r.studentEmail?.toLowerCase().includes(q);
+        const matchDni = r.studentDni?.toLowerCase().includes(q);
+        return matchName || matchEmail || matchDni;
+      }
+      return true;
+    });
+  }, [records, recordsFilterTopic, topic.id, recordsSearchQuery]);
+
+  // Dashboard Statistics
+  const dashboardStats = useMemo(() => {
+    if (filteredRecords.length === 0) {
+      return { total: 0, avg: '0.0', passCount: 0, passRate: '0%', maxScore: '0.0' };
+    }
+    const total = filteredRecords.length;
+    const sum = filteredRecords.reduce((acc, r) => acc + r.score, 0);
+    const avg = (sum / total).toFixed(1);
+    const passCount = filteredRecords.filter(r => r.score >= 5.0).length;
+    const passRate = ((passCount / total) * 100).toFixed(0) + '%';
+    const maxScore = Math.max(...filteredRecords.map(r => r.score)).toFixed(1);
+    return { total, avg, passCount, passRate, maxScore };
+  }, [filteredRecords]);
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
         className="modal-container" 
-        style={{ maxWidth: '720px' }} 
+        style={{ 
+          maxWidth: activeTab === 'records' ? '920px' : '760px',
+          width: '95%',
+          transition: 'max-width 0.25s ease'
+        }} 
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <HelpCircle size={20} color="var(--teal-ink)" />
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-title)' }}>
-              Autoevaluación: {topic.number}
-            </h3>
+        {/* Modal Top Header */}
+        <div className="modal-header" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '8px',
+              background: 'var(--primary-bg)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--navy)'
+            }}>
+              <GraduationCap size={20} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                  Autoevaluación: {topic.number} · {topic.title}
+                </h3>
+                <span className="qfdos-badge" style={{ fontSize: '0.66rem', background: '#3b82f6', color: '#fff' }}>
+                  Modelo A Oficial
+                </span>
+              </div>
+              <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
+                15 Preguntas Calibradas JEV System-1 · Módulo Exclusivo Docente
+              </p>
+            </div>
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-outline"><X size={18} /></button>
+          <button onClick={onClose} className="btn btn-sm btn-outline" title="Cerrar ventana"><X size={18} /></button>
         </div>
 
-        {/* Body */}
-        <div className="modal-body">
-          {!isCompleted ? (
+        {/* Tab Switcher */}
+        <div style={{ 
+          display: 'flex', 
+          borderBottom: '1.5px solid var(--border-color)', 
+          background: 'var(--surface-raised)',
+          padding: '6px 16px 0',
+          gap: '8px'
+        }}>
+          <button
+            onClick={() => setActiveTab('quiz')}
+            style={{
+              padding: '8px 16px',
+              border: 'none',
+              background: activeTab === 'quiz' ? 'var(--surface)' : 'transparent',
+              color: activeTab === 'quiz' ? 'var(--navy)' : 'var(--text-muted)',
+              fontWeight: activeTab === 'quiz' ? 800 : 600,
+              fontSize: '0.84rem',
+              borderRadius: '8px 8px 0 0',
+              borderTop: activeTab === 'quiz' ? '3px solid var(--navy)' : '3px solid transparent',
+              borderLeft: activeTab === 'quiz' ? '1px solid var(--border-color)' : 'none',
+              borderRight: activeTab === 'quiz' ? '1px solid var(--border-color)' : 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <HelpCircle size={15} /> Test Interactivo (15 Preguntas)
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('records');
+              loadStoredRecords();
+            }}
+            style={{
+              padding: '8px 16px',
+              border: 'none',
+              background: activeTab === 'records' ? 'var(--surface)' : 'transparent',
+              color: activeTab === 'records' ? 'var(--navy)' : 'var(--text-muted)',
+              fontWeight: activeTab === 'records' ? 800 : 600,
+              fontSize: '0.84rem',
+              borderRadius: '8px 8px 0 0',
+              borderTop: activeTab === 'records' ? '3px solid var(--navy)' : '3px solid transparent',
+              borderLeft: activeTab === 'records' ? '1px solid var(--border-color)' : 'none',
+              borderRight: activeTab === 'records' ? '1px solid var(--border-color)' : 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <BarChart3 size={15} /> Registro de Intentos / Calificaciones
+            <span style={{ 
+              fontSize: '0.68rem', 
+              padding: '1px 6px', 
+              borderRadius: '10px', 
+              background: activeTab === 'records' ? 'var(--navy)' : 'var(--surface-alt)',
+              color: activeTab === 'records' ? '#fff' : 'var(--text-main)',
+              fontWeight: 700 
+            }}>
+              {records.filter(r => r.topicId === topic.id).length}
+            </span>
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="modal-body" style={{ maxHeight: '75vh', overflowY: 'auto', padding: '1.25rem' }}>
+          {activeTab === 'quiz' ? (
+            /* TAB 1: QUIZ INTERACTIVO */
             <div>
-              {/* Progress & Difficulty Bar */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--navy-ink)' }}>
-                  Pregunta {currentIndex + 1} de {questions.length}
-                </span>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {currentQ.badge && (
-                    <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#3b82f6', color: '#fff' }}>
-                      {currentQ.badge}
-                    </span>
-                  )}
-                  {currentQ.block && (
-                    <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>
-                      {currentQ.block}
-                    </span>
-                  )}
-                  {currentQ.difficulty && (
-                    <span className="qfdos-badge badge-amber" style={{ fontSize: '0.68rem' }}>
-                      Nivel {currentQ.difficulty}
-                    </span>
-                  )}
-                </div>
-              </div>
+              {!isStarted ? (
+                /* PRE-QUIZ: FICHA DE REGISTRO DOCENTE / IDENTIFICACIÓN DEL EVALUADO */
+                <div>
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.06) 0%, rgba(13, 148, 136, 0.06) 100%)',
+                    border: '1.5px solid var(--border-strong)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '1.25rem',
+                    marginBottom: '1.25rem'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <UserCheck size={20} color="var(--navy)" />
+                      <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
+                        Registro de Identificación para la Evaluación
+                      </h4>
+                    </div>
+                    <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                      Como docente acreditado, puedes realizar una prueba de validación con tu sesión o registrar la evaluación continua presencial de un alumno específico. La calificación quedará guardada de forma persistente.
+                    </p>
+                  </div>
 
-              {/* Question Text */}
-              <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
-                {currentQ.question}
-              </div>
+                  {/* Selector de modo */}
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
+                      Modalidad de Evaluación:
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEvaluationMode('docente_sesion');
+                          setStudentName(user?.name || 'Prof. Juan José Díaz-Mochón');
+                          setStudentEmail(user?.email || 'jjdiaz@ugr.es');
+                          setStudentDni('DOCENTE-UGR');
+                        }}
+                        style={{
+                          padding: '12px',
+                          borderRadius: 'var(--radius-md)',
+                          border: evaluationMode === 'docente_sesion' ? '2px solid var(--navy)' : '1px solid var(--border-color)',
+                          background: evaluationMode === 'docente_sesion' ? 'var(--primary-bg)' : 'var(--surface)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <UserCheck size={18} color={evaluationMode === 'docente_sesion' ? 'var(--navy)' : 'var(--text-muted)'} style={{ marginTop: '2px' }} />
+                        <div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)' }}>
+                            Sesión Docente / Validación
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                            Registrar con mis credenciales de profesor
+                          </div>
+                        </div>
+                      </button>
 
-              {/* Optional Figure / Image for Question */}
-              {currentQ.imagePath && (
-                <div 
-                  style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    marginBottom: '1rem', 
-                    background: '#ffffff', 
-                    padding: '10px 14px', 
-                    borderRadius: 'var(--radius-md)', 
-                    border: '1.5px solid var(--border-color)',
-                    cursor: 'zoom-in',
-                    position: 'relative',
-                    transition: 'all 0.2s ease',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
-                  }}
-                  onClick={() => {
-                    const src = currentQ.imagePath!.startsWith('http') 
-                      ? currentQ.imagePath! 
-                      : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath!.replace(/^\//, '')}`;
-                    setLightboxImage({
-                      src,
-                      title: `Pregunta ${currentIndex + 1}: ${currentQ.block || 'Retrosíntesis'}`,
-                      subtitle: currentQ.question,
-                      tag: currentQ.badge || 'Figura de Examen'
-                    });
-                  }}
-                  title="Haz clic para ver la figura a pantalla completa"
-                >
-                  <img 
-                    src={currentQ.imagePath.startsWith('http') ? currentQ.imagePath : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath.replace(/^\//, '')}`}
-                    alt="Figura de la pregunta" 
-                    style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain' }} 
-                  />
-                  <span style={{ marginTop: '6px', fontSize: '0.72rem', color: 'var(--teal-ink)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Maximize2 size={12} /> Clic para ampliar a pantalla completa
-                  </span>
-                </div>
-              )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEvaluationMode('alumno_evaluado');
+                          setStudentName('');
+                          setStudentEmail('');
+                          setStudentDni('');
+                        }}
+                        style={{
+                          padding: '12px',
+                          borderRadius: 'var(--radius-md)',
+                          border: evaluationMode === 'alumno_evaluado' ? '2px solid var(--teal)' : '1px solid var(--border-color)',
+                          background: evaluationMode === 'alumno_evaluado' ? 'var(--secondary-bg)' : 'var(--surface)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <UserPlus size={18} color={evaluationMode === 'alumno_evaluado' ? 'var(--teal)' : 'var(--text-muted)'} style={{ marginTop: '2px' }} />
+                        <div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)' }}>
+                            Evaluar Alumno de Grado
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                            Ingresar nombre, correo y DNI del estudiante
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
 
-              {/* Optional SMILES Structure for Question */}
-              {currentQ.questionSmiles && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                  <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} />
-                </div>
-              )}
-
-              {/* Options List */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.25rem' }}>
-                {currentQ.options.map((opt, idx) => {
-                  const optText = typeof opt === 'string' ? opt : opt.text;
-                  const optSmiles = typeof opt === 'string' ? undefined : opt.smiles;
-
-                  let optionBg = 'var(--surface)';
-                  let optionBorder = 'var(--border-color)';
-
-                  if (selectedOption === idx) {
-                    optionBg = 'var(--primary-bg)';
-                    optionBorder = 'var(--navy)';
-                  }
-
-                  if (showExplanation) {
-                    if (idx === currentQ.correctIndex) {
-                      optionBg = 'rgba(16, 185, 129, 0.12)';
-                      optionBorder = '#10b981';
-                    } else if (selectedOption === idx) {
-                      optionBg = 'rgba(239, 68, 68, 0.12)';
-                      optionBorder = '#ef4444';
-                    }
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => handleSelectOption(idx)}
-                      style={{
-                        padding: '12px 16px',
-                        borderRadius: 'var(--radius-md)',
-                        border: `1.5px solid ${optionBorder}`,
-                        background: optionBg,
-                        cursor: showExplanation ? 'default' : 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '10px',
-                        transition: 'all var(--transition-fast)'
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span 
-                          className="font-mono" 
+                  {/* Formulario de datos */}
+                  <div className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: 'var(--surface)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
+                          Nombre Completo del Evaluado *
+                        </label>
+                        <input
+                          type="text"
+                          value={studentName}
+                          onChange={e => setStudentName(e.target.value)}
+                          placeholder="Ej: García Morales, Elena"
+                          className="form-control"
                           style={{
-                            width: '24px',
-                            height: '24px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: selectedOption === idx ? 'var(--navy)' : 'var(--surface-alt)',
-                            color: selectedOption === idx ? '#fff' : 'var(--text-main)',
-                            fontSize: '0.75rem',
-                            fontWeight: 700
+                            width: '100%',
+                            padding: '8px 12px',
+                            fontSize: '0.86rem',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1.5px solid var(--border-color)'
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
+                          Correo Electrónico (UGR / Institucional)
+                        </label>
+                        <input
+                          type="email"
+                          value={studentEmail}
+                          onChange={e => setStudentEmail(e.target.value)}
+                          placeholder="Ej: elena_gm@correo.ugr.es"
+                          className="form-control"
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            fontSize: '0.86rem',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1.5px solid var(--border-color)'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
+                          DNI / Identificador de Matrícula
+                        </label>
+                        <input
+                          type="text"
+                          value={studentDni}
+                          onChange={e => setStudentDni(e.target.value)}
+                          placeholder="Ej: 77482910X"
+                          className="form-control"
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            fontSize: '0.86rem',
+                            borderRadius: 'var(--radius-md)',
+                            border: '1.5px solid var(--border-color)'
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                          Docente Supervisor
+                        </label>
+                        <div style={{
+                          padding: '8px 12px',
+                          fontSize: '0.84rem',
+                          background: 'var(--surface-alt)',
+                          borderRadius: 'var(--radius-md)',
+                          color: 'var(--text-main)',
+                          fontWeight: 600
+                        }}>
+                          {user?.name ? `${user.name} (Grupo E)` : 'Dr. Juan José Díaz-Mochón (Grupo E)'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Selector de Modelo de Examen Oficial */}
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
+                      Modelo de Examen Oficial (15 Preguntas Calibradas):
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? '1fr 1fr' : '1fr', gap: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedModel('modelo-a')}
+                        style={{
+                          padding: '12px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: selectedModel === 'modelo-a' ? '2px solid var(--navy)' : '1px solid var(--border-color)',
+                          background: selectedModel === 'modelo-a' ? 'var(--primary-bg)' : 'var(--surface)',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <strong style={{ fontSize: '0.86rem', color: 'var(--navy)' }}>
+                            Modelo A: Farmacología, MoA y Síntesis (15P)
+                          </strong>
+                          {selectedModel === 'modelo-a' && (
+                            <span className="qfdos-badge badge-navy" style={{ fontSize: '0.66rem' }}>Activo</span>
+                          )}
+                        </div>
+                        <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                          Fundamentos colinérgicos, receptores M/N, SAR de agonistas, inhibidores de AChE, reactivadores y síntesis directa.
+                        </p>
+                      </button>
+
+                      {topic.id === 'tema-01' && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedModel('retrosintesis')}
+                          style={{
+                            padding: '12px 14px',
+                            borderRadius: 'var(--radius-md)',
+                            border: selectedModel === 'retrosintesis' ? '2px solid var(--teal)' : '1px solid var(--border-color)',
+                            background: selectedModel === 'retrosintesis' ? 'var(--secondary-bg)' : 'var(--surface)',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease'
                           }}
                         >
-                          {String.fromCharCode(65 + idx)}
-                        </span>
-                        <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.4 }}>
-                          {optText}
-                        </span>
-                      </div>
-
-                      {optSmiles && (
-                        <Chem2DDrawer smiles={optSmiles} width={120} height={60} />
-                      )}
-
-                      {showExplanation && idx === currentQ.correctIndex && (
-                        <CheckCircle2 size={18} color="#10b981" style={{ flexShrink: 0 }} />
-                      )}
-                      {showExplanation && selectedOption === idx && idx !== currentQ.correctIndex && (
-                        <AlertCircle size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <strong style={{ fontSize: '0.86rem', color: 'var(--teal)' }}>
+                              Modelo Retrosíntesis: Desconexiones y Sintones (15P)
+                            </strong>
+                            {selectedModel === 'retrosintesis' && (
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem' }}>Activo</span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                            Teoría de desconexiones (Slides 28-35), polaridad de sintones, reactivo de Ivanov, furfural a piperidolato y aminopropanoles.
+                          </p>
+                        </button>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Explanation Card */}
-              {showExplanation && (
-                <div 
-                  className="qfdos-card" 
-                  style={{
-                    background: selectedOption === currentQ.correctIndex ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-                    borderColor: selectedOption === currentQ.correctIndex ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)',
-                    padding: '1rem',
-                    marginBottom: '1rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <BookOpen size={16} color={selectedOption === currentQ.correctIndex ? '#059669' : '#dc2626'} />
-                    <strong style={{ fontSize: '0.88rem', color: selectedOption === currentQ.correctIndex ? '#047857' : '#b91c1c' }}>
-                      {selectedOption === currentQ.correctIndex ? '¡Respuesta Correcta!' : 'Explicación Pedagógica:'}
-                    </strong>
                   </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
-                    {currentQ.explanation}
+
+                  {/* Banner de resumen del examen */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--surface-alt)',
+                    border: '1px solid var(--border-color)',
+                    marginBottom: '1.5rem'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy)' }}>
+                        {questions.length}
+                      </span>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
+                        <strong>{selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}</strong>{' '}
+                        {selectedModel === 'retrosintesis'
+                          ? '15 preguntas de desconexiones C-C, polaridad de sintones, reactivo de Ivanov, piperidolato y trihexifenidilo.'
+                          : '15 preguntas de fundamentos, agonistas, inhibidores de AChE, antagonistas y síntesis directa.'}
+                      </div>
+                    </div>
+                    <span className="qfdos-badge badge-teal" style={{ fontSize: '0.72rem' }}>
+                      Cero LaTeX Crudo · RDKit 2D
+                    </span>
+                  </div>
+
+                  {/* Botón de Iniciar */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                    <button onClick={onClose} className="btn btn-outline">
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!studentName.trim()) {
+                          alert('Por favor, indica el nombre del evaluado antes de comenzar.');
+                          return;
+                        }
+                        setIsStarted(true);
+                        handleRestart();
+                      }}
+                      className="btn btn-primary"
+                      style={{ padding: '10px 24px', fontSize: '0.92rem', fontWeight: 700 }}
+                    >
+                      Comenzar {selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              ) : !isCompleted ? (
+                /* QUIZ EN PROGRESO */
+                <div>
+                  {/* Respondent Info Bar & Progress Bar */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    marginBottom: '0.85rem',
+                    padding: '6px 12px',
+                    background: 'var(--surface-raised)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
+                      <User size={14} color="var(--navy)" />
+                      <span style={{ color: 'var(--text-muted)' }}>Evaluando a:</span>
+                      <strong style={{ color: 'var(--text-title)' }}>{studentName}</strong>
+                      {studentDni && studentDni !== '-' && (
+                        <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          ({studentDni})
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="qfdos-badge" style={{ 
+                        fontSize: '0.68rem', 
+                        background: selectedModel === 'retrosintesis' ? 'var(--teal)' : 'var(--navy)', 
+                        color: '#fff',
+                        fontWeight: 700 
+                      }}>
+                        {selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'}
+                      </span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)' }}>
+                        Pregunta {currentIndex + 1} de {questions.length}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Badges Bar */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {currentQ.badge && (
+                        <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#3b82f6', color: '#fff' }}>
+                          {currentQ.badge}
+                        </span>
+                      )}
+                      {currentQ.block && (
+                        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>
+                          {currentQ.block}
+                        </span>
+                      )}
+                      {currentQ.difficulty && (
+                        <span className="qfdos-badge badge-amber" style={{ fontSize: '0.68rem' }}>
+                          Nivel {currentQ.difficulty}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                      ID: {currentQ.id}
+                    </div>
+                  </div>
+
+                  {/* Question Text */}
+                  <div style={{ fontSize: '1.02rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.5, marginBottom: '1.25rem' }}>
+                    {currentIndex + 1}. {currentQ.question}
+                  </div>
+
+                  {/* Optional Image for Question */}
+                  {currentQ.imagePath && (
+                    <div 
+                      style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        marginBottom: '1rem', 
+                        background: '#ffffff', 
+                        padding: '10px 14px', 
+                        borderRadius: 'var(--radius-md)', 
+                        border: '1.5px solid var(--border-color)',
+                        cursor: 'zoom-in',
+                        position: 'relative',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                      }}
+                      onClick={() => {
+                        const src = currentQ.imagePath!.startsWith('http') 
+                          ? currentQ.imagePath! 
+                          : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath!.replace(/^\//, '')}`;
+                        setLightboxImage({
+                          src,
+                          title: `Pregunta ${currentIndex + 1}: ${currentQ.block || 'Examen'}`,
+                          subtitle: currentQ.question,
+                          tag: currentQ.badge || 'Figura de Examen'
+                        });
+                      }}
+                      title="Haz clic para ver la figura a pantalla completa"
+                    >
+                      <img 
+                        src={currentQ.imagePath.startsWith('http') ? currentQ.imagePath : `${import.meta.env.BASE_URL || '/'}${currentQ.imagePath.replace(/^\//, '')}`}
+                        alt="Figura de la pregunta" 
+                        style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain' }} 
+                      />
+                      <span style={{ marginTop: '6px', fontSize: '0.72rem', color: 'var(--teal-ink)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Maximize2 size={12} /> Clic para ampliar a pantalla completa
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Optional SMILES Structure for Question */}
+                  {currentQ.questionSmiles && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                      <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} />
+                    </div>
+                  )}
+
+                  {/* Options List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.25rem' }}>
+                    {currentQ.options.map((opt, idx) => {
+                      const optText = typeof opt === 'string' ? opt : opt.text;
+                      const optSmiles = typeof opt === 'string' ? undefined : opt.smiles;
+
+                      let optionBg = 'var(--surface)';
+                      let optionBorder = 'var(--border-color)';
+
+                      if (selectedOption === idx) {
+                        optionBg = 'var(--primary-bg)';
+                        optionBorder = 'var(--navy)';
+                      }
+
+                      if (showExplanation) {
+                        if (idx === currentQ.correctIndex) {
+                          optionBg = 'rgba(16, 185, 129, 0.12)';
+                          optionBorder = '#10b981';
+                        } else if (selectedOption === idx) {
+                          optionBg = 'rgba(239, 68, 68, 0.12)';
+                          optionBorder = '#ef4444';
+                        }
+                      }
+
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => handleSelectOption(idx)}
+                          style={{
+                            padding: '12px 16px',
+                            borderRadius: 'var(--radius-md)',
+                            border: `1.5px solid ${optionBorder}`,
+                            background: optionBg,
+                            cursor: showExplanation ? 'default' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '12px',
+                            transition: 'all var(--transition-fast)'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+                            <span 
+                              className="font-mono" 
+                              style={{
+                                width: '26px',
+                                height: '26px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: selectedOption === idx ? 'var(--navy)' : 'var(--surface-alt)',
+                                color: selectedOption === idx ? '#fff' : 'var(--text-main)',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                                flexShrink: 0
+                              }}
+                            >
+                              {String.fromCharCode(65 + idx)}
+                            </span>
+                            <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>
+                              {optText}
+                            </span>
+                          </div>
+
+                          {optSmiles && (
+                            <div style={{ flexShrink: 0, marginLeft: '10px' }}>
+                              <Chem2DDrawer smiles={optSmiles} width={130} height={65} bare={false} />
+                            </div>
+                          )}
+
+                          {showExplanation && idx === currentQ.correctIndex && (
+                            <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginLeft: '6px' }} />
+                          )}
+                          {showExplanation && selectedOption === idx && idx !== currentQ.correctIndex && (
+                            <AlertCircle size={20} color="#ef4444" style={{ flexShrink: 0, marginLeft: '6px' }} />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Explanation Card */}
+                  {showExplanation && (
+                    <div 
+                      className="qfdos-card" 
+                      style={{
+                        background: selectedOption === currentQ.correctIndex ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                        borderColor: selectedOption === currentQ.correctIndex ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)',
+                        padding: '1rem',
+                        marginBottom: '1rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                        <BookOpen size={16} color={selectedOption === currentQ.correctIndex ? '#059669' : '#dc2626'} />
+                        <strong style={{ fontSize: '0.88rem', color: selectedOption === currentQ.correctIndex ? '#047857' : '#b91c1c' }}>
+                          {selectedOption === currentQ.correctIndex ? '¡Respuesta Correcta!' : 'Explicación Pedagógica:'}
+                        </strong>
+                      </div>
+                      <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5, margin: 0 }}>
+                        {currentQ.explanation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* PANTALLA DE RESULTADOS */
+                <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--primary-bg)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                    <Award size={34} color="var(--navy-ink)" />
+                  </div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '4px' }}>
+                    ¡Autoevaluación Calibrada Finalizada!
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+                    La calificación y el desglose de respuestas se han registrado en el portal docente.
                   </p>
+
+                  {/* Ficha de Calificación */}
+                  {(() => {
+                    const stats = calculateFinalScore();
+                    const numScore = Number(stats.score);
+                    const isAprobado = numScore >= 5.0;
+                    return (
+                      <div className="qfdos-card" style={{ maxWidth: '420px', margin: '0 auto 1.25rem', padding: '1.25rem', textAlign: 'center' }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                          Calificación Oficial ({topic.title} · {selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'}):
+                        </div>
+                        <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal)' : 'var(--accent-red)', lineHeight: 1 }}>
+                          {stats.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>
+                        </div>
+                        <div style={{ marginTop: '8px', fontSize: '0.84rem', fontWeight: 700, color: isAprobado ? 'var(--secondary-dark)' : 'var(--accent-red)' }}>
+                          {isAprobado ? '✓ APROBADO' : '✗ NO SUPERADO'} · {stats.correct} aciertos de {stats.total} preguntas
+                        </div>
+
+                        <hr style={{ margin: '12px 0', borderColor: 'var(--border-color)' }} />
+
+                        {/* Metadatos del Evaluado */}
+                        <div style={{ fontSize: '0.78rem', textAlign: 'left', color: 'var(--text-main)', lineHeight: 1.6 }}>
+                          <div><strong>Evaluado:</strong> {studentName}</div>
+                          {studentDni && <div><strong>DNI / Matrícula:</strong> <span className="font-mono">{studentDni}</span></div>}
+                          <div><strong>Correo:</strong> {studentEmail}</div>
+                          <div><strong>Docente:</strong> {user?.name || 'Dr. Juan José Díaz-Mochón'}</div>
+                          <div><strong>Registro:</strong> <span className="font-mono" style={{ fontSize: '0.72rem' }}>qfdos_test_registration_records</span></div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Acciones tras el examen */}
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => {
+                        setActiveTab('records');
+                        loadStoredRecords();
+                      }}
+                      className="btn btn-primary"
+                    >
+                      <BarChart3 size={15} /> Ver Registro de Calificaciones
+                    </button>
+                    <button onClick={handleNewStudentEvaluation} className="btn btn-secondary">
+                      <UserPlus size={15} /> Evaluar a Otro Alumno
+                    </button>
+                    <button onClick={handleRestart} className="btn btn-outline">
+                      <RotateCcw size={15} /> Repetir Intento
+                    </button>
+                    <button onClick={onClose} className="btn btn-outline">
+                      Finalizar & Cerrar
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
-            /* Results Screen */
-            <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--primary-bg)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                <Award size={36} color="var(--navy-ink)" />
+            /* TAB 2: REGISTRO DE INTENTOS / CALIFICACIONES (DOCENTE) */
+            <div>
+              {/* Header de controles */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 2px 0' }}>
+                    Historial de Autoevaluaciones Registradas
+                  </h4>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
+                    Portal Docente · Consultas y exportación de calificaciones en tiempo real
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={handleExportCsv}
+                    className="btn btn-sm btn-primary"
+                    disabled={filteredRecords.length === 0}
+                    title="Exportar informe a CSV para Excel"
+                  >
+                    <Download size={14} /> Exportar CSV (Excel)
+                  </button>
+                  <button
+                    onClick={handleClearAllRecords}
+                    className="btn btn-sm btn-outline"
+                    disabled={records.length === 0}
+                    style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)' }}
+                    title="Borrar todo el historial de calificaciones"
+                  >
+                    <Trash2 size={14} /> Vaciar Historial
+                  </button>
+                </div>
               </div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '6px' }}>
-                ¡Autoevaluación Finalizada!
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                Resultado registrado en tu portafolio de evaluación continua
-              </p>
 
-              {(() => {
-                const stats = calculateFinalScore();
-                return (
-                  <div className="qfdos-card" style={{ maxWidth: '360px', margin: '0 auto 1.5rem', padding: '1.25rem' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Calificación Obtenida:</span>
-                    <div className="font-mono" style={{ fontSize: '2.5rem', fontWeight: 900, color: Number(stats.score) >= 5 ? 'var(--teal)' : 'var(--accent-red)' }}>
-                      {stats.score} <span style={{ fontSize: '1.2rem' }}>/ 10</span>
-                    </div>
-                    <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                      {stats.correct} aciertos de {stats.total} preguntas
-                    </span>
-                  </div>
-                );
-              })()}
-
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-                <button onClick={handleRestart} className="btn btn-outline">
-                  <RotateCcw size={15} /> Repetir Cuestionario
-                </button>
-                <button onClick={onClose} className="btn btn-primary">
-                  Finalizar & Volver
-                </button>
+              {/* Estadísticas Resumen */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', 
+                gap: '10px', 
+                marginBottom: '1.25rem' 
+              }}>
+                <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Total Evaluaciones</span>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy)' }}>
+                    {dashboardStats.total}
+                  </span>
+                </div>
+                <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Nota Media</span>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: Number(dashboardStats.avg) >= 5 ? 'var(--teal)' : 'var(--accent-red)' }}>
+                    {dashboardStats.avg} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ 10</span>
+                  </span>
+                </div>
+                <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Aprobados</span>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--teal)' }}>
+                    {dashboardStats.passCount} ({dashboardStats.passRate})
+                  </span>
+                </div>
+                <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Puntuación Máxima</span>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy)' }}>
+                    {dashboardStats.maxScore} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ 10</span>
+                  </span>
+                </div>
               </div>
+
+              {/* Barra de Filtros */}
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+                  <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input
+                    type="text"
+                    value={recordsSearchQuery}
+                    onChange={e => setRecordsSearchQuery(e.target.value)}
+                    placeholder="Buscar por alumno, DNI o correo..."
+                    className="form-control"
+                    style={{
+                      width: '100%',
+                      padding: '7px 12px 7px 32px',
+                      fontSize: '0.82rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1.5px solid var(--border-color)'
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setRecordsFilterTopic('current')}
+                    className={`btn btn-sm ${recordsFilterTopic === 'current' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ fontSize: '0.76rem' }}
+                  >
+                    Solo Tema 1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRecordsFilterTopic('all')}
+                    className={`btn btn-sm ${recordsFilterTopic === 'all' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ fontSize: '0.76rem' }}
+                  >
+                    Todos los Temas
+                  </button>
+                </div>
+              </div>
+
+              {/* Lista de Registros */}
+              {filteredRecords.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2.5rem 1rem', background: 'var(--surface-raised)', borderRadius: 'var(--radius-lg)' }}>
+                  <HelpCircle size={36} color="var(--text-muted)" style={{ margin: '0 auto 8px', display: 'block', opacity: 0.6 }} />
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: 700, marginBottom: '4px' }}>
+                    No hay registros de evaluación para mostrar
+                  </p>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                    {recordsSearchQuery ? 'Prueba con otro término de búsqueda.' : 'Inicia el test de 15 preguntas para registrar el primer intento.'}
+                  </p>
+                  <button onClick={() => setActiveTab('quiz')} className="btn btn-sm btn-primary">
+                    Realizar Test Ahora
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {filteredRecords.map(rec => {
+                    const isExpanded = expandedRecordId === rec.id;
+                    const isPass = rec.score >= 5.0;
+
+                    return (
+                      <div
+                        key={rec.id}
+                        className="qfdos-card"
+                        style={{
+                          padding: '12px 16px',
+                          border: isExpanded ? '1.5px solid var(--navy)' : '1px solid var(--border-color)',
+                          background: 'var(--surface)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {/* Fila Principal */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            {/* Nota Badge */}
+                            <div 
+                              className="font-mono" 
+                              style={{
+                                width: '52px',
+                                height: '52px',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: isPass ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                                border: `1.5px solid ${isPass ? '#10b981' : '#ef4444'}`,
+                                color: isPass ? '#047857' : '#b91c1c',
+                                flexShrink: 0
+                              }}
+                            >
+                              <span style={{ fontSize: '1.15rem', fontWeight: 900, lineHeight: 1 }}>
+                                {rec.score.toFixed(1)}
+                              </span>
+                              <span style={{ fontSize: '0.62rem', fontWeight: 700 }}>/ 10</span>
+                            </div>
+
+                            {/* Datos del Alumno */}
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                                <strong style={{ fontSize: '0.92rem', color: 'var(--text-title)' }}>
+                                  {rec.studentName}
+                                </strong>
+                                <span className={`qfdos-badge ${rec.evaluationMode === 'docente_sesion' ? 'badge-amber' : 'badge-teal'}`} style={{ fontSize: '0.65rem' }}>
+                                  {rec.evaluationMode === 'docente_sesion' ? 'Sesión Docente' : 'Alumno'}
+                                </span>
+                                {rec.modelName && (
+                                  <span className="qfdos-badge" style={{ 
+                                    fontSize: '0.64rem',
+                                    background: rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : 'rgba(30, 58, 138, 0.12)',
+                                    color: rec.modelName.includes('Retrosíntesis') ? '#0d9488' : '#1e3a8a',
+                                    border: `1px solid ${rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : '#3b82f6'}`
+                                  }}>
+                                    {rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                {rec.studentDni && rec.studentDni !== '-' && (
+                                  <span>DNI: <strong className="font-mono">{rec.studentDni}</strong></span>
+                                )}
+                                <span>{rec.studentEmail}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  <Clock size={12} /> {rec.timestamp}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Métricas y Botones de Acción */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ textAlign: 'right', marginRight: '6px' }}>
+                              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy)' }}>
+                                {rec.correctCount} / {rec.totalQuestions} aciertos
+                              </div>
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                {((rec.correctCount / rec.totalQuestions) * 100).toFixed(0)}% de acierto
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => setExpandedRecordId(isExpanded ? null : rec.id)}
+                              className="btn btn-sm btn-outline"
+                              style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem' }}
+                              title="Ver desglose de respuestas pregunta a pregunta"
+                            >
+                              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                              {isExpanded ? 'Ocultar' : 'Ver Detalle'}
+                            </button>
+
+                            <button
+                              onClick={e => handleDeleteRecord(rec.id, e)}
+                              className="btn btn-sm btn-outline"
+                              style={{ color: 'var(--text-muted)', padding: '6px 8px' }}
+                              title="Eliminar este intento"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Desglose de Preguntas (Accordion) */}
+                        {isExpanded && (
+                          <div style={{ 
+                            marginTop: '12px', 
+                            paddingTop: '12px', 
+                            borderTop: '1px dashed var(--border-color)' 
+                          }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <BookOpen size={14} /> Desglose de las 15 Preguntas del Examen:
+                            </div>
+
+                            {rec.answersDetail && rec.answersDetail.length > 0 ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {rec.answersDetail.map((item, qIdx) => (
+                                  <div
+                                    key={qIdx}
+                                    style={{
+                                      padding: '8px 12px',
+                                      borderRadius: 'var(--radius-sm)',
+                                      background: item.isCorrect ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)',
+                                      borderLeft: `4px solid ${item.isCorrect ? '#10b981' : '#ef4444'}`,
+                                      fontSize: '0.78rem'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
+                                      <strong style={{ color: 'var(--text-title)' }}>
+                                        P{item.questionNumber}. {item.questionText}
+                                      </strong>
+                                      <span style={{ 
+                                        fontWeight: 800, 
+                                        color: item.isCorrect ? '#047857' : '#b91c1c', 
+                                        flexShrink: 0,
+                                        marginLeft: '8px'
+                                      }}>
+                                        {item.isCorrect ? '✓ Correcta' : '✗ Incorrecta'}
+                                      </span>
+                                    </div>
+                                    <div style={{ color: 'var(--text-main)', marginBottom: '2px' }}>
+                                      <strong>Respuesta del Alumno:</strong> {item.selectedOptionText}
+                                    </div>
+                                    {!item.isCorrect && (
+                                      <div style={{ color: '#047857', marginBottom: '2px' }}>
+                                        <strong>Respuesta Correcta Oficial:</strong> {item.correctOptionText}
+                                      </div>
+                                    )}
+                                    <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginTop: '4px', fontStyle: 'italic' }}>
+                                      {item.explanation}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
+                                Este intento previo no contiene el registro detallado pregunta por pregunta. Los nuevos intentos incorporarán el desglose íntegro.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        {!isCompleted && (
-          <div className="modal-footer">
-            {!showExplanation ? (
+        {/* Footer (solo activo durante la realización de preguntas) */}
+        {activeTab === 'quiz' && isStarted && !isCompleted && (
+          <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', padding: '10px 16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
               <button
-                onClick={handleCheckAnswer}
-                disabled={selectedOption === null}
-                className="btn btn-primary"
+                onClick={() => {
+                  if (window.confirm('¿Deseas interrumpir el cuestionario en curso y volver a la configuración?')) {
+                    setIsStarted(false);
+                    handleRestart();
+                  }
+                }}
+                className="btn btn-sm btn-outline"
               >
-                Comprobar Respuesta
+                Salir del Examen
               </button>
-            ) : (
-              <button
-                onClick={handleNextQuestion}
-                className="btn btn-secondary"
-              >
-                {currentIndex < questions.length - 1 ? 'Siguiente Pregunta' : 'Ver Resultados'} <ArrowRight size={14} />
-              </button>
-            )}
+              <div>
+                {!showExplanation ? (
+                  <button
+                    onClick={handleCheckAnswer}
+                    disabled={selectedOption === null}
+                    className="btn btn-primary"
+                  >
+                    Comprobar Respuesta
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNextQuestion}
+                    className="btn btn-secondary"
+                  >
+                    {currentIndex < questions.length - 1 ? 'Siguiente Pregunta' : 'Ver Calificación Final'} <ArrowRight size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
