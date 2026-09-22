@@ -648,75 +648,45 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
-                      {/* 5. Cuestionario Test con Moléculas (Activo solo en Modo Docente) */}
+                      {/* 5. Cuestionario Test Oficial (Activo con Modelo B y Registro en Google Sheets) */}
                       {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
-                        isProfesor ? (
-                          <div className="qfdos-card card-amber resource-card is-active">
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <div style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '8px',
-                                    background: 'rgba(245, 158, 11, 0.14)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0
-                                  }}>
-                                    <HelpCircle size={17} color="var(--accent-amber)" />
-                                  </div>
-                                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
+                        <div className="qfdos-card card-amber resource-card is-active">
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(245, 158, 11, 0.14)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <HelpCircle size={17} color="var(--accent-amber)" />
                                 </div>
-                                <span className="qfdos-badge badge-amber" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
-                                  Modo Docente
-                                </span>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
                               </div>
-                              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                                {topic.testQuestions.length} preguntas con estructuras químicas y corrección razonada (Borrador docente activo).
-                              </p>
+                              <span className={`qfdos-badge ${isProfesor ? 'badge-amber' : 'badge-teal'}`} style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                {isProfesor ? 'Modo Docente' : 'Modelo B Oficial (15P)'}
+                              </span>
                             </div>
-                            <button 
-                              onClick={() => onOpenQuiz(topic)}
-                              className="btn btn-sm btn-primary" 
-                              style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
-                            >
-                              <HelpCircle size={13} /> Realizar Test (Portal Docente)
-                            </button>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              {isProfesor
+                                ? `${topic.testQuestions.length} preguntas oficiales (Modelo B por defecto). Calificaciones volcadas en Google Sheets.`
+                                : `${topic.testQuestions.length} preguntas oficiales calibradas (Modelo B). Tus intentos se registran en Google Sheets.`
+                              }
+                            </p>
                           </div>
-                        ) : (
-                          <div className="qfdos-card card-amber resource-card is-inactive">
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <div style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '8px',
-                                    background: 'var(--surface-alt)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0
-                                  }}>
-                                    <HelpCircle size={17} color="var(--text-muted)" />
-                                  </div>
-                                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>5. Test de Autoevaluación</strong>
-                                </div>
-                                <span className="qfdos-badge badge-neutral" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
-                                  En Revisión Docente
-                                </span>
-                              </div>
-                              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                                Cuestionario en fase de validación por el profesorado. Estará disponible próximamente para el alumnado.
-                              </p>
-                            </div>
-                            <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
-                              🔒 Próximamente disponible
-                            </span>
-                          </div>
-                        )
+                          <button 
+                            onClick={() => onOpenQuiz(topic)}
+                            className="btn btn-sm btn-primary" 
+                            style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
+                          >
+                            <HelpCircle size={13} /> {isProfesor ? 'Portal Docente / Realizar Test' : 'Realizar Autoevaluación (15 Preguntas)'}
+                          </button>
+                        </div>
                       )}
 
                       {/* 6. Flashcards Interactivas */}

@@ -6,9 +6,17 @@ import {
   QuizAnswerDetail, 
   QuizRegistrationRecord,
   RETROSINTESIS_TEST_QUESTIONS,
+  MODELO_A_TEST_QUESTIONS,
   MODELO_B_TEST_QUESTIONS,
   MODELO_C_TEST_QUESTIONS
 } from '../data/qfdosData';
+import {
+  submitAttemptToGoogleSheets,
+  getGoogleSheetsUrl,
+  setGoogleSheetsUrl,
+  GOOGLE_APPS_SCRIPT_TEMPLATE,
+  GoogleSheetsSubmissionResult
+} from '../services/googleSheetsService';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
@@ -33,7 +41,14 @@ import {
   GraduationCap,
   BarChart3,
   UserPlus,
-  Printer
+  Printer,
+  Settings,
+  Copy,
+  Check,
+  ExternalLink,
+  Sheet,
+  Send,
+  History
 } from 'lucide-react';
 
 const REGISTRATION_STORAGE_KEY = 'qfdos_test_registration_records';
@@ -55,15 +70,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const { user, isProfesor } = useAuth();
 
   // Model Selection State
-  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-a');
+  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-b');
 
-  // Compute active question bank dynamically
+  // Compute active question bank dynamically (Default is Modelo B)
   const questions: TestQuestion[] = useMemo(() => {
     if (topic.id === 'tema-01') {
-      if (selectedModel === 'modelo-b') return MODELO_B_TEST_QUESTIONS;
+      if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
       if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
       if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
-      return topic.testQuestions || [];
+      return MODELO_B_TEST_QUESTIONS;
     }
     return topic.testQuestions || [];
   }, [topic, selectedModel]);
@@ -72,9 +87,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [activeTab, setActiveTab] = useState<'quiz' | 'records'>('quiz');
 
   // Registration State
-  const [evaluationMode, setEvaluationMode] = useState<'docente_sesion' | 'alumno_evaluado'>('docente_sesion');
-  const [studentName, setStudentName] = useState<string>(user?.name || 'Prof. Juan José Díaz-Mochón');
-  const [studentEmail, setStudentEmail] = useState<string>(user?.email || 'jjdiaz@ugr.es');
+  const [evaluationMode, setEvaluationMode] = useState<'docente_sesion' | 'alumno_evaluado'>(
+    isProfesor ? 'docente_sesion' : 'alumno_evaluado'
+  );
+  const [studentName, setStudentName] = useState<string>(
+    user?.name ? user.name : (isProfesor ? 'Prof. Juan José Díaz-Mochón' : '')
+  );
+  const [studentEmail, setStudentEmail] = useState<string>(
+    user?.email ? user.email : (isProfesor ? 'jjdiaz@ugr.es' : '')
+  );
   const [studentDni, setStudentDni] = useState<string>('');
   const [isStarted, setIsStarted] = useState<boolean>(false);
 
@@ -87,6 +108,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
 
   // Records / Grading Dashboard State
+  // Google Sheets Integration State
+  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'no_url' | 'network_error'>('idle');
+  const [showSheetsConfig, setShowSheetsConfig] = useState<boolean>(false);
+  const [sheetsUrlInput, setSheetsUrlInput] = useState<string>(getGoogleSheetsUrl());
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
+  const [urlSaveSuccess, setUrlSaveSuccess] = useState<boolean>(false);
+
   const [records, setRecords] = useState<QuizRegistrationRecord[]>([]);
   const [recordsFilterTopic, setRecordsFilterTopic] = useState<'current' | 'all'>('current');
   const [recordsSearchQuery, setRecordsSearchQuery] = useState<string>('');
@@ -116,36 +144,19 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     loadStoredRecords();
   }, []);
 
-  // Set default respondent based on user when in teacher mode
+  // Set default respondent based on role and mode
   useEffect(() => {
-    if (evaluationMode === 'docente_sesion') {
+    if (isProfesor && evaluationMode === 'docente_sesion') {
       setStudentName(user?.name || 'Prof. Juan José Díaz-Mochón');
       setStudentEmail(user?.email || 'jjdiaz@ugr.es');
       setStudentDni('DOCENTE-UGR');
+    } else if (!isProfesor && user) {
+      setStudentName(user.name || '');
+      setStudentEmail(user.email || '');
     }
-  }, [evaluationMode, user]);
+  }, [evaluationMode, user, isProfesor]);
 
-  // Mandatory teacher guard
-  if (!isProfesor) {
-    return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-container" style={{ maxWidth: '500px' }} onClick={e => e.stopPropagation()}>
-          <div className="modal-header">
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 800 }}>Cuestionario en Revisión Docente</h3>
-            <button onClick={onClose} className="btn btn-sm btn-outline"><X size={18} /></button>
-          </div>
-          <div className="modal-body" style={{ textAlign: 'center', padding: '2rem' }}>
-            <p style={{ color: 'var(--text-main)', lineHeight: 1.5, fontSize: '0.9rem' }}>
-              Este cuestionario oficial con estructuras químicas se encuentra en fase de validación por el profesorado y estará disponible próximamente para el alumnado.
-            </p>
-          </div>
-          <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px' }}>
-            <button onClick={onClose} className="btn btn-sm btn-primary">Entendido</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+// Guard removed: Open for both students and teacher
 
   if (questions.length === 0) {
     return (
@@ -273,6 +284,17 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         onAttemptCompleted(finalAttempt);
       }
 
+      // Enviar de forma asíncrona a Google Sheets
+      setSheetSubmitStatus('sending');
+      submitAttemptToGoogleSheets(finalAttempt)
+        .then((res: GoogleSheetsSubmissionResult) => {
+          setSheetSubmitStatus(res.status);
+        })
+        .catch((err: any) => {
+          console.error('Error enviando a Google Sheets:', err);
+          setSheetSubmitStatus('network_error');
+        });
+
       setIsCompleted(true);
     }
   };
@@ -283,6 +305,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     setShowExplanation(false);
     setAnswers({});
     setIsCompleted(false);
+    setSheetSubmitStatus('idle');
   };
 
   const handleNewStudentEvaluation = () => {
@@ -293,6 +316,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     setStudentDni('');
     setIsStarted(false);
     setActiveTab('quiz');
+  };
+
+    const handleCopyAppsScriptCode = () => {
+    navigator.clipboard.writeText(GOOGLE_APPS_SCRIPT_TEMPLATE);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 3000);
+  };
+
+  const handleSaveSheetsUrl = () => {
+    setGoogleSheetsUrl(sheetsUrlInput);
+    setUrlSaveSuccess(true);
+    setTimeout(() => setUrlSaveSuccess(false), 3000);
   };
 
   const calculateFinalScore = () => {
@@ -442,12 +477,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                 <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
                   Autoevaluación: {topic.number} · {topic.title}
                 </h3>
-                <span className="qfdos-badge" style={{ fontSize: '0.66rem', background: '#3b82f6', color: '#fff' }}>
-                  Modelo A Oficial
+                <span className="qfdos-badge" style={{ 
+                  fontSize: '0.66rem', 
+                  background: selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#3b82f6', 
+                  color: '#fff' 
+                }}>
+                  {selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
                 </span>
               </div>
               <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
-                15 Preguntas Calibradas JEV System-1 · Módulo Exclusivo Docente
+                15 Preguntas Calibradas JEV System-1 · Evaluación Continua QFDOS {isProfesor ? '(Modo Profesor)' : '(Portal Alumnado)'}
               </p>
             </div>
           </div>
@@ -481,7 +520,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               gap: '6px'
             }}
           >
-            <HelpCircle size={15} /> Test Interactivo (15 Preguntas)
+            <HelpCircle size={15} /> {isProfesor ? 'Test Interactivo (15 Preguntas)' : 'Cuestionario Oficial (15P)'}
           </button>
           <button
             onClick={() => {
@@ -505,7 +544,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               gap: '6px'
             }}
           >
-            <BarChart3 size={15} /> Registro de Intentos / Calificaciones
+            {isProfesor ? <BarChart3 size={15} /> : <History size={15} />}
+            {isProfesor ? 'Registro de Calificaciones' : 'Mis Intentos'}
             <span style={{ 
               fontSize: '0.68rem', 
               padding: '1px 6px', 
@@ -514,7 +554,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               color: activeTab === 'records' ? '#fff' : 'var(--text-main)',
               fontWeight: 700 
             }}>
-              {records.filter(r => r.topicId === topic.id).length}
+              {isProfesor ? records.filter(r => r.topicId === topic.id).length : records.length}
             </span>
           </button>
         </div>
@@ -537,15 +577,19 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                       <UserCheck size={20} color="var(--navy)" />
                       <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
-                        Registro de Identificación para la Evaluación
+                        {isProfesor ? 'Registro de Identificación para la Evaluación' : 'Identificación Oficial del Alumno · Evaluación Continua'}
                       </h4>
                     </div>
                     <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
-                      Como docente acreditado, puedes realizar una prueba de validación con tu sesión o registrar la evaluación continua presencial de un alumno específico. La calificación quedará guardada de forma persistente.
+                      {isProfesor 
+                        ? 'Como docente acreditado, puedes realizar una prueba de validación con tu sesión o registrar la evaluación continua de un alumno. Las calificaciones se sincronizan con Google Sheets.'
+                        : 'Introduce tus datos oficiales de la UGR para que tu calificación y respuestas queden debidamente registradas en la hoja oficial de Google Sheets del profesorado y en tu historial personal.'
+                      }
                     </p>
                   </div>
 
-                  {/* Selector de modo */}
+                  {/* Selector de modo (Solo visible para Docente) */}
+                  {isProfesor && (
                   <div style={{ marginBottom: '1.25rem' }}>
                     <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
                       Modalidad de Evaluación:
@@ -616,6 +660,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </button>
                     </div>
                   </div>
+                  )}
 
                   {/* Formulario de datos */}
                   <div className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: 'var(--surface)' }}>
@@ -700,9 +745,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                   {/* Selector de Modelo de Examen Oficial */}
                   <div style={{ marginBottom: '1.25rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
-                      Modelo de Examen Oficial (15 Preguntas Calibradas):
-                    </label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', margin: 0 }}>
+                        {isProfesor ? 'Modelo de Examen Oficial (15 Preguntas Calibradas):' : 'Modelo de Examen Asignado:'}
+                      </label>
+                      {!isProfesor && (
+                        <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#8b5cf6', color: '#fff' }}>
+                          Modelo B (Predeterminado)
+                        </span>
+                      )}
+                    </div>
                     <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr', gap: '10px' }}>
                       {/* Modelo A */}
                       <button
@@ -836,10 +888,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         {questions.length}
                       </span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
-                        <strong>{selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}</strong>{' '}
-                        {selectedModel === 'retrosintesis'
+                        <strong>
+                          {selectedModel === 'modelo-b' ? 'Modelo B Oficial:' : selectedModel === 'modelo-c' ? 'Modelo C Oficial:' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}
+                        </strong>{' '}
+                        {selectedModel === 'modelo-b'
+                          ? '15 preguntas de diferenciación ionotrópica/metabotrópica, cinética de carbamoilación, envejecimiento de AChE y síntesis de derivados.'
+                          : selectedModel === 'modelo-c'
+                          ? '15 preguntas de tríada catalítica de AChE, estereoquímica de muscarina, selectividad y síntesis de neostigmina.'
+                          : selectedModel === 'retrosintesis'
                           ? '15 preguntas de desconexiones C-C, polaridad de sintones, reactivo de Ivanov, piperidolato y trihexifenidilo.'
-                          : '15 preguntas de fundamentos, agonistas, inhibidores de AChE, antagonistas y síntesis directa.'}
+                          : '15 preguntas de fundamentos colinérgicos, agonistas, inhibidores de AChE, reactivadores y síntesis directa.'}
                       </div>
                     </div>
                     <span className="qfdos-badge badge-teal" style={{ fontSize: '0.72rem' }}>
@@ -855,7 +913,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <button
                       onClick={() => {
                         if (!studentName.trim()) {
-                          alert('Por favor, indica el nombre del evaluado antes de comenzar.');
+                          alert('Por favor, indica tu nombre o el del evaluado antes de comenzar.');
                           return;
                         }
                         setIsStarted(true);
@@ -864,7 +922,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       className="btn btn-primary"
                       style={{ padding: '10px 24px', fontSize: '0.92rem', fontWeight: 700 }}
                     >
-                      Comenzar {selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} />
+                      Comenzar {selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -895,11 +953,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
-                        background: selectedModel === 'retrosintesis' ? 'var(--teal)' : 'var(--navy)', 
+                        background: selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'retrosintesis' ? 'var(--teal)' : 'var(--navy)', 
                         color: '#fff',
                         fontWeight: 700 
                       }}>
-                        {selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'}
+                        {selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'}
                       </span>
                       <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)' }}>
                         Pregunta {currentIndex + 1} de {questions.length}
@@ -1049,11 +1107,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             </span>
                           </div>
 
-                          {optSmiles && (
-                            <div style={{ flexShrink: 0, marginLeft: '10px' }}>
-                              <Chem2DDrawer smiles={optSmiles} width={130} height={65} bare={false} />
-                            </div>
-                          )}
+{/* Opciones en texto limpio conforme a instrucción docente */}
 
                           {showExplanation && idx === currentQ.correctIndex && (
                             <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginLeft: '6px' }} />
@@ -1110,7 +1164,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     return (
                       <div className="qfdos-card" style={{ maxWidth: '420px', margin: '0 auto 1.25rem', padding: '1.25rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
-                          Calificación Oficial ({topic.title} · {selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'}):
+                          Calificación Oficial ({topic.title} · {selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'}):
                         </div>
                         <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal)' : 'var(--accent-red)', lineHeight: 1 }}>
                           {stats.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>
@@ -1126,8 +1180,32 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           <div><strong>Evaluado:</strong> {studentName}</div>
                           {studentDni && <div><strong>DNI / Matrícula:</strong> <span className="font-mono">{studentDni}</span></div>}
                           <div><strong>Correo:</strong> {studentEmail}</div>
-                          <div><strong>Docente:</strong> {user?.name || 'Dr. Juan José Díaz-Mochón'}</div>
-                          <div><strong>Registro:</strong> <span className="font-mono" style={{ fontSize: '0.72rem' }}>qfdos_test_registration_records</span></div>
+                          <div><strong>Docente Responsable:</strong> Dr. Juan José Díaz-Mochón</div>
+                          <div><strong>Almacenamiento Local:</strong> <span className="font-mono" style={{ fontSize: '0.72rem' }}>qfdos_test_registration_records</span></div>
+                        </div>
+
+                        {/* Estado de Sincronización Google Sheets */}
+                        <div style={{ marginTop: '12px' }}>
+                          {sheetSubmitStatus === 'sending' && (
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', color: '#1d4ed8', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <Clock size={15} /> Sincronizando con la hoja oficial de Google Sheets del docente...
+                            </div>
+                          )}
+                          {sheetSubmitStatus === 'sent' && (
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid #10b981', color: '#065f46', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <CheckCircle2 size={16} color="#10b981" /> <span><strong>Sincronizado:</strong> Respuestas y nota volcadas en Google Sheets.</span>
+                            </div>
+                          )}
+                          {sheetSubmitStatus === 'no_url' && (
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid #f59e0b', color: '#92400e', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <AlertCircle size={15} color="#f59e0b" /> <span>Intento guardado localmente en tu historial.</span>
+                            </div>
+                          )}
+                          {sheetSubmitStatus === 'network_error' && (
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', color: '#991b1b', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <AlertCircle size={15} color="#ef4444" /> <span>Guardado localmente (sin conexión con Google Sheets).</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -1164,32 +1242,115 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 2px 0' }}>
-                    Historial de Autoevaluaciones Registradas
+                    {isProfesor ? 'Historial de Autoevaluaciones Registradas' : 'Mis Evaluaciones Realizadas'}
                   </h4>
                   <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
-                    Portal Docente · Consultas y exportación de calificaciones en tiempo real
+                    {isProfesor 
+                      ? 'Portal Docente · Consultas, sincronización en Google Sheets y exportación oficial'
+                      : 'Registro personal guardado en este dispositivo para seguimiento de tu aprendizaje'
+                    }
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={handleExportCsv}
-                    className="btn btn-sm btn-primary"
-                    disabled={filteredRecords.length === 0}
-                    title="Exportar informe a CSV para Excel"
-                  >
-                    <Download size={14} /> Exportar CSV (Excel)
-                  </button>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {isProfesor && (
+                    <button
+                      onClick={() => setShowSheetsConfig(!showSheetsConfig)}
+                      className="btn btn-sm btn-secondary"
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem' }}
+                      title="Configurar webhook de Google Sheets para recepción de notas"
+                    >
+                      <Sheet size={14} /> {showSheetsConfig ? 'Ocultar Google Sheets' : 'Configurar Google Sheets'}
+                    </button>
+                  )}
+                  {isProfesor && (
+                    <button
+                      onClick={handleExportCsv}
+                      className="btn btn-sm btn-primary"
+                      disabled={filteredRecords.length === 0}
+                      title="Exportar informe a CSV para Excel"
+                    >
+                      <Download size={14} /> Exportar CSV
+                    </button>
+                  )}
                   <button
                     onClick={handleClearAllRecords}
                     className="btn btn-sm btn-outline"
                     disabled={records.length === 0}
-                    style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)' }}
-                    title="Borrar todo el historial de calificaciones"
+                    style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)', fontSize: '0.76rem' }}
+                    title={isProfesor ? "Borrar todo el historial docente" : "Vaciar mi historial en este equipo"}
                   >
-                    <Trash2 size={14} /> Vaciar Historial
+                    <Trash2 size={14} /> Vaciar
                   </button>
                 </div>
               </div>
+
+              {/* Panel de Configuración de Google Sheets (Solo Docente) */}
+              {isProfesor && showSheetsConfig && (
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(30, 58, 138, 0.05) 100%)',
+                  border: '1.5px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '1.25rem',
+                  marginBottom: '1.25rem'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sheet size={18} color="#059669" />
+                      <h5 style={{ fontSize: '0.92rem', fontWeight: 800, color: '#065f46', margin: 0 }}>
+                        Vincular con Google Sheets (Evaluación Continua Docente)
+                      </h5>
+                    </div>
+                    <button
+                      onClick={handleCopyAppsScriptCode}
+                      className="btn btn-sm btn-outline"
+                      style={{ fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    >
+                      {copiedCode ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
+                      {copiedCode ? '¡Código Copiado!' : 'Copiar Google Apps Script'}
+                    </button>
+                  </div>
+
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', lineHeight: 1.45, marginBottom: '12px' }}>
+                    Cada vez que un estudiante o tú completéis un examen, las respuestas y la calificación se insertarán automáticamente como una fila en tu hoja de Google Sheets.
+                  </p>
+
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                    <input
+                      type="url"
+                      value={sheetsUrlInput}
+                      onChange={e => setSheetsUrlInput(e.target.value)}
+                      placeholder="https://script.google.com/macros/s/.../exec"
+                      className="form-control"
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        fontSize: '0.8rem',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1.5px solid var(--border-color)',
+                        fontFamily: 'var(--font-mono)'
+                      }}
+                    />
+                    <button
+                      onClick={handleSaveSheetsUrl}
+                      className="btn btn-sm btn-primary"
+                      style={{ whiteSpace: 'nowrap', fontSize: '0.78rem', fontWeight: 700 }}
+                    >
+                      {urlSaveSuccess ? '¡Guardada ✓!' : 'Guardar URL'}
+                    </button>
+                  </div>
+
+                  <div style={{ background: 'var(--surface)', padding: '10px 12px', borderRadius: 'var(--radius-md)', fontSize: '0.74rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    <strong>Instrucciones rápidas para el profesor:</strong>
+                    <ol style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                      <li>Crea una Google Sheet en tu Google Drive (ej: <em>Evaluación QFDOS 2627</em>).</li>
+                      <li>Haz clic en <strong>Extensiones &gt; Apps Script</strong>.</li>
+                      <li>Borra el código existente, pulsa el botón <strong>Copiar Google Apps Script</strong> de arriba y pégalo. Pulsa Guardar (Ctrl+S).</li>
+                      <li>Haz clic en <strong>Implementar &gt; Nueva implementación</strong> &gt; Tipo: <strong>Aplicación web</strong> &gt; Ejecutar como: <strong>Yo</strong> &gt; Quién tiene acceso: <strong>Cualquier persona</strong>.</li>
+                      <li>Copia la URL resultante que termina en <code>/exec</code> y pégala en el campo de arriba.</li>
+                    </ol>
+                  </div>
+                </div>
+              )}
 
               {/* Estadísticas Resumen */}
               <div style={{ 
@@ -1332,11 +1493,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 {rec.modelName && (
                                   <span className="qfdos-badge" style={{ 
                                     fontSize: '0.64rem',
-                                    background: rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : 'rgba(30, 58, 138, 0.12)',
-                                    color: rec.modelName.includes('Retrosíntesis') ? '#0d9488' : '#1e3a8a',
-                                    border: `1px solid ${rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : '#3b82f6'}`
+                                    background: rec.modelName.includes('Modelo B') ? '#f5f3ff' : rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : rec.modelName.includes('Modelo C') ? '#fff7ed' : 'rgba(30, 58, 138, 0.12)',
+                                    color: rec.modelName.includes('Modelo B') ? '#7c3aed' : rec.modelName.includes('Retrosíntesis') ? '#0d9488' : rec.modelName.includes('Modelo C') ? '#c2410c' : '#1e3a8a',
+                                    border: `1px solid ${rec.modelName.includes('Modelo B') ? '#8b5cf6' : rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : rec.modelName.includes('Modelo C') ? '#ea580c' : '#3b82f6'}`
                                   }}>
-                                    {rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
+                                    {rec.modelName.includes('Modelo B') ? 'Modelo B' : rec.modelName.includes('Modelo C') ? 'Modelo C' : rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
                                   </span>
                                 )}
                               </div>
