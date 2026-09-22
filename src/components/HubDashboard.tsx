@@ -21,6 +21,7 @@ interface HubDashboardProps {
   onOpenExamGenerator: () => void;
   onOpenAdminCms: () => void;
   onOpenFirSimulator?: () => void;
+  onOpenTema1Exam?: () => void;
 }
 
 export const HubDashboard: React.FC<HubDashboardProps> = ({
@@ -34,7 +35,8 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
   onNavigateToPracticas,
   onOpenExamGenerator,
   onOpenAdminCms,
-  onOpenFirSimulator
+  onOpenFirSimulator,
+  onOpenTema1Exam
 }) => {
   const { isProfesor } = useAuth();
 
@@ -92,6 +94,64 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
               <Award size={14} /> Generar examen
             </button>
           </div>
+        </div>
+      )}
+
+      {/*
+        Examen del Tema 1.
+
+        Va en cabecera y no dentro del temario a proposito: el alumnado entra al
+        hub y tiene que ver el examen abierto sin buscarlo por los modulos.
+      */}
+      {onOpenTema1Exam && (
+        <div
+          style={{
+            marginBottom: '1.75rem',
+            padding: '18px 20px',
+            borderRadius: 'var(--radius-lg)',
+            background: 'linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '18px',
+            flexWrap: 'wrap',
+            boxShadow: '0 6px 18px rgba(30, 58, 138, 0.22)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: '260px', flex: 1 }}>
+            <Award size={26} color="#fff" style={{ flexShrink: 0, marginTop: 2 }} />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: 4 }}>
+                <strong style={{ color: '#fff', fontSize: '1.02rem', fontWeight: 800 }}>
+                  Examen tipo test del Tema 1 · Sistema Colinérgico
+                </strong>
+                <span
+                  className="qfdos-badge"
+                  style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', fontSize: '0.66rem', fontWeight: 700 }}
+                >
+                  ABIERTO · Modelo A · 15 preguntas
+                </span>
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.86)', fontSize: '0.83rem', lineHeight: 1.5 }}>
+                Modo examen: respondes sin ver la corrección, cambias lo que quieras y entregas cuando decidas.
+                La nota y tus respuestas se registran en la hoja oficial del profesorado. Solo hacen falta nombre y correo UGR.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onOpenTema1Exam}
+            className="btn btn-sm"
+            style={{
+              background: '#fff',
+              color: 'var(--navy)',
+              fontWeight: 800,
+              padding: '10px 18px',
+              fontSize: '0.88rem',
+              flexShrink: 0
+            }}
+          >
+            Realizar el examen <ArrowRight size={15} />
+          </button>
         </div>
       )}
 

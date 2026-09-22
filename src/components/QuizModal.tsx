@@ -69,20 +69,32 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 }) => {
   const { user, isProfesor } = useAuth();
 
-  // Model Selection State
-  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-b');
+  // Model Selection State (Modelo A es el examen oficial publicado del Tema 1)
+  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-a');
+
+  /**
+   * Modo examen.
+   *
+   * El alumno responde sin ver la correccion ni la explicacion, navega libremente
+   * entre preguntas y entrega cuando quiera. El profesor puede desactivarlo para
+   * usar el mismo banco en modo estudio, con correccion pregunta a pregunta.
+   */
+  const [examMode, setExamMode] = useState<boolean>(true);
+  const isExamMode = isProfesor ? examMode : true;
 
   // Compute active question bank dynamically (Default is Modelo B - exactly 15 questions)
   const questions: TestQuestion[] = useMemo(() => {
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
     if (isTema1) {
+      // El alumnado tiene asignado el Modelo A oficial; el selector es del profesor
+      if (!isProfesor) return MODELO_A_TEST_QUESTIONS;
       if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
       if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
       if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
       return MODELO_B_TEST_QUESTIONS;
     }
-    return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_B_TEST_QUESTIONS;
-  }, [topic, selectedModel]);
+    return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_A_TEST_QUESTIONS;
+  }, [topic, selectedModel, isProfesor]);
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'quiz' | 'records'>('quiz');
@@ -97,7 +109,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [studentEmail, setStudentEmail] = useState<string>(
     user?.email ? user.email : (isProfesor ? 'jjdiaz@ugr.es' : '')
   );
-  const [studentDni, setStudentDni] = useState<string>('');
   const [isStarted, setIsStarted] = useState<boolean>(false);
 
   // Quiz Navigation State
@@ -150,7 +161,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     if (isProfesor && evaluationMode === 'docente_sesion') {
       setStudentName(user?.name || 'Prof. Juan José Díaz-Mochón');
       setStudentEmail(user?.email || 'jjdiaz@ugr.es');
-      setStudentDni('DOCENTE-UGR');
     } else if (!isProfesor && user) {
       setStudentName(user.name || '');
       setStudentEmail(user.email || '');
@@ -183,6 +193,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const handleSelectOption = (idx: number) => {
     if (showExplanation) return;
     setSelectedOption(idx);
+    // En modo examen la respuesta queda anotada al instante: el alumno puede
+    // volver atras, cambiarla y entregar en cualquier momento.
+    if (isExamMode) {
+      setAnswers(prev => ({ ...prev, [currentIndex]: idx }));
+    }
   };
 
   const handleCheckAnswer = () => {
@@ -191,14 +206,27 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     setAnswers(prev => ({ ...prev, [currentIndex]: selectedOption }));
   };
 
-  const handleNextQuestion = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setSelectedOption(null);
-      setShowExplanation(false);
-    } else {
-      // Quiz Finished! Calculate score and detail
-      const finalAnswersMap = { ...answers, [currentIndex]: selectedOption ?? -1 };
+  /** Navegacion libre entre preguntas durante el examen. */
+  const goToQuestion = (target: number) => {
+    if (target < 0 || target >= questions.length) return;
+    setCurrentIndex(target);
+    const stored = answers[target];
+    setSelectedOption(stored === undefined || stored < 0 ? null : stored);
+    setShowExplanation(false);
+  };
+
+  const answeredCount = questions.reduce(
+    (total, _q, idx) => (answers[idx] !== undefined && answers[idx] >= 0 ? total + 1 : total),
+    0
+  );
+
+  /**
+   * Cierra el intento: calcula la nota, la guarda en local y la envia a la hoja
+   * oficial de Google Sheets. Se llama tanto al terminar la ultima pregunta como
+   * al pulsar «Entregar examen».
+   */
+  const finalizeAttempt = (finalAnswersMap: { [key: number]: number }) => {
+    {
       let correct = 0;
 
       const answersDetail: QuizAnswerDetail[] = questions.map((q, idx) => {
@@ -236,7 +264,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         minute: '2-digit'
       });
 
-      let modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis (15P)';
+      let modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis de Metacolina y Betanecol (15P)';
       if (topic.id === 'tema-01') {
         if (selectedModel === 'modelo-b') {
           modelDisplayName = 'Modelo B: Diferenciación, Cinética y Síntesis Directa (15P)';
@@ -251,7 +279,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         id: `rec_${Date.now()}`,
         studentName: studentName.trim() || 'Evaluado sin registrar',
         studentEmail: studentEmail.trim() || (user?.email ?? 'sin-email@ugr.es'),
-        studentDni: studentDni.trim() || '-',
+        studentDni: '',
         evaluator: user?.name ? `${user.name} (Docente)` : 'Dr. Juan José Díaz-Mochón (Docente)',
         evaluationMode: evaluationMode,
         topicId: topic.id,
@@ -300,6 +328,30 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     }
   };
 
+  const handleNextQuestion = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+      setSelectedOption(null);
+      setShowExplanation(false);
+    } else {
+      finalizeAttempt({ ...answers, [currentIndex]: selectedOption ?? -1 });
+    }
+  };
+
+  /** Entrega del examen en cualquier momento, con o sin todas las preguntas hechas. */
+  const handleSubmitExam = () => {
+    const finalAnswersMap: { [key: number]: number } = { ...answers };
+    if (selectedOption !== null) {
+      finalAnswersMap[currentIndex] = selectedOption;
+    }
+    const sinResponder = questions.filter((_q, idx) => finalAnswersMap[idx] === undefined || finalAnswersMap[idx] < 0).length;
+    const aviso = sinResponder > 0
+      ? `Vas a entregar el examen con ${sinResponder} pregunta(s) sin responder, que puntuaran como falladas. ¿Confirmas la entrega?`
+      : '¿Confirmas la entrega del examen? La calificacion quedara registrada en la hoja oficial del profesorado.';
+    if (!window.confirm(aviso)) return;
+    finalizeAttempt(finalAnswersMap);
+  };
+
   const handleRestart = () => {
     setCurrentIndex(0);
     setSelectedOption(null);
@@ -314,7 +366,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     setEvaluationMode('alumno_evaluado');
     setStudentName('');
     setStudentEmail('');
-    setStudentDni('');
     setIsStarted(false);
     setActiveTab('quiz');
   };
@@ -588,7 +639,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     </p>
                   </div>
 
-                  {/* Selector de modo accesible para alternar entre Docente y Alumno */}
+                  {/* Selector Docente / Alumno: solo tiene sentido en sesion de profesor */}
+                  {isProfesor && (
                   <div style={{ marginBottom: '1.25rem' }}>
                     <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
                       Modalidad de Evaluación:
@@ -600,7 +652,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           setEvaluationMode('docente_sesion');
                           setStudentName('Prof. Juan José Díaz-Mochón');
                           setStudentEmail('jjdiaz@ugr.es');
-                          setStudentDni('DOCENTE-UGR');
                         }}
                         style={{
                           padding: '12px',
@@ -636,7 +687,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           } else {
                             setStudentName('');
                             setStudentEmail('');
-                            setStudentDni('');
                           }
                         }}
                         style={{
@@ -658,12 +708,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             Modo Alumno (Autoevaluación)
                           </div>
                           <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                            Registro con nombre, correo UGR y DNI
+                            Registro con nombre y correo UGR
                           </div>
                         </div>
                       </button>
                     </div>
                   </div>
+                  )}
 
                   {/* Formulario de datos */}
                   <div className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: 'var(--surface)' }}>
@@ -708,26 +759,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
-                          DNI / Identificador de Matrícula
-                        </label>
-                        <input
-                          type="text"
-                          value={studentDni}
-                          onChange={e => setStudentDni(e.target.value)}
-                          placeholder="Ej: 77482910X"
-                          className="form-control"
-                          style={{
-                            width: '100%',
-                            padding: '8px 12px',
-                            fontSize: '0.86rem',
-                            borderRadius: 'var(--radius-md)',
-                            border: '1.5px solid var(--border-color)'
-                          }}
-                        />
-                      </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
                           Docente Supervisor
@@ -746,7 +778,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Selector de Modelo de Examen Oficial */}
+                  {/* Selector de Modelo de Examen Oficial (reservado al profesorado) */}
+                  {isProfesor && (
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', margin: 0 }}>
@@ -871,7 +904,55 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         </button>
                       )}
                     </div>
+
+                    {/* Modo de realizacion: examen (sin correccion) o estudio */}
+                    <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-title)' }}>
+                        Modo de realización:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setExamMode(true)}
+                        className={examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
+                        style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                      >
+                        Modo examen (sin ver respuestas)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setExamMode(false)}
+                        className={!examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
+                        style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                      >
+                        Modo estudio (con corrección)
+                      </button>
+                    </div>
                   </div>
+                  )}
+
+                  {/* Instrucciones del examen oficial para el alumnado */}
+                  {!isProfesor && (
+                    <div style={{
+                      marginBottom: '1.25rem',
+                      padding: '14px 16px',
+                      borderRadius: 'var(--radius-lg)',
+                      background: 'rgba(30, 58, 138, 0.06)',
+                      border: '1.5px solid var(--navy)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <Clock size={17} color="var(--navy)" />
+                        <strong style={{ fontSize: '0.92rem', color: 'var(--navy)' }}>
+                          Examen Oficial Tema 1 · Modelo A (15 preguntas) · Modo examen
+                        </strong>
+                      </div>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.81rem', color: 'var(--text-main)', lineHeight: 1.6 }}>
+                        <li>Respondes sin ver la corrección: no se muestra la respuesta correcta ni la explicación durante la prueba.</li>
+                        <li>Puedes avanzar, retroceder y cambiar cualquier respuesta mientras el examen siga abierto.</li>
+                        <li>Puedes entregar en cualquier momento; las preguntas sin responder puntúan como falladas.</li>
+                        <li>Al entregar, la nota y el detalle de respuestas se registran en la hoja oficial de Google Sheets del profesorado.</li>
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Banner de resumen del examen */}
                   <div style={{
@@ -898,7 +979,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           ? '15 preguntas de tríada catalítica de AChE, estereoquímica de muscarina, selectividad y síntesis de neostigmina.'
                           : selectedModel === 'retrosintesis'
                           ? '15 preguntas de desconexiones C-C, polaridad de sintones, reactivo de Ivanov, piperidolato y trihexifenidilo.'
-                          : '15 preguntas de fundamentos colinérgicos, agonistas, inhibidores de AChE, reactivadores y síntesis directa.'}
+                          : '15 preguntas de fundamentos colinérgicos, agonistas y SAR, inhibidores de AChE, reactivadores y síntesis directa de metacolina y betanecol.'}
                       </div>
                     </div>
                     <span className="qfdos-badge badge-teal" style={{ fontSize: '0.72rem' }}>
@@ -945,9 +1026,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       <User size={14} color="var(--navy)" />
                       <span style={{ color: 'var(--text-muted)' }}>Evaluando a:</span>
                       <strong style={{ color: 'var(--text-title)' }}>{studentName}</strong>
-                      {studentDni && studentDni !== '-' && (
+                      {studentEmail && (
                         <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                          ({studentDni})
+                          ({studentEmail})
                         </span>
                       )}
                     </div>
@@ -965,6 +1046,51 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </span>
                     </div>
                   </div>
+
+                  {/* Navegador de preguntas (modo examen: entrega libre) */}
+                  {isExamMode && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      flexWrap: 'wrap',
+                      padding: '8px 10px',
+                      marginBottom: '0.85rem',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--surface-alt)',
+                      border: '1px solid var(--border-color)'
+                    }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', marginRight: '4px' }}>
+                        Respondidas {answeredCount} / {questions.length}
+                      </span>
+                      {questions.map((_q, idx) => {
+                        const contestada = answers[idx] !== undefined && answers[idx] >= 0;
+                        const activa = idx === currentIndex;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => goToQuestion(idx)}
+                            title={contestada ? `Pregunta ${idx + 1} (respondida)` : `Pregunta ${idx + 1} (sin responder)`}
+                            className="font-mono"
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              border: activa ? '2px solid var(--navy)' : '1px solid var(--border-color)',
+                              background: contestada ? 'rgba(16, 185, 129, 0.16)' : 'var(--surface)',
+                              color: contestada ? '#047857' : 'var(--text-muted)'
+                            }}
+                          >
+                            {idx + 1}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {/* Badges Bar */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -1179,7 +1305,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         {/* Metadatos del Evaluado */}
                         <div style={{ fontSize: '0.78rem', textAlign: 'left', color: 'var(--text-main)', lineHeight: 1.6 }}>
                           <div><strong>Evaluado:</strong> {studentName}</div>
-                          {studentDni && <div><strong>DNI / Matrícula:</strong> <span className="font-mono">{studentDni}</span></div>}
                           <div><strong>Correo:</strong> {studentEmail}</div>
                           <div><strong>Docente Responsable:</strong> Dr. Juan José Díaz-Mochón</div>
                           <div><strong>Almacenamiento Local:</strong> <span className="font-mono" style={{ fontSize: '0.72rem' }}>qfdos_test_registration_records</span></div>
@@ -1522,15 +1647,21 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                               </div>
                             </div>
 
-                            <button
-                              onClick={() => setExpandedRecordId(isExpanded ? null : rec.id)}
-                              className="btn btn-sm btn-outline"
-                              style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem' }}
-                              title="Ver desglose de respuestas pregunta a pregunta"
-                            >
-                              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                              {isExpanded ? 'Ocultar' : 'Ver Detalle'}
-                            </button>
+                            {isProfesor ? (
+                              <button
+                                onClick={() => setExpandedRecordId(isExpanded ? null : rec.id)}
+                                className="btn btn-sm btn-outline"
+                                style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.76rem' }}
+                                title="Ver desglose de respuestas pregunta a pregunta"
+                              >
+                                {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                {isExpanded ? 'Ocultar' : 'Ver Detalle'}
+                              </button>
+                            ) : (
+                              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', maxWidth: '150px', textAlign: 'right' }}>
+                                Desglose reservado al profesorado
+                              </span>
+                            )}
 
                             <button
                               onClick={e => handleDeleteRecord(rec.id, e)}
@@ -1543,8 +1674,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           </div>
                         </div>
 
-                        {/* Desglose de Preguntas (Accordion) */}
-                        {isExpanded && (
+                        {/* Desglose de Preguntas (Accordion, solo profesorado) */}
+                        {isExpanded && isProfesor && (
                           <div style={{ 
                             marginTop: '12px', 
                             paddingTop: '12px', 
@@ -1616,7 +1747,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
               <button
                 onClick={() => {
-                  if (window.confirm('¿Deseas interrumpir el cuestionario en curso y volver a la configuración?')) {
+                  if (window.confirm('¿Deseas salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) {
                     setIsStarted(false);
                     handleRestart();
                   }
@@ -1625,24 +1756,52 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               >
                 Salir del Examen
               </button>
-              <div>
-                {!showExplanation ? (
+              {isExamMode ? (
+                /* Modo examen: navegacion libre y entrega en cualquier momento */
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <button
-                    onClick={handleCheckAnswer}
-                    disabled={selectedOption === null}
+                    onClick={() => goToQuestion(currentIndex - 1)}
+                    disabled={currentIndex === 0}
+                    className="btn btn-sm btn-outline"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={() => goToQuestion(currentIndex + 1)}
+                    disabled={currentIndex >= questions.length - 1}
+                    className="btn btn-sm btn-secondary"
+                  >
+                    Siguiente <ArrowRight size={14} />
+                  </button>
+                  <button
+                    onClick={handleSubmitExam}
                     className="btn btn-primary"
+                    style={{ fontWeight: 700 }}
+                    title="Entrega el examen ahora; las preguntas sin responder puntuan como falladas"
                   >
-                    Comprobar Respuesta
+                    <Send size={15} /> Entregar Examen ({answeredCount}/{questions.length})
                   </button>
-                ) : (
-                  <button
-                    onClick={handleNextQuestion}
-                    className="btn btn-secondary"
-                  >
-                    {currentIndex < questions.length - 1 ? 'Siguiente Pregunta' : 'Ver Calificación Final'} <ArrowRight size={14} />
-                  </button>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div>
+                  {!showExplanation ? (
+                    <button
+                      onClick={handleCheckAnswer}
+                      disabled={selectedOption === null}
+                      className="btn btn-primary"
+                    >
+                      Comprobar Respuesta
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleNextQuestion}
+                      className="btn btn-secondary"
+                    >
+                      {currentIndex < questions.length - 1 ? 'Siguiente Pregunta' : 'Ver Calificación Final'} <ArrowRight size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

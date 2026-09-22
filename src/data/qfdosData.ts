@@ -330,8 +330,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.8.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-22T12:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.9.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-22T16:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -360,6 +360,13 @@ export const QFDOS_INFO = {
 };
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-examen-tema1-modelo-a',
+    title: '📝 Abierto el Examen Tipo Test del Tema 1 · Modelo A (15 preguntas) en modo examen',
+    content: 'Ya está disponible para todo el alumnado el cuestionario oficial del Tema 1 (Sistema Colinérgico), Modelo A de 15 preguntas calibradas. Se realiza en modo examen: respondéis sin ver la corrección, podéis moveros libremente entre preguntas y entregar en cualquier momento. Las preguntas de síntesis del bloque final corresponden a metacolina y betanecol. Al entregar, la nota y el detalle de respuestas quedan registrados automáticamente en la hoja oficial de calificaciones. Basta con vuestro nombre y correo UGR: ya no se pide el DNI.',
+    date: '22 Septiembre 2026',
+    priority: 'alta'
+  },
   {
     id: 'ann-estructuras-qfdos-update',
     title: '🔬 Base de Datos de Estructuras QFDOS Actualizada: 40 Fármacos Oficiales (Bloques 1 a 8)',
@@ -621,41 +628,41 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
   {
     id: 't01-a-13',
     topicId: 'tema-01',
-    block: 'Bloque 5 · Mecanismos de Acción y Síntesis Directa',
-    badge: 'Mecanismo de Transducción Muscaríni',
-    question: 'En la señalización colinérgica muscarínica, ¿qué cascada bioquímica intracelular diferencia a los receptores M1, M3 y M5 respecto a los subtipos M2 y M4?',
-    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    block: 'Bloque 5 · Síntesis Directa: Metacolina y Betanecol',
+    badge: 'Síntesis Directa de Metacolina',
+    question: 'En la síntesis directa de la metacolina a partir de óxido de propileno, ¿qué secuencia de reactivos construye el éster acético sobre el alcohol secundario y la cabeza de amonio cuaternario?',
+    questionSmiles: 'CC(=O)OC(C)C[N+](C)(C)C',
     options: [
-  { text: 'M2 y M4 estimulan a la fosfolipasa C citoplasmática liberando inositol trifosfato, mientras que M1, M3 y M5 fosforilan receptores.' },
-  { text: 'M1, M3 y M5 activan la proteína Gq estimulando fosfolipasa C (PLC-β), mientras que M2 y M4 inhiben la adenilato ciclasa vía Gi.' },
-  { text: 'M1, M3 y M5 se acoplan a la proteína Gs estimuladora elevando el AMP cíclico, mientras que M2 y M4 operan como canales de cloruro.' },
-  { text: 'Todos los subtipos activan la cascada citoplasmática de tirosina cinasa induciendo la apertura directa de macrocanales de membrana.' }
+  { text: 'Condensación de Claisen entre acetato de etilo y cloruro de trimetilamonio en etóxido sódico, con reducción final del cetoéster mediante borohidruro.' },
+  { text: 'Apertura del óxido de propileno con amoníaco anhidro seguida de carbamoilación con fosgeno y posterior alquilación exhaustiva con bromuro de etilo.' },
+  { text: 'Apertura del óxido de propileno con dimetilamina por el carbono menos impedido, acetilación con anhídrido acético y cuaternización con yoduro de metilo.' },
+  { text: 'Adición de bromuro de metilmagnesio a cloroacetato de metilo seguida de hidrólisis ácida y tratamiento directo con trimetilamina en medio acuoso.' }
     ],
-    correctIndex: 1,
-    explanation: 'En la transducción de señales de receptores muscarínicos, diferenciamos dos cascadas: los subtipos M1, M3 y M5 se acoplan a proteínas Gq/11, activando la fosfolipasa C-beta (PLCβ) con generación de inositol trisfosfato (IP3) y diacilglicerol (DAG), lo que moviliza calcio intracelular. En cambio, los receptores M2 y M4 se acoplan a proteínas Gi/o, inhibiendo a la adenilato ciclasa y disminuyendo los niveles de AMPc. El error conceptual del distractor a invierte el acoplamiento, asociando erróneamente M2 a estimulación celular.',
+    correctIndex: 2,
+    explanation: 'En el laboratorio preparamos metacolina abriendo el óxido de propileno con dimetilamina: el nucleófilo ataca por el carbono menos sustituido y deja el hidroxilo en posición secundaria, que es precisamente el metilo en beta que distingue a la metacolina de la acetilcolina. Acetilamos después ese alcohol secundario con anhídrido acético (o cloruro de acetilo) y cerramos la ruta cuaternizando la amina terciaria con yoduro de metilo, que fija la carga positiva permanente. El orden importa: si cuaternizamos antes de acilar, el amonio vecino desactiva el hidroxilo y la esterificación se vuelve mucho más lenta. La opción b conduce al esqueleto carbámico del betanecol, no al éster acético que buscamos.',
     difficulty: 'Medio'
   },
   {
     id: 't01-a-14',
     topicId: 'tema-01',
-    block: 'Bloque 5 · Mecanismos de Acción y Síntesis Directa',
-    badge: 'Síntesis Orgánica Directa de Ciclop',
-    question: 'En la síntesis orgánica directa del ciclopentolato, ¿cuál es la secuencia de reacciones que construye el fragmento hidroxiácido y el éster final?',
-    questionSmiles: 'CN(C)CCOC(=O)C(c1ccccc1)C2(O)CCCC2',
+    block: 'Bloque 5 · Síntesis Directa: Metacolina y Betanecol',
+    badge: 'Bifurcación Sintética: Metacolina vs Betanecol',
+    question: 'La metacolina y el betanecol comparten el intermedio 1-(trimetilamonio)propan-2-ol. ¿Qué etapa final diferencia la obtención de cada fármaco a partir de ese precursor común?',
+    questionSmiles: 'OC(C)C[N+](C)(C)C',
     options: [
-  { text: 'Acilación de Friedel-Crafts de ciclopenteno con cloruro de benzoilo y posterior oxidación de Baeyer-Villiger en medio anhidro.' },
-  { text: 'Condensación de Claisen de ciclopentanocarboxilato con fenilacetato de etilo en etóxido sódico y posterior hidrólisis ácida.' },
-  { text: 'Adición del dianión de fenilacetato (reactivo de Ivanov) a ciclopentanona seguida de esterificación con dimetilaminoetanol.' },
-  { text: 'Reacción de Reformatsky entre alfa-bromofenilacetato y ciclopentanol sobre zinc metálico activado en tetrahidrofurano anhidro.' }
+  { text: 'La acilación del hidroxilo con anhídrido acético rinde metacolina, mientras que la carbamoilación vía fosgeno y amoníaco anhidro rinde betanecol.' },
+  { text: 'La acilación con cloruro de acetilo rinde betanecol, mientras que el calentamiento con urea en ácido sulfúrico concentrado rinde directamente metacolina.' },
+  { text: 'La reacción con isocianato de metilo rinde metacolina, mientras que la esterificación de Fischer con ácido fórmico en medio ácido rinde betanecol.' },
+  { text: 'La oxidación del carbinol secundario a cetona rinde metacolina, mientras que la aminación reductora posterior con amoníaco rinde betanecol.' }
     ],
-    correctIndex: 2,
-    explanation: 'En la síntesis de ciclopentolato en el laboratorio, preparamos el reactivo de Ivanov tratando el ácido fenilacético con dos equivalentes de reactivo de Grignard o LDA para generar el dianión hidrocarbonado correspondiente. Al condensar este dianión con ciclopentanona, la presencia de la carga carboxilato suprime la enolización competitiva de la cetona ciclopentánica, permitiendo la adición nucleófila limpia sobre el carbonilo y rindiendo el alfa-hidroxiácido con excelente rendimiento sin subproductos aldólicos. La opción a es la trampa típica: un enolato simple provocaría autocondensación aldólica descontrolada de la ciclopentanona.',
+    correctIndex: 0,
+    explanation: 'Partimos del mismo 1-(trimetilamonio)propan-2-ol y la ruta se bifurca únicamente en la naturaleza del acilo que colgamos del hidroxilo secundario. Con anhídrido acético o cloruro de acetilo obtenemos el éster acético, es decir la metacolina, que sigue siendo sustrato de la acetilcolinesterasa aunque se hidroliza bastante más despacio que la acetilcolina por el impedimento del metilo en beta. Si en cambio activamos el alcohol con fosgeno y tratamos el cloroformiato con amoníaco anhidro obtenemos el carbamato, el betanecol, resistente a la esterasa porque el par solitario del nitrógeno se deslocaliza sobre el carbonilo y le resta carácter electrófilo. El distractor b invierte ambas rutas: es el error más repetido en el examen.',
     difficulty: 'Medio'
   },
   {
     id: 't01-a-15',
     topicId: 'tema-01',
-    block: 'Bloque 5 · Mecanismos de Acción y Síntesis Directa',
+    block: 'Bloque 5 · Síntesis Directa: Metacolina y Betanecol',
     badge: 'Ruta Sintética Directa de Betanecol',
     question: 'En la preparación sintética directa del betanecol a partir de 1-(trimetilamonio)propan-2-ol, ¿qué secuencia de reactivos introduce el grupo carbamato?',
     questionSmiles: 'NC(=O)OC(C)C[N+](C)(C)C',
@@ -2040,7 +2047,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         date: '17/09/2026'
       }
     ],
-        testQuestions: MODELO_B_TEST_QUESTIONS,
+        testQuestions: MODELO_A_TEST_QUESTIONS,
 
     flashcards: [
       {

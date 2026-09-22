@@ -222,7 +222,7 @@ export const App: React.FC = () => {
     purgeStaleCourseCache();
     const raw = contenidoEnCache()?.topics ?? loadCached('qfdos_v3_topics', INITIAL_TOPICS);
     const normalized = normalizarTemas(raw);
-    // Auto-heal Tema 1 para garantizar que siempre tenga las 15 preguntas oficiales del Modelo B
+    // Auto-heal Tema 1 para garantizar que siempre tenga las 15 preguntas oficiales del Modelo A
     const t1 = normalized.find(t => t.id === 'tema-01');
     if (t1 && (!t1.testQuestions || t1.testQuestions.length !== 15)) {
       t1.testQuestions = INITIAL_TOPICS[1].testQuestions;
@@ -418,6 +418,10 @@ export const App: React.FC = () => {
             onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
             onOpenAdminCms={() => setIsAdminCmsOpen(true)}
             onOpenFirSimulator={() => setIsFirModalOpen(true)}
+            onOpenTema1Exam={() => {
+              const tema1 = topics.find(t => t.id === 'tema-01');
+              if (tema1) setSelectedQuizTopic(tema1);
+            }}
           />
         )}
         {activeTab === 'info' && <CourseInfoSection />}

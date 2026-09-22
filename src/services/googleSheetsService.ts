@@ -9,6 +9,22 @@ import { QuizRegistrationRecord } from '../data/qfdosData';
 const STORAGE_KEY_WEBHOOK = 'qfdos_google_sheets_webhook_url';
 
 /**
+ * Hoja oficial de calificaciones del Grupo E (Tema 1 en adelante).
+ *
+ * El alumnado abre la web sin variables de entorno ni configuracion previa, asi
+ * que el destino tiene que venir cocido en el propio bundle. Si esto queda
+ * vacio, el examen se guarda solo en el navegador del alumno y el profesor no
+ * recibe nada.
+ */
+export const OFICIAL_SHEETS_WEBHOOK_URL =
+  'https://script.google.com/macros/s/AKfycbyUQO79DKtdayKwgysYIt1vodx2ZtZUOjSAV9U4QOpSNmFTF5340ek8jmwrfKW7EfVU/exec';
+
+export const OFICIAL_SHEETS_DOC_ID = '1ha8QIAHQqK7PFm0wQJfeSsG3Y24_vovAlphvVfR7gME';
+
+export const OFICIAL_SHEETS_DOC_URL =
+  `https://docs.google.com/spreadsheets/d/${OFICIAL_SHEETS_DOC_ID}/edit`;
+
+/**
  * Obtiene la URL configurada para Google Apps Script.
  */
 export function getGoogleSheetsUrl(): string {
@@ -16,7 +32,7 @@ export function getGoogleSheetsUrl(): string {
   if (custom && custom.trim().length > 0) {
     return custom.trim();
   }
-  return (import.meta.env.VITE_GOOGLE_SHEETS_URL as string) || '';
+  return (import.meta.env.VITE_GOOGLE_SHEETS_URL as string) || OFICIAL_SHEETS_WEBHOOK_URL;
 }
 
 /**

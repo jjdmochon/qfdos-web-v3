@@ -648,7 +648,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
-                      {/* 5. Cuestionario Test Oficial (Activo con Modelo B y Registro en Google Sheets) */}
+                      {/* 5. Examen Oficial del Tema (Modelo A en modo examen + Google Sheets) */}
                       {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
                         <div className="qfdos-card card-amber resource-card is-active">
                           <div>
@@ -669,13 +669,13 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
                               </div>
                               <span className={`qfdos-badge ${isProfesor ? 'badge-amber' : 'badge-teal'}`} style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
-                                {isProfesor ? 'Modo Docente' : 'Modelo B Oficial (15P)'}
+                                {isProfesor ? 'Modo Docente' : 'Modelo A Oficial (15P) · Modo Examen'}
                               </span>
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales (Modelo B por defecto). Calificaciones volcadas en Google Sheets.`
-                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales calibradas (Modelo B). Tus intentos se registran en Google Sheets.`
+                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales (Modelo A por defecto, cuatro modelos disponibles). Calificaciones volcadas en Google Sheets.`
+                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales calibradas (Modelo A). Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
                               }
                             </p>
                           </div>
@@ -684,7 +684,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             className="btn btn-sm btn-primary" 
                             style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
                           >
-                            <HelpCircle size={13} /> {isProfesor ? 'Portal Docente / Realizar Test' : 'Realizar Autoevaluación (15 Preguntas)'}
+                            <HelpCircle size={13} /> {isProfesor ? 'Portal Docente / Realizar Test' : 'Realizar el Examen (15 Preguntas)'}
                           </button>
                         </div>
                       )}
