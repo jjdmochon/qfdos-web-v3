@@ -667,6 +667,523 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
   }
 ];
 
+export const MODELO_B_TEST_QUESTIONS: TestQuestion[] = [
+  {
+    id: 't01-b-01',
+    topicId: 'tema-01',
+    block: 'Bloque 1 · Fundamentos y Farmacóforo de ACh',
+    badge: 'Diferenciación Estructural de Recep',
+    question: '¿Qué característica estructural y funcional fundamental distingue a los receptores muscarínicos de los receptores nicotínicos en la sinapsis colinérgica?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Los receptores muscarínicos son dímeros citoplasmáticos con actividad tirosina cinasa y los nicotínicos son canales activados por voltaje.' },
+      { text: 'Los receptores nicotínicos son receptores acoplados a proteínas G triméricas y los muscarínicos operan como canales de calcio intracelular.' },
+      { text: 'Ambos tipos de receptores presentan una estructura idéntica de siete dominios transmembrana diferenciándose sólo por su velocidad de apertura.' },
+      { text: 'Los receptores muscarínicos son GPCRs de siete hélices transmembrana y los nicotínicos son canales iónicos pentaméricos activados por ligando.' }
+    ],
+    correctIndex: 3,
+    explanation: 'En la cátedra diferenciamos claramente las dos familias colinérgicas: los receptores muscarínicos son GPCRs metabotrópicos monoméricos con siete segmentos transmembrana acoplados a proteínas G heterodiméricas, mientras que los nicotínicos son canales iónicos ionotrópicos pentaméricos formados por cinco subunidades homoméricas o heteroméricas dispuestas en torno a un poro acuoso central. La opción a es una trampa clásica de examen que invierte la naturaleza metabotrópica e ionotrópica de ambas familias proteicas.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-02',
+    topicId: 'tema-01',
+    block: 'Bloque 1 · Fundamentos y Farmacóforo de ACh',
+    badge: 'Geometría Conformacional Gauche de ',
+    question: 'En disolución acuosa y en el estado cristalino, la acetilcolina adopta preferentemente una conformación respecto al enlace central O–C–C–N⁺. ¿Cuál es y cuál es su origen?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'La conformación antiperiplanar con un ángulo de torsión de 180° que aleja al máximo las densidades de carga de ambos heteroátomos polares.' },
+      { text: 'La conformación sinclinal (gauche) con ángulo diedro de unos 60° que sitúa los centros farmacofóricos a la distancia óptima de interacción.' },
+      { text: 'La conformación eclipsada con ángulo diedro de 0° estabilizada por enlace por puente de hidrógeno intramolecular entre los metilos catiónicos.' },
+      { text: 'Una mezcla equimolecular desordenada sin preferencia conformacional debido a la barrera de rotación nula en torno al enlace carbono-carbono.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Mediante resonancia magnética nuclear (1H RMN) y cristalografía determinamos que la acetilcolina en disolución y en el sitio activo muscarínico adopta prioritariamente la conformación sinclinal (gauche), con un ángulo diedro O–C–C–N⁺ de ~60°. Esta disposición espacial sitúa el catión trimetilamonio a ~3.2 Å del oxígeno del éster, encajando a la perfección en la distancia entre el residuo de aspartato y los subsitios aromáticos. El distractor a confunde la estabilidad antiperiplanar en fase gas con la conformación bioactiva real impuesta por el receptor.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-03',
+    topicId: 'tema-01',
+    block: 'Bloque 1 · Fundamentos y Farmacóforo de ACh',
+    badge: 'Etapa Limitante Presináptica: Recap',
+    question: 'En el ciclo de biosíntesis y degradación de la acetilcolina en la sinapsis colinérgica, ¿cuál es el paso limitante que modula la velocidad de síntesis del neurotransmisor?',
+    questionSmiles: 'OCC[N+](C)(C)C',
+    options: [
+      { text: 'La recaptación de colina mediante el transportador de alta afinidad CHT1 dependiente de sodio, diana que resulta inhibida por hemicolinio-3.' },
+      { text: 'La fosforilación mitocondrial del acetil-CoA catalizada por fosfotransferasas dependientes de magnesio, estimulada por toxina botulínica.' },
+      { text: 'La condensación citoplasmática mediada por colina acetiltransferasa, la cual es bloqueada competitivamente por concentraciones de nicotina.' },
+      { text: 'La entrada pasiva de acetato libre a través de la bicapa lipídica presináptica, proceso acelerado por agentes bloqueantes de los canales de calcio.' }
+    ],
+    correctIndex: 0,
+    explanation: 'Al analizar el ciclo presináptico de la acetilcolina, identificamos la recaptación de colina mediante el transportador CHT1 de alta afinidad (simporte dependiente de Na⁺ y Cl⁻) como la etapa limitante de toda la biosíntesis. Este transportador es el cuello de botella cinético que regula la disponibilidad del sustrato intracelular para la colina acetiltransferasa (ChAT). La opción b es un error conceptual común: la enzima ChAT trabaja a velocidad saturante y no constituye el factor limitante.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-04',
+    topicId: 'tema-01',
+    block: 'Bloque 2 · Agonistas Directos y SAR',
+    badge: 'Selectividad Receptor: Alfa-Metilco',
+    question: 'La introducción de un sustituyente metilo en la cadena etilénica de la acetilcolina modifica drásticamente la selectividad por receptores. Indique la pauta correcta:',
+    questionSmiles: 'CC(=O)OCC(C)[N+](C)(C)C',
+    options: [
+      { text: 'La alfa-metilcolina es un agonista selectivo muscarínico y la beta-metilcolina carece por completo de actividad sobre cualquier receptor.', smiles: 'CC(=O)OCC(C)[N+](C)(C)C' },
+      { text: 'Ambos derivados pierden la actividad agonista y actúan como antagonistas competitivos debido al excesivo volumen estérico de los metilos.', smiles: 'CC(=O)OC(C)C[N+](C)(C)C' },
+      { text: 'La alfa-metilcolina presenta mayor afinidad por receptores nicotínicos mientras que la beta-metilcolina muestra selectividad muscarínica.', smiles: 'CC(=O)OCC[N+](C)(C)C' },
+      { text: 'Ambos análogos muestran idéntica selectividad muscarínica porque el receptor colinérgico no distingue la posición relativa del sustituyente.', smiles: 'OCC[N+](C)(C)C' }
+    ],
+    correctIndex: 2,
+    explanation: 'En el desarrollo de derivados metilados de colina, demostramos la rigurosa selectividad estérica: la sustitución con metilo en posición alfa (alfa-metilcolina) preserva la actividad agonista nicotínica pero anula prácticamente la muscarínica, mientras que la metilación en beta (metacolina) induce una selectividad muscarínica casi exclusiva con resistencia añadida frente a la AChE. La trampa del distractor a invierte la posición de los sustituyentes alfa y beta en el puente etilénico.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-05',
+    topicId: 'tema-01',
+    block: 'Bloque 2 · Agonistas Directos y SAR',
+    badge: 'Betanecol: Resistencia Combinada y ',
+    question: 'El betanecol es un agonista colinérgico de acción prolongada empleado en la retención urinaria posoperatoria. ¿Qué dos modificaciones moleculares sustentan su perfil?',
+    questionSmiles: 'NC(=O)OC(C)C[N+](C)(C)C',
+    options: [
+      { text: 'Un anillo bencénico rígido y un grupo sulfonato que proporcionan afinidad por canales iónicos y protección química frente a esterasas.', smiles: 'CC(=O)OCC[N+](C)(C)C' },
+      { text: 'Un enlace éter inalterable y una amina terciaria no protonable que impiden el ataque de la triada catalítica de la acetilcolinesterasa sináptica.', smiles: 'CC(=O)OC(C)C[N+](C)(C)C' },
+      { text: 'Un grupo éster aromático y dos centros cuaternarios que inducen resistencia enzimática pero confieren selectividad hacia nicotínicos.', smiles: 'NC(=O)OCC[N+](C)(C)C' },
+      { text: 'Un grupo carbamato resistente por resonancia junto a un grupo metilo en posición beta que confiere impedimento estérico y selectividad M.', smiles: 'NC(=O)OC(C)C[N+](C)(C)C' }
+    ],
+    correctIndex: 3,
+    explanation: 'Diseñamos el betanecol combinando dos modificaciones protectoras sinérgicas: el grupo carbamato le otorga resistencia electrónica frente a la AChE mediante deslocalización por resonancia (+M), mientras que el grupo metilo en posición beta introduce impedimento estérico frente a la catálisis enzimática y anula toda afinidad nicotínica, convirtiéndolo en un agonista muscarínico puro de acción selectiva sobre músculo liso gastrointestinal y urinario. La opción b induce a error al sugerir una afinidad residual por la placa motora.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-06',
+    topicId: 'tema-01',
+    block: 'Bloque 2 · Agonistas Directos y SAR',
+    badge: 'Cevimelina: Agonista Muscarínico Es',
+    question: 'La cevimelina es un agonista muscarínico prescrito en el síndrome de Sjögren para la xerostomía. ¿Cuál es su elemento estructural distintivo frente a los ésteres clásicos?',
+    questionSmiles: 'CC1OC2(CN3CCC2CC3)SC1',
+    options: [
+      { text: 'Posee un grupo éster fosfato unido a un anillo de piperidina que simula fielmente la densidad de carga del neurotransmisor acetilcolina.' },
+      { text: 'Presenta un sistema bicíclico de espirooxatiolano quinuclidina que carece de enlace éster, siendo refractaria a esterasas plasmáticas.' },
+      { text: 'Contiene un núcleo de carbamato aromático cuaternario que libera fluoruro en el bolsillo activo bloqueando la degradación enzimática.' },
+      { text: 'Incorpora una cadena alquílica larga de doce carbonos que ancla covalentemente la molécula a la superficie externa de la membrana celular.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Al estudiar agonistas no clásicos para el síndrome de Sjögren, analizamos la cevimelina: su núcleo quinuclidinil-tiolano espirocíclico sustituye la cabeza de trimetilamonio acíclica por una amina terciaria bicíclica rígida que estimula selectivamente los receptores M1 y M3 de las glándulas salivales y lagrimales con mínima afectación cardiovascular (M2). El distractor a clasifica erróneamente a la cevimelina como inhibidor de la acetilcolinesterasa.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-07',
+    topicId: 'tema-01',
+    block: 'Bloque 3 · Inhibidores de AChE y Reactivadores',
+    badge: 'Mecanismo y Cinética de Carbamoilac',
+    question: 'Al inhibir la acetilcolinesterasa mediante derivados de carbamato como la neostigmina, ¿cuál es el fundamento mecanístico de su carácter pseudoirreversible?',
+    questionSmiles: 'CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C',
+    options: [
+      { text: 'El fármaco se coordina de forma irreversible con el triptófano del subsitio aniónico bloqueando la salida de los reactivos polares.' },
+      { text: 'La molécula se oxida en el fondo de la cavidad catalítica generando un precipitado insoluble que bloquea el acceso a la serina.' },
+      { text: 'La enzima carbamoilada en Ser203 sufre una hidrólisis sumamente lenta (orden de horas) frente a la enzima acetilada rápida.' },
+      { text: 'El grupo fenólico saliente establece un enlace covalente cruzado irreversible entre la histidina y el glutamato de la tríada.' }
+    ],
+    correctIndex: 2,
+    explanation: 'En el mecanismo de inhibición por carbamatos (neostigmina, piridostigmina), la Ser203 ataca al carbonilo carbámico formando una carbamoil-enzima covalente. A diferencia del intermediario acetilado de la ACh (que se hidroliza en microsegundos), la descarbamoilación de la enzima es sumamente lenta debido a la estabilización por resonancia del carbamato, con una semivida de regeneración de varias horas, actuando como inhibidores pseudoirreversibles. La opción a confunde este proceso con la fosforilación irreversible de los organofosforados.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-08',
+    topicId: 'tema-01',
+    block: 'Bloque 3 · Inhibidores de AChE y Reactivadores',
+    badge: 'Modulación Alostérica Positiva (PAM',
+    question: 'La galantamina ofrece una acción terapéutica particular en el tratamiento de la enfermedad de Alzheimer gracias a un mecanismo dual. ¿En qué consiste?',
+    questionSmiles: 'CN1CC[C@@]23c4cc5c(cc4O[C@@H]2[C@@H](O)C=C[C@H]3C1)OCO5',
+    options: [
+      { text: 'Inhibe de forma competitiva reversible la AChE y actúa a la vez como modulador alostérico positivo (PAM) de receptores nicotínicos.', smiles: 'CN1CC[C@@]23c4cc5c(cc4O[C@@H]2[C@@H](O)C=C[C@H]3C1)OCO5' },
+      { text: 'Actúa como inhibidor covalente irreversible de la AChE y como antagonista competitivo selectivo de los receptores muscarínicos M1.', smiles: 'COc1cc2c(cc1OC)C(=O)CC2CC3CCN(Cc4ccccc4)CC3' },
+      { text: 'Bloquea la captación neuronal de colina en la terminal presináptica y estimula la recaptación vesicular de acetato en el citosol.', smiles: 'CCN(C)C(=O)Oc1cccc(c1)[C@@H](C)N(C)C' },
+      { text: 'Induce la degradación selectiva de la butirilcolinesterasa plasmática y activa los canales de calcio dependientes de voltaje en axones.', smiles: 'c1ccc2c(c1)c(c3c(n2)CCCC3)N' }
+    ],
+    correctIndex: 0,
+    explanation: 'La galantamina posee un doble mecanismo de acción terapéutico en la enfermedad de Alzheimer: actúa como inhibidor competitivo reversible de la AChE y, simultáneamente, se une como modulador alostérico positivo (PAM) a los receptores colinérgicos nicotínicos neuronales (subtipos alfa4-beta2 y alfa7), potenciando la neurotransmisión colinérgica endógena. El distractor b propone falsamente un antagonismo competitivo nicotínico, lo que empeoraría el cuadro cognitivo.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-09',
+    topicId: 'tema-01',
+    block: 'Bloque 3 · Inhibidores de AChE y Reactivadores',
+    badge: 'Fenómeno de Envejecimiento (Aging) ',
+    question: 'Tras la fosforilación de la acetilcolinesterasa por ciertos organofosforados como el somán o el sarín, la enzima se vuelve irreversiblemente refractaria. ¿A qué se debe?',
+    questionSmiles: 'CC(C)OP(=O)(C)F',
+    options: [
+      { text: 'La protonación reversible de la histidina catalítica que desplaza el catión magnesio necesario para la catálisis enzimática fisiológica.' },
+      { text: 'La migración intramolecular del grupo fosforilo hacia el residuo de triptófano vecino en la entrada de la garganta hidrofóbica activa.' },
+      { text: 'La racemización del centro fosforado con pérdida de la afinidad por reactivadores derivados de oximas y desnaturalización de la proteína.' },
+      { text: 'La desaquilación no enzimática del aducto enzima-fosforilado que genera una carga negativa neta que repele el ataque de la pralidoxima.' }
+    ],
+    correctIndex: 3,
+    explanation: 'El fenómeno de envejecimiento (aging) de la AChE fosforilada por organofosforados consiste en la ruptura no enzimática de uno de los enlaces éster C–O del resto organofosforado con pérdida de un grupo alquilo (p. ej. isopropilo en sarín), dejando un átomo de oxígeno cargado negativamente sobre el fósforo. Esta carga negativa aniónica desactiva el carácter electrófilo del fósforo e impide por completo el ataque de reactivadores como la pralidoxima. La opción a es errónea: el aging no es la hidrólisis espontánea del enlace fosfoserina.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-10',
+    topicId: 'tema-01',
+    block: 'Bloque 4 · Antagonistas y Farmacocinética BHE',
+    badge: 'Atropina como Mezcla Racémica Natur',
+    question: 'La atropina utilizada en clínica se presenta como una mezcla racémica (±), a pesar de proceder de la planta Atropa belladonna. ¿Cuál es el origen químico de este hecho?',
+    questionSmiles: 'CN1C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3',
+    options: [
+      { text: 'El vegetal biosintetiza exclusivamente el racemato mediante una ruta enzimática que carece por completo de estereoselectividad óptica.' },
+      { text: 'Se aísla a partir de la (-)-hiosciamina natural, la cual sufre una racemización espontánea en el carbono alfa del éster durante el proceso.' },
+      { text: 'Procede de una ruta semisintética donde el acoplamiento entre tropanol y ácido trópico transcurre con pérdida total de los centros quirales.' },
+      { text: 'Ambos enantiómeros poseen idéntica afinidad por el receptor muscarínico debido a que el centro quiral no participa en el anclaje a la diana.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Explicamos a los alumnos que la atropina es la mezcla racémica (±)-hiosciamina. En la planta Atropa belladonna se biosintetiza exclusivamente el enantiómero levógiro (-)-(S)-hiosciamina, pero durante el proceso de extracción en medio alcalino el centro quiral alfa al carbonilo se enoliza con extrema facilidad, racemizando a (±)-atropina. El enantiómero (-) retiene casi toda la actividad antimuscarínica. El distractor a confunde la racemización química de extracción con una síntesis biológica racémica.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-11',
+    topicId: 'tema-01',
+    block: 'Bloque 4 · Antagonistas y Farmacocinética BHE',
+    badge: 'Butilescopolamina: Confinamiento Pe',
+    question: 'El bromuro de butilescopolamina es un fármaco ampliamente prescrito en cólicos gastrointestinales y renales. ¿Cuál es la base de su ausencia de efectos sedantes en el SNC?',
+    questionSmiles: 'CCCC[N+]1(C)C2CC(C1C3OC23)OC(=O)C(CO)c4ccccc4',
+    options: [
+      { text: 'La supresión del puente epóxido en el anillo de tropano que acelera la excreción renal reduciendo de manera drástica la toxicidad sistémica.', smiles: 'CN1C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3' },
+      { text: 'La escisión del anillo bicíclico para convertirlo en una cadena alifática flexible que incrementa la selectividad espasmolítica digestiva.', smiles: 'CN1C2CC(C1C3OC23)OC(=O)C(CO)c4ccccc4' },
+      { text: 'La introducción de un resto butilo cuaternario que confiere carga formal permanente impidiendo atravesar la barrera hematoencefálica.', smiles: 'CCCC[N+]1(C)C2CC(C1C3OC23)OC(=O)C(CO)c4ccccc4' },
+      { text: 'La sustitución del éster trópico por una función amida alifática primaria que confiere resistencia frente a esterasas de la luz intestinal.', smiles: 'CC(C)[N+]1(C)C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3' }
+    ],
+    correctIndex: 2,
+    explanation: 'El bromuro de butilescopolamina es el ejemplo paradigmático de diseño de antiespasmódico por cuaternización: la incorporación del grupo n-butilo sobre el nitrógeno del tropano genera una sal cuaternaria permanente con LogP extremadamente bajo. Esto anula su absorción sistémica y su paso a través de la barrera hematoencefálica, limitando su acción al bloqueo local de receptores M3 en el plexo mientérico intestinal sin efectos centrales. La opción a es falsa: la butilescopolamina no atraviesa la BHE.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-12',
+    topicId: 'tema-01',
+    block: 'Bloque 4 · Antagonistas y Farmacocinética BHE',
+    badge: 'Biperideno vs Tropicamida: Diferenc',
+    question: 'Al comparar las estructuras y aplicaciones del biperideno y la tropicamida, identifique la correlación molecular y clínica acertada:',
+    questionSmiles: 'OC(CCN1CCCCC1)(c2ccccc2)C3CC4C=CC3C4',
+    options: [
+      { text: 'El biperideno es un aminoalcohol terciario lipófilo para Parkinson central; la tropicamida es una amida terciaria para midriasis diagnóstica.', smiles: 'OC(CCN1CCCCC1)(c2ccccc2)C3CC4C=CC3C4' },
+      { text: 'El biperideno es un catión amonio cuaternario para broncodilatación en EPOC; la tropicamida es un carbinol bicíclico para tratamiento de úlcera.', smiles: 'CCN(Cc1ccccc1)C(=O)C(CO)c2ccncc2' },
+      { text: 'La tropicamida posee una carga formal permanente positiva que confiere cicloplejía prolongada; el biperideno es un éster de acción ultracorta.', smiles: 'OC(CCN1CCCCC1)(c2ccccc2)C3CCCCC3' },
+      { text: 'Ambos son amonios cuaternarios hidrófilos que se administran conjuntamente por vía oftálmica para tratar el glaucoma de ángulo cerrado.', smiles: 'CN(C)CCOC(=O)C(c1ccccc1)C2(O)CCCC2' }
+    ],
+    correctIndex: 0,
+    explanation: 'Comparamos el perfil de biperideno y tropicamida: el biperideno es una amina terciaria lipófila que cruza con rapidez la BHE para bloquear receptores M1 estriatales en el Parkinson, mientras que la tropicamida es una amida/amina diseñada para uso oftálmico tópico como midriático y ciclopléjico de acción ultracorta (recuperación en 4-6 h). La opción b invierte la farmacocinética de ambos agentes terapéuticos.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-13',
+    topicId: 'tema-01',
+    block: 'Bloque 5 · Mecanismos de Acción y Síntesis Directa',
+    badge: 'Mecanismo de Apertura y Desensibili',
+    question: 'A nivel molecular, ¿qué cambio conformacional desencadena la unión de dos moléculas de acetilcolina en el receptor nicotínico muscular (nAChR)?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Fosforilación del bucle citoplasmático por cinasas celulares induciendo la escisión proteolítica irreversible del canal iónico.' },
+      { text: 'Disociación de las subunidades alfa en monómeros citoplasmáticos solubles debido a cambios bruscos del potencial de membrana.' },
+      { text: 'Oligomerización de varios pentámeros en la membrana plasmática formando un megaporos no selectivo permeable a proteínas globulares.' },
+      { text: 'Rotación de las hélices transmembrana M2 desplazando el anillo de leucinas de la compuerta para permitir el influjo catiónico.' }
+    ],
+    correctIndex: 3,
+    explanation: 'Al activarse el receptor nicotínico muscular o neuronal, la unión concertada de dos moléculas de acetilcolina en las interfases alfa-gamma y alfa-delta provoca una rotación de las hélices transmembrana M2, abriendo el canal iónico central y permitiendo la entrada rápida de Na⁺ (y salida de K⁺) que despolariza la membrana. La ocupación prolongada por agonistas conduce a una desensibilización conformacional reversible del canal. La opción a comete el error de afirmar que el canal se abre con una sola molécula de ligando.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-14',
+    topicId: 'tema-01',
+    block: 'Bloque 5 · Mecanismos de Acción y Síntesis Directa',
+    badge: 'Síntesis Orgánica Directa de Trihex',
+    question: 'En la ruta sintética directa del trihexifenidilo, ¿qué dos etapas consecutivas permiten construir el esqueleto del aminoalcohol carbinólico?',
+    questionSmiles: 'OC(CCN1CCCCC1)(c2ccccc2)C3CCCCC3',
+    options: [
+      { text: 'Condensación de Claisen de fenilacetato con ciclohexanona en medio básico y posterior aminación reductora catalítica con piperidina.', smiles: 'CC(=O)c1ccccc1' },
+      { text: 'Acilación de Friedel-Crafts de benceno con cloruro de acriloilo sobre AlCl₃ y posterior adición organometálica de tipo Reformatsky.', smiles: 'O=C(c1ccccc1)CCN2CCCCC2' },
+      { text: 'Reacción de Mannich de acetofenona, formaldehído y piperidina en medio ácido seguida de adición con bromuro de ciclohexilmagnesio.', smiles: 'Br[Mg]C1CCCCC1' },
+      { text: 'Acoplamiento de Heck entre bromobenceno y 1-alilpiperidina catalizado por paladio seguido de epoxidación con perácidos aromáticos.', smiles: 'OC(CCN1CCCCC1)(c2ccccc2)C3CCCCC3' }
+    ],
+    correctIndex: 2,
+    explanation: 'Planteamos la síntesis directa de trihexifenidilo mediante una secuencia en dos pasos clave: en primer lugar, ejecutamos una reacción de Mannich de tres componentes condensando acetofenona, formaldehído acuoso y piperidina en medio ácido para obtener la beta-aminocetona precursora; a continuación, realizamos una adición de Grignard con bromuro de ciclohexilmagnesio en éter anhidro sobre el carbonilo cetónico para construir el carbinol terciario con alto rendimiento. La opción a es la trampa de examen clásica: una adición aldólica directa no introduciría el grupo amino piperidínico.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-b-15',
+    topicId: 'tema-01',
+    block: 'Bloque 5 · Mecanismos de Acción y Síntesis Directa',
+    badge: 'Síntesis Orgánica Directa de Adifen',
+    question: 'En la preparación sintética directa del antiespasmódico adifenina, ¿qué reactivos y condiciones conducen eficazmente al éster aminoalcohólico?',
+    questionSmiles: 'CCN(CC)CCOC(=O)C(c1ccccc1)c2ccccc2',
+    options: [
+      { text: 'Condensación entre difenilcetena y dietilcloroamina en presencia de etóxido sódico en medio alcohólico anhidro a temperatura ambiente.', smiles: 'ClC(=O)C(c1ccccc1)c2ccccc2' },
+      { text: 'Reacción entre cloruro de difenilacetilo y 2-(dietilamino)etanol en disolvente aprótico anhidro en presencia de una base aceptora.', smiles: 'CCN(CC)CCO' },
+      { text: 'Acoplamiento radicalario entre ácido difenilacético y dietilamina libre promovido por peróxidos orgánicos a temperaturas elevadas.', smiles: 'O=C(O)C(c1ccccc1)c2ccccc2' },
+      { text: 'Alquilación reductora de difenilmetano con carbonato de dietilaminoetilo catalizada por ácido sulfúrico concentrado a reflujo suave.', smiles: 'CCN(CC)CCOC(=O)C(c1ccccc1)c2ccccc2' }
+    ],
+    correctIndex: 1,
+    explanation: 'Para la preparación de adifenina en el laboratorio, seleccionamos la acilación directa del 2-(dietilamino)etanol empleando cloruro de difenilacetilo en disolvente aprótico anhidro (diclorometano o tolueno) en presencia de una base no nucleofílica como trietilamina o piridina como captador del HCl liberado. Esta vía acilo-oxígeno evita reacciones colaterales de cuaternización intramolecular. El distractor a confunde la ruta acilo con una sustitución nucleófila SN2 sobre haluros de alquilo que polimerizaría la diamina.',
+    difficulty: 'Medio'
+  }
+];
+
+export const MODELO_C_TEST_QUESTIONS: TestQuestion[] = [
+  {
+    id: 't01-c-01',
+    topicId: 'tema-01',
+    block: 'Bloque 1 · Fundamentos y Farmacóforo de ACh',
+    badge: 'Interacción de Enlace de Hidrógeno ',
+    question: 'El oxígeno carbonílico del enlace éster de la acetilcolina desempeña un papel clave en el receptor muscarínico. ¿Cuál es su interacción molecular primaria?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Actúa como aceptor de enlace de hidrógeno con un residuo conservado (como Asn o Thr) estabilizando la conformación activa del receptor.' },
+      { text: 'Cede electrones para formar un enlace covalente dativo irreversible con cationes de hierro presentes en el bolsillo de unión proteico.' },
+      { text: 'Genera una repulsión estérica voluntaria que expulsa las moléculas de agua circundantes aumentando la entropía de solvatación del ligando.' },
+      { text: 'Sufre un ataque nucleófilo por parte de un residuo de histidina desprotonada para formar un enlace acilo covalente transitorio y reversible.' }
+    ],
+    correctIndex: 0,
+    explanation: 'En el reconocimiento molecular de la acetilcolina por el receptor muscarínico, el oxígeno del grupo carbonilo del éster actúa como un aceptor de enlace de hidrógeno específico y riguroso, interactuando con restos conservados de tirosina y asparagina en el fondo de la cavidad ortostérica. Esta interacción orienta el dipolo de la molécula para permitir el anclaje óptimo de la cabeza catiónica. El distractor b comete el error habitual de proponer al oxígeno como dador de hidrógeno, lo cual es físicamente imposible al carecer de enlaces O–H.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-02',
+    topicId: 'tema-01',
+    block: 'Bloque 1 · Fundamentos y Farmacóforo de ACh',
+    badge: 'Rotación y Flexibilidad en la Caden',
+    question: 'La cadena de dos carbonos (puente etilénico) de la acetilcolina posee una elevada flexibilidad conformacional. ¿Cómo influye dicha propiedad en su perfil farmacológico?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'El enlace C-C posee rotación completamente impedida por enlaces de hidrógeno intramoleculares, forzando una estructura rígida plana en agua.' },
+      { text: 'La molécula adopta con exclusividad la conformación eclipsada de máxima energía para superar la barrera dipolar generada por el nitrógeno.' },
+      { text: 'La rotación permite estados sinclinal y antiperiplanar, siendo la sinclinal (gauche) la predominante en el complejo de unión muscarínico.' },
+      { text: 'El puente de dos metilenos polimeriza espontáneamente en ausencia de disolventes próticos impidiendo la rotación en medio fisiológico.' }
+    ],
+    correctIndex: 2,
+    explanation: 'El enlace sigma C–C del puente etilénico en la acetilcolina presenta una barrera rotacional muy baja (~3 kcal/mol), lo que permite a la molécula interconvertirse libremente en disolución acuosa entre confórmeros antiperiplanarares (trans) y sinclinales (gauche). Sin embargo, el receptor muscarínico selecciona específicamente el confórmero gauche (sinclinal, ~60°, 3.2 Å) al inducir el acoplamiento bioactivo complementario. La opción a es falsa: la cadena de ACh no está rígidamente bloqueada por enlaces dobles.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-03',
+    topicId: 'tema-01',
+    block: 'Bloque 1 · Fundamentos y Farmacóforo de ACh',
+    badge: 'Catálisis Enzimática en AChE: Tríad',
+    question: 'En la tríada catalítica de la acetilcolinesterasa (Ser203, His447, Glu334), ¿cuál es la función mecanística coordinada de His447 y Glu334 durante la acetilación de Ser203?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Glu334 protona directamente a la serina para neutralizar su carácter nucleófilo facilitando la aproximación dipolar del grupo acetilo.' },
+      { text: 'His447 establece un enlace covalente dativo con el nitrógeno cuaternario anclando la molécula de acetilcolina en el fondo de la cavidad.' },
+      { text: 'La tríada catalítica estabiliza el ión oxianión intermedio por repulsión iónica sin participar en transferencias de protones en el ciclo.' },
+      { text: 'Glu334 orienta y polariza a His447, la cual actúa como base general sustrayendo el protón de Ser203 para potenciar su ataque nucleófilo.' }
+    ],
+    correctIndex: 3,
+    explanation: 'Al analizar la catálisis enzimática en la acetilcolinesterasa, describimos el mecanismo de relé de carga de la tríada Ser203-His447-Glu334: el carboxilato de Glu334 estabiliza por puente de hidrógeno a His447, permitiendo que esta base actúe como un aceptor general de protones que desprotona el hidroxilo de la Ser203, transformándolo en un alcóxido sumamente nucleófilo capaz de atacar al carbonilo de la acetilcolina a velocidad de difusión. La opción a comete el grave error de atribuir el ataque nucleófilo a un residuo de cisteína.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-04',
+    topicId: 'tema-01',
+    block: 'Bloque 2 · Agonistas Directos y SAR',
+    badge: 'Mimetismo Estéreo: (S)-Metacolina y',
+    question: 'Al comparar tridimensionalmente la (+)-muscarina natural y la (S)-metacolina, ¿qué coincidencia estereoquímica explica la superior potencia del enantiómero S?',
+    questionSmiles: 'CC(=O)O[C@@H](C)C[N+](C)(C)C',
+    options: [
+      { text: 'El grupo beta-metilo en (R)-metacolina orienta el amonio hacia el exterior impidiendo toda interacción con el residuo de aspartato diana.', smiles: 'CC(=O)O[C@H](C)C[N+](C)(C)C' },
+      { text: 'El grupo beta-metilo en configuración S reproduce la orientación del metilo en C-5 y la conformación gauche bioactiva de (+)-muscarina.', smiles: 'CC(=O)O[C@@H](C)C[N+](C)(C)C' },
+      { text: 'La configuración R provoca la desprotonación espontánea del nitrógeno cuaternario en el fondo del bolsillo del receptor colinérgico diana.', smiles: 'C[C@H]1O[C@H](C[N+](C)(C)C)C[C@@H]1O' },
+      { text: 'La orientación S incrementa el peso molecular del ligando reduciendo de manera drástica su tasa de difusión transmembrana en la sinapsis.', smiles: 'CC(=O)OCC[N+](C)(C)C' }
+    ],
+    correctIndex: 1,
+    explanation: 'La razón estructural de la eudismia en metacolina es que la (S)-metacolina mimetiza con fidelidad el centro estereogénico C-5 de la (+)-(2S,4R,5S)-muscarina natural. Esta correspondencia conformacional sitúa el sustituyente metilo en una bolsa hidrófoba no impedida del receptor muscarínico, mientras que en el eutómero (R) el metilo genera un choque estéreo frontal que impide el acercamiento del éster a los residuos polares del receptor. La opción a confunde los centros quirales, asignando erróneamente la actividad a la forma (R).',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-05',
+    topicId: 'tema-01',
+    block: 'Bloque 2 · Agonistas Directos y SAR',
+    badge: 'Jerarquía de Estabilidad Metabólica',
+    question: 'Considere la serie de análogos de acetilcolina: acetilcolina, metacolina, carbacol y betanecol. ¿Cuál es el orden creciente de estabilidad metabólica frente a AChE?',
+    questionSmiles: 'CC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Carbacol < Acetilcolina < Metacolina < Betanecol, ya que los carbamatos aceleran notablemente el ataque nucleófilo en la cavidad activa.', smiles: 'NC(=O)OCC[N+](C)(C)C' },
+      { text: 'Betanecol < Metacolina < Carbacol < Acetilcolina, ya que los sustituyentes beta aumentan la accesibilidad al bolsillo catalítico de la serina.', smiles: 'NC(=O)OC(C)C[N+](C)(C)C' },
+      { text: 'Acetilcolina < Metacolina < Carbacol < Betanecol, combinando sucesivamente impedimento estérico beta y resonancia donadora del carbamato.', smiles: 'CC(=O)OCC[N+](C)(C)C' },
+      { text: 'Metacolina < Betanecol < Acetilcolina < Carbacol, porque la presencia del centro quiral favorece la aproximación de la serina catalítica.', smiles: 'CC(=O)OC(C)C[N+](C)(C)C' }
+    ],
+    correctIndex: 2,
+    explanation: 'Establecemos en el laboratorio la jerarquía estricta de estabilidad metabólica frente a la AChE: Acetilcolina (hidrólisis ultra rápida, t½ en milisegundos) < Metacolina (estabilidad intermedia por efecto estérico del metilo en beta) < Carbacol / Betanecol (resistencia prácticamente total debido al efecto mesómero donador +M del grupo carbamato que anula la electrofilia del carbonilo). El distractor a propone erróneamente que la acetilcolina es más resistente que los carbamatos.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-06',
+    topicId: 'tema-01',
+    block: 'Bloque 2 · Agonistas Directos y SAR',
+    badge: 'Pilocarpina: Farmacóforo y Protonac',
+    question: 'A diferencia de la mayoría de los agonistas muscarínicos, la pilocarpina carece de un nitrógeno cuaternario. ¿Cómo interactúa eficazmente con el receptor?',
+    questionSmiles: 'CCC1C(COC1=O)Cc2cnc[nH]2',
+    options: [
+      { text: 'El nitrógeno del anillo de imidazol se protona parcialmente a pH fisiológico mimetizando la cabeza catiónica y la lactona aporta el oxígeno.' },
+      { text: 'El heterociclo de imidazol actúa como dador de enlaces covalentes directos con el zinc catalítico del canal iónico nicotínico postsináptico.' },
+      { text: 'La lactona aromática se abre reversiblemente en el plasma rindiendo un ácido carboxílico que interacciona con los residuos básicos del canal.' },
+      { text: 'La molécula carece de interacciones polares actuando de forma indirecta mediante la inhibición competitiva de esterasas en la hendidura sináptica.' }
+    ],
+    correctIndex: 0,
+    explanation: 'Al examinar la estructura de la pilocarpina, observamos que su farmacóforo combina un anillo de imidazol que a pH fisiológico (7.4) se encuentra en un equilibrio de protonación parcial (~20-30% como catión) y un anillo gamma-lactónico sustituido. La forma catiónica del imidazol mimetiza a la cabeza de amonio cuaternario de la acetilcolina interactuando con el carboxilato del receptor muscarínico, mientras que el oxígeno lactónico mimetiza al éster de ACh. La opción b induce a error al afirmar que el imidazol está cuaternizado permanentemente.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-07',
+    topicId: 'tema-01',
+    block: 'Bloque 3 · Inhibidores de AChE y Reactivadores',
+    badge: 'Rivastigmina: Inhibidor Pseudoirrev',
+    question: 'La rivastigmina se emplea en la demencia tipo Alzheimer. ¿Qué rasgo estructural le confiere una selectividad enzimática central y prolongada acción terapéutica?',
+    questionSmiles: 'CCN(C)C(=O)Oc1cccc(c1)[C@@H](C)N(C)C',
+    options: [
+      { text: 'Un grupo amonio cuaternario hidrófilo que impide su distribución periférica facilitando un transporte activo mediado por vesículas a encéfalo.', smiles: 'CCN(C)C(=O)Oc1cccc(c1)[C@@H](C)N(C)C' },
+      { text: 'Un enlace éster fosfato aromático que forma enlaces covalentes irreversibles con la butirilcolinesterasa de los miocitos periféricos.', smiles: 'CNC(=O)Oc1ccc2c(c1)[C@]3(C)CCN(C)[C@@H]3N2C' },
+      { text: 'Un núcleo pirroloindólico oxidable que genera radicales libres en la vecindad de las placas beta-amiloides neutralizando su toxicidad neuronal.', smiles: 'CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C' },
+      { text: 'Un grupo carbamato lipófilo con amina terciaria que cruza la BHE y carbamoila la serina catalítica de la AChE cerebral durante horas.', smiles: 'CN(C)C(=O)Oc1ccc[n+](C)c1' }
+    ],
+    correctIndex: 3,
+    explanation: 'Diseñamos la rivastigmina como un inhibidor carbámico dual de AChE y BuChE para el tratamiento del Alzheimer en el SNC: su estructura incorpora un grupo carbamato fenólico N-etil-N-metilo que se carbamoila lentamente en el cerebro (semivida de inhibición ~10 horas) y una amina terciaria lipófila que cruza la BHE, metabolizándose por sulfoconjugación y no por el citocromo P450, lo que elimina el riesgo de hepatotoxicidad severa. El distractor a confunde a la rivastigmina con un bloqueante neuromuscular irreversible.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-08',
+    topicId: 'tema-01',
+    block: 'Bloque 3 · Inhibidores de AChE y Reactivadores',
+    badge: 'Evolución Molecular: De Tacrina a D',
+    question: 'La tacrina fue el primer inhibidor de AChE aprobado para Alzheimer pero se retiró por severa hepatotoxicidad. ¿Cómo solucionó el diseño de donepezilo este problema?',
+    questionSmiles: 'c1ccc2c(c1)c(c3c(n2)CCCC3)N',
+    options: [
+      { text: 'Se incorporó un grupo amonio cuaternario con carga fija que confina la molécula al hígado impidiendo su metabolismo oxidativo por citocromos.', smiles: 'c1ccc2c(c1)c(c3c(n2)CCCC3)N' },
+      { text: 'Se reemplazó el núcleo aminoacridínico reactivo por un sistema de bencilpiperidina e indanona que inhibe de modo reversible no hepatotóxico.', smiles: 'COc1cc2c(cc1OC)C(=O)CC2CC3CCN(Cc4ccccc4)CC3' },
+      { text: 'Se eliminaron todos los heteroátomos aromáticos de la molécula transformándola en un lípido insaponificable que no requiere excreción biliar.', smiles: 'CN1CC[C@@]23c4cc5c(cc4O[C@@H]2[C@@H](O)C=C[C@H]3C1)OCO5' },
+      { text: 'Se añadió un enlace carbamato fluorado que suprime por completo la formación de metabolitos reactivos de tipo quinona imina en hepatocitos.', smiles: 'CCN(C)C(=O)Oc1cccc(c1)[C@@H](C)N(C)C' }
+    ],
+    correctIndex: 1,
+    explanation: 'En la evolución histórica de fármacos anticolinesterásicos para el Alzheimer, la tacrina fue el primer fármaco aprobado pero debió retirarse por su alta incidencia de necrosis hepática e hipertransaminasemia. Fue sustituida por el donepezilo, un inhibidor reversible no carbamato derivado de bencildimetoxialcanos que no forma metabolitos quinónicos hepatotóxicos y posee una semivida plasmática prolongada (~70 h) que permite una sola dosis diaria. La opción a invierte la cronología y el perfil toxicológico de ambos compuestos.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-09',
+    topicId: 'tema-01',
+    block: 'Bloque 3 · Inhibidores de AChE y Reactivadores',
+    badge: 'Función del Catión Piridinio en la ',
+    question: 'La pralidoxima posee un nitrógeno cuaternario de N-metilpiridinio contiguo a la función aldoxima. ¿Cuál es la justificación fisicoquímica de este catión?',
+    questionSmiles: 'O/N=C/c1cccc[n+]1C',
+    options: [
+      { text: 'El catión piridinio ancla la molécula en el subsitio aniónico orientando con precisión el ión oximato frente al fósforo electrofílico.' },
+      { text: 'El nitrógeno cuaternario permite que la pralidoxima atraviese con facilidad la barrera hematoencefálica para reactivar la enzima central.' },
+      { text: 'El anillo aromático reacciona por sustitución electrófila desactivando las moléculas de organofosforado libres en la hendidura sináptica.' },
+      { text: 'La carga positiva oxida al residuo de histidina catalítica impidiendo que continúe la hidrólisis anormal de fosfoésteres en la serina.' }
+    ],
+    correctIndex: 0,
+    explanation: 'Al utilizar pralidoxima (2-PAM) como reactivador enzimático, el átomo de nitrógeno del anillo de piridinio porta una carga formal positiva permanente que se ancla electrostáticamente en el subsitio aniónico periférico (PAS) de la enzima; este posicionamiento tridimensional orienta de manera precisa el grupo oxima nucleófilo en ángulo directo de ataque hacia el átomo de fósforo del organofosforado. La trampa en la opción b sostiene que el piridinio es una base que captura protones, ignorando su estado cuaternario invariable.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-10',
+    topicId: 'tema-01',
+    block: 'Bloque 4 · Antagonistas y Farmacocinética BHE',
+    badge: 'Bromuro de Tiotropio: Selectividad ',
+    question: 'El bromuro de tiotropio se administra una sola vez al día en EPOC gracias a su selectividad cinética. ¿Qué modificación molecular explica su disociación tan lenta?',
+    questionSmiles: 'C[N+]1(C)C2CC(C1C3OC23)OC(=O)C(O)(c4cccs4)c5cccs5',
+    options: [
+      { text: 'La reducción de su volumen estérico que acelera el transporte activo en el músculo liso bronquial mediado por transportadores de cationes.', smiles: 'C[N+]1(C)C2CC(C1C3OC23)OC(=O)C(O)(c4cccs4)c5cccs5' },
+      { text: 'La sustitución del anillo de tropano por una amina voluminosa que resiste la hidrólisis por esterasas en el tejido respiratorio periférico.', smiles: 'CC(C)[N+]1(C)C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3' },
+      { text: 'La formación de un enlace covalente coordinado con el receptor muscarínico que impide la inactivación por internalización endocítica rápida.', smiles: 'CN1C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3' },
+      { text: 'La incorporación de dos anillos aromáticos ditienilo voluminosos que retardan drásticamente la constante de disociación del receptor M3.', smiles: 'CN1C2CC(C1C3OC23)OC(=O)C(CO)c4ccccc4' }
+    ],
+    correctIndex: 3,
+    explanation: 'En el tratamiento del broncoespasmo en la EPOC, el bromuro de tiotropio destaca por su selectividad cinética: aunque tiene afinidad similar por los receptores M1, M2 y M3, se disocia extremadamente despacio de los receptores M3 broncodilatadores (t½ de disociación > 35 horas) y mucho más rápido de los receptores M2 autorreceptores, permitiendo un efecto broncodilatador sostenido de 24 horas con una única inhalación al día. El distractor a propone una selectividad termodinámica pura, desconociendo el fenómeno de selectividad cinética por disociación lenta.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-11',
+    topicId: 'tema-01',
+    block: 'Bloque 4 · Antagonistas y Farmacocinética BHE',
+    badge: 'Parámetros Fisicoquímicos y Confina',
+    question: '¿Qué combinación de propiedades fisicoquímicas en una molécula anticolinérgica asegura que quede confinada en periferia sin penetrar en el encéfalo?',
+    questionSmiles: 'CC(C)[N+]1(C)C2CCC1CC(C2)OC(=O)C(CO)c3ccccc3',
+    options: [
+      { text: 'Una elevada lipofilia (LogP > 4.5) combinada con un área polar superficial (TPSA) baja inferior a 25 Å² que excluye la penetración celular.' },
+      { text: 'Un peso molecular superior a 1500 Da que supera el umbral de filtración glomerular impidiendo el transporte por transportadores endoteliales.' },
+      { text: 'Una carga positiva neta permanente (ionización 100%), hidrofilia elevada y TPSA efectiva alta que bloquean la difusión pasiva por la BHE.' },
+      { text: 'Una susceptibilidad extrema a la degradación por aminopeptidasas del endotelio vascular cerebral que destruyen el fármaco antes de cruzar.' }
+    ],
+    correctIndex: 2,
+    explanation: 'En Química Médica correlacionamos la biodisponibilidad y cruce de barreras mediante el coeficiente de reparto LogP y la carga formal: fármacos con amonios cuaternarios permanentes (neostigmina, ipratropio) poseen LogP negativo y carecen de formas neutras permeables, quedando estrictamente confinados en el compartimento vascular y periférico. En contraste, las aminas terciarias (fisostigmina, donepezilo, atropina) mantienen una fracción neutra en equilibrio que atraviesa membranas biológicas y la BHE por difusión pasiva lipófila. La opción a invierte esta correlación.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-12',
+    topicId: 'tema-01',
+    block: 'Bloque 4 · Antagonistas y Farmacocinética BHE',
+    badge: 'Ciclopentolato vs Tropicamida: Dura',
+    question: 'Tanto ciclopentolato como tropicamida se emplean como midriáticos en exploraciones oculares. ¿Cuál es la base química de la acción más breve de la tropicamida?',
+    questionSmiles: 'CN(C)CCOC(=O)C(c1ccccc1)C2(O)CCCC2',
+    options: [
+      { text: 'La presencia de una función amida en la tropicamida que confiere menor afinidad y disociación rápida respecto al éster de ciclopentolato.', smiles: 'CCN(Cc1ccccc1)C(=O)C(CO)c2ccncc2' },
+      { text: 'El grupo amino cuaternario de la tropicamida que sufre una hidrólisis ácida instantánea en contacto con las sales del fluido lagrimal ocular.', smiles: 'CN(C)CCOC(=O)C(c1ccccc1)C2(O)CCCC2' },
+      { text: 'La menor solubilidad de la tropicamida en el humor acuoso que induce su precipitación mecánica en forma de microcristales insolubles inertes.', smiles: 'CCN(CC)CCOC(=O)C(O)(c1ccccc1)c2ccccc2' },
+      { text: 'La degradación fotoquímica del anillo de piridina de la tropicamida inducida por la luz azul empleada en la lámpara de hendidura diagnóstica.', smiles: 'CCN(CC)CCOC(=O)C(c1ccccc1)c2ccccc2' }
+    ],
+    correctIndex: 0,
+    explanation: 'Comparamos la duración clínica de la midriasis y cicloplejía en oftalmología: la tropicamida posee una afinidad moderada y una cinética de disociación rápida, lo que permite la recuperación de la función visual en solo 4 a 6 horas, siendo ideal para exploraciones diagnósticas de fondo de ojo. Por el contrario, el ciclopentolato se disocia mucho más lentamente del receptor M3 ciliar, prolongando la parálisis acomodativa durante más de 24 horas. La opción a es la trampa típica: invierte los tiempos de acción de ambos fármacos oftálmicos.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-13',
+    topicId: 'tema-01',
+    block: 'Bloque 5 · Síntesis Orgánica Directa de Fármacos Colinérgicos',
+    badge: 'Síntesis Orgánica Directa de Neosti',
+    question: 'En la síntesis industrial de la neostigmina a partir de 3-(dimetilamino)fenol, ¿cuál es la ruta sintética directa de dos etapas empleada?',
+    questionSmiles: 'CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C',
+    options: [
+      { text: 'Tratamiento fenólico con fosgeno gaseoso seguido de aminólisis con hidrazina y posterior metilación exhaustiva con diazometano.', smiles: 'CN(C)c1cccc(O)c1' },
+      { text: 'Carbamoilación del fenol con cloruro de dimetilcarbamoilo en medio básico y posterior cuaternización con sulfato de dimetilo.', smiles: 'CN(C)C(=O)Cl' },
+      { text: 'Alquilación directa del fenol con cloruro de tetrametilamonio acuoso seguida de carbamoilación con urea en ácido sulfúrico anhidro.', smiles: 'CN(C)C(=O)Oc1cccc(c1)N(C)C' },
+      { text: 'Nitración aromática del fenol seguida de hidrogenación catalítica y condensación con isocianato de metilo en amoniaco líquido.', smiles: 'CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C' }
+    ],
+    correctIndex: 1,
+    explanation: 'Para la síntesis de neostigmina en el laboratorio, preparamos primero el éster carbámico tratando el 3-(dimetilamino)fenol con cloruro de dimetilcarbamoilo (Me₂N–COCl) en piridina anhidra a reflujo moderado; una vez aislado el carbamato aromático, procedemos a la cuaternización regioselectiva del nitrógeno de la amina terciaria mediante tratamiento con sulfato de dimetilo o bromuro de metilo a temperatura ambiente. La opción a es errónea: intentar cuaternizar antes de la carbamilación desactivaría nucleofílicamente al fenol o formaría sales insolubles.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-14',
+    topicId: 'tema-01',
+    block: 'Bloque 5 · Síntesis Orgánica Directa de Fármacos Colinérgicos',
+    badge: 'Síntesis Orgánica Directa de Carbac',
+    question: 'En la preparación sintética directa del carbacol a partir de 2-cloroetanol, ¿qué reactivos y transformaciones químicas se suceden en la ruta?',
+    questionSmiles: 'NC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Oxidación de 2-cloroetanol a ácido cloroacético seguida de condensación con urea anhidra y metilación con yoduro de metilo gaseoso.', smiles: 'ClCCO' },
+      { text: 'Sustitución con cianuro sódico seguida de reducción con hidruro de litio y aluminio e introducción del carbamato con cloroformiato.', smiles: 'ClC(=O)OCCCl' },
+      { text: 'Reacción de óxido de etileno con amoniaco seguida de acilación con cloruro de acetilo y cuaternización final con cloruro de metilo.', smiles: 'NC(=O)OCCCl' },
+      { text: 'Reacción con fosgeno para dar cloroformiato de cloroetilo, aminólisis con amoniaco y desplazamiento bimolecular con trimetilamina.', smiles: 'NC(=O)OCC[N+](C)(C)C' }
+    ],
+    correctIndex: 3,
+    explanation: 'Planteamos la ruta industrial de carbacol a partir de 2-cloroetanol: condensamos el alcohol clorado con fosgeno gaseoso (COCl₂) en medio seco para formar el cloroformiato de 2-cloroetilo; a continuación, el tratamiento con amoníaco anhidro rinde el carbamato de 2-cloroetilo libre de subproductos; finalmente, la cuaternización mediante sustitución nucleófila bimolecular (SN2) con trimetilamina en tubo cerrado produce el cloruro de carbacol puro. El distractor a propone una aminación con urea que no prospera por la baja nucleofilia de las amidas.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-c-15',
+    topicId: 'tema-01',
+    block: 'Bloque 5 · Síntesis Orgánica Directa de Fármacos Colinérgicos',
+    badge: 'Síntesis Orgánica Directa de Metaco',
+    question: 'En la ruta sintética directa de la metacolina a partir de 1-bromo-2-propanol, ¿cuáles son los reactivos empleados en la secuencia de dos etapas?',
+    questionSmiles: 'CC(=O)OC(C)C[N+](C)(C)C',
+    options: [
+      { text: '(1) Fosgeno (COCl₂) en medio básico alcalino y (2) amoníaco gas anhidro en exceso para rendir directamente el éster carbámico terminal.', smiles: 'CC(O)CBr' },
+      { text: '(1) Amoniaco gaseoso en autoclave para formar amina primaria y (2) cloruro de acetilo seguido de metilación con diazometano volátil.', smiles: 'CC(O)C[N+](C)(C)C' },
+      { text: '(1) Trimetilamina para la cuaternización nucleófila (SN2) y (2) anhídrido acético para la acilación selectiva del alcohol secundario.', smiles: 'CC(=O)OC(C)C[N+](C)(C)C' },
+      { text: '(1) Trietilamina para favorecer eliminación de tipo Hofmann a alqueno y (2) adición electrofílica de ácido acético concentrado caliente.', smiles: 'CC(=O)OCC[N+](C)(C)C' }
+    ],
+    correctIndex: 2,
+    explanation: 'En la síntesis directa de metacolina, partimos de 1-bromo-2-propanol o abrimos regioespecíficamente óxido de propileno con trimetilamina en disolución alcohólica, rindiendo el hidroxi-amonio cuaternario 1-(trimetilamonio)propan-2-ol; en la etapa final, acetilamos el alcohol secundario con cloruro de acetilo o anhídrido acético en presencia de acetato sódico anhidro. La trampa del distractor a consiste en intentar condensar acetato de etilo con bromuro de colina, lo que no generaría la ramificación metílica beta de la metacolina.',
+    difficulty: 'Medio'
+  }
+];
+
+
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
     id: 'tema-00',

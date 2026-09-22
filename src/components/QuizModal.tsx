@@ -5,7 +5,9 @@ import {
   QuizAttempt, 
   QuizAnswerDetail, 
   QuizRegistrationRecord,
-  RETROSINTESIS_TEST_QUESTIONS 
+  RETROSINTESIS_TEST_QUESTIONS,
+  MODELO_B_TEST_QUESTIONS,
+  MODELO_C_TEST_QUESTIONS
 } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
@@ -30,7 +32,8 @@ import {
   ChevronUp,
   GraduationCap,
   BarChart3,
-  UserPlus
+  UserPlus,
+  Printer
 } from 'lucide-react';
 
 const REGISTRATION_STORAGE_KEY = 'qfdos_test_registration_records';
@@ -42,7 +45,7 @@ interface QuizModalProps {
   onAttemptCompleted?: (attempt: QuizAttempt) => void;
 }
 
-export type QuizModelType = 'modelo-a' | 'retrosintesis';
+export type QuizModelType = 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis';
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -56,8 +59,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Compute active question bank dynamically
   const questions: TestQuestion[] = useMemo(() => {
-    if (topic.id === 'tema-01' && selectedModel === 'retrosintesis') {
-      return RETROSINTESIS_TEST_QUESTIONS;
+    if (topic.id === 'tema-01') {
+      if (selectedModel === 'modelo-b') return MODELO_B_TEST_QUESTIONS;
+      if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
+      if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
+      return topic.testQuestions || [];
     }
     return topic.testQuestions || [];
   }, [topic, selectedModel]);
@@ -218,9 +224,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         minute: '2-digit'
       });
 
-      const modelDisplayName = (topic.id === 'tema-01' && selectedModel === 'retrosintesis')
-        ? 'Modelo Retrosíntesis: Desconexiones y Sintones (15P)'
-        : 'Modelo A: Farmacología, MoA y Síntesis (15P)';
+      let modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis (15P)';
+      if (topic.id === 'tema-01') {
+        if (selectedModel === 'modelo-b') {
+          modelDisplayName = 'Modelo B: Diferenciación, Cinética y Síntesis Directa (15P)';
+        } else if (selectedModel === 'modelo-c') {
+          modelDisplayName = 'Modelo C: Catálisis Enzimática, Estereoquímica y Síntesis (15P)';
+        } else if (selectedModel === 'retrosintesis') {
+          modelDisplayName = 'Modelo Retrosíntesis: Desconexiones y Sintones (15P)';
+        }
+      }
 
       const finalAttempt: QuizRegistrationRecord = {
         id: `rec_${Date.now()}`,
@@ -690,7 +703,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
                       Modelo de Examen Oficial (15 Preguntas Calibradas):
                     </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? '1fr 1fr' : '1fr', gap: '10px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr', gap: '10px' }}>
+                      {/* Modelo A */}
                       <button
                         type="button"
                         onClick={() => setSelectedModel('modelo-a')}
@@ -717,6 +731,65 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         </p>
                       </button>
 
+                      {/* Modelo B */}
+                      {topic.id === 'tema-01' && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedModel('modelo-b')}
+                          style={{
+                            padding: '12px 14px',
+                            borderRadius: 'var(--radius-md)',
+                            border: selectedModel === 'modelo-b' ? '2px solid #8b5cf6' : '1px solid var(--border-color)',
+                            background: selectedModel === 'modelo-b' ? '#f5f3ff' : 'var(--surface)',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <strong style={{ fontSize: '0.86rem', color: '#7c3aed' }}>
+                              Modelo B: Diferenciación y Cinética (15P)
+                            </strong>
+                            {selectedModel === 'modelo-b' && (
+                              <span className="qfdos-badge" style={{ fontSize: '0.66rem', background: '#8b5cf6', color: '#fff' }}>Activo</span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                            Receptores ionotrópicos vs metabotrópicos, cinética de carbamoilación, aging por organofosforados y síntesis de Mannich.
+                          </p>
+                        </button>
+                      )}
+
+                      {/* Modelo C */}
+                      {topic.id === 'tema-01' && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedModel('modelo-c')}
+                          style={{
+                            padding: '12px 14px',
+                            borderRadius: 'var(--radius-md)',
+                            border: selectedModel === 'modelo-c' ? '2px solid #ea580c' : '1px solid var(--border-color)',
+                            background: selectedModel === 'modelo-c' ? '#fff7ed' : 'var(--surface)',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <strong style={{ fontSize: '0.86rem', color: '#c2410c' }}>
+                              Modelo C: Catálisis y Estereoquímica (15P)
+                            </strong>
+                            {selectedModel === 'modelo-c' && (
+                              <span className="qfdos-badge" style={{ fontSize: '0.66rem', background: '#ea580c', color: '#fff' }}>Activo</span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                            Tríada catalítica de AChE, eudismia con (+)-muscarina, selectividad cinética de tiotropio y síntesis de neostigmina.
+                          </p>
+                        </button>
+                      )}
+
+                      {/* Modelo Retrosíntesis */}
                       {topic.id === 'tema-01' && (
                         <button
                           type="button"
@@ -733,14 +806,14 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <strong style={{ fontSize: '0.86rem', color: 'var(--teal)' }}>
-                              Modelo Retrosíntesis: Desconexiones y Sintones (15P)
+                              Modelo Retrosíntesis y Sintones (15P)
                             </strong>
                             {selectedModel === 'retrosintesis' && (
                               <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem' }}>Activo</span>
                             )}
                           </div>
                           <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                            Teoría de desconexiones (Slides 28-35), polaridad de sintones, reactivo de Ivanov, furfural a piperidolato y aminopropanoles.
+                            Desconexiones C-C, sintones acilo-oxígeno, reactivo de Ivanov, expansión furánica y estructuras en opciones.
                           </p>
                         </button>
                       )}
