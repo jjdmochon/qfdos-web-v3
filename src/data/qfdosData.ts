@@ -424,7 +424,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'El sintón es el subproducto inorgánico precipitado que desplaza el equilibrio termodinámico de la transformación química.', smiles: '[Na+].[Br-]' }
     ],
     correctIndex: 0,
-    explanation: 'Un sintón (synthon) es una unidad estructural idealizada, generalmente cargada (catiónica a-sintón o aniónica d-sintón) o radicalaria, generada formalmente al romper un enlace clave en la molécula diana. Por su parte, el equivalente sintético es la molécula o reactivo de partida real disponible en el laboratorio (por ejemplo, el bromuro de bencilo PhCH₂Br como equivalente sintético del sintón [PhCH₂]⁺).',
+    explanation: 'Planteamos la desconexión estratégica del enlace C(alfa)–C(bencílico) porque nos genera el sintón aceptor PhCH₂⁺ (equivalente comercial: bromuro de bencilo) y el sintón nucleófilo dador ⁻CH(CO₂Et)₂ (malonato de dietilo desprotonado con NaOEt). Esta ruta funciona con rendimientos excelentes mediante sustitución SN2 limpia sobre el carbono bencílico primario activado. Como trampa típica (opción a), el alumno suele intentar desconectar el enlace C(alfa)–Ar; sin embargo, generar un sintón Ph⁺ requeriría una sustitución nucleófila directa sobre un haluro de arilo (bromobenceno), lo cual es imposible por SN2 en carbonos aromáticos sp².',
     difficulty: 'Fácil'
   },
   {
@@ -441,7 +441,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Alcohol bencílico y malonato de dietilo con diciclohexilcarbodiimida (DCC) a reflujo de piridina.', smiles: 'c1ccccc1CO' }
     ],
     correctIndex: 1,
-    explanation: 'El corte heterolítico del enlace C-C bencílico produce el sintón electrofílico [PhCH₂]⁺ (catión bencilo, estabilizado por resonancia en el anillo aromático) y el sintón nucleofílico [–CH(CO₂Et)₂] (carbanión malonato diéster). Sus equivalentes sintéticos inmediatos son el bromuro de bencilo (PhCH₂Br) como electrófilo y el enolato de malonato de dietilo generado desprotonando el malonato con etóxido sódico en etanol.',
+    explanation: 'Planteamos la desconexión C–O acilo-oxígeno como la ruta más limpia y convergente: activamos el ácido difenilacético como cloruro de acilo (Ph₂CH–COCl) y condensamos directamente con el 2-(dietilamino)etanol en piridina o trietilamina anhidra. La trampa conceptual clásica en la que cae el alumno (opción b) es intentar la desconexión alquilo-oxígeno: alquilar el carboxilato libre con una beta-cloroalquilamina (ClCH₂CH₂NEt₂) provoca la ciclación intramolecular instantánea de la amina a catión aziridinio, polimerizando el reactivo y arruinando el rendimiento.',
     difficulty: 'Fácil'
   },
   {
@@ -458,7 +458,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'El carbono aromático sufre un ataque SN2 por el dorso que colapsa la estructura tridimensional planar del anillo.', smiles: 'c1ccccc1O' }
     ],
     correctIndex: 1,
-    explanation: 'El catión fenilo [Ph]⁺ tiene el orbital vacío en un híbrido sp² del plano molecular sigma, que forma un ángulo de 90° con los orbitales 2p perpendiculares que constituyen la nube aromática pi. Al ser estrictamente ortogonales, no existe solapamiento ni estabilización por resonancia, requiriendo más de 100 kcal/mol de energía adicional. Asimismo, los haluros de arilo no experimentan sustitución nucleófila SN2.',
+    explanation: 'En el laboratorio planteamos la desconexión del ácido bencílico hacia la 1,2-dicetona simétrica bencilo (Ph–CO–CO–Ph). En sentido sintético directo, al tratar el bencilo con KOH en medio hidroalcohólico caliente, el ion hidróxido ataca a uno de los carbonilos induciendo una transposición concertada 1,2 del anillo fenílico con migración aniónica al carbono vecino. Esta reacción rinde el alfa-hidroxiácido con rendimiento casi cuantitativo y total economía atómica, evitando el uso de organometálicos sensibles.',
     difficulty: 'Medio'
   },
   {
@@ -475,7 +475,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Halogenación de benceno con tetrabromuro de carbono y catálisis con tricloruro de aluminio anhidro.', smiles: 'c1ccccc1' }
     ],
     correctIndex: 0,
-    explanation: 'El ácido difenilacético Ph₂CH-COOH puede desconectarse formalmente en el enlace C(alfa)-C(=O): 1) Hacia el sintón carbaniónico [Ph₂CH]⁻ cuyo equivalente sintético es el difenilmetillitio (Ph₂CHLi) que se hace reaccionar con CO₂ gaseoso (carbonatación organometálica); 2) Hacia el difenilacetonitrilo (Ph₂CH-CN), accesible por alquilación de fenilacetonitrilo o desplazamiento nucleófilo con cianuro sobre Ph₂CHBr, seguido de hidrólisis ácida o básica.',
+    explanation: 'Para sintetizar el resto alfa-hidroxiácido del ciclopentolato, seleccionamos la desconexión del carbinol terciario hacia ciclopentanona y el dianión del ácido fenilacético (reactivo de Ivanov, preparado tratando el ácido con dos equivalentes de reactivo de Grignard o LDA). La enorme ventaja que debemos destacar en el laboratorio es que la carga negativa sobre el carboxilato del reactivo de Ivanov bloquea la desprotonación alfa de la ciclopentanona, permitiendo una adición nucleófila quimioselectiva sin que la cetona ciclopentánica enolice ni experimente autocondensaciones aldólicas indeseadas.',
     difficulty: 'Medio'
   },
   {
@@ -492,7 +492,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'El borohidruro sódico en disolución acuosa básica con agitación magnética vigorosa.', smiles: 'OC(c1ccccc1)c1ccccc1' }
     ],
     correctIndex: 0,
-    explanation: 'La adición de acetiluro sódico (HC≡C⁻ Na⁺) o reactivos de Grignard alquinílicos sobre diarilcetonas como benzofenona produce carbinoles propargílicos terciarios (1,1-difenilprop-2-in-1-ol). El triple enlace carbono-carbono puede ser posteriormente hidratado selectivamente a cetona, hidrogenado a alqueno/alcano o funcionalizado con aminas en síntesis de fármacos anticolinérgicos.',
+    explanation: 'Planteamos la desconexión del anillo de 1-etilpiperidin-3-ol hasta furfural. En el laboratorio, condensamos primero el furfural con etilamina y sometemos el intermediario a hidrogenación catalítica con catalizador de níquel Raney a presión y temperatura: bajo estas condiciones forzadas, el anillo de furano experimenta hidrogenólisis y una expansión molecular concertada que cicla al anillo piperidínico sustituido en posición 3. Desconectar a piridinas aromáticas (opción a) obligaría a una reducción heterogénea difícilmente controlable y poco selectiva.',
     difficulty: 'Medio'
   },
   {
@@ -509,7 +509,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'La fotólisis del enlace C-C central generando monóxido de carbono e hidrocarburos aromáticos condensados.', smiles: 'c1ccccc1' }
     ],
     correctIndex: 2,
-    explanation: 'La transposición del ácido bencílico ocurre por ataque del nucleófilo OH⁻ a uno de los carbonilos del 1,2-dicetona bencilo, formando un intermedio tetraédrico. A continuación se produce la migración 1,2 intramolecular concertada del anillo fenilo hacia el carbono electrofílico vecino. La transferencia protónica final desde el grupo carboxilo al alcóxido rinde el anión difenilglicolato; la resonancia del carboxilato proporciona la fuerza impulsora termodinámica que hace la reacción irreversible.',
+    explanation: 'Desconectamos el carbinol terciario del trihexifenidilo mediante adición nucleófila de bromuro de ciclohexilmagnesio sobre la beta-aminocetona precursora (3-piperidin-1-il-1-fenilpropan-1-ona). A su vez, esta aminocetona la desconectamos limpiamente en sus tres componentes elementales de la reacción de Mannich clásica: acetofenona (componente enolizable), formaldehído y piperidina en medio ácido acuoso. La trampa habitual (opción d) es intentar añadir ciclohexilamina sobre una enona, lo que daría adición conjugada 1,4 en lugar del carbinol terciario deseado.',
     difficulty: 'Medio'
   },
   {
@@ -526,7 +526,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Corte C-alfa carbinol: produce alcohol bencílico y ciclopentanona con eliminación de agua.', smiles: 'O=C1CCCC1' }
     ],
     correctIndex: 0,
-    explanation: 'La desconexión retrosintética primaria del ciclopentolato es la ruptura del enlace éster C(=O)–O (corte acilo-oxígeno), una desconexión estándar y limpia de aminoésteres colinérgicos. Genera el sintón catión acilio del ácido sustituido (ácido alfa-(1-hidroxiciclopentil)fenilacético) y el sintón alcóxido del 2-(dimetilamino)etanol (HO–CH₂–CH₂–NMe₂), acoplables mediante esterificación o transesterificación.',
+    explanation: 'Planteamos la retrosíntesis de la isopropamida desconectando en primer lugar el catión amonio cuaternario mediante desmetilación (yoduro de metilo como último paso). A continuación, aplicamos una interconversión de grupo funcional (FGI) sobre la amida primaria, llevándola al nitrilo aromático 2,2-difenil-4-(diisopropilamino)butanonitrilo; esto nos permite generar previamente el centro cuaternario por doble alquilación consecutiva del fenilacetonitrilo con electrófilos halogenados en presencia de NaNH₂ o LDA.',
     difficulty: 'Fácil'
   },
   {
@@ -543,7 +543,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Condensación aldólica de benzaldehído con ciclopentanona usando hidróxido sódico acuoso.', smiles: 'O=C1CCCC1' }
     ],
     correctIndex: 0,
-    explanation: 'El reactivo de Ivanov es el dianión organometálico del ácido fenilacético. Se prepara tratando ácido fenilacético con 2 equivalentes de una base organomagnésica fuerte o amida alcalina (como cloruro de isopropilmagnesio o amida sódica). El primer equivalente desprotona cuantitativamente el grupo carboxilo (–COO⁻), y el segundo equivalente sustrae el protón bencílico alfa, formando un dianión estabilizado por resonancia con el anillo y el carboxilato.',
+    explanation: 'Planteamos la desconexión directa del enlace amida acilo-nitrógeno de la tropicamida, obteniendo como equivalentes sintéticos el ácido trópico (ácido 3-hidroxi-2-fenilpropanoico) y la N-etil-N-(piridin-4-ilmetil)amina. En la síntesis directa, debemos proteger previamente el hidroxilo primario del ácido trópico (o emplear su acetil derivado) para evitar la competencia nucleófila del alcohol frente a la amina secundaria al acoplar con agentes de condensación como DCC o cloruro de tionilo.',
     difficulty: 'Medio'
   },
   {
@@ -560,7 +560,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Los ésteres convencionales no pueden purificarse por cromatografía debido a la presencia de trazas de agua.', smiles: 'CN(C)CCOC(=O)C(c1ccccc1)C2(O)CCCC2' }
     ],
     correctIndex: 0,
-    explanation: 'La ciclopentanona posee una marcada acidez en sus protones alfa (pKa ≈ 16) asociada a la tensión angular del anillo pentagonal. Los carbaniones duros monovalentes actúan preferentemente como bases, desprotonándola y provocando su autocondensación aldólica (formando 2-ciclopentilidenciclopentanona). En cambio, el dianión de Ivanov tiene la carga negativa deslocalizada y polarizable (carácter blando), lo que favorece el ataque nucleófilo 1,2 al carbonilo ciclopentánico frente a la desprotonación competitiva.',
+    explanation: 'Desconectamos el éster de acetato para revelar el aminoalcohol quiróforo 1-(trimetilamonio)propan-2-ol. Retrosintéticamente, este aminoalcohol beta-sustituido proviene de la apertura regioespecífica de óxido de propileno mediante ataque nucleófilo directo de trimetilamina anhidra. Por regla de apertura de epóxidos en medio básico/neutro, la trimetilamina ataca quimioselectivamente al carbono menos impedido (C-1), dejando el grupo hidroxilo libre en C-2 listo para la acetilación final con cloruro de acetilo.',
     difficulty: 'Avanzado'
   },
   {
@@ -577,7 +577,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Dicarbonato de di-terc-butilo (Boc₂O) en tetrahidrofurano acuoso con hidróxido sódico 1 M.', smiles: 'CCN1CCCC(O)C1' }
     ],
     correctIndex: 0,
-    explanation: 'La esterificación directa del 1-etilpiperidin-3-ol con cloruro de difenilacetilo en disolvente aprótico (como diclorometano) y trietilamina como aceptor de ácido HCl rinde piperidolato con rendimientos superiores al 90%. La trietilamina atrapa el cloruro de hidrógeno liberado, evitando que protone y desactive la amina terciaria del anillo de piperidina.',
+    explanation: 'Planteamos la desconexión del grupo carbamato del carbacol hacia cloruro de cloroformilo o fosgeno (COCl₂). En la síntesis directa, hacemos reaccionar el 2-cloroetanol con fosgeno para generar el éster de cloroformiato correspondiente, el cual tratamos con amoníaco gas para obtener el carbamato de 2-cloroetilo; finalmente, una sustitución nucleófila SN2 con trimetilamina acuosa a presión cuaterniza el nitrógeno rindiendo el cloruro de carbacol con pureza analítica.',
     difficulty: 'Fácil'
   },
   {
@@ -594,7 +594,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Bromación fotoquímica radicalaria del furano en C-2 seguida de sustitución con etilendiamina anhidra.', smiles: 'CCN1CCCC(O)C1' }
     ],
     correctIndex: 0,
-    explanation: 'La elegante síntesis parte de la aminación reductiva del furfural con etilamina rindiendo N-(furfuril)etilamina. Al tratar con HBr acuoso al 48% en ácido acético caliente, el oxígeno del furano se protona, el anillo de 5 miembros se abre hidrolíticamente y el nitrógeno etilamino ataca intramolecularmente para ciclar a un anillo de 6 miembros, deshidratándose a bromuro de 1-etil-3-hidroxipiridinio. Su posterior hidrogenación catalítica con PtO₂ o Ru/C rinde el 1-etilpiperidin-3-ol racémico.',
+    explanation: 'Desconectamos el carbinol terciario del biperideno hacia la beta-aminopropanona precursora (1-fenil-3-piperidinopropan-1-ona) y un nucleófilo organometálico portador del resto bicíclico: el reactivo de Grignard derivado del 5-bromo-2-norborneno. La gran ventaja sintética de este diseño es que el enlace carbono-carbono entre el norbornenilo y el carbinol se construye en una sola etapa con alta estereoselectividad endo/exo controlada por el impedimento estérico del puente metilénico.',
     difficulty: 'Avanzado'
   },
   {
@@ -611,7 +611,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'La posición C-3 se oxida espontáneamente por el aire generando un óxido de nitrógeno altamente hidrófilo.', smiles: 'CCN1CCCC(C1)OC(=O)C(c1ccccc1)c1ccccc1' }
     ],
     correctIndex: 0,
-    explanation: 'El anillo de piperidina sustituido en C-3 imita espacialmente el puente tropánico de la atropina (sustituido en la posición 3-alfa del esqueleto 8-azabiciclo[3.2.1]octano). Esta posición mantiene la distancia conformacional óptima de 3.0 Å entre el nitrógeno básico protonable y el enlace éster, geometría requerida para interaccionar simultáneamente con el aspartato ortostérico y las bolsas hidrófobas accesorias del receptor muscarínico.',
+    explanation: 'Planteamos la desconexión convergente del éster de oxibutinina en el enlace acilo-oxígeno, aislando el ácido alfa-ciclohexil-alfa-hidroxifenilacético y el alcohol propargílico 4-(dietilamino)but-2-in-1-ol. Este aminoalcohol acetilénico se sintetiza elegantemente mediante una reacción de Mannich de tres componentes empleando alcohol propargílico, paraformaldehído y dietilamina en presencia de cloruro de cobre(I) como catalizador.',
     difficulty: 'Medio'
   },
   {
@@ -628,7 +628,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Ruptura del anillo bencénico por ozonólisis reductiva con dimetilsulfuro en metanol seco.', smiles: 'Br[Mg]C1CCCCC1' }
     ],
     correctIndex: 0,
-    explanation: 'El trihexifenidilo posee un carbinol terciario asimétrico unido a tres grupos: fenilo, ciclohexilo y el brazo beta-aminoetílico (–CH₂CH₂–piperidina). La desconexión más lógica rompe el enlace entre el carbono del carbinol y el anillo ciclohexilo, generando como equivalentes sintéticos el bromuro de ciclohexilmagnesio (c-HexMgBr) como nucleófilo y la beta-aminocetona 1-fenil-3-(piperidin-1-il)propan-1-ona (la conocida base de Mannich) como electrófilo.',
+    explanation: 'Planteamos la desconexión del éster de diciclomina hacia el ácido [1,1'-bi(ciclohexil)]-1-carboxílico y el 2-(dietilamino)etanol. El fragmento ácido se sintetiza mediante acoplamiento organometálico y carboxilación, o por reducción catalítica exhaustiva con PtO₂ a alta presión del ácido 1-fenilciclohexanocarboxílico, saturando totalmente los dos anillos carbocíclicos antes de formar el cloruro de acilo y esterificar.',
     difficulty: 'Medio'
   },
   {
@@ -645,7 +645,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'Fenilacetonitrilo, bromuro de etilo y etilendiamina con catálisis de cloruro de zinc anhidro.', smiles: 'O=C(c1ccccc1)CCN2CCCCC2' }
     ],
     correctIndex: 0,
-    explanation: 'La reacción de Mannich es una condensación multicomponente clásica entre un compuesto con protones alfa enolizables (acetofenona PhCOCH₃), un aldehído no enolizable (formaldehído (CH₂O)n) y una amina secundaria (clorhidrato de piperidina). El ión iminio generado in situ sufre el ataque nucleófilo del enol de la acetofenona, rindiendo limpiamente la beta-aminocetona con rendimiento superior al 85%.',
+    explanation: 'Desconectamos la propantelina desglosando la cuaternización del nitrógeno (adición de bromuro de metilo como paso final) y desconectando el éster acilo-oxígeno hacia el ácido xanteno-9-carboxílico y el 2-(diisopropilamino)etanol. El ácido tricíclico se prepara a partir de xantidrol por carbonilación o tratamiento con cianuro e hidrólisis alcalina; la esterificación se efectúa vía cloruro de acilo en piridina seca para evitar la apertura del anillo de pirona.',
     difficulty: 'Fácil'
   },
   {
@@ -662,7 +662,7 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
       { text: 'El nitrilo actúa como reactivo deshidratante consumiendo todo el disolvente orgánico sin generar calor.', smiles: 'CC(C)[N+](C)(CCC(C(N)=O)(c1ccccc1)c1ccccc1)C(C)C.[I-]' }
     ],
     correctIndex: 0,
-    explanation: 'El ácido 4-(diisopropilamino)-2,2-difenilbutanoico posee un centro cuaternario muy impedido con dos fenilos voluminosos en alfa que dificultaría enormemente la activación y amidación convencional, sufriendo descarboxilaciones parásitas. La hidratación con H₂SO₄ al 85% a 95 °C transforma selectivamente el grupo nitrilo (–C≡N) en amida primaria (–CONH₂), deteniéndose cuantitativamente en ella sin hidrolizarse a ácido. La posterior cuaternización con yoduro de metilo (MeI) rinde la isopropamida.',
+    explanation: 'Planteamos la desconexión del carbamato de la neostigmina hacia 3-(dimetilamino)fenol y cloruro de dimetilcarbamoilo (Me₂N–COCl). En el laboratorio, la reacción de carbamilación se conduce en piridina anhidra a temperatura controlada; el fenolato ataca selectivamente al carbonilo del cloruro de carbamoilo. Posteriormente, la cuaternización regiespecífica del nitrógeno amínico terciario se logra tratando con sulfato de dimetilo o bromuro de metilo, obteniendo la sal cuaternaria sin alterar el éster carbámico.',
     difficulty: 'Medio'
   }
 ];
@@ -1276,7 +1276,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'La rápida velocidad de inversión piramidal del nitrógeno que dispersa la densidad electrónica sobre el puente etilénico.', smiles: 'C[N+](C)(C)C' }
         ],
         correctIndex: 2,
-        explanation: 'El átomo de nitrógeno de la acetilcolina está unido mediante cuatro enlaces covalentes C–N a tres metilos y a la cadena etilénica. Al carecer de pares de electrones libres, no puede participar en equilibrios ácido-base de transferencia protónica; por tanto, su carga formal neta +1 es permanente e invariable frente a oscilaciones de pH fisiológico.',
+        explanation: 'Debemos destacar que el catión amonio cuaternario tiene sus cuatro valencias saturadas por enlaces covalentes C–N (tres metilos y el puente etilénico). Al carecer por completo de par electrónico solitario desprotonable, mantiene de forma permanente e invariable su carga formal positiva independientemente del pH fisiológico. En cuanto a los distractores, la trampa conceptual típica (opción a) confunde el efecto inductivo: los alquilos son dadores (+I), no atractores; la opción b es inviable porque el nitrógeno cuaternario no posee enlaces N–H para donar hidrógeno; y en la opción d, al no haber par solitario, no existe inversión piramidal.',
         difficulty: 'Fácil'
       },
       {
@@ -1293,7 +1293,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'La formación de enlaces covalentes coordinados con cationes divalentes de zinc solvatados en el fondo del bolsillo de unión.', smiles: 'NC(=O)OCC[N+](C)(C)C' }
         ],
         correctIndex: 0,
-        explanation: 'El catión trimetilamonio se une en una cavidad hidrófoba y aromática del receptor muscarínico (formada por restos de Tyr y Trp) mediante interacciones catión-π con las nubes electrónicas aromáticas, complementada por la atracción coulombiana iónica directa con el anión carboxilato de un residuo conservado de aspartato (Asp105/Asp147).',
+        explanation: 'En el laboratorio de modelado molecular observamos que el catión trimetilamonio encaja en una cavidad aromática formada por residuos de tirosina y triptófano mediante interacciones catión-π con las nubes electrónicas aromáticas, anclándose de forma simultánea por atracción electrostática iónica directa con el carboxilato del aspartato conservado (Asp105/Asp147). Respecto a las alternativas erróneas, la opción b es imposible porque el nitrógeno cuaternario carece de protones para formar puentes de hidrógeno convencionales; la opción c supondría una desmetilación irreversible destructiva; y la opción d es falsa porque los receptores muscarínicos son GPCRs que no emplean cofactores de zinc en el sitio ortostérico.',
         difficulty: 'Medio'
       },
       {
@@ -1310,7 +1310,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'Exige la presencia obligatoria de un anillo aromático condensado a cinco carbonos del átomo de nitrógeno cuaternario.', smiles: 'c1ccccc1CC[N+](C)(C)C' }
         ],
         correctIndex: 1,
-        explanation: 'La regla de Ing establece que para una máxima actividad agonista muscarínica no debe haber más de cinco átomos entre el nitrógeno cuaternario y el extremo terminal. En la conformación bioactiva sinclinal (gauche), el ángulo diedro O–C–C–N⁺ es cercano a 60°, ubicando la cabeza catiónica a ~3.2 Å del oxígeno carbonílico/éster, distancia exacta para interactuar simultáneamente con los subsitios del receptor.',
+        explanation: 'Al analizar la regla de los cinco átomos de Ing, comprobamos que para una máxima actividad agonista muscarínica no debe superarse una separación de cinco átomos entre el nitrógeno cuaternario y el extremo terminal. En la conformación bioactiva sinclinal (gauche), el ángulo diedro O–C–C–N⁺ se sitúa en torno a 60°, lo que fija una distancia interatómica óptima de ~3.2 Å entre el centro catiónico y el oxígeno del éster, permitiendo la interacción complementaria simultánea con los dos subsitios del receptor. La opción a es un error frecuente: la conformación antiperiplanar separa los grupos a ~4.5 Å, reduciendo drásticamente la afinidad muscarínica.',
         difficulty: 'Medio'
       },
       {
@@ -1327,7 +1327,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'El enantiómero (S) es unas 250 veces más activo al reproducir con fidelidad la disposición espacial de la (+)-muscarina natural.', smiles: 'CC(=O)O[C@@H](C)C[N+](C)(C)C' }
         ],
         correctIndex: 3,
-        explanation: 'El eutómero es la (S)-metacolina. Su centro estereogénico sitúa el grupo metilo en una orientación espacial tridimensional que coincide con la configuración observada en el carbono C-5 de la (+)-(2S,4R,5S)-muscarina natural, encajando en una cavidad hidrófoba complementaria del receptor sin generar impedimento estérico.',
+        explanation: 'En el diseño estereoquímico de agonistas, el eutómero indiscutible es la (S)-metacolina, que muestra unas 250 veces más potencia que su enantiómero (R). El fundamento molecular reside en que su centro estereogénico sitúa el grupo metilo en la orientación tridimensional equivalente a la configuración del carbono C-5 de la (+)-(2S,4R,5S)-muscarina natural, emulando con exactitud su encaje en el bolsillo hidrófobo del receptor sin generar impedimento estérico. El distractor a induce al error típico de atribuir mayor afinidad a la forma (R) confundiéndola con su cinética de hidrólisis lenta frente a la AChE.',
         difficulty: 'Medio'
       },
       {
@@ -1344,7 +1344,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'La formación de un enlace disulfuro covalente con el bolsillo enzimático que impide la liberación del centro acetilado.', smiles: 'CC(=O)OC(C)C[N+](C)(C)C' }
         ],
         correctIndex: 1,
-        explanation: 'El carbacol es un éster carbámico (carbamato). El par de electrones no compartido del grupo –NH₂ se deslocaliza hacia el grupo carbonilo por efecto mesómero donador (+M: NH₂–C(=O)–O ↔ ⁺NH₂=C(–O⁻)–O). Esto disminuye la carga parcial positiva sobre el carbono carbonílico, dificultando enormemente el ataque nucleófilo del hidroxilo de la Ser203.',
+        explanation: 'Planteamos la síntesis de carbacol para resolver la inestabilidad metabólica de la acetilcolina. El carbacol es un éster carbámico (carbamato) donde el par de electrones no enlazante del nitrógeno –NH₂ se deslocaliza hacia el carbonilo por efecto mesómero donador (+M: NH₂–C(=O)–O ↔ ⁺NH₂=C(–O⁻)–O). Esta conjugación disminuye drásticamente el carácter electrófilo del carbono carbonílico, bloqueando el ataque nucleófilo de la Ser203 de la acetilcolinesterasa. La trampa en la que cae el alumno en la opción a es atribuir la resistencia a impedimento estérico: el grupo amino primario no es voluminoso, su efecto protector es puramente electrónico.',
         difficulty: 'Medio'
       },
       {
@@ -1361,7 +1361,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'La dimerización intermolecular mediante acoplamiento de tipo radicalario entre dos anillos de imidazol bajo radiación UV.', smiles: 'CC[C@@H]1C(=O)OC[C@@H]1CO' }
         ],
         correctIndex: 0,
-        explanation: 'La pilocarpina posee dos centros estereogénicos contiguos en el anillo de γ-butirolactona con configuración cis (3S,4R). El protón alfa al carbonilo lactónico es relativamente ácido; en medio básico o neutro se desprotona formando un enolato plano cuya reprotonación termodinámica produce la trans-isopilocarpina (epimerización en C-3), la cual carece de actividad biológica.',
+        explanation: 'Al trabajar con disoluciones de pilocarpina debemos controlar rigurosamente dos rutas de degradación: la epimerización en el carbono quiral C-3 que genera isopilocarpina (inactiva) y la hidrólisis básica del anillo lactónico que rinde ácido pilocárpico. En medio básico, la desprotonación del protón en alfa al carbonilo genera un enolato plano que al reprotonarse termodinámicamente invierte la configuración relativa cis a trans, provocando la pérdida irreversible de actividad antiglaucomatosa. Los distractores b y c confunden la labilidad del anillo lactónico con el heterociclo de imidazol, el cual es químicamente estable en condiciones fisiológicas.',
         difficulty: 'Avanzado'
       },
       {
@@ -1378,7 +1378,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'La fisostigmina queda confinada a la placa motora neuromuscular periférica debido a la presencia de su anillo tricíclico de indol.', smiles: 'CN(C)C(=O)Oc1cccnc1' }
         ],
         correctIndex: 2,
-        explanation: 'La fisostigmina es un alcaloide natural con una amina terciaria (pKa ≈ 8.0); a pH fisiológico existe una fracción neutra en equilibrio lipófila capaz de cruzar pasivamente la barrera hematoencefálica (BHE). Por el contrario, la neostigmina es un análogo sintético que incorpora un catión trimetilamonio cuaternario permanente (+1), lo que le impide cruzar la BHE y confina su acción a la periferia (miastenia gravis).',
+        explanation: 'En farmacología clínica distinguimos con claridad la fisostigmina de la neostigmina por su confinamiento: la fisostigmina es un carbamato alcaloide con nitrógeno terciario no ionizado a pH fisiológico (LogP alto), lo que le permite atravesar la barrera hematoencefálica y revertir intoxicaciones anticolinérgicas centrales por atropina. Por el contrario, la neostigmina incorpora un nitrógeno cuaternario permanentemente cargado (LogP muy bajo) que le impide cruzar la BHE, restringiendo su acción terapéutica a la placa motora periférica (miastenia gravis). La opción a invierte de manera errónea el estado de ionización de ambas moléculas.',
         difficulty: 'Fácil'
       },
       {
@@ -1395,7 +1395,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'Interacciona de forma reversible no covalente ocupando simultáneamente el sitio catalítico (CAS) y el sitio aniónico periférico (PAS).', smiles: 'COc1cc2c(cc1OC)C(=O)CC2CC3CCN(Cc4ccccc4)CC3' }
         ],
         correctIndex: 3,
-        explanation: 'El donepezilo es un inhibidor no covalente de doble diana en la AChE: el anillo de bencilpiperidina se orienta en el fondo de la garganta catalítica interaccionando con Trp84 en el sitio aniónico catalítico (CAS), mientras que el resto de indanona dimetoxilada se ancla en la entrada de la garganta estableciendo apilamiento π con Trp279 en el sitio aniónico periférico (PAS). No forma aductos covalentes.',
+        explanation: 'Para el tratamiento del Alzheimer seleccionamos donepezilo porque es un inhibidor reversible no carbamato que ocupa simultáneamente el sitio activo catalítico (CAS) y el sitio aniónico periférico (PAS) de la AChE mediante apilamiento aromático con Trp86 y Trp286. Al no transferir grupos químicos covalentes a la Ser203, carece por completo de la hepatotoxicidad grave observada históricamente con la tacrina y no induce tolerancia enzimática. El error conceptual del distractor a radica en clasificar al donepezilo como sustrato suicida o carbamoilante covalente.',
         difficulty: 'Medio'
       },
       {
@@ -1412,7 +1412,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'Induce la desmetilación oxidativa del residuo de colina fosforilado permitiendo la entrada directa de agua para desfosforilar.', smiles: 'CC(C)(C)C(C)OP(=O)(C)F' }
         ],
         correctIndex: 0,
-        explanation: 'La pralidoxima posee un grupo oxima (=N–OH) con pKa ≈ 7.8, que a pH fisiológico genera una concentración significativa de ion oximato (=N–O⁻), un nucleófilo potentísimo de tipo alfa (efecto alfa). Guiada por su cabeza de N-metilpiridinio hacia el subsitio aniónico, ataca al fósforo electrofílico del aducto Ser-O-P(=O), rompiendo el enlace éster fosfórico y liberando la Ser203 libre.',
+        explanation: 'Al diseñar antídotos contra organofosforados, empleamos pralidoxima (2-PAM) porque combina un catión piridinio que se ancla electrostáticamente al subsitio aniónico periférico de la AChE y un grupo oxima nucleófilo (=N–OH) perfectamente posicionado. El grupo oxima ataca el átomo de fósforo electrofílico del resto organofosforado unido a la Ser203, desplazándolo mediante sustitución nucleófila y regenerando la enzima libre antes de que ocurra el envejecimiento. La trampa de la opción c consiste en creer que la oxima ataca a la colina o al resto acetilo.',
         difficulty: 'Medio'
       },
       {
@@ -1429,7 +1429,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'La eliminación de cualquier átomo de nitrógeno para evitar interacciones electrostáticas con los residuos aniónicos del receptor.', smiles: 'CCN(CC)CCOC(=O)C(O)(c1ccccc1)c1ccccc1' }
         ],
         correctIndex: 2,
-        explanation: 'El farmacóforo de los anticolinérgicos muscarínicos comparte con la acetilcolina una cabeza básica catiónica y un grupo acilo/éster espaciado, pero se diferencia radicalmente por incorporar sustituyentes lipófilos voluminosos (anillos fenilo, ciclohexilo o ciclopentilo). Estos grupos se anclan en bolsas hidrófobas accesorias adyacentes al sitio activo, impidiendo el cambio conformacional necesario para la activación del GPCR.',
+        explanation: 'Definimos el farmacóforo de los antagonistas muscarínicos como una cabeza catiónica básica separada por una cadena alquilica corta de un centro acilo esterificado con dos anillos hidrófobos voluminosos (aromáticos o cicloalifáticos). Estos anillos lipófilos actúan como un 'escudo hidrófobo' que establece interacciones no específicas con zonas adyacentes al sitio ortostérico, impidiendo el cambio conformacional del receptor hacia el estado activo. La opción a es la trampa habitual: la regla de Ing rige para agonistas colinérgicos flexibles, mientras que los antagonistas toleran estructuras voluminosas de mayor extensión.',
         difficulty: 'Fácil'
       },
       {
@@ -1446,7 +1446,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'Actúa selectivamente como agonista nicotínico facilitando la contracción de la musculatura lisa bronquial en crisis agudas.', smiles: 'CN1[C@@H]2C[C@@H](OC(=O)[C@H](CO)c3ccccc3)C[C@H]1[C@@H]1O[C@@H]12' }
         ],
         correctIndex: 1,
-        explanation: 'El ipratropio es el derivado N-isopropílico cuaternizado de la atropina. Al poseer cuatro sustituyentes sobre el nitrógeno, tiene una carga formal positiva fija independiente del pH. Su baja liposolubilidad y alto coeficiente de hidratación impiden que cruce la barrera hematoencefálica o se absorba masivamente a sangre, concentrando su efecto broncodilatador local y suprimiendo la toxicidad central atropínica.',
+        explanation: 'Prescribimos bromuro de ipratropio por vía inhalatoria en EPOC porque la presencia del nitrógeno cuaternario N-isopropílico le confiere una carga positiva permanente e hidrofobicidad nula (LogP < 0). Esto anula su absorción a través de la mucosa bronquial y la barrera hematoencefálica, limitando el bloqueo de receptores M3 al músculo liso bronquial sin provocar los efectos anticolinérgicos sistémicos típicos de la atropina (taquicardia, retención urinaria, sequedad). La opción a confunde la selectividad farmacocinética (confinamiento tópico) con una selectividad por subtipo de receptor.',
         difficulty: 'Fácil'
       },
       {
@@ -1463,7 +1463,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'El reemplazo del enlace éster por un carbinol terciario lipófilo que resulta completamente inmune a las esterasas plasmáticas.', smiles: 'OC(CCN1CCCCC1)(c2ccccc2)C3CCCCC3' }
         ],
         correctIndex: 3,
-        explanation: 'Los aminoésteres clásicos (como atropina o ciclopentolato) se inactivan rápidamente en plasma por la acción de butirilcolinesterasas y esterasas hepáticas que hidrolizan el enlace C(=O)–O. El trihexifenidilo reemplaza la función éster por un carbinol terciario (alcohol terciario –C(OH)(Ph)(c-Hex)–) estable a la hidrólisis, confiriéndole una prolongada semivida de eliminación (10-12 horas).',
+        explanation: 'Al evaluar antimuscarínicos sintéticos como el trihexifenidilo, comprobamos que la presencia de un carbinol terciario impide su oxidación metabólica a cetona, ya que el carbono carbinólico carece de átomos de hidrógeno disponibles (C–H). Además, el grupo amino terciario piperidínico en forma básica neutra facilita un cruce eficiente de la BHE para controlar el temblor y rigidez en el Parkinson. La trampa típica (opción a) afirma que los alcoholes terciarios se oxidan a ácidos carboxílicos, lo cual es químicamente imposible sin rotura de enlaces C–C.',
         difficulty: 'Medio'
       },
       {
@@ -1480,7 +1480,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'El bromobenceno resultante como reactivo comercial actúa como oxidante fuerte consumiendo el malonato por condensación parásita.', smiles: 'CCOC(=O)C(Cc1ccccc1)C(=O)OCC' }
         ],
         correctIndex: 1,
-        explanation: 'El corte entre el anillo aromático y el carbono metilénico generaría un sintón catión fenilo [Ph]⁺. La vacante electrónica se localiza en un orbital híbrido sp² que se encuentra en el plano del anillo, perpendicular (ortogonal) a los orbitales 2p que forman el sexteto aromático π. Por tanto, no existe estabilización por resonancia. Además, los haluros de arilo como el bromobenceno no sufren sustitución nucleófila SN2.',
+        explanation: 'En la transducción de señales de receptores muscarínicos, diferenciamos dos cascadas: los subtipos M1, M3 y M5 se acoplan a proteínas Gq/11, activando la fosfolipasa C-beta (PLCβ) con generación de inositol trisfosfato (IP3) y diacilglicerol (DAG), lo que moviliza calcio intracelular. En cambio, los receptores M2 y M4 se acoplan a proteínas Gi/o, inhibiendo a la adenilato ciclasa y disminuyendo los niveles de AMPc. El error conceptual del distractor a invierte el acoplamiento, asociando erróneamente M2 a estimulación celular.',
         difficulty: 'Medio'
       },
       {
@@ -1497,7 +1497,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'Actúa como ácido de Lewis quelando al oxígeno del carbonilo para promover una sustitución nucleófila bimolecular sobre el anillo.', smiles: 'CN(C)CCOC(=O)C(c1ccccc1)C2(O)CCCC2' }
         ],
         correctIndex: 2,
-        explanation: 'La ciclopentanona tiene protones alfa con acusada acidez (pKa ≈ 16) asociada a la tensión angular de su anillo pentagonal. Al reaccionar con bases o carbaniones duros monovalentes, se enoliza rápidamente dando autocondensación aldólica en lugar de adición. El reactivo de Ivanov (dianión de fenilacetato [PhCH(CO₂⁻)]⁻ 2 M⁺) posee densidad electrónica deslocalizada que le confiere carácter de nucleófilo blando, atacando regioselectivamente en 1,2 al carbonilo con rendimiento > 80%.',
+        explanation: 'En la síntesis de ciclopentolato en el laboratorio, preparamos el reactivo de Ivanov tratando el ácido fenilacético con dos equivalentes de reactivo de Grignard o LDA para generar el dianión hidrocarbonado correspondiente. Al condensar este dianión con ciclopentanona, la presencia de la carga carboxilato suprime la enolización competitiva de la cetona ciclopentánica, permitiendo la adición nucleófila limpia sobre el carbonilo y rindiendo el alfa-hidroxiácido con excelente rendimiento sin subproductos aldólicos. La opción a es la trampa típica: un enolato simple provocaría autocondensación aldólica descontrolada de la ciclopentanona.',
         difficulty: 'Avanzado'
       },
       {
@@ -1514,7 +1514,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
           { text: 'Tratamiento con isocianato de metilo anhidro en presencia de una base terciaria impedida para rendir un N-metilcarbamato.', smiles: 'CN=C=O' }
         ],
         correctIndex: 0,
-        explanation: 'La síntesis industrial del betanecol convierte el alcohol secundario del 1-(trimetilamonio)propan-2-ol en carbamato activándolo primero con fosgeno (COCl₂) para generar el intermedio cloroformiato cuaternario (–CH(CH₃)–O–CO–Cl), liberando HCl. A continuación, el tratamiento con amoniaco gaseoso anhidro (NH₃) desplaza el cloruro mediante una sustitución nucleófila acílica limpia, aislando betanecol.',
+        explanation: 'Planteamos la ruta directa de betanecol a partir de 1-(trimetilamonio)propan-2-ol: activamos el alcohol secundario con fosgeno (COCl₂) para generar el éster de cloroformiato correspondiente y lo tratamos seguidamente con amoníaco anhidro en medio aprótico para formar el grupo carbamato terminal. La presencia del metilo en beta bloquea cualquier interacción con el receptor nicotínico y protege estéricamente el enlace éster. La opción b falla porque la urea es un electrófilo demasiado poco reactivo para acilar un alcohol secundario sin catalizadores metálicos agresivos.',
         difficulty: 'Medio'
       }
     ],
