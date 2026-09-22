@@ -596,7 +596,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               gap: '6px'
             }}
           >
-            <BarChart3 size={15} /> Registro de Calificaciones & Google Sheets
+            <BarChart3 size={15} /> {isProfesor ? 'Registro de Calificaciones & Google Sheets' : 'Mis Calificaciones'}
             <span style={{ 
               fontSize: '0.68rem', 
               padding: '1px 6px', 
@@ -1378,14 +1378,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={() => setShowSheetsConfig(!showSheetsConfig)}
-                    className="btn btn-sm btn-secondary"
-                    style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', fontWeight: 700 }}
-                    title="Configurar webhook de Google Sheets para recepción de notas"
-                  >
-                    <Sheet size={14} /> {showSheetsConfig ? 'Ocultar Google Sheets' : '⚙ Configurar Google Sheets'}
-                  </button>
+                  {isProfesor && (
+                    <button
+                      onClick={() => setShowSheetsConfig(!showSheetsConfig)}
+                      className="btn btn-sm btn-secondary"
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', fontWeight: 700 }}
+                      title="Configurar webhook de Google Sheets para recepción de notas"
+                    >
+                      <Sheet size={14} /> {showSheetsConfig ? 'Ocultar Google Sheets' : '⚙ Configurar Google Sheets'}
+                    </button>
+                  )}
                   <button
                     onClick={handleExportCsv}
                     className="btn btn-sm btn-primary"
@@ -1407,8 +1409,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                 </div>
               </div>
 
-              {/* Panel de Configuración de Google Sheets */}
-              {showSheetsConfig && (
+              {/* Panel de Configuración de Google Sheets (Solo para Docentes) */}
+              {isProfesor && showSheetsConfig && (
                 <div style={{
                   background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(30, 58, 138, 0.05) 100%)',
                   border: '1.5px solid rgba(16, 185, 129, 0.3)',
