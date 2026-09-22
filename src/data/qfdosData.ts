@@ -650,13 +650,13 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
     question: 'La metacolina y el betanecol comparten el intermedio 1-(trimetilamonio)propan-2-ol. ¿Qué etapa final diferencia la obtención de cada fármaco a partir de ese precursor común?',
     questionSmiles: 'OC(C)C[N+](C)(C)C',
     options: [
-  { text: 'La acilación del hidroxilo con anhídrido acético rinde metacolina, mientras que la carbamoilación vía fosgeno y amoníaco anhidro rinde betanecol.' },
-  { text: 'La acilación con cloruro de acetilo rinde betanecol, mientras que el calentamiento con urea en ácido sulfúrico concentrado rinde directamente metacolina.' },
+  { text: 'La acilación con cloruro de acetilo rinde betanecol, mientras que el calentamiento con urea en ácido sulfúrico concentrado rinde metacolina.' },
   { text: 'La reacción con isocianato de metilo rinde metacolina, mientras que la esterificación de Fischer con ácido fórmico en medio ácido rinde betanecol.' },
-  { text: 'La oxidación del carbinol secundario a cetona rinde metacolina, mientras que la aminación reductora posterior con amoníaco rinde betanecol.' }
+  { text: 'La oxidación del carbinol secundario a cetona rinde metacolina, mientras que la aminación reductora posterior con amoníaco rinde betanecol.' },
+  { text: 'La acilación del hidroxilo con anhídrido acético rinde metacolina, mientras que la carbamoilación vía fosgeno y amoníaco anhidro rinde betanecol.' }
     ],
-    correctIndex: 0,
-    explanation: 'Partimos del mismo 1-(trimetilamonio)propan-2-ol y la ruta se bifurca únicamente en la naturaleza del acilo que colgamos del hidroxilo secundario. Con anhídrido acético o cloruro de acetilo obtenemos el éster acético, es decir la metacolina, que sigue siendo sustrato de la acetilcolinesterasa aunque se hidroliza bastante más despacio que la acetilcolina por el impedimento del metilo en beta. Si en cambio activamos el alcohol con fosgeno y tratamos el cloroformiato con amoníaco anhidro obtenemos el carbamato, el betanecol, resistente a la esterasa porque el par solitario del nitrógeno se deslocaliza sobre el carbonilo y le resta carácter electrófilo. El distractor b invierte ambas rutas: es el error más repetido en el examen.',
+    correctIndex: 3,
+    explanation: 'Partimos del mismo 1-(trimetilamonio)propan-2-ol y la ruta se bifurca únicamente en la naturaleza del acilo que colgamos del hidroxilo secundario. Con anhídrido acético o cloruro de acetilo obtenemos el éster acético, es decir la metacolina, que sigue siendo sustrato de la acetilcolinesterasa aunque se hidroliza bastante más despacio que la acetilcolina por el impedimento del metilo en beta. Si en cambio activamos el alcohol con fosgeno y tratamos el cloroformiato con amoníaco anhidro obtenemos el carbamato, el betanecol, resistente a la esterasa porque el par solitario del nitrógeno se deslocaliza sobre el carbonilo y le resta carácter electrófilo. El distractor a invierte ambas rutas: es el error más repetido en el examen.',
     difficulty: 'Medio'
   },
   {
