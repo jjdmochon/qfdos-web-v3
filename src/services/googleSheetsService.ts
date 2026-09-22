@@ -69,7 +69,7 @@ export async function submitAttemptToGoogleSheets(
     totalQuestions: attempt.totalQuestions,
     evaluator: attempt.evaluator,
     evaluationMode: attempt.evaluationMode,
-    answersDetail: attempt.answersDetail.map(a => ({
+    answersDetail: (attempt.answersDetail ?? []).map(a => ({
       num: a.questionNumber,
       question: a.questionText,
       selectedText: a.selectedOptionText,
