@@ -15,7 +15,8 @@ import {
   getGoogleSheetsUrl,
   setGoogleSheetsUrl,
   GOOGLE_APPS_SCRIPT_TEMPLATE,
-  GoogleSheetsSubmissionResult
+  GoogleSheetsSubmissionResult,
+  misCalificaciones
 } from '../services/googleSheetsService';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
@@ -121,40 +122,91 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Records / Grading Dashboard State
   // Google Sheets Integration State
-  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'no_url' | 'network_error'>('idle');
+  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error'>('idle');
   const [showSheetsConfig, setShowSheetsConfig] = useState<boolean>(false);
   const [sheetsUrlInput, setSheetsUrlInput] = useState<string>(getGoogleSheetsUrl());
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
   const [urlSaveSuccess, setUrlSaveSuccess] = useState<boolean>(false);
 
   const [records, setRecords] = useState<QuizRegistrationRecord[]>([]);
+  const [estadoHistorial, setEstadoHistorial] =
+    useState<'local' | 'cargando' | 'sincronizado' | 'sin_conexion'>('local');
   const [recordsFilterTopic, setRecordsFilterTopic] = useState<'current' | 'all'>('current');
   const [recordsSearchQuery, setRecordsSearchQuery] = useState<string>('');
   const [expandedRecordId, setExpandedRecordId] = useState<string | null>(null);
 
-  // Load records from localStorage
-  const loadStoredRecords = () => {
+  /** Lo guardado en ESTE navegador. */
+  const leerRegistrosLocales = (): QuizRegistrationRecord[] => {
     try {
-      const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY);
-      if (raw) {
-        setRecords(JSON.parse(raw) as QuizRegistrationRecord[]);
-      } else {
-        const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-        if (legacy) {
-          setRecords(JSON.parse(legacy) as QuizRegistrationRecord[]);
-        } else {
-          setRecords([]);
-        }
-      }
+      const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY)
+        ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as QuizRegistrationRecord[]) : [];
     } catch (e) {
       console.error('Error loading quiz records', e);
-      setRecords([]);
+      return [];
     }
   };
 
+  /**
+   * Dos intentos son el mismo si coinciden correo, tema y marca temporal.
+   *
+   * La hoja y el navegador asignan identificadores distintos al mismo examen,
+   * así que comparar por `id` duplicaría cada intento hecho en este equipo.
+   */
+  const huella = (r: QuizRegistrationRecord) =>
+    `${(r.studentEmail || '').toLowerCase().trim()}|${r.topicId}|${(r.timestamp || '').trim()}`;
+
+  const fusionar = (
+    remotos: QuizRegistrationRecord[],
+    locales: QuizRegistrationRecord[]
+  ): QuizRegistrationRecord[] => {
+    const vistos = new Set(remotos.map(huella));
+    // Los locales que ya constan en la hoja se descartan: gana la versión
+    // remota, que es la que ve el profesor.
+    return [...remotos, ...locales.filter(r => !vistos.has(huella(r)))];
+  };
+
+  const loadStoredRecords = () => {
+    setRecords(leerRegistrosLocales());
+  };
+
+  /**
+   * Trae de la hoja los intentos de la cuenta con la que se ha entrado.
+   *
+   * Antes esto no existía: «Mis Calificaciones» leía el localStorage, así que
+   * al entrar desde otro equipo con la misma cuenta el historial salía vacío
+   * aunque la nota estuviera registrada.
+   */
+  const sincronizarRegistros = async () => {
+    const locales = leerRegistrosLocales();
+    const correo = (user?.email || studentEmail || '').trim();
+
+    // El profesor consulta la hoja entera, no su propia fila.
+    if (isProfesor || !correo) {
+      setRecords(locales);
+      setEstadoHistorial('local');
+      return;
+    }
+
+    setEstadoHistorial('cargando');
+    const remotos = await misCalificaciones(correo);
+
+    if (remotos === null) {
+      setRecords(locales);
+      setEstadoHistorial('sin_conexion');
+      return;
+    }
+
+    setRecords(fusionar(remotos, locales));
+    setEstadoHistorial('sincronizado');
+  };
+
   useEffect(() => {
-    loadStoredRecords();
-  }, []);
+    sincronizarRegistros();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email, isProfesor]);
 
   // Set default respondent based on role and mode
   useEffect(() => {
@@ -1307,7 +1359,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           <div><strong>Evaluado:</strong> {studentName}</div>
                           <div><strong>Correo:</strong> {studentEmail}</div>
                           <div><strong>Docente Responsable:</strong> Dr. Juan José Díaz-Mochón</div>
-                          <div><strong>Almacenamiento Local:</strong> <span className="font-mono" style={{ fontSize: '0.72rem' }}>qfdos_test_registration_records</span></div>
+                          {isProfesor && (
+                            <div><strong>Almacenamiento Local:</strong> <span className="font-mono" style={{ fontSize: '0.72rem' }}>qfdos_test_registration_records</span></div>
+                          )}
                         </div>
 
                         {/* Estado de Sincronización Google Sheets */}
@@ -1320,6 +1374,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           {sheetSubmitStatus === 'sent' && (
                             <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid #10b981', color: '#065f46', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <CheckCircle2 size={16} color="#10b981" /> <span><strong>Sincronizado:</strong> Respuestas y nota volcadas en Google Sheets.</span>
+                            </div>
+                          )}
+                          {sheetSubmitStatus === 'sent_unconfirmed' && (
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--semantic-warn-bg)', border: '1px solid var(--accent-amber)', color: 'var(--text-main)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <AlertCircle size={15} color="var(--accent-amber)" />
+                              <span><strong>Enviado.</strong> No se ha podido releer la hoja para confirmarlo; el intento queda también en este navegador.</span>
                             </div>
                           )}
                           {sheetSubmitStatus === 'no_url' && (
@@ -1342,15 +1402,19 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <button
                       onClick={() => {
                         setActiveTab('records');
-                        loadStoredRecords();
+                        sincronizarRegistros();
                       }}
                       className="btn btn-primary"
                     >
-                      <BarChart3 size={15} /> Ver Registro de Calificaciones
+                      <BarChart3 size={15} /> {isProfesor ? 'Ver Registro de Calificaciones' : 'Ver Mis Calificaciones'}
                     </button>
-                    <button onClick={handleNewStudentEvaluation} className="btn btn-secondary">
-                      <UserPlus size={15} /> Evaluar a Otro Alumno
-                    </button>
+                    {/* Encadenar evaluaciones es cosa del profesorado: un alumno
+                        no debe poder abrir un examen a nombre de otra persona. */}
+                    {isProfesor && (
+                      <button onClick={handleNewStudentEvaluation} className="btn btn-secondary">
+                        <UserPlus size={15} /> Evaluar a Otro Alumno
+                      </button>
+                    )}
                     <button onClick={handleRestart} className="btn btn-outline">
                       <RotateCcw size={15} /> Repetir Intento
                     </button>
@@ -1373,7 +1437,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
                     {isProfesor 
                       ? 'Portal Docente · Consultas, sincronización en Google Sheets y exportación oficial'
-                      : 'Registro personal guardado en este dispositivo para seguimiento de tu aprendizaje'
+                      : <>Intentos registrados a nombre de <span className="font-mono">{user?.email || studentEmail}</span>, entres desde donde entres</>
                     }
                   </p>
                 </div>
@@ -1397,17 +1461,69 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   >
                     <Download size={14} /> Exportar CSV
                   </button>
-                  <button
-                    onClick={handleClearAllRecords}
-                    className="btn btn-sm btn-outline"
-                    disabled={records.length === 0}
-                    style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)', fontSize: '0.76rem' }}
-                    title="Vaciar historial de evaluaciones registradas"
-                  >
-                    <Trash2 size={14} /> Vaciar
-                  </button>
+                  {isProfesor && (
+                    <button
+                      onClick={handleClearAllRecords}
+                      className="btn btn-sm btn-outline"
+                      disabled={records.length === 0}
+                      style={{ color: 'var(--accent-red)', borderColor: 'var(--accent-red)', fontSize: '0.76rem' }}
+                      title="Vaciar historial de evaluaciones registradas"
+                    >
+                      <Trash2 size={14} /> Vaciar
+                    </button>
+                  )}
                 </div>
               </div>
+
+              {!isProfesor && estadoHistorial !== 'local' && (
+                <div
+                  style={{
+                    marginBottom: '1rem',
+                    background: estadoHistorial === 'sin_conexion' ? 'var(--semantic-warn-bg)' : 'var(--semantic-ok-bg)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '9px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.78rem',
+                    color: 'var(--text-main)'
+                  }}
+                >
+                  {estadoHistorial === 'cargando' && (
+                    <><Clock size={15} /> Recuperando tus intentos del registro del profesor…</>
+                  )}
+                  {estadoHistorial === 'sincronizado' && (
+                    <>
+                      <CheckCircle2 size={15} color="var(--accent-emerald)" />
+                      <span>Historial completo: incluye los intentos hechos desde otros navegadores.</span>
+                      <button
+                        onClick={sincronizarRegistros}
+                        className="btn btn-sm btn-ghost"
+                        style={{ marginLeft: 'auto', fontSize: '0.74rem' }}
+                      >
+                        Actualizar
+                      </button>
+                    </>
+                  )}
+                  {estadoHistorial === 'sin_conexion' && (
+                    <>
+                      <AlertCircle size={15} color="var(--accent-amber)" />
+                      <span>
+                        No se ha podido consultar el registro del profesor, así que abajo sólo aparece
+                        lo hecho en este navegador. Tus notas siguen registradas.
+                      </span>
+                      <button
+                        onClick={sincronizarRegistros}
+                        className="btn btn-sm btn-ghost"
+                        style={{ marginLeft: 'auto', fontSize: '0.74rem' }}
+                      >
+                        Reintentar
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
 
               {/* Panel de Configuración de Google Sheets (Solo para Docentes) */}
               {isProfesor && showSheetsConfig && (
@@ -1665,14 +1781,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                               </span>
                             )}
 
-                            <button
-                              onClick={e => handleDeleteRecord(rec.id, e)}
-                              className="btn btn-sm btn-outline"
-                              style={{ color: 'var(--text-muted)', padding: '6px 8px' }}
-                              title="Eliminar este intento"
-                            >
-                              <Trash2 size={14} />
-                            </button>
+                            {isProfesor && (
+                              <button
+                                onClick={e => handleDeleteRecord(rec.id, e)}
+                                className="btn btn-sm btn-outline"
+                                style={{ color: 'var(--text-muted)', padding: '6px 8px' }}
+                                title="Eliminar este intento"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
                           </div>
                         </div>
 
