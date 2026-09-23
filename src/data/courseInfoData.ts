@@ -142,8 +142,8 @@ export const COURSE_EVALUATION_GUIDE = {
       sistema: "Examen parcial",
       codigos: "SE.1, SE.2, SE.3 y SE.4",
       porcentaje: 20,
-      caracter: "No eliminatorio",
-      descripcion: "Prueba intermedia de progreso para afianzar conceptos clave de la primera mitad del curso."
+      caracter: "Evaluación continua (19/11/2026)",
+      descripcion: "Prueba intermedia de progreso (jueves 19 de noviembre de 2026, 17:00 h). Pondera un 20% de la nota final dentro de la evaluación continua; no eliminatoria."
     },
     {
       sistema: "Prácticas de laboratorio",
@@ -176,7 +176,7 @@ export const COURSE_EVALUATION_GUIDE = {
     { codigo: "SE.15", desc: "Asistencia" }
   ],
   ordinariaDetalle: {
-    teoria: "La calificación final se obtendrá mediante la suma de las calificaciones obtenidas en cada una de las partes de la Tabla 1, siempre y cuando en el examen final se haya obtenido una calificación mínima de 5. Ninguno de los exámenes aprobados se guardará ni para convocatorias extraordinarias ni para posteriores cursos académicos.",
+    teoria: "La calificación final se obtendrá mediante la suma de las calificaciones obtenidas en cada una de las partes de la Tabla 1, siempre y cuando en el examen final se haya obtenido una calificación mínima de 5. El Examen Parcial de evaluación continua se realizará el 19 de noviembre de 2026 (20% de la nota, no eliminatorio). Ninguno de los exámenes aprobados se guardará ni para convocatorias extraordinarias ni para posteriores cursos académicos.",
     practicas: "Es obligatorio aprobar las prácticas para poder superar la asignatura. El alumno debe asistir a TODAS las sesiones prácticas y superar las pruebas de conocimiento. Ante cualquier duda razonable, el profesor podrá realizar pruebas orales o prácticas individuales complementarias. Alumnos con prácticas no realizadas o suspensas no podrán superar la asignatura en convocatoria ordinaria."
   },
   extraordinariaDetalle: {
@@ -199,8 +199,8 @@ export const COURSE_EVALUATION_GUIDE = {
     plazoSolicitud: "Del 1 al 7 de octubre de 2026 (Imprescindible)",
     viaSolicitud: "Sede Electrónica de la Universidad de Granada (sede.ugr.es)",
     sedeUrl: "https://sede.ugr.es/procs/Gestion-Academica-Solicitud-de-convocatoria-especial-de-noviembre/",
-    fechaExamen: "19 de noviembre de 2026",
-    requisitos: "Podrán solicitar esta convocatoria los estudiantes de Grado que cumplan los requisitos establecidos por la Normativa de Evaluación y Calificación de la UGR para finalización de estudios (tener pendientes para concluir el Grado un número máximo de créditos reglamentarios y haber estado matriculados previamente de la asignatura).",
+    fechaExamen: "10 de noviembre de 2026",
+    requisitos: "Podrán solicitar esta convocatoria los estudiantes de Grado que cumplan los requisitos establecidos por la Normativa de Evaluación y Calificación de la UGR para finalización de estudios (tener pendientes para concluir el Grado un número máximo de créditos reglamentarios y haber estado matriculados previamente de la asignatura). Plazo obligatorio: del 1 al 7 de octubre de 2026 por la Sede Electrónica de la UGR.",
     partes: [
       { parte: "Parte Teórica (100% en Acta)", desc: "Examen oficial que evalúa la totalidad del programa teórico de Química Farmacéutica II. Requisito indispensable: calificación mínima de 5,0 sobre 10 para superar la asignatura." },
       { parte: "Prácticas de Laboratorio", desc: "Requisito obligatorio: tener superadas y convalidadas las prácticas de laboratorio en cursos anteriores (o superar la prueba práctica oficial de laboratorio si no estuvieran convalidadas)." }

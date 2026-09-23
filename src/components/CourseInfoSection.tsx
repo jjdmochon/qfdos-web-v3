@@ -735,7 +735,7 @@ export const CourseInfoSection: React.FC = () => {
 
               <div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', background: 'rgba(13, 148, 136, 0.06)', padding: '8px 10px', borderRadius: '6px', borderLeft: '3px solid var(--teal-ink)', marginBottom: '10px', marginTop: '12px' }}>
-                  🎓 <strong>Fecha examen oficial:</strong> {COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.fechaExamen} (Aula 7, 09:00 h).
+                  🎓 <strong>Fecha examen oficial:</strong> {COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.fechaExamen} (según llamamiento de Facultad).
                 </div>
 
                 <a
