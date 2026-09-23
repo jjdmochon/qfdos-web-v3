@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StudentEvaluationProfile, INITIAL_STUDENT_EVALUATION_DATA, QFDOS_INFO } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
+import { leerEvaluacion, guardarEvaluacion } from '../services/contenidoRemoto';
 import { 
   GraduationCap, 
   Download, 
@@ -20,8 +21,11 @@ import {
   ExternalLink
 } from 'lucide-react';
 
+// La hoja es privada: sólo se usa para el enlace «Abrir hoja» del profesor.
+// Los datos llegan a través de Apps Script (accion=evaluacion), filtrados por
+// cuenta en el servidor.
 const EVALUATION_SHEET_ID = '1gbbet7PZavZQKffB3d7BUs3nhbg9dMJy4ZYGoh3q9yQ';
-const EVALUATION_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${EVALUATION_SHEET_ID}/export?format=csv`;
+const EVALUATIONS_KEY = 'qfdos_v3_evaluations';
 
 interface EvaluationSectionProps {
   onOpenFirSimulator?: () => void;
@@ -30,15 +34,22 @@ interface EvaluationSectionProps {
 export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirSimulator }) => {
   const { isProfesor, user } = useAuth();
   const [students, setStudents] = useState<StudentEvaluationProfile[]>(() => {
-    const saved = localStorage.getItem('qfdos_v3_evaluations');
+    const saved = localStorage.getItem(EVALUATIONS_KEY);
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const lista = JSON.parse(saved) as StudentEvaluationProfile[];
+        if (isProfesor) return lista;
+        // Versiones anteriores guardaban aquí la clase entera también en el
+        // navegador del alumno. Se recorta a su propia fila y se reescribe.
+        const propio = (user?.email || '').toLowerCase().trim();
+        const recortada = lista.filter(s => (s.email || '').toLowerCase().trim() === propio);
+        localStorage.setItem(EVALUATIONS_KEY, JSON.stringify(recortada));
+        return recortada;
       } catch (e) {
         console.error('Error loading saved evaluations', e);
       }
     }
-    return INITIAL_STUDENT_EVALUATION_DATA;
+    return isProfesor ? INITIAL_STUDENT_EVALUATION_DATA : [];
   });
 
   const [loadingSheet, setLoadingSheet] = useState<boolean>(false);
@@ -50,49 +61,28 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
   const [editLab, setEditLab] = useState<number>(0);
   const [editTrabajos, setEditTrabajos] = useState<number>(0);
 
-  // Sync from Google Sheet CSV
+  // Sincronización con la hoja de evaluación, vía Apps Script
   const syncFromGoogleSheet = async () => {
     setLoadingSheet(true);
     setSheetSyncStatus('Sincronizando con Google Sheets...');
     try {
-      const res = await fetch(EVALUATION_SHEET_CSV_URL);
-      if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-      const csvText = await res.text();
-      
-      const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
-      if (lines.length <= 1) {
-        setSheetSyncStatus('La hoja está vacía o no tiene registros.');
+      const r = await leerEvaluacion();
+      if (!r.ok) throw new Error(r.error);
+      const { cabeceras, filas } = r.tabla;
+
+      if (filas.length === 0) {
+        if (!isProfesor) {
+          // El alumno aún no figura en la hoja: nada que mostrar, y nada viejo
+          setStudents([]);
+          localStorage.setItem(EVALUATIONS_KEY, '[]');
+        }
+        setSheetSyncStatus(isProfesor ? 'La hoja está vacía o no tiene registros.' : 'Todavía no hay calificaciones registradas a tu nombre.');
         setLoadingSheet(false);
         return;
       }
 
-      // Función robusta para parsear una fila CSV respetando comillas (ej. "García Pérez, Elena")
-      const parseCSVRow = (text: string): string[] => {
-        const result: string[] = [];
-        let cur = '';
-        let inQuotes = false;
-        for (let i = 0; i < text.length; i++) {
-          const char = text[i];
-          if (char === '"') {
-            if (inQuotes && text[i + 1] === '"') {
-              cur += '"';
-              i++; // skip escaped quote
-            } else {
-              inQuotes = !inQuotes;
-            }
-          } else if (char === ',' && !inQuotes) {
-            result.push(cur.trim());
-            cur = '';
-          } else {
-            cur += char;
-          }
-        }
-        result.push(cur.trim());
-        return result.map(c => c.replace(/^"|"$/g, '').trim());
-      };
-
       // Parse headers
-      const headers = parseCSVRow(lines[0]).map(h => h.toLowerCase());
+      const headers = cabeceras.map(h => String(h).toLowerCase());
       const emailIdx = headers.findIndex(h => h.includes('email') || h.includes('correo') || h.includes('ugr'));
       const nameIdx = headers.findIndex(h => h.includes('nombre') || h.includes('alumno') || h.includes('estudiante'));
       const finalIdx = headers.findIndex(h => (h.includes('final') || h.includes('70')) && !h.includes('parcial'));
@@ -113,8 +103,8 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
 
       const parsedStudents: StudentEvaluationProfile[] = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const cols = parseCSVRow(lines[i]);
+      for (let i = 1; i <= filas.length; i++) {
+        const cols = filas[i - 1].map(c => String(c ?? '').trim());
         const email = emailIdx !== -1 ? cols[emailIdx] : `alumno${i}@correo.ugr.es`;
         const name = nameIdx !== -1 ? cols[nameIdx] : `Estudiante ${i}`;
         
@@ -149,12 +139,12 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
 
       if (parsedStudents.length > 0) {
         setStudents(parsedStudents);
-        localStorage.setItem('qfdos_v3_evaluations', JSON.stringify(parsedStudents));
+        localStorage.setItem(EVALUATIONS_KEY, JSON.stringify(parsedStudents));
         setSheetSyncStatus(`✓ Sincronizados ${parsedStudents.length} estudiantes correctamente desde Google Sheets.`);
       }
     } catch (err: any) {
       console.warn('Error fetching Google Sheet, using stored data:', err);
-      setSheetSyncStatus(`Nota: No se pudo conectar directamente con Google Sheets (${err.message}). Mostrando datos locales.`);
+      setSheetSyncStatus(`Nota: no se pudo sincronizar con Google Sheets (${err.message}). Mostrando la última copia guardada.`);
     } finally {
       setLoadingSheet(false);
     }
@@ -235,7 +225,15 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
     setEditTrabajos(s.trabajosGrade ?? 0);
   };
 
-  const handleSaveEdit = (email: string) => {
+  const [guardandoEmail, setGuardandoEmail] = useState<string | null>(null);
+
+  const handleSaveEdit = async (email: string) => {
+    const notas = [editExamenFinal, editParcial, editLab, editTrabajos].map(n => Number(n) || 0);
+    if (notas.some(n => n < 0 || n > 10)) {
+      setSheetSyncStatus('Las notas tienen que estar entre 0 y 10. No se ha guardado nada.');
+      return;
+    }
+
     const updated = students.map(s => {
       if (s.email === email) {
         return {
@@ -262,8 +260,28 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
     });
 
     setStudents(updated);
-    localStorage.setItem('qfdos_v3_evaluations', JSON.stringify(updated));
+    localStorage.setItem(EVALUATIONS_KEY, JSON.stringify(updated));
     setEditingEmail(null);
+
+    // La hoja es la fuente oficial: sin esto, la edición vivía sólo en este
+    // navegador y se perdía al cambiar de equipo o limpiar datos.
+    setGuardandoEmail(email);
+    setSheetSyncStatus(`Guardando las notas de ${email} en la hoja…`);
+    const alumno = students.find(s => s.email === email);
+    const r = await guardarEvaluacion({
+      email,
+      nombre: alumno?.name,
+      examenFinal: notas[0],
+      parcial: notas[1],
+      practicas: notas[2],
+      trabajos: notas[3]
+    });
+    setGuardandoEmail(null);
+    setSheetSyncStatus(
+      r.ok
+        ? `✓ ${email}: ${r.mensaje}`
+        : `No se pudo guardar en la hoja (${r.mensaje}). El cambio queda solo en este navegador: vuelve a guardarlo.`
+    );
   };
 
   // Filtrado de seguridad: Si es estudiante, SOLO ve su propio registro asociado a su correo institucional go.ugr.es
@@ -721,10 +739,13 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                           ) : (
                             <button
                               onClick={() => handleStartEdit(s)}
+                              disabled={guardandoEmail === s.email}
                               className="btn btn-sm btn-outline"
                               style={{ padding: '3px 8px', fontSize: '0.72rem' }}
                             >
-                              <Edit3 size={12} /> Editar
+                              {guardandoEmail === s.email
+                                ? <><RefreshCw size={12} className="spin" /> Guardando…</>
+                                : <><Edit3 size={12} /> Editar</>}
                             </button>
                           )}
                         </td>

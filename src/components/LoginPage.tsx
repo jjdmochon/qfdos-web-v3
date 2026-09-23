@@ -21,10 +21,10 @@ export const LoginPage: React.FC = () => {
     }
   }, []);
 
-  const handleSuccess = (credentialResponse: { credential?: string }) => {
+  const handleSuccess = async (credentialResponse: { credential?: string }) => {
     setLoading(true);
     setError(null);
-    const result = loginWithGoogle(credentialResponse);
+    const result = await loginWithGoogle(credentialResponse);
     if (!result.success) {
       setError(result.error || 'Error al iniciar sesión.');
     }
@@ -100,7 +100,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Divider */}
         <div className="login-divider">
-          <span>Acceso con @go.ugr.es o @gmail.com</span>
+          <span>Acceso con @correo.ugr.es, @go.ugr.es o @gmail.com</span>
         </div>
 
         {/* Google login */}
@@ -139,7 +139,7 @@ export const LoginPage: React.FC = () => {
             <div>
               <strong>Estudiantes</strong>
               <p>
-                Entra con tu cuenta institucional (<code>@go.ugr.es</code>) o con tu cuenta de <code>@gmail.com</code>.
+                Entra con tu cuenta institucional (<code>@correo.ugr.es</code> o <code>@go.ugr.es</code>) o con tu cuenta de <code>@gmail.com</code>.
               </p>
             </div>
           </div>

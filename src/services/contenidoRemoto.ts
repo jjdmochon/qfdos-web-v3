@@ -11,6 +11,7 @@
 //                en su navegador, nunca en el código distribuido
 // ==========================================================================
 
+import { tokenSesion, esSesionInvalida } from './sesion';
 import { QfdosTopic, QfdosAnnouncement, QfdosGlossaryTerm, QfdosResourceLink, COURSE_BUILD_TIMESTAMP, INITIAL_TOPICS } from '../data/qfdosData';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
@@ -158,7 +159,8 @@ export async function publicarContenido(
 
   try {
     const resp = await fetch(
-      `${WEBAPP_URL}?accion=guardarContenido&clave=${encodeURIComponent(clave.trim())}`,
+      `${WEBAPP_URL}?accion=guardarContenido&clave=${encodeURIComponent(clave.trim())}` +
+        `&sesion=${encodeURIComponent(tokenSesion())}`,
       {
         method: 'POST',
         // text/plain evita la petición previa de CORS, que Apps Script no atiende
@@ -175,6 +177,9 @@ export async function publicarContenido(
         ok: true,
         mensaje: `Publicado para todo el curso (${kb} KB). El alumnado lo verá al recargar.`
       };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return { ok: false, mensaje: 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar para publicar.' };
     }
     return { ok: false, mensaje: cuerpo?.error ?? 'La hoja rechazó la publicación.' };
   } catch (err) {
@@ -236,7 +241,9 @@ const inFlightMisEntregas = new Map<string, Promise<EntregaPropia[] | null>>();
  */
 export async function misEntregas(email: string): Promise<EntregaPropia[] | null> {
   const normEmail = (email || '').toLowerCase().trim();
+  const sesion = tokenSesion();
   if (!publicacionDisponible() || !normEmail) return null;
+  if (!sesion) return getCachedEntregas(normEmail);
 
   if (inFlightMisEntregas.has(normEmail)) {
     return inFlightMisEntregas.get(normEmail)!;
@@ -245,7 +252,10 @@ export async function misEntregas(email: string): Promise<EntregaPropia[] | null
   const promesa = (async () => {
     try {
       const resp = await fetch(
-        `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(normEmail)}&t=${Date.now()}`,
+        // El servidor devuelve lo de la cuenta de la sesión; `email` sólo lo
+        // atiende si quien pregunta es profesor
+        `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(normEmail)}` +
+          `&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
         { method: 'GET', redirect: 'follow' }
       );
       if (!resp.ok) {
@@ -266,4 +276,97 @@ export async function misEntregas(email: string): Promise<EntregaPropia[] | null
 
   inFlightMisEntregas.set(normEmail, promesa);
   return promesa;
+}
+
+// ==========================================================================
+// Matriz de evaluación
+// ==========================================================================
+
+export interface TablaEvaluacion {
+  cabeceras: string[];
+  filas: string[][];
+}
+
+export type ResultadoEvaluacion =
+  | { ok: true; tabla: TablaEvaluacion }
+  | { ok: false; error: string; sesionInvalida?: boolean };
+
+/**
+ * Filas de la hoja de evaluación que corresponden a quien pregunta: todas si
+ * es profesor, sólo la suya si es estudiante. El filtrado lo hace el servidor;
+ * al navegador del alumno no llegan las notas de nadie más.
+ */
+export async function leerEvaluacion(): Promise<ResultadoEvaluacion> {
+  if (!publicacionDisponible()) {
+    return { ok: false, error: 'Falta configurar VITE_PRACTICAS_WEBAPP_URL.' };
+  }
+  const sesion = tokenSesion();
+  if (!sesion) {
+    return { ok: false, error: 'Tu sesión ha caducado. Vuelve a entrar.', sesionInvalida: true };
+  }
+  try {
+    const resp = await fetch(
+      `${WEBAPP_URL}?accion=evaluacion&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
+      { method: 'GET', redirect: 'follow' }
+    );
+    const cuerpo = await resp.json().catch(() => null);
+    if (cuerpo?.ok && Array.isArray(cuerpo.cabeceras) && Array.isArray(cuerpo.filas)) {
+      return { ok: true, tabla: { cabeceras: cuerpo.cabeceras, filas: cuerpo.filas } };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return { ok: false, error: 'Tu sesión ha caducado. Vuelve a entrar.', sesionInvalida: true };
+    }
+    return { ok: false, error: cuerpo?.error ?? `El servidor respondió ${resp.status}.` };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+export interface NotasEvaluacion {
+  email: string;
+  nombre?: string;
+  examenFinal: number;
+  parcial: number;
+  practicas: number;
+  trabajos: number;
+}
+
+/**
+ * Escribe en la hoja de evaluación las notas de un estudiante. Sólo lo
+ * acepta el servidor si la sesión es de profesor.
+ */
+export async function guardarEvaluacion(
+  notas: NotasEvaluacion
+): Promise<{ ok: boolean; mensaje: string; fila?: number }> {
+  if (!publicacionDisponible()) {
+    return { ok: false, mensaje: 'Falta configurar VITE_PRACTICAS_WEBAPP_URL.' };
+  }
+  const sesion = tokenSesion();
+  if (!sesion) return { ok: false, mensaje: 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar.' };
+  try {
+    const resp = await fetch(
+      `${WEBAPP_URL}?accion=guardarEvaluacion&sesion=${encodeURIComponent(sesion)}`,
+      {
+        method: 'POST',
+        // text/plain evita la petición previa de CORS, que Apps Script no atiende
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(notas),
+        redirect: 'follow'
+      }
+    );
+    const cuerpo = await resp.json().catch(() => null);
+    if (cuerpo?.ok) {
+      return {
+        ok: true,
+        fila: cuerpo.fila,
+        mensaje: `${cuerpo.nueva ? 'Añadido' : 'Guardado'} en la hoja de evaluación (fila ${cuerpo.fila}).`
+      };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return { ok: false, mensaje: 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar.' };
+    }
+    return { ok: false, mensaje: cuerpo?.error ?? `El servidor respondió ${resp.status}.` };
+  } catch (err) {
+    return { ok: false, mensaje: err instanceof Error ? err.message : String(err) };
+  }
 }

@@ -76,6 +76,49 @@ dentro de la pestaña *Módulos*.
 
 ---
 
+## Identidad verificada en el servidor
+
+El navegador sólo decodifica el token de Google para leer el nombre y la foto.
+Quién es cada cual lo decide Apps Script:
+
+1. Tras el login, el cliente envía el ID token a `Codigo.gs`
+   (`accion=iniciarSesion`). El script lo comprueba contra Google (`tokeninfo`:
+   `aud`, emisor, caducidad, `email_verified`) y el dominio.
+2. Devuelve una **sesión firmada** (HMAC-SHA256 con `SESION_SECRETO`) con el
+   correo y el rol. Dura 30 días y se renueva sola al pasar la mitad.
+3. Toda lectura o escritura de datos personales lleva esa sesión. El correo y
+   el rol salen de ella, nunca de un parámetro:
+   - `anotarFila` sólo escribe en `Cuaderno de parejas`, `normas de seguridad`
+     y `Material` de la hoja fija, y añade la columna `cuentaVerificada`.
+   - `misEntregas` y `misCalificaciones` devuelven lo de la propia cuenta
+     (el profesorado puede consultar la de cualquiera).
+   - `evaluacion` lee la hoja de evaluación continua (privada): el profesor
+     recibe todas las filas; cada estudiante, sólo la suya. Otra hoja se
+     configura con la propiedad `EVALUACION_HOJA_ID`.
+   - `guardarEvaluacion` (sólo profesor) escribe en esa hoja las notas que se
+     editan en la matriz: actualiza la fila del correo o añade una nueva. La
+     hoja necesita columnas de correo, examen final, parcial, prácticas y
+     trabajos.
+   - Un estudiante sólo registra notas a su nombre; publicar exige sesión de
+     profesor **y** la clave.
+
+**Propiedades de Apps Script** (⚙️ → Propiedades de la secuencia de comandos):
+
+| Propiedad | Codigo.gs | Calificaciones.gs |
+|---|---|---|
+| `SESION_SECRETO` (≥ 32 caracteres aleatorios) | Sí | Sí, **el mismo valor** |
+| `CLAVE_PUBLICACION` | Sí | — |
+| `GOOGLE_CLIENT_ID` | Opcional (por defecto, el de la plataforma) | — |
+| `PROFESORES` | Opcional (correos separados por comas) | — |
+| `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
+
+**Orden de despliegue** tras cambiar los scripts: nueva implementación de los
+dos scripts y, justo después, compilar y publicar `docs/`. Cada mitad sola deja
+de funcionar con la otra. Al actualizar, todo el mundo tiene que volver a
+iniciar sesión una vez.
+
+---
+
 ## Recepción de entregas
 
 Las entregas del cuaderno, las firmas de las normas de seguridad y los partes de

@@ -11,10 +11,9 @@
 // ==========================================================================
 
 import { addCachedEntrega } from './contenidoRemoto';
+import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 
 export const PROFESOR_EMAIL = 'juandiaz@ugr.es';
-
-const GSHEET_ID = '1RrMzWJPFOKKH76vJh70pQw9vbiQZNOGOJH7vNaTGkso';
 
 /** URL del Apps Script desplegado. Se define en .env.local */
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
@@ -59,7 +58,19 @@ export async function enviarAHoja(
     };
   }
 
-  const params = new URLSearchParams({ sheetId: GSHEET_ID, sheetName: hoja, ...datos });
+  // La hoja de destino la fija el servidor; aquí sólo viaja la pestaña y la
+  // sesión, que es lo que acredita quién entrega.
+  await renovarSiHaceFalta();
+  const sesion = tokenSesion();
+  if (!sesion) {
+    return {
+      estado: 'error',
+      mensaje:
+        'Tu sesión ha caducado. No cierres esta página: usa «Enviar por correo» o descarga ' +
+        'el informe, y vuelve a entrar para el envío automático.'
+    };
+  }
+  const params = new URLSearchParams({ ...datos, sheetName: hoja, sesion });
   const url = `${WEBAPP_URL}?${params.toString()}`;
 
   try {
@@ -85,6 +96,14 @@ export async function enviarAHoja(
           estado: 'confirmado',
           fila: cuerpo.fila,
           mensaje: `Recibido y anotado en la hoja «${hoja}», fila ${cuerpo.fila}.`
+        };
+      }
+      if (esSesionInvalida(cuerpo)) {
+        return {
+          estado: 'error',
+          mensaje:
+            'El servidor no reconoce tu sesión. No cierres esta página: usa «Enviar por correo» ' +
+            'o descarga el informe, y vuelve a entrar para el envío automático.'
         };
       }
       return {
