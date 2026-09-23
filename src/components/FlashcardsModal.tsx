@@ -138,7 +138,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div 
         className="modal-container" 
-        style={{ maxWidth: '680px' }} 
+        style={{ maxWidth: '780px', width: '95vw' }} 
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -153,7 +153,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', overflowY: 'auto' }}>
           
           {/* Top Indicators */}
           <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -179,45 +179,52 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
             onClick={() => setIsFlipped(!isFlipped)}
             style={{
               width: '100%',
-              minHeight: '260px',
+              minHeight: '280px',
+              height: 'auto',
               background: isFlipped ? 'linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%)' : 'var(--surface)',
               borderRadius: 'var(--radius-xl)',
               border: isFlipped ? '2px solid var(--teal)' : '2px solid var(--navy)',
               boxShadow: 'var(--shadow-md)',
-              padding: '1.75rem',
+              padding: '1.5rem',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
+              justifyContent: isFlipped ? 'flex-start' : 'center',
+              alignItems: 'stretch',
               cursor: 'pointer',
               userSelect: 'none',
               transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
-              position: 'relative'
+              boxSizing: 'border-box'
             }}
           >
-            <span style={{
-              position: 'absolute',
-              top: '12px',
-              right: '16px',
-              fontSize: '0.72rem',
-              color: isFlipped ? 'var(--teal)' : 'var(--navy)',
-              fontWeight: 700,
+            {/* Header interior de la tarjeta con concepto y botón de girar sin solapamientos */}
+            <div style={{
+              width: '100%',
               display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              gap: '4px'
+              marginBottom: '1rem',
+              paddingBottom: '0.6rem',
+              borderBottom: '1px solid var(--border-color)'
             }}>
-              <RotateCw size={13} /> {isFlipped ? 'Ver Anverso' : 'Toca para Girar'}
-            </span>
-
-            <span className="qfdos-badge badge-navy" style={{ marginBottom: '12px', fontSize: '0.75rem' }}>
-              {currentCard.concept}
-            </span>
+              <span className="qfdos-badge badge-navy" style={{ fontSize: '0.78rem' }}>
+                {currentCard.concept}
+              </span>
+              <span style={{
+                fontSize: '0.75rem',
+                color: isFlipped ? 'var(--teal)' : 'var(--navy)',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <RotateCw size={13} /> {isFlipped ? 'Ver Anverso' : 'Toca para Girar'}
+              </span>
+            </div>
 
             {/* Front or Back Content */}
             {!isFlipped ? (
-              <div>
-                <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.45 }}>
+              <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                <h4 style={{ fontSize: '1.18rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.5 }}>
                   {currentCard.front}
                 </h4>
               </div>
@@ -228,13 +235,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 {/* Multi-structure display (e.g. aminoácidos activos AChE o Fisostigmina vs Neostigmina) */}
                 {currentCard.structures && currentCard.structures.length > 0 && (
                   <div style={{
-                    marginTop: '14px',
+                    marginTop: '16px',
                     display: 'flex',
                     gap: '12px',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
                     background: 'var(--surface-alt)',
-                    padding: '10px',
+                    padding: '12px',
                     borderRadius: 'var(--radius-md)',
                     border: '1px solid var(--border-color)'
                   }}>
@@ -258,7 +265,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
                 {/* Single Structure Display (si no hay imagen didáctica anotada específica) */}
                 {currentCard.smiles && !currentCard.structures && !currentCard.imagePath && (
-                  <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
                     <Chem2DDrawer smiles={currentCard.smiles} width={220} height={100} />
                   </div>
                 )}
@@ -266,11 +273,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 {/* Optional Didactic Image Asset */}
                 {currentCard.imagePath && (
                   <div style={{
-                    marginTop: '12px',
+                    marginTop: '16px',
                     display: 'flex',
                     justifyContent: 'center',
                     background: '#ffffff',
-                    padding: '8px',
+                    padding: '12px',
                     borderRadius: 'var(--radius-md)',
                     border: '1px solid var(--border-color)',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
@@ -278,7 +285,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     <img
                       src={recurso(currentCard.imagePath)}
                       alt={currentCard.concept}
-                      style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
+                      style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain' }}
                     />
                   </div>
                 )}
