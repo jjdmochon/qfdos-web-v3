@@ -339,7 +339,7 @@ export interface StudentQuestion {
  *          pralidoxima carecían de estereoquímica.
  */
 export const COURSE_DATA_VERSION = '3.20.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T19:30:00.000Z';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T20:40:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
