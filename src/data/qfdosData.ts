@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.19.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T19:05:00.000Z';
+export const COURSE_DATA_VERSION = '3.20.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T19:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

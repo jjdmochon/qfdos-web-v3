@@ -1454,82 +1454,127 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
           {/* TAB 4: Dudas de Alumnos */}
           {activeTab === 'questions' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div>
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '4px' }}>
-                  Buzón de Preguntas y Tutorías Virtuales
-                </h4>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  Preguntas enviadas por los estudiantes a través del portal. Responda para publicarlas en la sección docente.
-                </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '4px' }}>
+                    Buzón de Preguntas y Tutorías Virtuales
+                  </h4>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
+                    Preguntas enviadas por los estudiantes a través del portal. Responda para publicarlas en la sección docente.
+                  </p>
+                </div>
+                {studentQuestions.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearAllStudentQuestions}
+                    className="btn btn-sm btn-outline"
+                    style={{ fontSize: '0.74rem', color: 'var(--accent-red)', borderColor: 'var(--accent-red)' }}
+                    title="Vaciar todas las dudas del buzón"
+                  >
+                    <Trash2 size={13} /> Vaciar Buzón de Dudas
+                  </button>
+                )}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {studentQuestions.map(q => (
-                  <div
-                    key={q.id}
-                    className="qfdos-card"
-                    style={{
-                      padding: '1.25rem',
-                      borderLeft: q.status === 'pendiente' ? '4px solid #f59e0b' : '4px solid #10b981'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <span className="qfdos-badge badge-teal" style={{ fontSize: '0.7rem' }}>
-                        {q.topicTitle}
-                      </span>
-                      <span className={`qfdos-badge ${q.status === 'pendiente' ? 'badge-amber' : 'badge-emerald'}`} style={{ fontSize: '0.68rem' }}>
-                        {q.status.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <p style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-title)', marginBottom: '6px' }}>
-                      "{q.question}"
-                    </p>
-
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                      Por: <strong>{q.studentName}</strong> ({q.studentEmail}) · {q.timestamp}
-                    </div>
-
-                    {/* Response display or response form */}
-                    {q.response ? (
-                      <div style={{ background: 'var(--surface-alt)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                        <strong style={{ fontSize: '0.78rem', color: 'var(--navy-ink)', display: 'block', marginBottom: '3px' }}>
-                          Respuesta del Profesor:
-                        </strong>
-                        <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
-                          {q.response}
-                        </p>
-                      </div>
-                    ) : respondingQId === q.id ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
-                        <textarea
-                          placeholder="Escriba la respuesta oficial para el estudiante..."
-                          value={responseText}
-                          onChange={e => setResponseText(e.target.value)}
-                          className="form-input"
-                          rows={3}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                          <button onClick={() => setRespondingQId(null)} className="btn btn-sm btn-outline">
-                            Cancelar
-                          </button>
-                          <button onClick={() => handleSendResponse(q.id)} className="btn btn-sm btn-primary">
-                            <Send size={13} /> Enviar Respuesta Oficial
+              {studentQuestions.length === 0 ? (
+                <div style={{
+                  padding: '30px',
+                  textAlign: 'center',
+                  background: 'var(--surface-alt)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px dashed var(--border-color)',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.86rem'
+                }}>
+                  No hay preguntas de alumnos en el buzón actualmente.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {studentQuestions.map(q => (
+                    <div
+                      key={q.id}
+                      className="qfdos-card"
+                      style={{
+                        padding: '1.25rem',
+                        borderLeft: q.status === 'pendiente' ? '4px solid #f59e0b' : '4px solid #10b981'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.7rem' }}>
+                          {q.topicTitle}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className={`qfdos-badge ${q.status === 'pendiente' ? 'badge-amber' : 'badge-emerald'}`} style={{ fontSize: '0.68rem' }}>
+                            {q.status.toUpperCase()}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteStudentQuestion(q.id)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: 'var(--text-muted)',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}
+                            title="Eliminar esta consulta"
+                          >
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => { setRespondingQId(q.id); setResponseText(''); }}
-                        className="btn btn-sm btn-outline"
-                        style={{ alignSelf: 'flex-start' }}
-                      >
-                        <MessageSquare size={13} /> Responder Duda
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
+
+                      <p style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-title)', marginBottom: '6px' }}>
+                        "{q.question}"
+                      </p>
+
+                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                        Por: <strong>{q.studentName}</strong> ({q.studentEmail}) · {q.timestamp}
+                      </div>
+
+                      {/* Response display or response form */}
+                      {q.response ? (
+                        <div style={{ background: 'var(--surface-alt)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                          <strong style={{ fontSize: '0.78rem', color: 'var(--navy-ink)', display: 'block', marginBottom: '3px' }}>
+                            Respuesta del Profesor:
+                          </strong>
+                          <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5, margin: 0 }}>
+                            {q.response}
+                          </p>
+                        </div>
+                      ) : respondingQId === q.id ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
+                          <textarea
+                            placeholder="Escriba la respuesta oficial para el estudiante..."
+                            value={responseText}
+                            onChange={e => setResponseText(e.target.value)}
+                            className="form-input"
+                            rows={3}
+                          />
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                            <button onClick={() => setRespondingQId(null)} className="btn btn-sm btn-outline">
+                              Cancelar
+                            </button>
+                            <button onClick={() => handleSendResponse(q.id)} className="btn btn-sm btn-primary">
+                              <Send size={13} /> Enviar Respuesta Oficial
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => { setRespondingQId(q.id); setResponseText(''); }}
+                          className="btn btn-sm btn-outline"
+                          style={{ alignSelf: 'flex-start' }}
+                        >
+                          <MessageSquare size={13} /> Responder Duda
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
             </div>
           )}
