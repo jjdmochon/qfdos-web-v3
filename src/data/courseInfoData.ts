@@ -181,11 +181,26 @@ export const COURSE_EVALUATION_GUIDE = {
   },
   extraordinariaDetalle: {
     resumen: "Convocatoria para estudiantes que no hayan superado la asignatura en la Ordinaria, con independencia de haber seguido o no la Evaluación Continua.",
+    teoria: "Un examen teórico oficial que comprenderá toda la materia del curso (100% de la nota final en acta; nota mínima 5,0).",
     partes: [
-      { parte: "Parte Teórica (100%)", desc: "Un examen teórico que comprenderá toda la materia del curso (100% de la nota final en acta)." },
-      { parte: "Parte Práctica", desc: "Dos exámenes, teórico y práctico, correspondientes a las prácticas de laboratorio. Imprescindible superarlos." }
+      { parte: "Parte Teórica (100%)", desc: "Un examen teórico oficial que comprenderá toda la materia del curso (100% de la nota final en acta)." },
+      { parte: "Parte Práctica", desc: "Regulada en función de la situación previa del estudiante en el laboratorio." }
     ],
-    calificacionFinal: "Es obligatorio aprobar todos los exámenes de ambas partes. La calificación numérica final que figurará en acta será la obtenida en el examen teórico."
+    casosPracticas: [
+      {
+        titulo: "1. Prácticas realizadas y aprobadas en periodo ordinario",
+        desc: "Quedan exentos de la parte práctica: únicamente deben presentarse al examen teórico oficial (100% de la nota final en acta)."
+      },
+      {
+        titulo: "2. Prácticas realizadas con examen teórico-práctico suspendido",
+        desc: "Deben realizar el examen teórico-práctico de prácticas en esta convocatoria extraordinaria (además del examen teórico)."
+      },
+      {
+        titulo: "3. Prácticas no realizadas (o sin asistencia obligatoria)",
+        desc: "Deben realizar dos exámenes de prácticas: prueba práctica experimental en el laboratorio y prueba teórico-práctica escrita (además del examen teórico oficial)."
+      }
+    ],
+    calificacionFinal: "Es obligatorio superar todos los exámenes exigidos según la situación práctica del alumno/a. La calificación numérica final que figurará en el acta oficial será la obtenida en el examen teórico."
   },
   unicaFinalDetalle: {
     solicitud: "Para estudiantes que por motivos laborales, salud, discapacidad u otra causa justificada no puedan seguir la evaluación continua. Se solicita al Director/a de Departamento en las 2 primeras semanas de clase (o 2 semanas tras matriculación posterior) por vía telemática. Plazo de resolución: 10 días hábiles.",

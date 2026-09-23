@@ -656,11 +656,36 @@ export const CourseInfoSection: React.FC = () => {
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                  {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.partes.map((p, i) => (
-                    <div key={i} style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
-                      <strong style={{ color: 'var(--text-title)' }}>{p.parte}:</strong> {p.desc}
+                  {/* Parte Teórica */}
+                  <div style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
+                    <strong style={{ color: 'var(--text-title)' }}>Parte Teórica (100% en Acta):</strong> {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.teoria}
+                  </div>
+
+                  {/* Régimen de Prácticas según situación */}
+                  <div style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px' }}>
+                    <strong style={{ fontSize: '0.82rem', color: 'var(--text-title)', display: 'block', marginBottom: '6px' }}>
+                      Parte Práctica (según situación previa del estudiante):
+                    </strong>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.casosPracticas.map((caso, idx) => (
+                        <div key={idx} style={{
+                          padding: '7px 9px',
+                          background: 'var(--surface)',
+                          borderRadius: '5px',
+                          border: '1px solid var(--border-color)',
+                          fontSize: '0.78rem',
+                          lineHeight: 1.4
+                        }}>
+                          <div style={{ fontWeight: 700, color: '#9333ea', marginBottom: '2px' }}>
+                            {caso.titulo}:
+                          </div>
+                          <div style={{ color: 'var(--text-main)' }}>
+                            {caso.desc}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
 
