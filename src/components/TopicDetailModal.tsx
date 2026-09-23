@@ -1351,7 +1351,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               <>
                 {isProfesor && (
                   <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
-                    <HelpCircle size={14} /> Test ({topic.id === 'tema-01' ? 15 : (topic.testQuestions?.length || 0)})
+                    <HelpCircle size={14} /> {topic.id === 'tema-01' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
                   </button>
                 )}
                 <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">

@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.12.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T15:40:00.000Z';
+export const COURSE_DATA_VERSION = '3.13.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T16:02:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -1727,7 +1727,6 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'SAR Agonistas & Bioisosterismo',
     badge: 'FIR 2021 · P14 (Ministerio de Sanidad)',
     question: 'El carbacol es un análogo de acetilcolina que tiene en su estructura un grupo carbamato en lugar del grupo éster. ¿Qué consecuencias tiene esta sustitución?',
-    questionSmiles: 'C[N+](C)(C)CCOC(=O)N',
     options: [
       { text: 'El carbacol se hidroliza en medio ácido con mayor facilidad que la acetilcolina debido a la presencia del grupo carbamato.' },
       { text: 'El grupo carbamato confiere al carbacol estabilidad química y metabólica.' },
@@ -1760,7 +1759,6 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Bloqueantes Neuromusculares',
     badge: 'FIR 2020 · P4 (Ministerio de Sanidad)',
     question: '¿Qué es el suxametonio (succinilcolina) respecto al decametonio?',
-    questionSmiles: 'C[N+](C)(C)CCOC(=O)CCC(=O)OCC[N+](C)(C)C',
     options: [
       { text: 'Un profármaco activable por esterasas.' },
       { text: 'Un análogo blando.' },
@@ -1777,7 +1775,6 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Bloqueantes Neuromusculares',
     badge: 'FIR 2022 · P12 (Ministerio de Sanidad)',
     question: 'El atracurio es un bloqueante neuromuscular análogo sintético de la tubocurarina que se inactiva rápidamente en la sangre (pH = 7.4) por una reacción de:',
-    questionSmiles: 'COc1cc2c(cc1OC)[C@@H](Cc1ccc(OC)c(OC)c1)N(C)(CCCOC(=O)CCCC(=O)OCCCC[N+]2(C)Cc1ccc(OC)c(OC)c1)C',
     options: [
       { text: 'Hidrólisis enzimática de un grupo carbamato.' },
       { text: 'Desmetilación oxidativa de la sal de amonio cuaternario.' },
@@ -1810,7 +1807,6 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Inhibidores & Reactivadores AChE',
     badge: 'FIR 2021 · P16 (Ministerio de Sanidad)',
     question: 'Para el diseño de los antídotos frente a los gases neurotóxicos organofosforados (sarín, tabún, somán), se utilizó la siguiente estrategia:',
-    questionSmiles: 'C[N+]1=CC=CC=C1C=NO',
     options: [
       { text: 'Diseñar compuestos derivados de hidroxilamina capaces de hidrolizar la posición fosforilada en la acetilcolinesterasa y reactivar así la enzima rápidamente.' },
       { text: 'Diseñar compuestos derivados de hidroxilamina capaces de hidrolizar el residuo acetilado en la acetilcolinesterasa y reactivar así la enzima de forma controlada.' },
@@ -1827,14 +1823,15 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Antagonistas Muscarínicos',
     badge: 'FIR 2024 · P9 (Ministerio de Sanidad)',
     question: '¿Cuál de los siguientes fármacos con núcleo tricíclico ejerce su acción terapéutica principalmente por interacción antagonista con receptores muscarínicos (selectividad M1)?',
+    imagePath: 'fir-images/FIR2024_9.jpg',
     options: [
-      { text: 'Amitriptilina (derivado dibenzociclohepténico modulador de aminas).' },
-      { text: 'Imipramina (derivado dibenzoazepínico antidepresivo).' },
-      { text: 'Clomipramina (derivado cloro-dibenzoazepínico serotoninérgico).' },
-      { text: 'Pirenzepina (derivado piridobenzodiazepínico antisecretor gástrico).' }
+      { text: 'El compuesto A (Clozapina / dibenzodiazepina antipsicótica).' },
+      { text: 'El compuesto B (Clomipramina / dibenzoazepina antidepresiva).' },
+      { text: 'El compuesto C (Clorpromazina / fenotiazina neuroléptica).' },
+      { text: 'El compuesto D (Pirenzepina / piridobenzodiazepina antisecretora gástrica).' }
     ],
     correctIndex: 3,
-    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción D): Pirenzepina (Compuesto D en la lámina original FIR 2024). Aunque comparte un esqueleto tricíclico condensado (núcleo de piridobenzodiazepina) con los antidepresivos, la pirenzepina se diseñó como un antagonista selectivo de receptores muscarínicos M1. Bloquea los receptores muscarínicos en los ganglios intramurales gástricos reduciendo la secreción ácida gástrica sin penetrar en el SNC debido a su mayor polaridad hidrofílica.',
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción D): Pirenzepina (Compuesto D en la lámina oficial FIR 2024). Aunque comparte un esqueleto tricíclico condensado (núcleo de piridobenzodiazepina) con otros psicofármacos tricíclicos, la pirenzepina se diseñó como un antagonista selectivo de receptores muscarínicos M1. Bloquea los receptores muscarínicos en los ganglios intramurales gástricos reduciendo la secreción ácida gástrica sin penetrar en el SNC debido a su mayor polaridad hidrofílica.',
     difficulty: 'Avanzado'
   },
   {
@@ -1843,7 +1840,6 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Inhibidores & Reactivadores AChE',
     badge: 'FIR 2021 · P7 (Ministerio de Sanidad)',
     question: 'En el estudio de inhibidores enzimáticos en química farmacéutica, ¿cómo se clasifica mecanísticamente la Rivastigmina (fármaco colinérgico para Alzheimer) frente a un inhibidor suicida como la Selegilina?',
-    questionSmiles: 'CCN(C)C(=O)Oc1cccc([C@@H](C)N(C)C)c1',
     options: [
       { text: 'La rivastigmina es un inhibidor suicida porque requiere activación metabólica microsomal previa.' },
       { text: 'La rivastigmina es un inhibidor alostérico reversible no competitivo que no interacciona con la tríada catalítica.' },
@@ -1860,7 +1856,6 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Inhibidores & Reactivadores AChE',
     badge: 'FIR 2025 · P18 (Ministerio de Sanidad)',
     question: '¿Cuál de las siguientes afirmaciones describe con exactitud el mecanismo de interacción molecular del Donepezilo con la Acetilcolinesterasa (AChE)?',
-    questionSmiles: 'COc1cc2c(cc1OC)C(=O)CC2CC1CCN(Cc2ccccc2)CC1',
     options: [
       { text: 'Es un análogo del estado de transición que fosforila irreversiblemente el sitio activo.' },
       { text: 'Es un inhibidor no covalente reversible mixto que se une simultáneamente al centro catalítico (CAS) mediante apilamiento π con Trp-86 y al sitio aniónico periférico (PAS) con Trp-286.' },
@@ -1876,7 +1871,8 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
     topicId: 'tema-01',
     block: 'SAR Agonistas & Bioisosterismo',
     badge: 'FIR 2025 · P3 (Ministerio de Sanidad)',
-    question: 'El cloruro de cetilpiridinio y ciertos antisépticos catiónicos de amonio cuaternario han sido modificados incorporando un enlace éster intermedio en la cadena alifática hidrófoba. ¿Qué concepto de diseño farmacoquímico representa esta estrategia?',
+    question: 'El compuesto cuya estructura se representa a continuación incorpora un enlace éster intermedio en la cadena alifática hidrófoba respecto al cloruro de cetilpiridinio. ¿Qué concepto de diseño farmacoquímico representa esta estrategia?',
+    imagePath: 'fir-images/FIR2025_3.jpg',
     options: [
       { text: 'Diseño de un profármaco hidrofílico para administración intravenosa.' },
       { text: 'Diseño de un análogo blando (soft drug) para limitar la toxicidad sistémica mediante degradación metabólica predecible por esterasas.' },
