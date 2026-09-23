@@ -43,7 +43,7 @@ Esta verificación del token en servidor es además **prerrequisito de la app m�
 
 ### Alta
 - **Los materiales no llegan al alumnado.** `MaterialUploader` guarda en IndexedDB del propio navegador (`services/fileStorage.ts:8`), así que cada fichero se sube dos veces: aquí y en Drive, y luego se pega el enlace a mano. **Propuesta:** subir directamente a una carpeta de Drive vía Apps Script (`DriveApp.createFile`) y guardar el enlace en el módulo automáticamente. Así desaparece el paso manual.
-- **Las notas del cuaderno de parejas y las ediciones de evaluación son locales.** `PracticasPairReport.tsx:52-61, 441-463` lee el localStorage del profesor o, si está vacío, datos de demostración (`LAB_PAIR_REPORTS_DEFAULT`). La interfaz promete ver las entregas «en tiempo real» (`:611`), pero no lee la hoja. Si se borra el navegador o se cambia de equipo, las notas se pierden sin posibilidad de recuperarlas.
+- **Las notas del cuaderno de parejas son locales** (las ediciones de la matriz de evaluación ya se guardan en la hoja vía `guardarEvaluacion`, en esta rama). `PracticasPairReport.tsx:52-61, 441-463` lee el localStorage del profesor o, si está vacío, datos de demostración (`LAB_PAIR_REPORTS_DEFAULT`). La interfaz promete ver las entregas «en tiempo real» (`:611`), pero no lee la hoja. Si se borra el navegador o se cambia de equipo, las notas se pierden sin posibilidad de recuperarlas.
 - **Las dudas del alumnado no llegan** (P2). Hace falta una acción `guardarDuda` y otra `listarDudas` (solo profesor, con token verificado), más un contador de dudas pendientes en la cabecera del profesor.
 
 ### Media

@@ -73,13 +73,14 @@ function manejar(e) {
     if (accion === 'guardarContenido') return guardarContenido(p, e);
     if (accion === 'misEntregas')      return misEntregas(p);
     if (accion === 'evaluacion')       return evaluacion(p);
+    if (accion === 'guardarEvaluacion') return guardarEvaluacion(p, e);
 
     if (!p.sheetName) {
       return json({
         ok: true,
         servicio: 'QFDOS',
         version: 3,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion'],
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -472,6 +473,98 @@ function evaluacion(p) {
   }
 
   return json({ ok: true, cabeceras: cabeceras, filas: filas });
+}
+
+/**
+ * Localiza las columnas de nota con las mismas reglas que usa el cliente al
+ * leer (EvaluationSection), para que lo que se escribe sea lo que se lee.
+ * Devuelve índices base 0, o -1 si no existe.
+ */
+function columnasEvaluacion_(cabeceras) {
+  var h = cabeceras.map(function (c) { return String(c).toLowerCase(); });
+  var buscar = function (fn) { for (var i = 0; i < h.length; i++) if (fn(h[i])) return i; return -1; };
+  var tiene = function (t, trozos) { return trozos.some(function (x) { return t.indexOf(x) !== -1; }); };
+  return {
+    correo:   buscar(function (t) { return tiene(t, ['email', 'correo', 'ugr']); }),
+    nombre:   buscar(function (t) { return tiene(t, ['nombre', 'alumno', 'estudiante']); }),
+    final:    buscar(function (t) { return tiene(t, ['final', '70']) && t.indexOf('parcial') === -1; }),
+    parcial:  buscar(function (t) { return tiene(t, ['parcial', '20']); }),
+    practicas: buscar(function (t) { return tiene(t, ['lab', 'práct', 'pract', '5%']); }),
+    trabajos: buscar(function (t) { return tiene(t, ['trabaj', 'semin', 'proyect']) && t.indexOf('lab') === -1; })
+  };
+}
+
+/**
+ * Escribe las notas de un estudiante en la hoja de evaluación. Sólo
+ * profesorado. Recibe por POST { email, nombre?, examenFinal, parcial,
+ * practicas, trabajos } (notas de 0 a 10). Si el correo ya figura se
+ * actualiza su fila; si no, se añade una nueva.
+ */
+function guardarEvaluacion(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede modificar la evaluación.' });
+
+  var d;
+  try { d = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (err) { d = {}; }
+
+  var correo = String(d.email || '').trim().toLowerCase();
+  if (!correo || correo.indexOf('@') === -1) return json({ ok: false, error: 'Falta un correo válido.' });
+
+  var notas = {};
+  var campos = ['examenFinal', 'parcial', 'practicas', 'trabajos'];
+  for (var n = 0; n < campos.length; n++) {
+    var v = Number(d[campos[n]]);
+    if (isNaN(v) || v < 0 || v > 10) return json({ ok: false, error: 'Nota fuera de rango (0–10): ' + campos[n] });
+    notas[campos[n]] = Math.round(v * 100) / 100;
+  }
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = SpreadsheetApp.openById(propiedad_('EVALUACION_HOJA_ID') || EVALUACION_HOJA_ID).getSheets()[0];
+    var datos = hoja.getDataRange().getValues();
+    var col = columnasEvaluacion_(datos[0] || []);
+
+    var faltan = [];
+    if (col.correo === -1) faltan.push('correo');
+    if (col.final === -1) faltan.push('examen final');
+    if (col.parcial === -1) faltan.push('examen parcial');
+    if (col.practicas === -1) faltan.push('prácticas');
+    if (col.trabajos === -1) faltan.push('trabajos');
+    if (faltan.length) return json({ ok: false, error: 'La hoja de evaluación no tiene columna de: ' + faltan.join(', ') + '.' });
+
+    var fila = -1;
+    for (var f = 1; f < datos.length; f++) {
+      if (String(datos[f][col.correo]).trim().toLowerCase() === correo) { fila = f + 1; break; }
+    }
+
+    var ancho = datos[0].length;
+    var nueva = fila === -1;
+    var valores;
+    if (nueva) {
+      valores = [];
+      for (var i = 0; i < ancho; i++) valores.push('');
+      valores[col.correo] = correo;
+      if (col.nombre !== -1) valores[col.nombre] = textoSeguro_(d.nombre || '');
+    } else {
+      valores = hoja.getRange(fila, 1, 1, ancho).getValues()[0];
+    }
+    valores[col.final] = notas.examenFinal;
+    valores[col.parcial] = notas.parcial;
+    valores[col.practicas] = notas.practicas;
+    valores[col.trabajos] = notas.trabajos;
+
+    if (nueva) {
+      hoja.appendRow(valores);
+      fila = hoja.getLastRow();
+    } else {
+      hoja.getRange(fila, 1, 1, ancho).setValues([valores]);
+    }
+    return json({ ok: true, fila: fila, nueva: nueva });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /* ------------------------------------------------------------------ */

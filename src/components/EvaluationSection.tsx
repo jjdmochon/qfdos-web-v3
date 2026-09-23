@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StudentEvaluationProfile, INITIAL_STUDENT_EVALUATION_DATA, QFDOS_INFO } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
-import { leerEvaluacion } from '../services/contenidoRemoto';
+import { leerEvaluacion, guardarEvaluacion } from '../services/contenidoRemoto';
 import { 
   GraduationCap, 
   Download, 
@@ -225,7 +225,15 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
     setEditTrabajos(s.trabajosGrade ?? 0);
   };
 
-  const handleSaveEdit = (email: string) => {
+  const [guardandoEmail, setGuardandoEmail] = useState<string | null>(null);
+
+  const handleSaveEdit = async (email: string) => {
+    const notas = [editExamenFinal, editParcial, editLab, editTrabajos].map(n => Number(n) || 0);
+    if (notas.some(n => n < 0 || n > 10)) {
+      setSheetSyncStatus('Las notas tienen que estar entre 0 y 10. No se ha guardado nada.');
+      return;
+    }
+
     const updated = students.map(s => {
       if (s.email === email) {
         return {
@@ -254,6 +262,26 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
     setStudents(updated);
     localStorage.setItem(EVALUATIONS_KEY, JSON.stringify(updated));
     setEditingEmail(null);
+
+    // La hoja es la fuente oficial: sin esto, la edición vivía sólo en este
+    // navegador y se perdía al cambiar de equipo o limpiar datos.
+    setGuardandoEmail(email);
+    setSheetSyncStatus(`Guardando las notas de ${email} en la hoja…`);
+    const alumno = students.find(s => s.email === email);
+    const r = await guardarEvaluacion({
+      email,
+      nombre: alumno?.name,
+      examenFinal: notas[0],
+      parcial: notas[1],
+      practicas: notas[2],
+      trabajos: notas[3]
+    });
+    setGuardandoEmail(null);
+    setSheetSyncStatus(
+      r.ok
+        ? `✓ ${email}: ${r.mensaje}`
+        : `No se pudo guardar en la hoja (${r.mensaje}). El cambio queda solo en este navegador: vuelve a guardarlo.`
+    );
   };
 
   // Filtrado de seguridad: Si es estudiante, SOLO ve su propio registro asociado a su correo institucional go.ugr.es
@@ -711,10 +739,13 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                           ) : (
                             <button
                               onClick={() => handleStartEdit(s)}
+                              disabled={guardandoEmail === s.email}
                               className="btn btn-sm btn-outline"
                               style={{ padding: '3px 8px', fontSize: '0.72rem' }}
                             >
-                              <Edit3 size={12} /> Editar
+                              {guardandoEmail === s.email
+                                ? <><RefreshCw size={12} className="spin" /> Guardando…</>
+                                : <><Edit3 size={12} /> Editar</>}
                             </button>
                           )}
                         </td>

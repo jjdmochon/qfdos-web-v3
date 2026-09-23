@@ -95,6 +95,10 @@ Quién es cada cual lo decide Apps Script:
    - `evaluacion` lee la hoja de evaluación continua (privada): el profesor
      recibe todas las filas; cada estudiante, sólo la suya. Otra hoja se
      configura con la propiedad `EVALUACION_HOJA_ID`.
+   - `guardarEvaluacion` (sólo profesor) escribe en esa hoja las notas que se
+     editan en la matriz: actualiza la fila del correo o añade una nueva. La
+     hoja necesita columnas de correo, examen final, parcial, prácticas y
+     trabajos.
    - Un estudiante sólo registra notas a su nombre; publicar exige sesión de
      profesor **y** la clave.
 

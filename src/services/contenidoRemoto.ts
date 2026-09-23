@@ -321,3 +321,52 @@ export async function leerEvaluacion(): Promise<ResultadoEvaluacion> {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
+
+export interface NotasEvaluacion {
+  email: string;
+  nombre?: string;
+  examenFinal: number;
+  parcial: number;
+  practicas: number;
+  trabajos: number;
+}
+
+/**
+ * Escribe en la hoja de evaluación las notas de un estudiante. Sólo lo
+ * acepta el servidor si la sesión es de profesor.
+ */
+export async function guardarEvaluacion(
+  notas: NotasEvaluacion
+): Promise<{ ok: boolean; mensaje: string; fila?: number }> {
+  if (!publicacionDisponible()) {
+    return { ok: false, mensaje: 'Falta configurar VITE_PRACTICAS_WEBAPP_URL.' };
+  }
+  const sesion = tokenSesion();
+  if (!sesion) return { ok: false, mensaje: 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar.' };
+  try {
+    const resp = await fetch(
+      `${WEBAPP_URL}?accion=guardarEvaluacion&sesion=${encodeURIComponent(sesion)}`,
+      {
+        method: 'POST',
+        // text/plain evita la petición previa de CORS, que Apps Script no atiende
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(notas),
+        redirect: 'follow'
+      }
+    );
+    const cuerpo = await resp.json().catch(() => null);
+    if (cuerpo?.ok) {
+      return {
+        ok: true,
+        fila: cuerpo.fila,
+        mensaje: `${cuerpo.nueva ? 'Añadido' : 'Guardado'} en la hoja de evaluación (fila ${cuerpo.fila}).`
+      };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return { ok: false, mensaje: 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar.' };
+    }
+    return { ok: false, mensaje: cuerpo?.error ?? `El servidor respondió ${resp.status}.` };
+  } catch (err) {
+    return { ok: false, mensaje: err instanceof Error ? err.message : String(err) };
+  }
+}
