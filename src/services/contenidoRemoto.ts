@@ -277,3 +277,47 @@ export async function misEntregas(email: string): Promise<EntregaPropia[] | null
   inFlightMisEntregas.set(normEmail, promesa);
   return promesa;
 }
+
+// ==========================================================================
+// Matriz de evaluación
+// ==========================================================================
+
+export interface TablaEvaluacion {
+  cabeceras: string[];
+  filas: string[][];
+}
+
+export type ResultadoEvaluacion =
+  | { ok: true; tabla: TablaEvaluacion }
+  | { ok: false; error: string; sesionInvalida?: boolean };
+
+/**
+ * Filas de la hoja de evaluación que corresponden a quien pregunta: todas si
+ * es profesor, sólo la suya si es estudiante. El filtrado lo hace el servidor;
+ * al navegador del alumno no llegan las notas de nadie más.
+ */
+export async function leerEvaluacion(): Promise<ResultadoEvaluacion> {
+  if (!publicacionDisponible()) {
+    return { ok: false, error: 'Falta configurar VITE_PRACTICAS_WEBAPP_URL.' };
+  }
+  const sesion = tokenSesion();
+  if (!sesion) {
+    return { ok: false, error: 'Tu sesión ha caducado. Vuelve a entrar.', sesionInvalida: true };
+  }
+  try {
+    const resp = await fetch(
+      `${WEBAPP_URL}?accion=evaluacion&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
+      { method: 'GET', redirect: 'follow' }
+    );
+    const cuerpo = await resp.json().catch(() => null);
+    if (cuerpo?.ok && Array.isArray(cuerpo.cabeceras) && Array.isArray(cuerpo.filas)) {
+      return { ok: true, tabla: { cabeceras: cuerpo.cabeceras, filas: cuerpo.filas } };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return { ok: false, error: 'Tu sesión ha caducado. Vuelve a entrar.', sesionInvalida: true };
+    }
+    return { ok: false, error: cuerpo?.error ?? `El servidor respondió ${resp.status}.` };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}

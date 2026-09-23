@@ -92,6 +92,9 @@ Quién es cada cual lo decide Apps Script:
      y `Material` de la hoja fija, y añade la columna `cuentaVerificada`.
    - `misEntregas` y `misCalificaciones` devuelven lo de la propia cuenta
      (el profesorado puede consultar la de cualquiera).
+   - `evaluacion` lee la hoja de evaluación continua (privada): el profesor
+     recibe todas las filas; cada estudiante, sólo la suya. Otra hoja se
+     configura con la propiedad `EVALUACION_HOJA_ID`.
    - Un estudiante sólo registra notas a su nombre; publicar exige sesión de
      profesor **y** la clave.
 
@@ -103,6 +106,7 @@ Quién es cada cual lo decide Apps Script:
 | `CLAVE_PUBLICACION` | Sí | — |
 | `GOOGLE_CLIENT_ID` | Opcional (por defecto, el de la plataforma) | — |
 | `PROFESORES` | Opcional (correos separados por comas) | — |
+| `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
 
 **Orden de despliegue** tras cambiar los scripts: nueva implementación de los
 dos scripts y, justo después, compilar y publicar `docs/`. Cada mitad sola deja

@@ -72,13 +72,14 @@ function manejar(e) {
     if (accion === 'leerContenido')    return leerContenido();
     if (accion === 'guardarContenido') return guardarContenido(p, e);
     if (accion === 'misEntregas')      return misEntregas(p);
+    if (accion === 'evaluacion')       return evaluacion(p);
 
     if (!p.sheetName) {
       return json({
         ok: true,
         servicio: 'QFDOS',
         version: 3,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas'],
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -427,6 +428,50 @@ function misEntregas(p) {
   });
 
   return json({ ok: true, email: correo, total: resultado.length, entregas: resultado });
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Matriz de evaluación                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Hoja de evaluación continua (examen final, parcial, prácticas, trabajos).
+ * Antes el navegador la descargaba entera como CSV público y filtraba después,
+ * así que cualquier alumno tenía las notas de toda la clase. Ahora la hoja
+ * es privada y la lee este script, que corre con la cuenta del profesor:
+ *   · profesor   → todas las filas
+ *   · estudiante → sólo la fila cuyo correo coincide con el de su sesión
+ * Se puede cambiar de hoja con la propiedad EVALUACION_HOJA_ID.
+ */
+var EVALUACION_HOJA_ID = '1gbbet7PZavZQKffB3d7BUs3nhbg9dMJy4ZYGoh3q9yQ';
+
+function evaluacion(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+
+  var hoja = SpreadsheetApp.openById(propiedad_('EVALUACION_HOJA_ID') || EVALUACION_HOJA_ID).getSheets()[0];
+  var datos = hoja.getDataRange().getValues();
+  if (datos.length < 1) return json({ ok: true, cabeceras: [], filas: [] });
+
+  var cabeceras = datos[0].map(String);
+  var colCorreo = -1;
+  for (var c = 0; c < cabeceras.length; c++) {
+    if (/email|correo/i.test(cabeceras[c])) { colCorreo = c; break; }
+  }
+
+  var texto = function (v) { return (v instanceof Date) ? v.toISOString() : String(v); };
+  var filas = datos.slice(1)
+    .filter(function (f) { return f.some(function (v) { return String(v).trim() !== ''; }); })
+    .map(function (f) { return f.map(texto); });
+
+  if (s.r !== 'profesor') {
+    // Sin columna de correo no hay forma de saber qué fila es suya: nada
+    filas = colCorreo === -1 ? [] : filas.filter(function (f) {
+      return String(f[colCorreo]).trim().toLowerCase() === s.e;
+    });
+  }
+
+  return json({ ok: true, cabeceras: cabeceras, filas: filas });
 }
 
 /* ------------------------------------------------------------------ */
