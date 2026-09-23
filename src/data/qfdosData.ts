@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.15.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T17:05:00.000Z';
+export const COURSE_DATA_VERSION = '3.16.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-22T00:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -1941,10 +1941,11 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     status: 'Publicado',
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 01: Diapositivas Oficiales Sistema Colinérgico.pdf',
-    notesPdfUrl: '',
+    notesPdfUrl: 'https://drive.google.com/file/d/1h9jKvHzDiwjI0QWaHlqWjmgt1ImTNP2H/view?usp=drive_link',
     notesPdfName: 'Tema 01: Apuntes Magistrales de Fármacos Colinérgicos.pdf',
-    geminiNotebookUrl: '',
-    spotifyPodcastUrl: '',
+    geminiNotebookUrl: 'https://notebook.google.com/notebook/bb462eb7-e40b-42be-9356-f785b120b782',
+    spotifyPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
+    videoPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
     drugs: [
       {
         name: 'Acetilcolina',

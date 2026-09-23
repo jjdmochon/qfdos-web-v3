@@ -71,12 +71,14 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   const [editSlidesUrl, setEditSlidesUrl] = useState(topic.slidesPdfUrl || '');
   const [editNotesUrl, setEditNotesUrl] = useState(topic.notesPdfUrl || '');
   const [editNotebookUrl, setEditNotebookUrl] = useState(topic.geminiNotebookUrl || '');
+  const [editSpotifyUrl, setEditSpotifyUrl] = useState(topic.spotifyPodcastUrl || '');
   const [drugSearchTerm, setDrugSearchTerm] = useState('');
 
   useEffect(() => {
     setEditSlidesUrl(topic.slidesPdfUrl || '');
     setEditNotesUrl(topic.notesPdfUrl || '');
     setEditNotebookUrl(topic.geminiNotebookUrl || '');
+    setEditSpotifyUrl(topic.spotifyPodcastUrl || '');
     setIsEditingDriveLinks(false);
     setDrugSearchTerm('');
   }, [topic]);
@@ -110,7 +112,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
       ...topic,
       slidesPdfUrl: editSlidesUrl.trim() || undefined,
       notesPdfUrl: editNotesUrl.trim() || undefined,
-      geminiNotebookUrl: editNotebookUrl.trim() || undefined
+      geminiNotebookUrl: editNotebookUrl.trim() || undefined,
+      spotifyPodcastUrl: editSpotifyUrl.trim() || undefined,
+      videoPodcastUrl: editSpotifyUrl.trim() || undefined
     };
     onUpdateTopic(updated);
     setIsEditingDriveLinks(false);
@@ -405,6 +409,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           value={editNotebookUrl}
                           onChange={e => setEditNotebookUrl(e.target.value)}
                           placeholder="https://notebook.google.com/notebook/..."
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
+                          🎙️ Enlace Episodio Spotify
+                        </label>
+                        <input
+                          type="text"
+                          value={editSpotifyUrl}
+                          onChange={e => setEditSpotifyUrl(e.target.value)}
+                          placeholder="https://open.spotify.com/episode/..."
                           className="form-input"
                           style={{ width: '100%', fontSize: '0.8rem' }}
                         />

@@ -76,13 +76,15 @@ function purgeStaleCourseCache(): void {
     try {
       const parsed = JSON.parse(oldTopicsStr) as QfdosTopic[];
       parsed.forEach(t => {
-        if (t.notesPdfUrl || t.slidesPdfUrl || (t.geminiNotebookUrl && t.geminiNotebookUrl !== INITIAL_TOPICS[0]?.geminiNotebookUrl)) {
+        if (t.notesPdfUrl || t.slidesPdfUrl || t.spotifyPodcastUrl || (t.geminiNotebookUrl && t.geminiNotebookUrl !== INITIAL_TOPICS[0]?.geminiNotebookUrl)) {
           customTopicOverrides[t.id] = {
             notesPdfUrl: t.notesPdfUrl,
             notesPdfName: t.notesPdfName,
             slidesPdfUrl: t.slidesPdfUrl,
             slidesPdfName: t.slidesPdfName,
-            geminiNotebookUrl: t.geminiNotebookUrl
+            geminiNotebookUrl: t.geminiNotebookUrl,
+            spotifyPodcastUrl: t.spotifyPodcastUrl,
+            videoPodcastUrl: t.videoPodcastUrl
           };
         }
       });
