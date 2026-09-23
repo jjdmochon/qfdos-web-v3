@@ -2984,7 +2984,7 @@ export const INITIAL_STUDENT_QUESTIONS: StudentQuestion[] = [
     topicId: 'tema-00',
     topicTitle: 'Tema 00: Presentación del Curso',
     studentName: 'Elena García Pérez',
-    studentEmail: 'alumno.demo@correo.ugr.es',
+    studentEmail: 'elena.garcia@correo.ugr.es',
     question: 'Profesor Mochón, respecto a la evaluación continua, ¿la nota mínima de 5 sobre 10 en el examen final es indispensable para que sumen el parcial (20%) y las prácticas (5%)?',
     timestamp: '14/09/2026 11:20',
     status: 'respondida',
