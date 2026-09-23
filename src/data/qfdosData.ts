@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.10.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T14:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.11.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T15:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -2322,9 +2322,10 @@ flashcards: [
         id: 'fc-01-01',
         topicId: 'tema-01',
         concept: 'Regla de los Cinco Átomos de Ing',
-        front: '¿En qué consiste la Regla de Ing para agonistas colinérgicos y qué ocurre si se expande la cabeza catiónica a trietilo?',
-        back: '**Regla de Ing:** La cadena unida al nitrógeno no debe sobrepasar 5 átomos (longitud acetilcolina) para encajar en el bolsillo activo.\n\n**Efecto Trietilo:** Sustituir los 3 metilos por etilos desplaza el catión de r ≈ 3.2 Å a r > 7 Å de la cavidad receptora, permitiendo la intrusión de agua (eps aumenta de ~3 a ~80) y colapsando la atracción de Coulomb (molécula inactiva o antagonista).',
+        front: '¿En qué consiste la Regla de Ing para agonistas colinérgicos y cómo se numeran los 5 átomos de la cadena de la acetilcolina?',
+        back: '**Regla de los Cinco Átomos de Ing:** Para una actividad agonista muscarínica óptima, la cadena principal unida al catión amonio cuaternario no debe sobrepasar 5 átomos de longitud (distancia exacta de la acetilcolina). Cadenas más largas superan las dimensiones del bolsillo del receptor, perdiendo afinidad agonista o actuando como antagonistas.\n\n**Numeración de los 5 átomos de la cadena (desde N⁺):**\n1. **Átomo 1:** Carbono α (-CH₂- unido directamente al nitrógeno)\n2. **Átomo 2:** Carbono β (-CH₂- espaciador etilénico)\n3. **Átomo 3:** Oxígeno del éster (-O-)\n4. **Átomo 4:** Carbono del carbonilo (-C=O)\n5. **Átomo 5:** Carbono del metilo terminal (-CH₃)\n\n**Efecto Trietilo:** Sustituir los 3 metilos por etilos desplaza el catión de r ≈ 3.2 Å a r > 7.5 Å de la cavidad receptora, permitiendo la intrusión de agua (la constante dieléctrica ε aumenta de ~3 a ~80) y colapsando la atracción de Coulomb (molécula inactiva).',
         smiles: 'CC(=O)OCC[N+](C)(C)C',
+        imagePath: 'assets/tema-01/acetilcolina_regla_5_atomos.svg',
         difficulty: 'easy',
         category: 'SAR Agonistas'
       },
@@ -2343,7 +2344,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Sinergia Estérica y Electrónica en Betanecol',
         front: '¿Qué modificaciones estructurales convierten al Betanecol en un agonista muscarínico oral resistente a la acetilcolinesterasa?',
-        back: '1. **Protección Electrónica:** Grupo éster carbámico (-O-CO-NH2), cuya resonancia amídica reduce el carácter electrófilo del carbonilo.\n2. **Protección Estérica:** Metilo en el carbono beta, que apantalla físicamente el acceso nucleofílico de la Ser-203 de la AChE.',
+        back: '1. **Protección Electrónica:** Grupo éster carbámico (-O-CO-NH₂), cuya resonancia amídica reduce el carácter electrófilo del carbonilo.\n2. **Protección Estérica:** Metilo en el carbono beta, que apantalla físicamente el acceso nucleofílico de la Ser-203 de la AChE.',
         smiles: 'CC(C[N+](C)(C)C)OC(=O)N',
         difficulty: 'medium',
         category: 'SAR Agonistas'
@@ -2379,7 +2380,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Fenómeno de Envejecimiento (Aging) de la AChE',
         front: '¿Qué transformación química impide que un organofosforado sea revertido por oximas tras varias horas?',
-        back: 'La **descalquilación hidrolítica** de una de las cadenas alcóxido unidas al fósforo. Esto genera un oxígeno aniónico terminal (-P-O(-)), cuya carga negativa repele electrostáticamente a la oxima nucleófila impidiendo la reactivación.',
+        back: 'La **descalquilación hidrolítica** de una de las cadenas alcóxido unidas al fósforo. Esto genera un oxígeno aniónico terminal (-P-O⁻), cuya carga negativa repele electrostáticamente a la oxima nucleófila impidiendo la reactivación.',
         smiles: 'CC(C)OP(=O)(C)F',
         difficulty: 'hard',
         category: 'Toxicología'
@@ -2402,7 +2403,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Síntesis Industrial de Metacolina y Betanecol',
         front: '¿Cómo se diferencian las síntesis industriales de Metacolina y Betanecol a partir del alcohol cuaternario?',
-        back: 'Ambas preparan el intermediario **1-(trimetilamonio)propan-2-ol**.\n• **Metacolina:** Se acila directamente con **anhídrido acético** ((CH3CO)2O).\n• **Betanecol:** Reacciona primero con **fosgeno (COCl2)** dando un cloroformiato y luego con **amoniaco (NH3)** rindiendo el carbamato terminal.',
+        back: 'Ambas preparan el intermediario **1-(trimetilamonio)propan-2-ol**.\n• **Metacolina:** Se acila directamente con **anhídrido acético** ((CH₃CO)₂O).\n• **Betanecol:** Reacciona primero con **fosgeno (COCl₂)** dando un cloroformiato y luego con **amoniaco (NH₃)** rindiendo el carbamato terminal.',
         smiles: 'CC(C[N+](C)(C)C)OC(=O)C',
         difficulty: 'medium',
         category: 'Síntesis Orgánica'

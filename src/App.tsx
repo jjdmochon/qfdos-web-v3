@@ -231,7 +231,7 @@ export const App: React.FC = () => {
         t1.testQuestions = base1.testQuestions;
         modified = true;
       }
-      if (!t1.flashcards || t1.flashcards.length !== 10) {
+      if (!t1.flashcards || t1.flashcards.length !== 10 || t1.flashcards[0]?.front !== base1.flashcards?.[0]?.front) {
         t1.flashcards = base1.flashcards;
         modified = true;
       }

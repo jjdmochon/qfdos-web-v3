@@ -54,6 +54,63 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
     );
   }
 
+  const renderFormattedText = (text: string) => {
+    if (!text) return null;
+    const paragraphs = text.split(/\n\n+/);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', width: '100%' }}>
+        {paragraphs.map((para, pIdx) => {
+          const lines = para.split('\n');
+          return (
+            <div key={pIdx} style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
+              {lines.map((line, lIdx) => {
+                const trimmed = line.trim();
+                const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-');
+                const isNumbered = /^\d+\.\s/.test(trimmed);
+
+                // Parsear negritas **...**
+                const parts = line.split(/(\*\*[^*]+\*\*)/g);
+
+                return (
+                  <div 
+                    key={lIdx} 
+                    style={{ 
+                      paddingLeft: isBullet || isNumbered ? '12px' : '0px',
+                      marginBottom: lIdx < lines.length - 1 ? '4px' : '0px'
+                    }}
+                  >
+                    {parts.map((part, partIdx) => {
+                      if (part.startsWith('**') && part.endsWith('**')) {
+                        return (
+                          <strong key={partIdx} style={{ color: 'var(--navy)', fontWeight: 700 }}>
+                            {part.slice(2, -2)}
+                          </strong>
+                        );
+                      }
+                      // Soporte para cursivas *...* si las hubiera
+                      const italicParts = part.split(/(\*[^*]+\*)/g);
+                      return (
+                        <span key={partIdx}>
+                          {italicParts.map((sub, sIdx) => {
+                            if (sub.startsWith('*') && sub.endsWith('*')) {
+                              return <em key={sIdx} style={{ fontStyle: 'italic' }}>{sub.slice(1, -1)}</em>;
+                            }
+                            return sub;
+                          })}
+                        </span>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   const currentCard = cards[currentIndex];
 
   const handleNext = () => {
@@ -165,10 +222,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 </h4>
               </div>
             ) : (
-              <div>
-                <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-                  {currentCard.back}
-                </p>
+              <div style={{ width: '100%' }}>
+                {renderFormattedText(currentCard.back)}
 
                 {/* Multi-structure display (e.g. aminoácidos activos AChE o Fisostigmina vs Neostigmina) */}
                 {currentCard.structures && currentCard.structures.length > 0 && (
@@ -201,8 +256,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   </div>
                 )}
 
-                {/* Single Structure Display */}
-                {currentCard.smiles && !currentCard.structures && (
+                {/* Single Structure Display (si no hay imagen didáctica anotada específica) */}
+                {currentCard.smiles && !currentCard.structures && !currentCard.imagePath && (
                   <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center' }}>
                     <Chem2DDrawer smiles={currentCard.smiles} width={220} height={100} />
                   </div>
@@ -217,12 +272,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     background: '#ffffff',
                     padding: '8px',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)'
+                    border: '1px solid var(--border-color)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                   }}>
                     <img
                       src={recurso(currentCard.imagePath)}
                       alt={currentCard.concept}
-                      style={{ maxHeight: '160px', maxWidth: '100%', objectFit: 'contain' }}
+                      style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain' }}
                     />
                   </div>
                 )}
