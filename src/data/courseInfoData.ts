@@ -118,7 +118,7 @@ export const COURSE_GENERAL_INFO = {
   links: {
     geminiNotebook: "https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986",
     teachingGuide: "https://www.ugr.es/estudiantes/grados/grado-farmacia/quimica-farmaceutica-ii/guia-docente",
-    facultyCalendar: "https://farmacia.ugr.es/docencia/grado-farmacia/calendario-academico",
+    facultyCalendar: "https://grados.ugr.es/farmacia/docencia/horarios-calendarios",
     dgeCalendar: "https://shorturl.at/9yxQl",
     labNotebookPdf: "https://drive.google.com/file/d/1zHi7DsEEQ9TsXbelODcG5hcy8_pMl4Bl/view?usp=sharing",
     evaluationNormativaUgr: "https://goo.gl/uHfqJy",

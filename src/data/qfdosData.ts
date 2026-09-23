@@ -358,7 +358,6 @@ export const QFDOS_INFO = {
     url: "https://nexus-lab-team.netlify.app/"
   },
   designSystem: "QFDOS Structural Affinity Identity v2.0",
-  driveFolderUrl: "https://drive.google.com/drive/folders/1_QFDOS_2627_Classroom",
   evaluacion: {
     examenFinal: 70,
     examenParcial: 20,
@@ -2259,31 +2258,6 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
         tpsa: 126.44,
         rotBonds: 24,
         role: 'Bloqueante neuromuscular biscuaternario inactivado por degradación de Hofmann espontánea'
-      },
-      {
-        name: 'Donepezilo',
-        smiles: 'COC1=C(C=C2C(=C1)CC(C2=O)CC3CCN(CC3)CC4=CC=CC=C4)OC',
-        formula: 'C24H29NO3',
-        mw: 379.50,
-        logP: 4.27,
-        hbd: 0,
-        hba: 4,
-        tpsa: 38.8,
-        rotBonds: 6,
-        role: 'Inhibidor reversible y específico de AChE para enfermedad de Alzheimer',
-        pdbId: '4EY7'
-      },
-      {
-        name: 'Rivastigmina',
-        smiles: 'CCN(C)C(=O)OC1=CC=CC(=C1)[C@H](C)N(C)C',
-        formula: 'C14H22N2O2',
-        mw: 250.34,
-        logP: 2.30,
-        hbd: 0,
-        hba: 3,
-        tpsa: 32.8,
-        rotBonds: 4,
-        role: 'Inhibidor carbamato de acción pseudoirreversible en SNC (Alzheimer)'
       },
       {
         name: 'Acetil coenzima A',
