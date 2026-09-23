@@ -194,6 +194,19 @@ export const COURSE_EVALUATION_GUIDE = {
       { parte: "Parte Práctica", desc: "Dos exámenes, teórico y práctico, de las prácticas de laboratorio. Obligatorio aprobar ambos." }
     ]
   },
+  especialNoviembreDetalle: {
+    titulo: "Convocatoria Especial de Noviembre (Finalización de Estudios)",
+    plazoSolicitud: "Del 1 al 7 de octubre de 2026 (Imprescindible)",
+    viaSolicitud: "Sede Electrónica de la Universidad de Granada (sede.ugr.es)",
+    sedeUrl: "https://sede.ugr.es/procs/Gestion-Academica-Solicitud-de-convocatoria-especial-de-noviembre/",
+    fechaExamen: "19 de noviembre de 2026",
+    requisitos: "Podrán solicitar esta convocatoria los estudiantes de Grado que cumplan los requisitos establecidos por la Normativa de Evaluación y Calificación de la UGR para finalización de estudios (tener pendientes para concluir el Grado un número máximo de créditos reglamentarios y haber estado matriculados previamente de la asignatura).",
+    partes: [
+      { parte: "Parte Teórica (100% en Acta)", desc: "Examen oficial que evalúa la totalidad del programa teórico de Química Farmacéutica II. Requisito indispensable: calificación mínima de 5,0 sobre 10 para superar la asignatura." },
+      { parte: "Prácticas de Laboratorio", desc: "Requisito obligatorio: tener superadas y convalidadas las prácticas de laboratorio en cursos anteriores (o superar la prueba práctica oficial de laboratorio si no estuvieran convalidadas)." }
+    ],
+    calificacionFinal: "La calificación numérica que figurará en el acta oficial de noviembre corresponderá a la obtenida en el examen teórico, condicionada a la superación de las prácticas de laboratorio."
+  },
   incidencias: [
     { inc: "Incidencia 1", motivo: "Asistencia a órganos colegiados de gobierno o representación", plazo: "Desde recepción de convocatoria hasta fecha de examen", doc: "Original de la convocatoria" },
     { inc: "Incidencia 2", motivo: "Deportistas de alto nivel/rendimiento o representación oficial UGR", plazo: "Antelación mínima de 10 días hábiles", doc: "Documentación oficial acreditativa" },

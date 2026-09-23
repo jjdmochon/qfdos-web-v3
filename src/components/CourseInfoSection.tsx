@@ -11,7 +11,8 @@ import {
   Calendar, Clock, MapPin, Mail, ExternalLink, BookOpen,
   Sparkles, CheckCircle2, AlertCircle, FileText,
   HelpCircle, ChevronRight, UserCheck, ShieldCheck,
-  Building, Video, Users, Info, Award, AlertTriangle, Scale, Download
+  Building, Video, Users, Info, Award, AlertTriangle, Scale, Download,
+  GraduationCap
 } from 'lucide-react';
 
 export const CourseInfoSection: React.FC = () => {
@@ -556,35 +557,64 @@ export const CourseInfoSection: React.FC = () => {
             </h4>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-              {COURSE_EVALUATION_GUIDE.tabla1Continua.map((item, idx) => (
-                <div key={idx} style={{
-                  padding: '1.2rem',
-                  background: 'var(--surface-alt)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border-color)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between'
-                }}>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '2px 10px', marginBottom: '4px' }}>
-                      <strong style={{ fontSize: '1rem', color: 'var(--text-title)', minWidth: 0, overflowWrap: 'anywhere' }}>{item.sistema}</strong>
-                      <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--navy-ink)', fontFamily: 'var(--font-mono)' }}>
-                        {item.porcentaje}%
-                      </span>
+              {COURSE_EVALUATION_GUIDE.tabla1Continua.map((item, idx) => {
+                const cardAccentColors = ['#1a2b4c', '#0d9488', '#059669', '#7c3aed'];
+                const accentColor = cardAccentColors[idx % cardAccentColors.length];
+                const rawCodes = item.codigos.split(/,\s*|\s+y\s+/).filter(Boolean);
+
+                return (
+                  <div key={idx} style={{
+                    padding: '1.2rem',
+                    background: 'var(--surface-alt)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    borderTop: `4px solid ${accentColor}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minWidth: 0
+                  }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                        <strong style={{ fontSize: '0.98rem', color: 'var(--text-title)', lineHeight: 1.3 }}>{item.sistema}</strong>
+                        <span style={{ fontSize: '1.5rem', fontWeight: 900, color: accentColor, fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+                          {item.porcentaje}%
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '6px 0 10px 0' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', marginRight: '2px' }}>
+                          Códigos:
+                        </span>
+                        {rawCodes.map((cod, cIdx) => (
+                          <span
+                            key={cIdx}
+                            style={{
+                              fontSize: '0.66rem',
+                              padding: '1px 5px',
+                              borderRadius: '4px',
+                              background: 'var(--surface)',
+                              color: 'var(--text-title)',
+                              fontWeight: 700,
+                              border: '1px solid var(--border-color)'
+                            }}
+                          >
+                            {cod.trim()}
+                          </span>
+                        ))}
+                      </div>
+
+                      <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.45, margin: 0 }}>
+                        {item.descripcion}
+                      </p>
                     </div>
-                    <span className="qfdos-badge badge-navy" style={{ fontSize: '0.66rem', marginBottom: '8px' }}>
-                      Códigos: {item.codigos}
-                    </span>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.45, margin: '6px 0 0 0' }}>
-                      {item.descripcion}
-                    </p>
+
+                    <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-color)', fontSize: '0.74rem', fontWeight: 700, color: accentColor }}>
+                      • {item.caracter}
+                    </div>
                   </div>
-                  <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid var(--border-color)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--teal-ink)' }}>
-                    • {item.caracter}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Normas Teóricas y Prácticas de Evaluación Continua */}
@@ -609,69 +639,127 @@ export const CourseInfoSection: React.FC = () => {
             </div>
           </div>
 
-          {/* 2. EVALUACIÓN EXTRAORDINARIA & 3. EVALUACIÓN ÚNICA FINAL */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+          {/* 2. CONVOCATORIAS OFICIALES: EXTRAORDINARIA, ÚNICA FINAL Y ESPECIAL DE NOVIEMBRE */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
             
-            {/* Convocatoria Extraordinaria */}
-            <div className="qfdos-card card-purple" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <Award size={20} color="#9333ea" />
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                  Evaluación Extraordinaria
-                </h3>
-              </div>
-              <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.resumen}
-              </p>
+            {/* 2. Convocatoria Extraordinaria */}
+            <div className="qfdos-card card-purple" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Award size={20} color="#9333ea" />
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                    2. Evaluación Extraordinaria
+                  </h3>
+                </div>
+                <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                  {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.resumen}
+                </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.partes.map((p, i) => (
-                  <div key={i} style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
-                    <strong style={{ color: 'var(--text-title)' }}>{p.parte}:</strong> {p.desc}
-                  </div>
-                ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                  {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.partes.map((p, i) => (
+                    <div key={i} style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
+                      <strong style={{ color: 'var(--text-title)' }}>{p.parte}:</strong> {p.desc}
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', background: 'rgba(147,51,234,0.06)', padding: '8px 10px', borderRadius: '6px' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', background: 'rgba(147,51,234,0.06)', padding: '8px 10px', borderRadius: '6px', borderLeft: '3px solid #9333ea', marginTop: '12px' }}>
                 ⚠️ <strong>Calificación en acta:</strong> {COURSE_EVALUATION_GUIDE.extraordinariaDetalle.calificacionFinal}
               </div>
             </div>
 
-            {/* Evaluación Única Final */}
-            <div className="qfdos-card card-amber" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <AlertTriangle size={20} color="var(--accent-amber)" />
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                  Evaluación Única Final
-                </h3>
-              </div>
-              <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                {COURSE_EVALUATION_GUIDE.unicaFinalDetalle.solicitud}
-              </p>
+            {/* 3. Evaluación Única Final */}
+            <div className="qfdos-card card-amber" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <AlertTriangle size={20} color="var(--accent-amber)" />
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                    3. Evaluación Única Final
+                  </h3>
+                </div>
+                <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                  {COURSE_EVALUATION_GUIDE.unicaFinalDetalle.solicitud}
+                </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                {COURSE_EVALUATION_GUIDE.unicaFinalDetalle.partes.map((p, i) => (
-                  <div key={i} style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
-                    <strong style={{ color: 'var(--text-title)' }}>{p.parte}:</strong> {p.desc}
-                  </div>
-                ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                  {COURSE_EVALUATION_GUIDE.unicaFinalDetalle.partes.map((p, i) => (
+                    <div key={i} style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
+                      <strong style={{ color: 'var(--text-title)' }}>{p.parte}:</strong> {p.desc}
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', background: 'rgba(245,158,11,0.08)', padding: '8px 10px', borderRadius: '6px' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', background: 'rgba(245,158,11,0.08)', padding: '8px 10px', borderRadius: '6px', borderLeft: '3px solid var(--accent-amber)', marginTop: '12px' }}>
                 📌 <strong>Solicitud:</strong> Procedimiento electrónico al Director/a de Departamento en las 2 primeras semanas.
+              </div>
+            </div>
+
+            {/* 4. Convocatoria Especial de Noviembre (Finalización de Estudios) */}
+            <div className="qfdos-card card-teal" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <GraduationCap size={22} color="var(--teal-ink)" />
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                      4. Especial de Noviembre
+                    </h3>
+                  </div>
+                  <span className="qfdos-badge" style={{ background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a', fontWeight: 800, fontSize: '0.72rem' }}>
+                    Finalización Grado
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(13, 148, 136, 0.08)', border: '1px solid rgba(13, 148, 136, 0.25)', borderRadius: '6px', padding: '8px 10px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--teal-ink)' }}>
+                    📅 Solicitud: {COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.plazoSolicitud}
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Vía Sede Electrónica UGR (sede.ugr.es)
+                  </div>
+                </div>
+
+                <p style={{ fontSize: '0.81rem', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.45 }}>
+                  {COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.requisitos}
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+                  {COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.partes.map((p, i) => (
+                    <div key={i} style={{ padding: '10px', background: 'var(--surface-alt)', borderRadius: '6px', fontSize: '0.82rem' }}>
+                      <strong style={{ color: 'var(--text-title)' }}>{p.parte}:</strong> {p.desc}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', background: 'rgba(13, 148, 136, 0.06)', padding: '8px 10px', borderRadius: '6px', borderLeft: '3px solid var(--teal-ink)', marginBottom: '10px', marginTop: '12px' }}>
+                  🎓 <strong>Fecha examen oficial:</strong> {COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.fechaExamen} (Aula 7, 09:00 h).
+                </div>
+
+                <a
+                  href={COURSE_EVALUATION_GUIDE.especialNoviembreDetalle.sedeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-secondary"
+                  style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <ExternalLink size={13} /> Sede Electrónica UGR · Convocatoria Noviembre
+                </a>
               </div>
             </div>
 
           </div>
 
-          {/* 4. EVALUACIÓN POR INCIDENCIAS (ART. 9 NORMATIVA UGR) */}
+          {/* 5. EVALUACIÓN POR INCIDENCIAS (ART. 9 NORMATIVA UGR) */}
           <div className="qfdos-card card-navy" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <HelpCircle size={22} color="var(--navy-ink)" />
                 <div>
                   <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                    Evaluación por Incidencias (Artículo 9 Normativa UGR)
+                    5. Evaluación por Incidencias (Artículo 9 Normativa UGR)
                   </h3>
                   <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                     Procedimiento reglado mediante Registro Electrónico de la Universidad de Granada
