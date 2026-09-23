@@ -112,7 +112,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     user?.name ? user.name : (isProfesor ? 'Prof. Juan José Díaz-Mochón' : '')
   );
   const [studentEmail, setStudentEmail] = useState<string>(
-    user?.email ? user.email : (isProfesor ? 'jjdiaz@ugr.es' : '')
+    user?.email ? user.email : (isProfesor ? 'juandiaz@ugr.es' : '')
   );
   const [isStarted, setIsStarted] = useState<boolean>(false);
 
@@ -271,7 +271,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   useEffect(() => {
     if (isProfesor && evaluationMode === 'docente_sesion') {
       setStudentName(user?.name || 'Prof. Juan José Díaz-Mochón');
-      setStudentEmail(user?.email || 'jjdiaz@ugr.es');
+      setStudentEmail(user?.email || 'juandiaz@ugr.es');
     } else if (!isProfesor && user) {
       setStudentName(user.name || '');
       setStudentEmail(user.email || '');
@@ -852,7 +852,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         onClick={() => {
                           setEvaluationMode('docente_sesion');
                           setStudentName('Prof. Juan José Díaz-Mochón');
-                          setStudentEmail('jjdiaz@ugr.es');
+                          setStudentEmail('juandiaz@ugr.es');
                         }}
                         style={{
                           padding: '12px',

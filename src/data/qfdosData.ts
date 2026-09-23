@@ -268,7 +268,7 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
     id: 'link-ema-approvals',
     title: 'Medicamentos autorizados este año por la EMA',
-    url: 'https://www.ema.europa.eu/en/medicines/medicines-human-use-under-evaluation',
+    url: 'https://www.ema.europa.eu/en/medicines',
     summary:
       'El registro público de la Agencia Europea del Medicamento. Buscad cualquier principio activo del temario y leed su informe: veréis los datos reales de eficacia y seguridad con los que se toma la decisión de autorizar, y cuántas veces se rechaza.',
     category: 'Regulación & seguridad',
@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.16.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-22T00:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.17.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T00:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -1899,7 +1899,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
       'Normativa académica y régimen de convocatorias (UGR)',
       'Ecosistema interactivo QFDOS v3 y NotebookLM'
     ],
-    slideCount: 28,
+    slideCount: 19,
     targetName: 'Química Farmacéutica II · Guía Docente y Evaluación',
     status: 'Publicado',
     slidesPdfUrl: '',
@@ -1935,7 +1935,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
       'Reactivadores oxímicos (Pralidoxima / 2-PAM)',
       'Fármacos para la enfermedad de Alzheimer (Donepezilo, Rivastigmina)'
     ],
-    slideCount: 56,
+    slideCount: 59,
     pdbTargetId: '2HA4',
     targetName: 'Acetilcolinesterasa en complejo con Acetilcolina (AChE · ACh)',
     status: 'Publicado',
@@ -3503,27 +3503,4 @@ export const INITIAL_STUDENT_PROFILES: StudentEvaluationProfile[] = [];
 
 export const INITIAL_STUDENT_EVALUATION_DATA = INITIAL_STUDENT_PROFILES;
 
-export const INITIAL_STUDENT_QUESTIONS: StudentQuestion[] = [
-  {
-    id: 'sq-1',
-    topicId: 'tema-00',
-    topicTitle: 'Tema 00: Presentación del Curso',
-    studentName: 'Elena García Pérez',
-    studentEmail: 'elena.garcia@correo.ugr.es',
-    question: 'Profesor Mochón, respecto a la evaluación continua, ¿la nota mínima de 5 sobre 10 en el examen final es indispensable para que sumen el parcial (20%) y las prácticas (5%)?',
-    timestamp: '14/09/2026 11:20',
-    status: 'respondida',
-    response: '¡Hola, Elena! Efectivamente: de acuerdo con la guía docente aprobada por la UGR, es requisito indispensable alcanzar un mínimo de 5,0 sobre 10 en el examen final oficial para promediar con las calificaciones de la evaluación continua obtenidas durante el semestre.'
-  },
-  {
-    id: 'sq-2',
-    topicId: 'tema-09',
-    topicTitle: 'Tema 09: AINEs & Coxibs',
-    studentName: 'Manuel Martínez López',
-    studentEmail: 'martinez.m@correo.ugr.es',
-    question: '¿Por qué el celecoxib no inhibe la COX-1 a concentraciones terapéuticas si el sitio activo es tan parecido al de COX-2?',
-    timestamp: '15/09/2026 17:45',
-    status: 'respondida',
-    response: 'Manuel, el motivo es el impedimento estérico: el grupo sulfonamida voluminoso del celecoxib requiere entrar en el bolsillo lateral secundario. En COX-1, el aminoácido Isoleucina 523 tiene un grupo metilo extra que bloquea físicamente la entrada a ese bolsillo, mientras que en COX-2 la Valina 523 es más corta y deja expedito el canal.'
-  }
-];
+export const INITIAL_STUDENT_QUESTIONS: StudentQuestion[] = [];

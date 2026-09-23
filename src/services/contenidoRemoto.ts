@@ -51,31 +51,39 @@ export function limpiarCacheRemota(): void {
  */
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
-  const base0 = INITIAL_TOPICS[0];
   return topics.map(t => {
+    const base = INITIAL_TOPICS.find(item => item.id === t.id);
+    if (!base) return t;
+
     if (t.id === 'tema-00') {
       return {
-        ...base0,
-        slidesPdfUrl: typeof t.slidesPdfUrl === 'string' ? t.slidesPdfUrl : (base0.slidesPdfUrl || ''),
-        slidesPdfName: t.slidesPdfName || base0.slidesPdfName,
-        notesPdfUrl: typeof t.notesPdfUrl === 'string' ? t.notesPdfUrl : (base0.notesPdfUrl || ''),
-        notesPdfName: t.notesPdfName || base0.notesPdfName,
-        geminiNotebookUrl: t.geminiNotebookUrl || base0.geminiNotebookUrl,
+        ...base,
+        slidesPdfUrl: typeof t.slidesPdfUrl === 'string' && t.slidesPdfUrl.startsWith('http') ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
+        slidesPdfName: t.slidesPdfName || base.slidesPdfName,
+        notesPdfUrl: typeof t.notesPdfUrl === 'string' && t.notesPdfUrl.startsWith('http') ? t.notesPdfUrl : (base.notesPdfUrl || ''),
+        notesPdfName: t.notesPdfName || base.notesPdfName,
+        geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
         spotifyPodcastUrl: undefined,
         videoPodcastUrl: undefined,
         testQuestions: [],
         flashcards: []
       };
     }
-    if (t.id === 'tema-01') {
-      const base1 = INITIAL_TOPICS.find(item => item.id === 'tema-01') || INITIAL_TOPICS[1];
-      return {
-        ...t,
-        testQuestions: base1.testQuestions,
-        flashcards: base1.flashcards
-      };
-    }
-    return t;
+
+    return {
+      ...base,
+      ...t,
+      notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
+      notesPdfName: t.notesPdfName || base.notesPdfName,
+      slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
+      slidesPdfName: t.slidesPdfName || base.slidesPdfName,
+      geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
+      spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
+      videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
+      testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length > 0) ? t.testQuestions : base.testQuestions,
+      flashcards: (Array.isArray(t.flashcards) && t.flashcards.length > 0) ? t.flashcards : base.flashcards,
+      drugs: (Array.isArray(t.drugs) && t.drugs.length > 0) ? t.drugs : base.drugs,
+    };
   });
 }
 
@@ -98,9 +106,8 @@ export async function descargarContenido(): Promise<ContenidoPublicado | null> {
     if (!cuerpo?.ok || cuerpo.vacio || !cuerpo.contenido) return null;
 
     const publicadoEn = cuerpo.publicadoEn ?? '';
-    // Si la publicación en la hoja remota es más antigua que la versión oficial compilada,
-    // se descarta para no pisar el código nuevo con datos históricos obsoletos de la hoja.
-    if (publicadoEn && publicadoEn < COURSE_BUILD_TIMESTAMP) {
+    // Solo descartar si la fecha es inválida o anterior al inicio del curso
+    if (publicadoEn && publicadoEn < '2026-09-01T00:00:00.000Z') {
       limpiarCacheRemota();
       return null;
     }
@@ -127,7 +134,7 @@ export function contenidoEnCache(): ContenidoPublicado | null {
   if (!raw) return null;
   try { 
     const data = JSON.parse(raw) as ContenidoPublicado;
-    if (data.publicadoEn && data.publicadoEn < COURSE_BUILD_TIMESTAMP) {
+    if (data.publicadoEn && data.publicadoEn < '2026-09-01T00:00:00.000Z') {
       limpiarCacheRemota();
       return null;
     }

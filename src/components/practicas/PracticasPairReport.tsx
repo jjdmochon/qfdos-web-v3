@@ -86,7 +86,7 @@ export const PracticasPairReport: React.FC = () => {
       id: `P${1}-${Date.now().toString().slice(-4)}`,
       grupo: 'Prácticas',
       puesto: 1,
-      turno: '8:30-11:30',
+      turno: '16:00-19:00',
       fecha: new Date().toISOString().split('T')[0],
       student1: {
         nombre: user?.name || '',
@@ -383,20 +383,20 @@ export const PracticasPairReport: React.FC = () => {
   // Load a demo pair for student testing
   const handleLoadStudentDemo = () => {
     setCurrentReport({
-      id: 'P04-830_1130',
-      grupo: 'Prácticas',
+      id: 'EJEMPLO-P04',
+      grupo: 'Grupo E',
       puesto: 4,
-      turno: '8:30-11:30',
-      fecha: '2026-03-12',
+      turno: '16:00-19:00',
+      fecha: new Date().toISOString().split('T')[0],
       student1: {
-        nombre: 'Elena Morales Ruiz',
-        dni: '77234512A',
-        email: 'emorales@correo.ugr.es'
+        nombre: 'Alumno/a 1 (EJEMPLO)',
+        dni: '',
+        email: ''
       },
       student2: {
-        nombre: 'Carlos Navarro Vega',
-        dni: '75198234B',
-        email: 'cnavarro@correo.ugr.es'
+        nombre: 'Alumno/a 2 (EJEMPLO)',
+        dni: '',
+        email: ''
       },
       step1: {
         mass1Naftol: 3.00,

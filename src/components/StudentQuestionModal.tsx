@@ -23,7 +23,7 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
   const { user } = useAuth();
 
   const [questionsList, setQuestionsList] = useState<StudentQuestion[]>(() => {
-    const saved = localStorage.getItem('qfdos_v2_student_questions');
+    const saved = localStorage.getItem('qfdos_v3_student_questions');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -58,7 +58,12 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
 
     const updated = [newQuestion, ...questionsList];
     setQuestionsList(updated);
-    localStorage.setItem('qfdos_v2_student_questions', JSON.stringify(updated));
+    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updated));
+
+    // El buzón no tiene backend: la duda se envía al profesor por correo para que llegue de verdad.
+    const subject = encodeURIComponent(`[QFDOS E] Duda - ${newQuestion.topicTitle}`);
+    const body = encodeURIComponent(`${newQuestion.question}\n\n${newQuestion.studentName} <${newQuestion.studentEmail}>`);
+    window.location.href = `mailto:juandiaz@ugr.es?subject=${subject}&body=${body}`;
 
     setQuestionText('');
     setIsSubmitted(true);
@@ -94,7 +99,7 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
 
             {isSubmitted && (
               <div style={{ padding: '8px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-md)', color: '#047857', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                <CheckCircle2 size={16} /> ¡Tu pregunta ha sido registrada con éxito! El profesorado la responderá a la brevedad.
+                <CheckCircle2 size={16} /> Se ha abierto tu correo con la duda preparada: pulsa Enviar para que llegue al profesor.
               </div>
             )}
 

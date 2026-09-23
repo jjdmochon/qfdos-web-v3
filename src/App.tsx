@@ -69,23 +69,33 @@ function purgeStaleCourseCache(): void {
   const stored = localStorage.getItem(VERSION_KEY);
   if (stored === COURSE_DATA_VERSION) return;
 
-  // Preservar enlaces y modificaciones locales introducidas por el profesor
+  // Preservar SOLO enlaces válidos introducidos localmente por el profesor
   const oldTopicsStr = localStorage.getItem('qfdos_v3_topics');
   const customTopicOverrides: Record<string, Partial<QfdosTopic>> = {};
   if (oldTopicsStr) {
     try {
       const parsed = JSON.parse(oldTopicsStr) as QfdosTopic[];
       parsed.forEach(t => {
-        if (t.notesPdfUrl || t.slidesPdfUrl || t.spotifyPodcastUrl || (t.geminiNotebookUrl && t.geminiNotebookUrl !== INITIAL_TOPICS[0]?.geminiNotebookUrl)) {
-          customTopicOverrides[t.id] = {
-            notesPdfUrl: t.notesPdfUrl,
-            notesPdfName: t.notesPdfName,
-            slidesPdfUrl: t.slidesPdfUrl,
-            slidesPdfName: t.slidesPdfName,
-            geminiNotebookUrl: t.geminiNotebookUrl,
-            spotifyPodcastUrl: t.spotifyPodcastUrl,
-            videoPodcastUrl: t.videoPodcastUrl
-          };
+        const over: Partial<QfdosTopic> = {};
+        if (typeof t.notesPdfUrl === 'string' && t.notesPdfUrl.startsWith('http')) {
+          over.notesPdfUrl = t.notesPdfUrl;
+          if (t.notesPdfName) over.notesPdfName = t.notesPdfName;
+        }
+        if (typeof t.slidesPdfUrl === 'string' && t.slidesPdfUrl.startsWith('http')) {
+          over.slidesPdfUrl = t.slidesPdfUrl;
+          if (t.slidesPdfName) over.slidesPdfName = t.slidesPdfName;
+        }
+        if (typeof t.geminiNotebookUrl === 'string' && t.geminiNotebookUrl.startsWith('http')) {
+          over.geminiNotebookUrl = t.geminiNotebookUrl;
+        }
+        if (typeof t.spotifyPodcastUrl === 'string' && t.spotifyPodcastUrl.startsWith('http')) {
+          over.spotifyPodcastUrl = t.spotifyPodcastUrl;
+        }
+        if (typeof t.videoPodcastUrl === 'string' && t.videoPodcastUrl.startsWith('http')) {
+          over.videoPodcastUrl = t.videoPodcastUrl;
+        }
+        if (Object.keys(over).length > 0) {
+          customTopicOverrides[t.id] = over;
         }
       });
     } catch { /* ignorar dato corrupto */ }
@@ -95,10 +105,10 @@ function purgeStaleCourseCache(): void {
   localStorage.setItem(VERSION_KEY, COURSE_DATA_VERSION);
 
   if (Object.keys(customTopicOverrides).length > 0) {
-    const updated = INITIAL_TOPICS.map(t => {
+    const updated = normalizarTemas(INITIAL_TOPICS.map(t => {
       const over = customTopicOverrides[t.id];
       return over ? { ...t, ...over } : t;
-    });
+    }));
     localStorage.setItem('qfdos_v3_topics', JSON.stringify(updated));
   }
 }
@@ -316,6 +326,21 @@ export const App: React.FC = () => {
 
     return () => { cancelado = true; };
   }, []);
+
+  // Mantener actualizado el modal de detalle si está abierto cuando se actualiza topics
+  useEffect(() => {
+    if (selectedTopicDetail) {
+      const refreshed = topics.find(t => t.id === selectedTopicDetail.id);
+      if (refreshed && (
+        refreshed.spotifyPodcastUrl !== selectedTopicDetail.spotifyPodcastUrl ||
+        refreshed.geminiNotebookUrl !== selectedTopicDetail.geminiNotebookUrl ||
+        refreshed.slidesPdfUrl !== selectedTopicDetail.slidesPdfUrl ||
+        refreshed.notesPdfUrl !== selectedTopicDetail.notesPdfUrl
+      )) {
+        setSelectedTopicDetail(refreshed);
+      }
+    }
+  }, [topics, selectedTopicDetail]);
 
   // Ctrl+K search shortcut
   useEffect(() => {
