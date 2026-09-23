@@ -129,7 +129,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                   className="qfdos-badge"
                   style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', fontSize: '0.66rem', fontWeight: 700 }}
                 >
-                  ABIERTO · Modelo A · 15 preguntas
+                  ABIERTO · 15 preguntas
                 </span>
               </div>
               <div style={{ color: 'rgba(255,255,255,0.86)', fontSize: '0.83rem', lineHeight: 1.5 }}>

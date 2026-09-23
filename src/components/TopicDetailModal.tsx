@@ -685,14 +685,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 </div>
                                 <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>5. Test de Autoevaluación</strong>
                               </div>
-                              <span className={`qfdos-badge ${isProfesor ? 'badge-amber' : 'badge-teal'}`} style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
-                                {isProfesor ? 'Modo Docente' : 'Modelo A Oficial (15P) · Modo Examen'}
-                              </span>
+                              {isProfesor && (
+                                <span className="qfdos-badge badge-amber" style={{ fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                  Modo Docente
+                                </span>
+                              )}
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales (Modelo A por defecto, cuatro modelos disponibles). Calificaciones volcadas en Google Sheets.`
-                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales calibradas (Modelo A). Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
+                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales (cuatro modelos disponibles). Calificaciones volcadas en Google Sheets.`
+                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales calibradas. Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
                               }
                             </p>
                           </div>
