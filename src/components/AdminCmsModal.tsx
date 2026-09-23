@@ -439,10 +439,24 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     });
 
     onUpdateStudentQuestions(updatedQuestions);
-    localStorage.setItem('qfdos_v2_student_questions', JSON.stringify(updatedQuestions));
+    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updatedQuestions));
+    localStorage.removeItem('qfdos_v2_student_questions');
 
     setRespondingQId(null);
     setResponseText('');
+  };
+
+  const handleDeleteStudentQuestion = (qId: string) => {
+    const updated = studentQuestions.filter(q => q.id !== qId);
+    onUpdateStudentQuestions(updated);
+    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updated));
+  };
+
+  const handleClearAllStudentQuestions = () => {
+    if (!window.confirm('¿Está seguro de que desea vaciar todas las dudas del buzón?')) return;
+    onUpdateStudentQuestions([]);
+    localStorage.removeItem('qfdos_v3_student_questions');
+    localStorage.removeItem('qfdos_v2_student_questions');
   };
 
   return (
