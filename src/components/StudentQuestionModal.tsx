@@ -8,7 +8,8 @@ import {
   CheckCircle2, 
   MessageSquare, 
   Clock, 
-  UserCheck 
+  UserCheck,
+  Trash2
 } from 'lucide-react';
 
 interface StudentQuestionModalProps {
@@ -23,16 +24,34 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
   const { user } = useAuth();
 
   const [questionsList, setQuestionsList] = useState<StudentQuestion[]>(() => {
+    localStorage.removeItem('qfdos_v2_student_questions');
     const saved = localStorage.getItem('qfdos_v3_student_questions');
     if (saved) {
       try {
-        return (JSON.parse(saved) as StudentQuestion[]).filter(q => q.id !== 'sq-1' && q.id !== 'sq-2');
+        const parsed = (JSON.parse(saved) as StudentQuestion[]).filter(
+          q => q.id !== 'sq-1' && q.id !== 'sq-2' && !q.studentEmail?.includes('alumno.demo') && !q.studentEmail?.includes('martinez.m@correo.ugr.es')
+        );
+        localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(parsed));
+        return parsed;
       } catch (e) {
         console.error('Error parsing saved questions', e);
       }
     }
     return INITIAL_STUDENT_QUESTIONS;
   });
+
+  const handleDeleteQuestion = (id: string) => {
+    const updated = questionsList.filter(q => q.id !== id);
+    setQuestionsList(updated);
+    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updated));
+  };
+
+  const handleClearAllQuestions = () => {
+    if (!window.confirm('¿Deseas vaciar el historial de dudas en este navegador?')) return;
+    setQuestionsList([]);
+    localStorage.removeItem('qfdos_v3_student_questions');
+    localStorage.removeItem('qfdos_v2_student_questions');
+  };
 
   const [selectedTopicId, setSelectedTopicId] = useState(topics[0]?.id || 'tema-00');
   const [studentName, setStudentName] = useState(user?.name ?? '');
