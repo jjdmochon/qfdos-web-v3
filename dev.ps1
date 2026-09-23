@@ -42,6 +42,11 @@ function Sync-ToLocal {
         Copy-Item "$Source\public" "$Local\public" -Recurse -Force
     }
 
+    if (Test-Path "$Source\google-apps-script") {
+        if (Test-Path "$Local\google-apps-script") { Remove-Item "$Local\google-apps-script" -Recurse -Force }
+        Copy-Item "$Source\google-apps-script" "$Local\google-apps-script" -Recurse -Force
+    }
+
     foreach ($f in @('index.html', 'package.json', 'vite.config.ts',
                      'tsconfig.json', 'tsconfig.app.json', 'tsconfig.node.json')) {
         if (Test-Path "$Source\$f") { Copy-Item "$Source\$f" $Local -Force }

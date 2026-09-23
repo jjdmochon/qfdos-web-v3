@@ -6,6 +6,7 @@ import {
   QuizAnswerDetail, 
   QuizRegistrationRecord,
   RETROSINTESIS_TEST_QUESTIONS,
+  MODELO_E_TEST_QUESTIONS,
   MODELO_A_TEST_QUESTIONS,
   MODELO_B_TEST_QUESTIONS,
   MODELO_C_TEST_QUESTIONS
@@ -61,7 +62,7 @@ interface QuizModalProps {
   onAttemptCompleted?: (attempt: QuizAttempt) => void;
 }
 
-export type QuizModelType = 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis';
+export type QuizModelType = 'modelo-e' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis';
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -70,8 +71,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 }) => {
   const { user, isProfesor } = useAuth();
 
-  // Model Selection State (Modelo A es el examen oficial publicado del Tema 1)
-  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-a');
+  // Model Selection State (Modelo E es el examen oficial 2026/27 sin retrosíntesis del Tema 1)
+  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-e');
 
   /**
    * Modo examen.
@@ -83,18 +84,19 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [examMode, setExamMode] = useState<boolean>(true);
   const isExamMode = isProfesor ? examMode : true;
 
-  // Compute active question bank dynamically (Default is Modelo B - exactly 15 questions)
+  // Compute active question bank dynamically (Default is Modelo E para alumnos y profesor)
   const questions: TestQuestion[] = useMemo(() => {
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
     if (isTema1) {
-      // El alumnado tiene asignado el Modelo A oficial; el selector es del profesor
-      if (!isProfesor) return MODELO_A_TEST_QUESTIONS;
+      // El alumnado tiene asignado el Modelo E oficial; el selector es del profesor
+      if (!isProfesor) return MODELO_E_TEST_QUESTIONS;
+      if (selectedModel === 'modelo-e') return MODELO_E_TEST_QUESTIONS;
       if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
       if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
       if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
       return MODELO_B_TEST_QUESTIONS;
     }
-    return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_A_TEST_QUESTIONS;
+    return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
   }, [topic, selectedModel, isProfesor]);
 
   // Tab State
@@ -371,14 +373,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         minute: '2-digit'
       });
 
-      let modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis de Metacolina y Betanecol (15P)';
+      let modelDisplayName = 'Modelo E: Examen Oficial 2026/27 - Sin Retrosíntesis (15P)';
       if (topic.id === 'tema-01') {
-        if (selectedModel === 'modelo-b') {
+        if (selectedModel === 'modelo-a') {
+          modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis Directa (15P)';
+        } else if (selectedModel === 'modelo-b') {
           modelDisplayName = 'Modelo B: Diferenciación, Cinética y Síntesis Directa (15P)';
         } else if (selectedModel === 'modelo-c') {
           modelDisplayName = 'Modelo C: Catálisis Enzimática, Estereoquímica y Síntesis (15P)';
         } else if (selectedModel === 'retrosintesis') {
           modelDisplayName = 'Modelo Retrosíntesis: Desconexiones y Sintones (15P)';
+        } else {
+          modelDisplayName = 'Modelo E: Examen Oficial 2026/27 - Sin Retrosíntesis (15P)';
         }
       }
 
@@ -645,10 +651,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                 </h3>
                 <span className="qfdos-badge" style={{ 
                   fontSize: '0.66rem', 
-                  background: selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#3b82f6', 
+                  background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#3b82f6', 
                   color: '#fff' 
                 }}>
-                  {selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
+                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
                 </span>
               </div>
               <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
@@ -899,11 +905,40 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', margin: 0 }}>
                         {evaluationMode === 'docente_sesion' || isProfesor ? 'Modelo de Examen Seleccionado (15 Preguntas Calibradas):' : 'Modelo de Examen Oficial Asignado:'}
                       </label>
-                      <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#8b5cf6', color: '#fff' }}>
-                        {selectedModel === 'modelo-b' ? 'Modelo B (Activo)' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'}
+                      <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#3b82f6', color: '#fff' }}>
+                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial Activo)' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'}
                       </span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr', gap: '10px' }}>
+                      {/* Modelo E: Oficial 2026/27 (Sin Retrosíntesis) */}
+                      {topic.id === 'tema-01' && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedModel('modelo-e')}
+                          style={{
+                            padding: '12px 14px',
+                            borderRadius: 'var(--radius-md)',
+                            border: selectedModel === 'modelo-e' ? '2px solid var(--navy)' : '1px solid var(--border-color)',
+                            background: selectedModel === 'modelo-e' ? 'var(--primary-bg)' : 'var(--surface)',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <strong style={{ fontSize: '0.86rem', color: 'var(--navy)' }}>
+                              Modelo E: Oficial 2026/27 (15P)
+                            </strong>
+                            {selectedModel === 'modelo-e' && (
+                              <span className="qfdos-badge badge-navy" style={{ fontSize: '0.66rem' }}>Activo Alumnado</span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                            Sin retrosíntesis. Biosíntesis ChAT, SAR betanecol, eudismia, síntesis industrial directa, catálisis Ser/His de AChE, 2-PAM, aging y tubocurarina (1.4 nm).
+                          </p>
+                        </button>
+                      )}
+
                       {/* Modelo A */}
                       <button
                         type="button"
@@ -1085,9 +1120,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
                         <strong>
-                          {selectedModel === 'modelo-b' ? 'Modelo B Oficial:' : selectedModel === 'modelo-c' ? 'Modelo C Oficial:' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}
+                          {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27:' : selectedModel === 'modelo-b' ? 'Modelo B Oficial:' : selectedModel === 'modelo-c' ? 'Modelo C Oficial:' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}
                         </strong>{' '}
-                        {selectedModel === 'modelo-b'
+                        {selectedModel === 'modelo-e'
+                          ? '15 preguntas calibradas JEV System-1 (sin retrosíntesis): biosíntesis ChAT, SAR betanecol, eudismia metacolina, síntesis industrial directa, catálisis Ser/His de AChE, 2-PAM, aging, BHE y tubocurarina (1.4 nm).'
+                          : selectedModel === 'modelo-b'
                           ? '15 preguntas de diferenciación ionotrópica/metabotrópica, cinética de carbamoilación, envejecimiento de AChE y síntesis de derivados.'
                           : selectedModel === 'modelo-c'
                           ? '15 preguntas de tríada catalítica de AChE, estereoquímica de muscarina, selectividad y síntesis de neostigmina.'
@@ -1118,7 +1155,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       className="btn btn-primary"
                       style={{ padding: '10px 24px', fontSize: '0.92rem', fontWeight: 700 }}
                     >
-                      Comenzar {selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} />
+                      Comenzar {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -1149,11 +1186,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
-                        background: selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'retrosintesis' ? 'var(--teal)' : 'var(--navy)', 
+                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'retrosintesis' ? 'var(--teal)' : 'var(--navy)', 
                         color: '#fff',
                         fontWeight: 700 
                       }}>
-                        {selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'}
+                        {selectedModel === 'modelo-e' ? 'Modelo E' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'}
                       </span>
                       <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)' }}>
                         Pregunta {currentIndex + 1} de {questions.length}
@@ -1405,7 +1442,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     return (
                       <div className="qfdos-card" style={{ maxWidth: '420px', margin: '0 auto 1.25rem', padding: '1.25rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
-                          Calificación Oficial ({topic.title} · {selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'}):
+                          Calificación Oficial ({topic.title} · {selectedModel === 'modelo-e' ? 'Modelo E (15P)' : selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'}):
                         </div>
                         <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal)' : 'var(--accent-red)', lineHeight: 1 }}>
                           {stats.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>

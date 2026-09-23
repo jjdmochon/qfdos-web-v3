@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QfdosTopic, Flashcard } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { recurso } from '../services/rutas';
 import { 
   X, 
   Award, 
@@ -162,9 +163,61 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
                   {currentCard.back}
                 </p>
-                {currentCard.smiles && (
-                  <div style={{ marginTop: '12px' }}>
-                    <Chem2DDrawer smiles={currentCard.smiles} width={200} height={90} />
+
+                {/* Multi-structure display (e.g. aminoácidos activos AChE o Fisostigmina vs Neostigmina) */}
+                {currentCard.structures && currentCard.structures.length > 0 && (
+                  <div style={{
+                    marginTop: '14px',
+                    display: 'flex',
+                    gap: '12px',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    background: 'var(--surface-alt)',
+                    padding: '10px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)'
+                  }}>
+                    {currentCard.structures.map((st, i) => (
+                      <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--navy)' }}>
+                            {st.name}
+                          </span>
+                          {st.badge && (
+                            <span className="qfdos-badge" style={{ fontSize: '0.62rem', background: 'var(--teal)', color: '#fff' }}>
+                              {st.badge}
+                            </span>
+                          )}
+                        </div>
+                        <Chem2DDrawer smiles={st.smiles} width={130} height={85} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Single Structure Display */}
+                {currentCard.smiles && !currentCard.structures && (
+                  <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center' }}>
+                    <Chem2DDrawer smiles={currentCard.smiles} width={220} height={100} />
+                  </div>
+                )}
+
+                {/* Optional Didactic Image Asset */}
+                {currentCard.imagePath && (
+                  <div style={{
+                    marginTop: '12px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    background: '#ffffff',
+                    padding: '8px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)'
+                  }}>
+                    <img
+                      src={recurso(currentCard.imagePath)}
+                      alt={currentCard.concept}
+                      style={{ maxHeight: '160px', maxWidth: '100%', objectFit: 'contain' }}
+                    />
                   </div>
                 )}
               </div>
