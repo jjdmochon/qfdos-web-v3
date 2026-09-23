@@ -84,18 +84,20 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [examMode, setExamMode] = useState<boolean>(true);
   const isExamMode = isProfesor ? examMode : true;
 
-  // Compute active question bank dynamically (Disponible para Alumnos y Profesor)
+  // Compute active question bank dynamically (A y E para alumnado; B, C y Retrosíntesis exclusivos para docente)
   const questions: TestQuestion[] = useMemo(() => {
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
     if (isTema1) {
       if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
-      if (selectedModel === 'modelo-b') return MODELO_B_TEST_QUESTIONS;
-      if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
-      if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
+      if (isProfesor) {
+        if (selectedModel === 'modelo-b') return MODELO_B_TEST_QUESTIONS;
+        if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
+        if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
+      }
       return MODELO_E_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
-  }, [topic, selectedModel]);
+  }, [topic, selectedModel, isProfesor]);
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'quiz' | 'records'>('quiz');
@@ -273,6 +275,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       setStudentEmail(user.email || '');
     }
   }, [evaluationMode, user, isProfesor]);
+
+  // Asegurar que el alumnado solo acceda a los Modelos A y E (B, C y Retrosíntesis son exclusivos del profesor)
+  useEffect(() => {
+    if (!isProfesor && selectedModel !== 'modelo-e' && selectedModel !== 'modelo-a') {
+      setSelectedModel('modelo-e');
+    }
+  }, [isProfesor, selectedModel]);
 
   /**
    * Obtiene estadísticas de realización (estado, mejor nota, intentos, última fecha)
@@ -971,7 +980,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         color: '#fff',
                         fontWeight: 700 
                       }}>
-                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'}
+                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-b' ? 'Modelo B (Docente)' : selectedModel === 'modelo-c' ? 'Modelo C (Docente)' : selectedModel === 'retrosintesis' ? 'Retrosíntesis (Docente)' : 'Modelo A (Oficial Previo)'}
                       </span>
                     </div>
 
@@ -1083,11 +1092,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     )}
 
-                    {/* Modelos adicionales opcionales de entrenamiento */}
-                    {topic.id === 'tema-01' && (
+                    {/* Modelos adicionales de demostración y entrenamiento (Exclusivos para el docente) */}
+                    {isProfesor && topic.id === 'tema-01' && (
                       <details style={{ marginBottom: '14px', background: 'var(--surface-alt)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '8px 12px' }}>
                         <summary style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', cursor: 'pointer' }}>
-                          Modelos complementarios de entrenamiento (Modelos B, C y Retrosíntesis)
+                          Modelos complementarios de demostración docente (Modelos B, C y Retrosíntesis · Solo Profesor)
                         </summary>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '8px', marginTop: '10px' }}>
                           <button
