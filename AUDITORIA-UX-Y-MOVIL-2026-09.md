@@ -11,13 +11,13 @@ Este documento sigue a `informe-arquitectura-qfods-web-v3.md.txt` (11-sep). Prim
 
 | # | Problema | Evidencia | Impacto |
 |---|---|---|---|
-| S1 | **El botón «Acceso de revisión / Modo demo» da rol de profesor sin autenticarse.** | `LoginPage.tsx:137-158` → `AuthContext.tsx:124-131` (`role: 'profesor'`) | Cualquier alumno abre el CMS, el generador de exámenes, la matriz de notas y el cuaderno de parejas. |
+| S1 | ~~El botón «Acceso de revisión / Modo demo» daba rol de profesor sin autenticarse.~~ **Resuelto en `c610a11`** (eliminado de `src/` y del bundle de `docs/`). Queda abierto el fondo: el rol se decide en el cliente, con el JWT solo decodificado y la sesión en localStorage (`AuthContext.tsx:54-118`). | `AuthContext.tsx:74, 94, 118` | Editando localStorage aún se abre el CMS. Publicar sigue exigiendo la clave del servidor, pero la interfaz del profesor queda expuesta. |
 | S2 | **La hoja de evaluación está compartida por enlace y se descarga entera en el navegador de cada alumno.** | `EvaluationSection.tsx:23-24, 163-166`; el filtrado por correo es solo visual (`:268-278`). Hemos comprobado que `…/export?format=csv` responde 200 sin autenticación (hoy solo tiene cabecera y una fila). | En cuanto se rellene con notas, toda la clase verá las notas de todos (RGPD). |
 | S3 | **`anotarFila` escribe sin clave en cualquier pestaña, incluida `_Contenido`, y acepta cualquier `sheetId`.** | `google-apps-script/Codigo.gs:86-87` | Anula la protección de `guardarContenido`: un tercero puede inyectar trozos en el temario publicado (enlaces falsos, JSON roto). |
 | S4 | **`misEntregas` y `misCalificaciones` devuelven los datos de cualquier correo, y `doPost` de Calificaciones acepta notas con cualquier `studentEmail`.** | `Codigo.gs:192`, `Calificaciones.gs:71-148`, `googleSheetsService.ts:108, 223-235` | Lectura y falsificación de notas ajenas. |
 
 **Arreglo mínimo, en 1–2 días:**
-1. Eliminar `loginAsGuest` o convertirlo en un rol `revisor` de solo lectura sin CMS.
+1. ~~Eliminar `loginAsGuest`~~ (hecho en `c610a11`).
 2. Quitar el acceso por enlace a la hoja de evaluación y servir a cada alumno solo su fila desde Apps Script.
 3. En `anotarFila`, fijar `HOJA_ID`, ignorar `p.sheetId`, poner en lista blanca los `sheetName` permitidos y rechazar cualquiera que empiece por `_`.
 4. Enviar el **ID token de Google** en todas las llamadas y verificarlo en Apps Script (`https://oauth2.googleapis.com/tokeninfo?id_token=…`: comprobar `aud` = Client ID, `email_verified`, dominio UGR). El correo se toma del token, nunca de un parámetro. El rol de profesor también se decide ahí.
@@ -133,7 +133,7 @@ La ruta adecuada es **PWA completa → Capacitor**, reutilizando el 100 % del c�
 ### Respecto a los bloqueos técnicos de la fase B
 
 1. **Google Sign-In no funciona en WebView.** Google bloquea OAuth en navegadores embebidos (error `403 disallowed_useragent`), así que `@react-oauth/google` no sirve dentro de la app. Hay que usar un plugin nativo (por ejemplo `@capgo/capacitor-social-login`) que devuelva un ID token, con Client IDs de Android (huella SHA-1) y de iOS, y **verificar ese token en Apps Script**: el mismo arreglo que S1–S4.
-2. **Rol de profesor decidido en servidor.** Un APK se descompila en minutos. Con el rol en el cliente, la app nativa haría todavía más evidente el problema S1.
+2. **Rol de profesor decidido en servidor.** Un APK se descompila en minutos. Con el rol en el cliente, la app nativa haría todavía más evidente el fondo de S1.
 3. **Recursos locales.** RDKit (`RDKit_minimal.js` + `.wasm`), model-viewer y las fuentes deben ir empaquetados, no desde CDN, para que funcione offline y se cumplan las políticas de las tiendas. El GLB de 7,3 MB conviene descargarlo bajo demanda.
 4. **CORS.** Las peticiones salen de `https://localhost` (Android) y de `capacitor://localhost` (iOS). Las respuestas JSON de Apps Script funcionan, pero conviene probar el flujo de redirección de `/exec` en ambos. Alternativa: `CapacitorHttp` nativo.
 5. **Rutas.** El enrutado por hash ya es compatible. Hay que quitar la dependencia de `PAGES_BASE`.
@@ -157,7 +157,7 @@ Lo que justifica estar en la tienda y no solo ser una PWA:
 
 ### Recomendación
 
-1. **Esta semana:** cerrar S1–S4 y verificar el token en servidor.
+1. **Esta semana:** cerrar S2–S4 (S1 ya resuelto) y verificar el token en servidor.
 2. **Siguiente iteración:** fase A (PWA offline) junto con el componente `<Modal>`, el `React.lazy` y la barra inferior móvil. Con esto el alumnado ya tiene una «app» instalable en ambos sistemas.
 3. **Después, si el uso lo justifica:** fase B con Capacitor. Primero en Android, que tiene menos barreras, y después en iOS con notificaciones y offline como valor nativo. No recomendamos React Native ni Flutter.
 
@@ -167,7 +167,7 @@ Lo que justifica estar en la tienda y no solo ser una PWA:
 
 | Prioridad | Acción | Perfil |
 |---|---|---|
-| 1 | Eliminar el modo demo como profesor; cerrar la hoja de evaluación; blindar `anotarFila`; verificar el ID token en Apps Script | Ambos |
+| 1 | ~~Eliminar el modo demo~~ (hecho); cerrar la hoja de evaluación; blindar `anotarFila`; verificar el ID token en Apps Script | Ambos |
 | 2 | Buzón de dudas real + contador en el panel del profesor | Ambos |
 | 3 | Notas del cuaderno y de la evaluación persistidas en Sheets | Profesor |
 | 4 | `<Modal>` común (confirmación, Atrás, Escape, foco, `dvh`) | Alumnado |
