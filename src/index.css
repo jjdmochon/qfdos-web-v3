@@ -3624,3 +3624,109 @@ html, body { overflow-x: hidden; max-width: 100%; }
     padding-top: max(0px, env(safe-area-inset-top));
   }
 }
+
+/* ==========================================================================
+   Mobile Optimization for Modals & Quiz Experience (< 640px)
+   ========================================================================== */
+.quiz-header-badge,
+.quiz-banner-badge,
+.qfdos-badge {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.5rem !important;
+    align-items: flex-end !important;
+  }
+
+  .modal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 94vh !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+  }
+
+  .modal-header {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-body {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-tabs-scroll {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 10px 0 !important;
+    gap: 4px !important;
+  }
+
+  .modal-tabs-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quiz-banner-container {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .quiz-banner-badge {
+    align-self: flex-start !important;
+  }
+
+  .quiz-actions-footer {
+    flex-direction: column-reverse !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .quiz-actions-footer .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    white-space: normal !important;
+    text-align: center !important;
+    padding: 10px 14px !important;
+  }
+
+  .quiz-mode-selector-wrap {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .quiz-mode-selector-wrap .btn {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  .quiz-in-progress-user-bar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .quiz-in-progress-footer {
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+
+  .quiz-in-progress-footer > div {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .quiz-in-progress-footer .btn {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+
+  .form-grid-2col {
+    grid-template-columns: 1fr !important;
+  }
+}

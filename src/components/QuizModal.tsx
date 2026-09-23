@@ -709,7 +709,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       >
         {/* Modal Top Header */}
         <div className="modal-header" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
             <div style={{
               width: 32,
               height: 32,
@@ -718,33 +718,36 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--navy)'
+              color: 'var(--navy)',
+              flexShrink: 0
             }}>
               <GraduationCap size={20} />
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0, lineHeight: 1.3 }}>
                   Autoevaluación: {topic.number} · {topic.title}
                 </h3>
-                <span className="qfdos-badge" style={{ 
+                <span className="qfdos-badge quiz-header-badge" style={{ 
                   fontSize: '0.66rem', 
                   background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#3b82f6', 
-                  color: '#fff' 
+                  color: '#fff',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}>
                   {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (10P)' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
                 </span>
               </div>
-              <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
-                15 Preguntas Calibradas JEV System-1 · Evaluación Continua QFDOS {isProfesor ? '(Modo Profesor)' : '(Portal Alumnado)'}
+              <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: '2px 0 0 0', lineHeight: 1.3 }}>
+                {selectedModel === 'modelo-fir' ? '10 Preguntas Oficiales FIR' : '15 Preguntas Calibradas JEV System-1'} · Evaluación Continua QFDOS {isProfesor ? '(Modo Profesor)' : '(Portal Alumnado)'}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-outline" title="Cerrar ventana"><X size={18} /></button>
+          <button onClick={onClose} className="btn btn-sm btn-outline" style={{ flexShrink: 0, marginLeft: '8px' }} title="Cerrar ventana"><X size={18} /></button>
         </div>
 
         {/* Tab Switcher */}
-        <div style={{ 
+        <div className="modal-tabs-scroll" style={{ 
           display: 'flex', 
           borderBottom: '1.5px solid var(--border-color)', 
           background: 'var(--surface-raised)',
@@ -916,7 +919,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                   {/* Formulario de datos */}
                   <div className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: 'var(--surface)' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '12px' }}>
+                    <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '12px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
                           Nombre Completo del Evaluado *
@@ -978,7 +981,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                   {/* Selector de Modelo de Examen (Disponible para Alumnado y Docente) */}
                   <div style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                       <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
                         {topic.id === 'tema-01' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
                       </label>
@@ -986,7 +989,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         fontSize: '0.68rem', 
                         background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#2563eb', 
                         color: '#fff',
-                        fontWeight: 700 
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}>
                         {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-fir' ? 'Modelo FIR (Oficial 2020-2025)' : selectedModel === 'modelo-b' ? 'Modelo B (Docente)' : selectedModel === 'modelo-c' ? 'Modelo C (Docente)' : selectedModel === 'retrosintesis' ? 'Retrosíntesis (Docente)' : 'Modelo A (Oficial Previo)'}
                       </span>
@@ -1220,7 +1225,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     )}
 
                     {/* Selector de Modo: Preparación / Estudio vs Examen Oficial */}
-                    <div style={{
+                    <div className="quiz-mode-selector-wrap" style={{
                       marginTop: '12px',
                       padding: '12px 14px',
                       background: 'var(--surface-raised)',
@@ -1232,7 +1237,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       gap: '12px',
                       flexWrap: 'wrap'
                     }}>
-                      <div>
+                      <div style={{ flex: 1, minWidth: '220px' }}>
                         <div style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-title)' }}>
                           Modalidad de Realización:
                         </div>
@@ -1242,12 +1247,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             : 'Preparación y estudio: comprueba cada respuesta de inmediato con su explicación pedagógica.'}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <button
                           type="button"
                           onClick={() => setExamMode(true)}
                           className={examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
-                          style={{ fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px' }}
+                          style={{ fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px', whiteSpace: 'nowrap' }}
                         >
                           Modo Examen
                         </button>
@@ -1255,7 +1260,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           type="button"
                           onClick={() => setExamMode(false)}
                           className={!examMode ? 'btn btn-sm btn-teal' : 'btn btn-sm btn-outline'}
-                          style={{ fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px' }}
+                          style={{ fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px', whiteSpace: 'nowrap' }}
                         >
                           Modo Preparación / Estudio
                         </button>
@@ -1315,7 +1320,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   </div>
 
                   {/* Banner de resumen del examen */}
-                  <div style={{
+                  <div className="quiz-banner-container" style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -1323,10 +1328,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     borderRadius: 'var(--radius-md)',
                     background: 'var(--surface-alt)',
                     border: '1px solid var(--border-color)',
-                    marginBottom: '1.5rem'
+                    marginBottom: '1.5rem',
+                    flexWrap: 'wrap',
+                    gap: '12px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '220px' }}>
+                      <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy)', flexShrink: 0 }}>
                         {questions.length}
                       </span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
@@ -1346,13 +1353,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           : '15 preguntas de fundamentos colinérgicos, agonistas y SAR, inhibidores de AChE, reactivadores y síntesis directa de metacolina y betanecol.'}
                       </div>
                     </div>
-                    <span className="qfdos-badge badge-teal" style={{ fontSize: '0.72rem' }}>
+                    <span className="qfdos-badge badge-teal quiz-banner-badge" style={{ fontSize: '0.72rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
                       Cero LaTeX Crudo · RDKit 2D
                     </span>
                   </div>
 
                   {/* Botón de Iniciar */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                  <div className="quiz-actions-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' }}>
                     <button onClick={onClose} className="btn btn-outline">
                       Cancelar
                     </button>
@@ -1384,7 +1391,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                 /* QUIZ EN PROGRESO */
                 <div>
                   {/* Respondent Info Bar & Progress Bar */}
-                  <div style={{ 
+                  <div className="quiz-in-progress-user-bar" style={{ 
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
@@ -1392,10 +1399,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     padding: '6px 12px',
                     background: 'var(--surface-raised)',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)'
+                    border: '1px solid var(--border-color)',
+                    flexWrap: 'wrap',
+                    gap: '8px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
-                      <User size={14} color="var(--navy)" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', flexWrap: 'wrap' }}>
+                      <User size={14} color="var(--navy)" style={{ flexShrink: 0 }} />
                       <span style={{ color: 'var(--text-muted)' }}>Evaluando a:</span>
                       <strong style={{ color: 'var(--text-title)' }}>{studentName}</strong>
                       {studentEmail && (
@@ -1404,16 +1413,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         </span>
                       )}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
                         background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#2563eb', 
                         color: '#fff',
-                        fontWeight: 700 
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}>
                         {selectedModel === 'modelo-e' ? 'Modelo E' : selectedModel === 'modelo-fir' ? 'Modelo FIR' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'} · {isExamMode ? 'Examen' : 'Preparación'}
                       </span>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)', whiteSpace: 'nowrap' }}>
                         Pregunta {currentIndex + 1} de {questions.length}
                       </span>
                     </div>
@@ -2182,7 +2193,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         {/* Footer (solo activo durante la realización de preguntas) */}
         {activeTab === 'quiz' && isStarted && !isCompleted && (
           <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', padding: '10px 16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+            <div className="quiz-in-progress-footer" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <button
                 onClick={() => {
                   if (window.confirm('¿Deseas salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) {
@@ -2191,6 +2202,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   }
                 }}
                 className="btn btn-sm btn-outline"
+                style={{ whiteSpace: 'nowrap' }}
               >
                 Salir del Examen
               </button>
@@ -2214,19 +2226,20 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <button
                     onClick={handleSubmitExam}
                     className="btn btn-primary"
-                    style={{ fontWeight: 700 }}
+                    style={{ fontWeight: 700, whiteSpace: 'nowrap' }}
                     title="Entrega el examen ahora; las preguntas sin responder puntuan como falladas"
                   >
                     <Send size={15} /> Entregar Examen ({answeredCount}/{questions.length})
                   </button>
                 </div>
               ) : (
-                <div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {!showExplanation ? (
                     <button
                       onClick={handleCheckAnswer}
                       disabled={selectedOption === null}
                       className="btn btn-primary"
+                      style={{ whiteSpace: 'nowrap' }}
                     >
                       Comprobar Respuesta
                     </button>
@@ -2234,6 +2247,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <button
                       onClick={handleNextQuestion}
                       className="btn btn-secondary"
+                      style={{ whiteSpace: 'nowrap' }}
                     >
                       {currentIndex < questions.length - 1 ? 'Siguiente Pregunta' : 'Ver Calificación Final'} <ArrowRight size={14} />
                     </button>
