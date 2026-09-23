@@ -11,6 +11,7 @@
 //                en su navegador, nunca en el código distribuido
 // ==========================================================================
 
+import { tokenSesion, esSesionInvalida } from './sesion';
 import { QfdosTopic, QfdosAnnouncement, QfdosGlossaryTerm, QfdosResourceLink, COURSE_BUILD_TIMESTAMP, INITIAL_TOPICS } from '../data/qfdosData';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
@@ -158,7 +159,8 @@ export async function publicarContenido(
 
   try {
     const resp = await fetch(
-      `${WEBAPP_URL}?accion=guardarContenido&clave=${encodeURIComponent(clave.trim())}`,
+      `${WEBAPP_URL}?accion=guardarContenido&clave=${encodeURIComponent(clave.trim())}` +
+        `&sesion=${encodeURIComponent(tokenSesion())}`,
       {
         method: 'POST',
         // text/plain evita la petición previa de CORS, que Apps Script no atiende
@@ -175,6 +177,9 @@ export async function publicarContenido(
         ok: true,
         mensaje: `Publicado para todo el curso (${kb} KB). El alumnado lo verá al recargar.`
       };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return { ok: false, mensaje: 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar para publicar.' };
     }
     return { ok: false, mensaje: cuerpo?.error ?? 'La hoja rechazó la publicación.' };
   } catch (err) {
@@ -236,7 +241,9 @@ const inFlightMisEntregas = new Map<string, Promise<EntregaPropia[] | null>>();
  */
 export async function misEntregas(email: string): Promise<EntregaPropia[] | null> {
   const normEmail = (email || '').toLowerCase().trim();
+  const sesion = tokenSesion();
   if (!publicacionDisponible() || !normEmail) return null;
+  if (!sesion) return getCachedEntregas(normEmail);
 
   if (inFlightMisEntregas.has(normEmail)) {
     return inFlightMisEntregas.get(normEmail)!;
@@ -245,7 +252,10 @@ export async function misEntregas(email: string): Promise<EntregaPropia[] | null
   const promesa = (async () => {
     try {
       const resp = await fetch(
-        `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(normEmail)}&t=${Date.now()}`,
+        // El servidor devuelve lo de la cuenta de la sesión; `email` sólo lo
+        // atiende si quien pregunta es profesor
+        `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(normEmail)}` +
+          `&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
         { method: 'GET', redirect: 'follow' }
       );
       if (!resp.ok) {

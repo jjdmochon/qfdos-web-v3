@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getSesion, iniciarSesionServidor, renovarSiHaceFalta, borrarSesion } from '../services/sesion';
 
 export type UserRole = 'profesor' | 'estudiante';
 
@@ -18,18 +19,9 @@ interface AuthContextType {
   isEstudiante: boolean;
   /** true sólo si la cuenta pertenece a un dominio de la Universidad de Granada */
   isInstitucional: boolean;
-  loginWithGoogle: (credentialResponse: { credential?: string }) => { success: boolean; error?: string };
+  loginWithGoogle: (credentialResponse: { credential?: string }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
-
-const PROFESSOR_EMAILS = [
-  'juandiaz@ugr.es',
-  'juandiaz@go.ugr.es',
-  'jjdiaz@ugr.es',
-  'jjdiaz@go.ugr.es',
-  'jjdmochon@gmail.com',
-  'jjdiazmochon@gmail.com'
-];
 
 /**
  * Cuentas institucionales de la UGR. Quien entra con una de ellas queda
@@ -71,12 +63,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
+    // Sin sesión del servidor vigente, el perfil guardado no vale: es texto
+    // en localStorage que cualquiera puede editar. Se vuelve a pedir login.
+    const sesion = getSesion();
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return null; }
+    if (!sesion || !saved) return null;
+    try {
+      const perfil = JSON.parse(saved) as UserProfile;
+      // Correo y rol, siempre los de la sesión firmada
+      return { ...perfil, email: sesion.email, role: sesion.rol, institucional: sesion.institucional };
+    } catch {
+      return null;
     }
-    return null;
   });
+
+  useEffect(() => {
+    renovarSiHaceFalta().then(() => {
+      if (!getSesion()) setUser(null);
+    });
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -86,42 +91,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const loginWithGoogle = (credentialResponse: { credential?: string }): { success: boolean; error?: string } => {
+  const loginWithGoogle = async (
+    credentialResponse: { credential?: string }
+  ): Promise<{ success: boolean; error?: string }> => {
     if (!credentialResponse.credential) {
       return { success: false, error: 'No se recibió credencial de Google.' };
     }
 
+    // Sólo para el nombre y la foto; la identidad la verifica el servidor
     const payload = decodeJwt(credentialResponse.credential);
     if (!payload) {
-      return { success: false, error: 'No se pudo verificar la identidad con Google.' };
+      return { success: false, error: 'No se pudo leer la credencial de Google.' };
     }
 
-    const email = (payload.email || '').toLowerCase();
-    const name = payload.name || '';
-    const picture = payload.picture || '';
-
-    const institucional = esCuentaInstitucional(email);
-    const personal = PERSONAL_DOMAINS.some(d => email.endsWith(d));
-
-    if (!institucional && !personal) {
+    const correoToken = (payload.email || '').toLowerCase();
+    if (!esCuentaInstitucional(correoToken) && !PERSONAL_DOMAINS.some(d => correoToken.endsWith(d))) {
       return {
         success: false,
         error:
-          `Esta cuenta no está admitida. Entra con tu correo @go.ugr.es o con una cuenta de @gmail.com. ` +
-          `Cuenta recibida: ${email}`
+          `Esta cuenta no está admitida. Entra con tu correo @correo.ugr.es o @go.ugr.es, ` +
+          `o con una cuenta de @gmail.com. Cuenta recibida: ${correoToken}`
       };
     }
 
-    // El acceso de profesor exige cuenta institucional: una dirección personal
-    // no acredita la identidad frente a la universidad.
-    const role: UserRole =
-      institucional && PROFESSOR_EMAILS.includes(email) ? 'profesor' : 'estudiante';
+    const r = await iniciarSesionServidor(credentialResponse.credential);
+    if (!r.ok) return { success: false, error: r.error };
 
-    setUser({ name, email, role, avatarUrl: picture, institucional });
+    // Correo, rol y carácter institucional, tal y como los acredita el servidor
+    setUser({
+      name: payload.name || '',
+      email: r.sesion.email,
+      role: r.sesion.rol,
+      avatarUrl: payload.picture || '',
+      institucional: r.sesion.institucional
+    });
     return { success: true };
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    borrarSesion();
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{
