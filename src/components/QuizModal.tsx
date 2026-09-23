@@ -51,7 +51,9 @@ import {
   ExternalLink,
   Sheet,
   Send,
-  History
+  History,
+  Sparkles,
+  Lightbulb
 } from 'lucide-react';
 
 const REGISTRATION_STORAGE_KEY = 'qfdos_test_registration_records';
@@ -123,6 +125,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [answers, setAnswers] = useState<{ [key: number]: number }>({});
   const [isCompleted, setIsCompleted] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
+  const [showFirBonusModal, setShowFirBonusModal] = useState<boolean>(false);
 
   // Records / Grading Dashboard State
   // Google Sheets Integration State
@@ -1224,6 +1227,143 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </details>
                     )}
 
+                    {/* SECCIÓN BONUS: Claves Farmacoquímicas Avanzadas del FIR (Solo al elegir Modelo FIR) */}
+                    {selectedModel === 'modelo-fir' && (
+                      <div style={{
+                        marginTop: '14px',
+                        marginBottom: '8px',
+                        border: '1.5px solid #d97706',
+                        borderRadius: 'var(--radius-lg)',
+                        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.04) 100%)',
+                        padding: '14px 16px',
+                        boxShadow: '0 2px 8px rgba(217, 119, 6, 0.08)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '6px',
+                              background: '#d97706',
+                              color: '#fff'
+                            }}>
+                              <Sparkles size={16} />
+                            </span>
+                            <div>
+                              <strong style={{ fontSize: '0.92rem', color: '#92400e', display: 'block' }}>
+                                ⭐ Sección Bonus: Claves Farmacoquímicas Avanzadas del FIR
+                              </strong>
+                              <span style={{ fontSize: '0.74rem', color: '#b45309' }}>
+                                4 conceptos de química médica de alta especialización (evaluados en el FIR y no vistos en las diapositivas del Tema 1)
+                              </span>
+                            </div>
+                          </div>
+                          <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#d97706', color: '#fff', fontWeight: 700 }}>
+                            Lectura Clave
+                          </span>
+                        </div>
+
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', lineHeight: 1.5, margin: '0 0 10px 0' }}>
+                          Al auditar las 10 preguntas del Ministerio de Sanidad frente al temario impartido, 5 de ellas requieren fundamentación farmacoquímica avanzada que trasciende las presentaciones de clase. Consulta estas 4 píldoras antes de responder:
+                        </p>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+                          {/* Píldora 1: Fármacos Blandos (Soft Drugs) */}
+                          <div style={{
+                            background: 'var(--surface)',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '10px 12px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <Lightbulb size={14} color="#d97706" />
+                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                                1. Estrategia de Fármaco Blando (Soft Drug)
+                              </strong>
+                            </div>
+                            <p style={{ fontSize: '0.74rem', color: 'var(--text-main)', lineHeight: 1.45, margin: 0 }}>
+                              Un <em>fármaco blando</em> (concepto de Nicholas Bodor) es una molécula terapéuticamente activa diseñada con un enlace metabólicamente lábil para sufrir una inactivación predecible y rápida en metabolitos no tóxicos.
+                              <br />
+                              • <strong>Decametonio → Suxametonio:</strong> La cadena de 10 carbonos (parálisis prolongada irreversible) se sustituye por dos enlaces éster centrales en el suxametonio (succinilcolina), hidrolizables en 5-10 min por butirilcolinesterasa plasmática en colina y succinato inocuos.
+                              <br />
+                              • <strong>Cetilpiridinio blando:</strong> La inserción de un éster intermedio en la cadena alifática garantiza su destrucción sistémica inmediata si se absorbe, minimizando toxicidad tisular.
+                            </p>
+                          </div>
+
+                          {/* Píldora 2: Antagonismo Selectivo M1 (Pirenzepina) */}
+                          <div style={{
+                            background: 'var(--surface)',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '10px 12px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <Lightbulb size={14} color="#d97706" />
+                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                                2. Selectividad de Subtipo M1 (Pirenzepina)
+                              </strong>
+                            </div>
+                            <p style={{ fontSize: '0.74rem', color: 'var(--text-main)', lineHeight: 1.45, margin: 0 }}>
+                              A diferencia de los antimuscarínicos clásicos no selectivos (atropina, escopolamina), la <strong>pirenzepina</strong> fue el primer antagonista con selectividad de subtipo funcional:
+                              <br />
+                              • <strong>Estructura tricíclica:</strong> Núcleo de piridobenzodiazepina condensada con grupo metilpiperazinilo.
+                              <br />
+                              • <strong>Doble beneficio farmacoterapéutico:</strong> Bloquea selectivamente los receptores M1 de los ganglios intramurales gástricos inhibiendo la secreción de HCl, mientras que su alta polaridad e hidrofilia impiden el paso de la BHE, evitando los efectos centrales atropánicos.
+                            </p>
+                          </div>
+
+                          {/* Píldora 3: Cinética Enzimática AChE (Rivastigmina vs Selegilina) */}
+                          <div style={{
+                            background: 'var(--surface)',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '10px 12px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <Lightbulb size={14} color="#d97706" />
+                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                                3. Cinética de Inhibición: Carbamatos vs Suicidas
+                              </strong>
+                            </div>
+                            <p style={{ fontSize: '0.74rem', color: 'var(--text-main)', lineHeight: 1.45, margin: 0 }}>
+                              En enzimología clínica existen fronteras mecanísticas rigurosas:
+                              <br />
+                              • <strong>Rivastigmina (Inhibidor Pseudoirreversible / Sustrato de Carbamoilación):</strong> Transfiere covalentemente su grupo carbamato a la Ser-203 de la tríada catalítica de la AChE. La decarbamoilación hidrolítica tarda varias horas en regenerar la enzima libre activa. No es suicida.
+                              <br />
+                              • <strong>Selegilina (Inhibidor Suicida Genuino / Basado en Mecanismo):</strong> Es procesada por la enzima (MAO-B) como sustrato hasta generar una especie reactiva intermedia que alquila covalentemente e irreversiblemente el cofactor FAD, inactivando la diana para siempre.
+                            </p>
+                          </div>
+
+                          {/* Píldora 4: Topografía Dual CAS / PAS de la AChE (Donepezilo) */}
+                          <div style={{
+                            background: 'var(--surface)',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '10px 12px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <Lightbulb size={14} color="#d97706" />
+                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                                4. Garganta de 20 Å de AChE: CAS y PAS (Donepezilo)
+                              </strong>
+                            </div>
+                            <p style={{ fontSize: '0.74rem', color: 'var(--text-main)', lineHeight: 1.45, margin: 0 }}>
+                              La cavidad activa de la acetilcolinesterasa es un profundo desfiladero hidrofóbico de 20 Ångstroms con dos zonas clave de reconocimiento:
+                              <br />
+                              • <strong>CAS (Sitio Activo Catalítico, base):</strong> Contiene la tríada catalítica Ser-203/His-447/Glu-334 y el residuo de apilamiento pi Trp-86.
+                              <br />
+                              • <strong>PAS (Sitio Aniónico Periférico, entrada):</strong> Presidido por el Trp-286, responsable del reclutamiento inicial de acetilcolina y de la agregación amiloide.
+                              <br />
+                              • <strong>Donepezilo:</strong> Inhibidor reversible mixto no covalente de segunda generación que puentea ambos sitios simultáneamente (dimetoxiindanona en PAS con Trp-286 y bencilpiperidina en CAS con Trp-86).
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Selector de Modo: Preparación / Estudio vs Examen Oficial */}
                     <div className="quiz-mode-selector-wrap" style={{
                       marginTop: '12px',
@@ -1477,7 +1617,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                   {/* Badges Bar */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                       {currentQ.badge && (
                         <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#3b82f6', color: '#fff' }}>
                           {currentQ.badge}
@@ -1492,6 +1632,29 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <span className="qfdos-badge badge-amber" style={{ fontSize: '0.68rem' }}>
                           Nivel {currentQ.difficulty}
                         </span>
+                      )}
+                      {selectedModel === 'modelo-fir' && (
+                        <button
+                          type="button"
+                          onClick={() => setShowFirBonusModal(true)}
+                          className="btn btn-sm"
+                          style={{
+                            padding: '2px 8px',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            borderRadius: '12px',
+                            background: '#d97706',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          title="Abrir Claves Farmacoquímicas Avanzadas del FIR"
+                        >
+                          <Sparkles size={11} /> Claves Bonus FIR
+                        </button>
                       )}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
@@ -1650,6 +1813,33 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5, margin: 0 }}>
                         {currentQ.explanation}
                       </p>
+                      {selectedModel === 'modelo-fir' && ['t01-fir-03', 't01-fir-07', 't01-fir-08', 't01-fir-09', 't01-fir-10'].includes(currentQ.id) && (
+                        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed rgba(217, 119, 6, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                          <span style={{ fontSize: '0.74rem', color: '#92400e', fontWeight: 600 }}>
+                            ⭐ Esta pregunta evalúa conceptos avanzados no vistos en las diapositivas de clase.
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowFirBonusModal(true)}
+                            className="btn btn-sm"
+                            style={{
+                              padding: '3px 10px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              background: '#d97706',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <Sparkles size={12} /> Ver Píldora de la Sección Bonus
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -2259,6 +2449,185 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         )}
 
       </div>
+
+      {/* Modal / Dialog Flotante de Sección Bonus FIR */}
+      {showFirBonusModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(15, 23, 42, 0.7)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050,
+          padding: '16px'
+        }}
+        onClick={() => setShowFirBonusModal(false)}
+        >
+          <div
+            style={{
+              background: 'var(--surface)',
+              borderRadius: 'var(--radius-lg)',
+              maxWidth: '820px',
+              width: '100%',
+              maxHeight: '88vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+              border: '2px solid #d97706',
+              overflow: 'hidden'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header del Modal Bonus */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 18px',
+              background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+              color: '#fff'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={20} />
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#fff' }}>
+                    Sección Bonus: Claves Farmacoquímicas Avanzadas del FIR
+                  </h4>
+                  <span style={{ fontSize: '0.74rem', opacity: 0.9 }}>
+                    Conceptos de química médica evaluados en el FIR y no vistos en las diapositivas del Tema 1
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFirBonusModal(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title="Cerrar ventana"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Contenido scrolleable de las 4 píldoras */}
+            <div style={{ padding: '16px 20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(217, 119, 6, 0.3)',
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 14px',
+                fontSize: '0.8rem',
+                color: 'var(--text-main)',
+                lineHeight: 1.5
+              }}>
+                <strong>Propósito de esta sección:</strong> El examen oficial de Farmacéutico Interno Residente (FIR) incluye preguntas que requieren relacionar conceptos colinérgicos con química médica avanzada. A continuación se resumen las 4 claves teóricas esenciales:
+              </div>
+
+              {/* Píldora 1 */}
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>1</span>
+                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                    Estrategia de Fármaco Blando (Soft Drug) · Nicholas Bodor
+                  </strong>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
+                  Un <strong>fármaco blando</strong> es un agente biológicamente activo diseñado con un punto de clivaje metabólico predecible para inactivarse rápidamente en metabolitos inocuos:
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '20px' }}>
+                    <li><strong>Decametonio vs Suxametonio (FIR 2020 · P4):</strong> El decametonio (10 metilenos) producía bloqueo despolarizante excesivamente prolongado y arritmias. El suxametonio (succinilcolina) incorpora dos funciones éster centrales en el puente alquílico que la butirilcolinesterasa plasmática hidroliza en 5-10 minutos a succinato y colina inocuos.</li>
+                    <li><strong>Cetilpiridinio Blando (FIR 2025 · P3):</strong> La inserción de un éster intermedio en la cadena alifática del antiséptico catiónico cetilpiridinio garantiza su destrucción metabólica sistémica si se absorbe a través de las mucosas.</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Píldora 2 */}
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>2</span>
+                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                    Selectividad de Subtipo M1: Pirenzepina (FIR 2024 · P9)
+                  </strong>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
+                  Frente a los antimuscarínicos atropánicos no selectivos, la <strong>pirenzepina</strong> introdujo el concepto de selectividad de subtipo funcional:
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '20px' }}>
+                    <li><strong>Estructura:</strong> Esqueleto tricíclico de piridobenzodiazepina condensada unido a un resto de metilpiperazina.</li>
+                    <li><strong>Perfil Farmacológico:</strong> Antagonista selectivo M1 gástrico (ganglios intramurales que regulan la secreción ácida de células parietales). Su elevada hidrofilia y naturaleza anfótera le impiden cruzar la barrera hematoencefálica (BHE), evitando por completo los efectos adversos neuropsiquiátricos de la atropina o escopolamina.</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Píldora 3 */}
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>3</span>
+                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                    Cinética de Inhibición: Rivastigmina vs Inhibidores Suicidas (FIR 2021 · P7)
+                  </strong>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
+                  La enzimología médica clasifica con rigor los inhibidores colinérgicos y neuroactivos:
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '20px' }}>
+                    <li><strong>Inhibidores Reversibles Clásicos:</strong> Donepezilo, tacrina (se unen por interacciones no covalentes débiles, disociándose libremente).</li>
+                    <li><strong>Carbamatos Pseudoirreversibles (Rivastigmina, Neostigmina):</strong> Transfieren covalentemente el grupo carbamoilo al residuo Ser-203. La carbamoil-enzima sufre decarbamoilación hidrolítica lenta con una semivida de regeneración de horas. Se denominan "sustratos de carbamoilación de recambio lento", pero NO son suicidas.</li>
+                    <li><strong>Inhibidores Suicidas Genuinos (Selegilina / MAO-B):</strong> Moléculas químicamente inertes que la enzima procesa como sustrato catalítico hasta activar un enlace covalente irreversible con el cofactor prostético (FAD), destruyendo la diana de forma definitiva.</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Píldora 4 */}
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                  <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>4</span>
+                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                    Topografía de la Garganta de 20 Å de la AChE: CAS y PAS (FIR 2025 · P18)
+                  </strong>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
+                  El diseño del <strong>donepezilo</strong> aprovecha la arquitectura tridimensional completa de la acetilcolinesterasa:
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '20px' }}>
+                    <li><strong>CAS (Sitio Activo Catalítico, fondo de la garganta):</strong> Aloja la tríada Ser-203 / His-447 / Glu-334 y el anillo aromático de Trp-86. El donepezilo ubica allí su anillo de bencilpiperidina mediante interacción catión-pi y apilamiento pi.</li>
+                    <li><strong>PAS (Sitio Aniónico Periférico, entrada a la garganta):</strong> Centrado en Trp-286. El donepezilo posiciona su anillo de 5,6-dimetoxiindanona estableciendo interacciones de apilamiento pi-pi con Trp-286.</li>
+                    <li><strong>Conclusión de Diseño:</strong> Es un inhibidor dual no covalente que sella mecánicamente el desfiladero de 20 Å sin fosforilar ni carbamoilar la enzima.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer del Modal Bonus */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              padding: '10px 18px',
+              borderTop: '1px solid var(--border-color)',
+              background: 'var(--surface-alt)'
+            }}>
+              <button
+                type="button"
+                onClick={() => setShowFirBonusModal(false)}
+                className="btn btn-primary"
+                style={{ fontSize: '0.82rem', fontWeight: 700 }}
+              >
+                Entendido, Continuar con el Examen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Visor Lightbox a Pantalla Completa */}
       <ImageLightboxModal
