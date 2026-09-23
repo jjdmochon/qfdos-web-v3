@@ -92,6 +92,20 @@ function purgeStaleCourseCache(): void {
   }
 
   SHIPPED_KEYS.forEach(k => localStorage.removeItem(k));
+  
+  // Purgar también claves heredadas y dudas semilla inventadas de versiones anteriores
+  localStorage.removeItem('qfdos_v2_student_questions');
+  try {
+    const rawSq = localStorage.getItem('qfdos_v3_student_questions');
+    if (rawSq) {
+      const parsedSq = JSON.parse(rawSq) as StudentQuestion[];
+      const cleanedSq = parsedSq.filter(q => q.id !== 'sq-1' && q.id !== 'sq-2' && !q.studentEmail.includes('alumno.demo') && !q.studentEmail.includes('martinez.m@correo.ugr.es'));
+      localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(cleanedSq));
+    }
+  } catch {
+    localStorage.removeItem('qfdos_v3_student_questions');
+  }
+
   localStorage.setItem(VERSION_KEY, COURSE_DATA_VERSION);
 
   if (Object.keys(customTopicOverrides).length > 0) {
@@ -259,10 +273,11 @@ export const App: React.FC = () => {
     contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS)
   );
 
-  const [studentQuestions, setStudentQuestions] = useState<StudentQuestion[]>(() =>
-    loadUserOwned<StudentQuestion[]>('qfdos_v3_student_questions', INITIAL_STUDENT_QUESTIONS)
-      .filter(q => !SEED_QUESTION_IDS.has(q.id))
-  );
+  const [studentQuestions, setStudentQuestions] = useState<StudentQuestion[]>(() => {
+    localStorage.removeItem('qfdos_v2_student_questions');
+    return loadUserOwned<StudentQuestion[]>('qfdos_v3_student_questions', INITIAL_STUDENT_QUESTIONS)
+      .filter(q => q.id !== 'sq-1' && q.id !== 'sq-2' && !q.studentEmail?.includes('alumno.demo') && !q.studentEmail?.includes('martinez.m@correo.ugr.es'));
+  });
 
   // Modal states
   const [selectedTopicDetail, setSelectedTopicDetail] = useState<QfdosTopic | null>(null);
