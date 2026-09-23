@@ -69,33 +69,23 @@ function purgeStaleCourseCache(): void {
   const stored = localStorage.getItem(VERSION_KEY);
   if (stored === COURSE_DATA_VERSION) return;
 
-  // Preservar SOLO enlaces válidos introducidos localmente por el profesor
+  // Preservar enlaces y modificaciones locales introducidas por el profesor
   const oldTopicsStr = localStorage.getItem('qfdos_v3_topics');
   const customTopicOverrides: Record<string, Partial<QfdosTopic>> = {};
   if (oldTopicsStr) {
     try {
       const parsed = JSON.parse(oldTopicsStr) as QfdosTopic[];
       parsed.forEach(t => {
-        const over: Partial<QfdosTopic> = {};
-        if (typeof t.notesPdfUrl === 'string' && t.notesPdfUrl.startsWith('http')) {
-          over.notesPdfUrl = t.notesPdfUrl;
-          if (t.notesPdfName) over.notesPdfName = t.notesPdfName;
-        }
-        if (typeof t.slidesPdfUrl === 'string' && t.slidesPdfUrl.startsWith('http')) {
-          over.slidesPdfUrl = t.slidesPdfUrl;
-          if (t.slidesPdfName) over.slidesPdfName = t.slidesPdfName;
-        }
-        if (typeof t.geminiNotebookUrl === 'string' && t.geminiNotebookUrl.startsWith('http')) {
-          over.geminiNotebookUrl = t.geminiNotebookUrl;
-        }
-        if (typeof t.spotifyPodcastUrl === 'string' && t.spotifyPodcastUrl.startsWith('http')) {
-          over.spotifyPodcastUrl = t.spotifyPodcastUrl;
-        }
-        if (typeof t.videoPodcastUrl === 'string' && t.videoPodcastUrl.startsWith('http')) {
-          over.videoPodcastUrl = t.videoPodcastUrl;
-        }
-        if (Object.keys(over).length > 0) {
-          customTopicOverrides[t.id] = over;
+        if (t.notesPdfUrl || t.slidesPdfUrl || t.spotifyPodcastUrl || (t.geminiNotebookUrl && t.geminiNotebookUrl !== INITIAL_TOPICS[0]?.geminiNotebookUrl)) {
+          customTopicOverrides[t.id] = {
+            notesPdfUrl: t.notesPdfUrl,
+            notesPdfName: t.notesPdfName,
+            slidesPdfUrl: t.slidesPdfUrl,
+            slidesPdfName: t.slidesPdfName,
+            geminiNotebookUrl: t.geminiNotebookUrl,
+            spotifyPodcastUrl: t.spotifyPodcastUrl,
+            videoPodcastUrl: t.videoPodcastUrl
+          };
         }
       });
     } catch { /* ignorar dato corrupto */ }
@@ -105,10 +95,10 @@ function purgeStaleCourseCache(): void {
   localStorage.setItem(VERSION_KEY, COURSE_DATA_VERSION);
 
   if (Object.keys(customTopicOverrides).length > 0) {
-    const updated = normalizarTemas(INITIAL_TOPICS.map(t => {
+    const updated = INITIAL_TOPICS.map(t => {
       const over = customTopicOverrides[t.id];
       return over ? { ...t, ...over } : t;
-    }));
+    });
     localStorage.setItem('qfdos_v3_topics', JSON.stringify(updated));
   }
 }
@@ -127,6 +117,9 @@ function loadCached<T>(key: string, fallback: T): T {
  * ejemplos sólo la primera vez. Si el usuario los borró todos, respeta la
  * lista vacía en lugar de resucitarlos en la siguiente carga.
  */
+/** Ids de las preguntas de ejemplo de versiones anteriores: se purgan del navegador. */
+const SEED_QUESTION_IDS = new Set(['sq-1', 'sq-2']);
+
 function loadUserOwned<T>(key: string, seed: T): T {
   const saved = localStorage.getItem(key);
   if (saved !== null) {
@@ -243,7 +236,7 @@ export const App: React.FC = () => {
         t1.testQuestions = base1.testQuestions;
         modified = true;
       }
-      if (!t1.flashcards || t1.flashcards.length !== 10 || t1.flashcards[0]?.front !== base1.flashcards?.[0]?.front) {
+      if (!t1.flashcards || t1.flashcards.length !== 10 || t1.flashcards[0]?.front !== base1.flashcards?.[0]?.front || t1.flashcards[9]?.imagePath !== base1.flashcards?.[9]?.imagePath) {
         t1.flashcards = base1.flashcards;
         modified = true;
       }
@@ -267,7 +260,8 @@ export const App: React.FC = () => {
   );
 
   const [studentQuestions, setStudentQuestions] = useState<StudentQuestion[]>(() =>
-    loadUserOwned('qfdos_v3_student_questions', INITIAL_STUDENT_QUESTIONS)
+    loadUserOwned<StudentQuestion[]>('qfdos_v3_student_questions', INITIAL_STUDENT_QUESTIONS)
+      .filter(q => !SEED_QUESTION_IDS.has(q.id))
   );
 
   // Modal states
@@ -326,21 +320,6 @@ export const App: React.FC = () => {
 
     return () => { cancelado = true; };
   }, []);
-
-  // Mantener actualizado el modal de detalle si está abierto cuando se actualiza topics
-  useEffect(() => {
-    if (selectedTopicDetail) {
-      const refreshed = topics.find(t => t.id === selectedTopicDetail.id);
-      if (refreshed && (
-        refreshed.spotifyPodcastUrl !== selectedTopicDetail.spotifyPodcastUrl ||
-        refreshed.geminiNotebookUrl !== selectedTopicDetail.geminiNotebookUrl ||
-        refreshed.slidesPdfUrl !== selectedTopicDetail.slidesPdfUrl ||
-        refreshed.notesPdfUrl !== selectedTopicDetail.notesPdfUrl
-      )) {
-        setSelectedTopicDetail(refreshed);
-      }
-    }
-  }, [topics, selectedTopicDetail]);
 
   // Ctrl+K search shortcut
   useEffect(() => {

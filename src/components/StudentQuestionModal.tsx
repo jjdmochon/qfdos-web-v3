@@ -26,7 +26,7 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
     const saved = localStorage.getItem('qfdos_v3_student_questions');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        return (JSON.parse(saved) as StudentQuestion[]).filter(q => q.id !== 'sq-1' && q.id !== 'sq-2');
       } catch (e) {
         console.error('Error parsing saved questions', e);
       }

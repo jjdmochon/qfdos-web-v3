@@ -53,7 +53,7 @@ export const PracticasPairReport: React.FC = () => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        return (JSON.parse(saved) as LabPairReport[]).filter(r => r.id !== 'GPE-P04' && r.id !== 'GPE-P07');
       }
     } catch (e) {
       console.error('Error loading pair reports', e);

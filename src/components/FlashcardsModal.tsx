@@ -153,10 +153,10 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
         </div>
 
         {/* Body */}
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', overflowY: 'auto' }}>
+        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', overflowY: 'auto', flex: 1, padding: '1.25rem 1.5rem', gap: '1rem', boxSizing: 'border-box' }}>
           
           {/* Top Indicators */}
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>
               Tarjeta {currentIndex + 1} de {cards.length}
             </span>
@@ -179,7 +179,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
             onClick={() => setIsFlipped(!isFlipped)}
             style={{
               width: '100%',
-              minHeight: '280px',
+              flexShrink: 0,
+              minHeight: '260px',
               height: 'auto',
               background: isFlipped ? 'linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%)' : 'var(--surface)',
               borderRadius: 'var(--radius-xl)',
@@ -192,7 +193,6 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
               alignItems: 'stretch',
               cursor: 'pointer',
               userSelect: 'none',
-              transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
               boxSizing: 'border-box'
             }}
           >
@@ -204,7 +204,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
               alignItems: 'center',
               marginBottom: '1rem',
               paddingBottom: '0.6rem',
-              borderBottom: '1px solid var(--border-color)'
+              borderBottom: '1px solid var(--border-color)',
+              flexShrink: 0
             }}>
               <span className="qfdos-badge badge-navy" style={{ fontSize: '0.78rem' }}>
                 {currentCard.concept}
@@ -236,17 +237,16 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 {currentCard.structures && currentCard.structures.length > 0 && (
                   <div style={{
                     marginTop: '16px',
-                    display: 'flex',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
                     gap: '12px',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
                     background: 'var(--surface-alt)',
                     padding: '12px',
                     borderRadius: 'var(--radius-md)',
                     border: '1px solid var(--border-color)'
                   }}>
                     {currentCard.structures.map((st, i) => (
-                      <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'var(--surface)', padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
                           <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--navy)' }}>
                             {st.name}
@@ -285,7 +285,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     <img
                       src={recurso(currentCard.imagePath)}
                       alt={currentCard.concept}
-                      style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain' }}
+                      style={{ maxHeight: '240px', maxWidth: '100%', objectFit: 'contain', borderRadius: '6px' }}
                     />
                   </div>
                 )}
@@ -293,52 +293,64 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
             )}
           </div>
 
-          {/* Rating Buttons (Visible when flipped) */}
+          {/* Rating Buttons (Visible when flipped, cleanly separated below the card) */}
           {isFlipped && (
-            <div style={{ marginTop: '1.25rem', display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginRight: '4px' }}>¿Qué tal la recordaste?</span>
-              <button
-                onClick={() => handleRate('hard')}
-                className="btn btn-sm btn-outline"
-                style={{ borderColor: 'var(--accent-red)', color: 'var(--accent-red)', fontSize: '0.75rem' }}
-              >
-                Difícil
-              </button>
-              <button
-                onClick={() => handleRate('medium')}
-                className="btn btn-sm btn-outline"
-                style={{ borderColor: 'var(--accent-amber)', color: '#b45309', fontSize: '0.75rem' }}
-              >
-                Regular
-              </button>
-              <button
-                onClick={() => handleRate('easy')}
-                className="btn btn-sm btn-mint"
-                style={{ fontSize: '0.75rem' }}
-              >
-                Fácil ✓
-              </button>
+            <div style={{
+              flexShrink: 0,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '10px',
+              padding: '10px 16px',
+              background: 'var(--surface-alt)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--border-color)'
+            }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>¿Qué tal la recordaste?</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => handleRate('hard')}
+                  className="btn btn-sm btn-outline"
+                  style={{ borderColor: 'var(--accent-red)', color: 'var(--accent-red)', fontSize: '0.75rem', fontWeight: 700 }}
+                >
+                  Difícil
+                </button>
+                <button
+                  onClick={() => handleRate('medium')}
+                  className="btn btn-sm btn-outline"
+                  style={{ borderColor: 'var(--accent-amber)', color: '#b45309', fontSize: '0.75rem', fontWeight: 700 }}
+                >
+                  Regular
+                </button>
+                <button
+                  onClick={() => handleRate('easy')}
+                  className="btn btn-sm btn-mint"
+                  style={{ fontSize: '0.75rem', fontWeight: 700 }}
+                >
+                  Fácil ✓
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Navigation Controls */}
-          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button onClick={handlePrev} className="btn btn-sm btn-outline">
+        </div>
+
+        {/* Footer with Persistent Navigation Controls */}
+        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0.85rem 1.75rem', flexWrap: 'wrap', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button onClick={handlePrev} className="btn btn-sm btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
               <ChevronLeft size={16} /> Anterior
             </button>
-            <button onClick={handleShuffle} className="btn btn-sm btn-outline" title="Tarjeta Aleatoria">
+            <button onClick={handleShuffle} className="btn btn-sm btn-outline" title="Tarjeta Aleatoria" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
               <Shuffle size={14} /> Aleatorio
             </button>
-            <button onClick={handleNext} className="btn btn-sm btn-primary">
+            <button onClick={handleNext} className="btn btn-sm btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 700 }}>
               Siguiente <ChevronRight size={16} />
             </button>
           </div>
-
-        </div>
-
-        {/* Footer */}
-        <div className="modal-footer">
-          <button onClick={onClose} className="btn btn-outline">
+          <button onClick={onClose} className="btn btn-sm btn-outline">
             Cerrar Flashcards
           </button>
         </div>

@@ -41,12 +41,13 @@ export const PracticasProtocols: React.FC = () => {
             </p>
             <a
               href="https://drive.google.com/file/d/1zHi7DsEEQ9TsXbelODcG5hcy8_pMl4Bl/view?usp=sharing"
+              title="Acceso restringido: abre el PDF con tu cuenta @go.ugr.es"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-sm btn-secondary"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: 700 }}
             >
-              📥 Descargar Cuaderno Completo (PDF)
+              📥 Descargar Cuaderno Completo (PDF · cuenta @go.ugr.es)
             </a>
           </div>
 

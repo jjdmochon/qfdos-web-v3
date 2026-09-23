@@ -340,13 +340,14 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
               <div className="qfdos-hero-cta-group">
                 <a
                   href="https://drive.google.com/file/d/1zHi7DsEEQ9TsXbelODcG5hcy8_pMl4Bl/view?usp=sharing"
+                  title="Acceso restringido: abre el PDF con tu cuenta @go.ugr.es"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-hero-pill-primary"
                   style={{ textDecoration: 'none' }}
                 >
                   <Download size={16} />
-                  <span>Descargar Cuaderno (PDF)</span>
+                  <span>Descargar Cuaderno (PDF · cuenta @go.ugr.es)</span>
                   <ChevronRight size={15} className="cta-arrow" />
                 </a>
                 <button
