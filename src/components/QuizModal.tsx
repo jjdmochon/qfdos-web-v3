@@ -7,6 +7,7 @@ import {
   QuizRegistrationRecord,
   RETROSINTESIS_TEST_QUESTIONS,
   MODELO_E_TEST_QUESTIONS,
+  MODELO_FIR_TEST_QUESTIONS,
   MODELO_A_TEST_QUESTIONS,
   MODELO_B_TEST_QUESTIONS,
   MODELO_C_TEST_QUESTIONS
@@ -62,7 +63,7 @@ interface QuizModalProps {
   onAttemptCompleted?: (attempt: QuizAttempt) => void;
 }
 
-export type QuizModelType = 'modelo-e' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis';
+export type QuizModelType = 'modelo-e' | 'modelo-fir' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis';
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -84,10 +85,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [examMode, setExamMode] = useState<boolean>(true);
   const isExamMode = isProfesor ? examMode : true;
 
-  // Compute active question bank dynamically (A y E para alumnado; B, C y Retrosíntesis exclusivos para docente)
+  // Compute active question bank dynamically (E, FIR y A para alumnado; B, C y Retrosíntesis exclusivos para docente)
   const questions: TestQuestion[] = useMemo(() => {
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
     if (isTema1) {
+      if (selectedModel === 'modelo-fir') return MODELO_FIR_TEST_QUESTIONS;
       if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
       if (isProfesor) {
         if (selectedModel === 'modelo-b') return MODELO_B_TEST_QUESTIONS;
@@ -276,9 +278,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     }
   }, [evaluationMode, user, isProfesor]);
 
-  // Asegurar que el alumnado solo acceda a los Modelos A y E (B, C y Retrosíntesis son exclusivos del profesor)
+  // Asegurar que el alumnado solo acceda a los Modelos E, FIR y A (B, C y Retrosíntesis son exclusivos del profesor)
   useEffect(() => {
-    if (!isProfesor && selectedModel !== 'modelo-e' && selectedModel !== 'modelo-a') {
+    if (!isProfesor && selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
       setSelectedModel('modelo-e');
     }
   }, [isProfesor, selectedModel]);
@@ -305,6 +307,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (model === 'modelo-e') {
         return m.includes('modelo e');
       }
+      if (model === 'modelo-fir') {
+        return m.includes('modelo fir') || m.includes('fir');
+      }
       if (model === 'modelo-b') {
         return m.includes('modelo b');
       }
@@ -316,7 +321,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       }
       if (model === 'modelo-a') {
         // En Tema 1, los intentos iniciales decían 'Modelo A' o no tenían subtipo de modelo
-        return m.includes('modelo a') || (!m.includes('modelo e') && !m.includes('modelo b') && !m.includes('modelo c') && !m.includes('retrosint'));
+        return m.includes('modelo a') || (!m.includes('modelo e') && !m.includes('modelo fir') && !m.includes('fir') && !m.includes('modelo b') && !m.includes('modelo c') && !m.includes('retrosint'));
       }
       return false;
     });
@@ -437,7 +442,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
       let modelDisplayName = 'Modelo E: Examen Oficial 2026/27 - Sin Retrosíntesis (15P)';
       if (topic.id === 'tema-01') {
-        if (selectedModel === 'modelo-a') {
+        if (selectedModel === 'modelo-fir') {
+          modelDisplayName = 'Modelo FIR: Preguntas Oficiales Convocatorias 2020-2025 (10P)';
+        } else if (selectedModel === 'modelo-a') {
           modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis Directa (15P)';
         } else if (selectedModel === 'modelo-b') {
           modelDisplayName = 'Modelo B: Diferenciación, Cinética y Síntesis Directa (15P)';
@@ -682,6 +689,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Model attempt statistics for active user / browser
   const statsE = getModelStats('modelo-e');
+  const statsFir = getModelStats('modelo-fir');
   const statsA = getModelStats('modelo-a');
   const statsB = getModelStats('modelo-b');
   const statsC = getModelStats('modelo-c');
@@ -721,10 +729,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                 </h3>
                 <span className="qfdos-badge" style={{ 
                   fontSize: '0.66rem', 
-                  background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#3b82f6', 
+                  background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#3b82f6', 
                   color: '#fff' 
                 }}>
-                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
+                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (10P)' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
                 </span>
               </div>
               <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
@@ -972,20 +980,20 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                        {topic.id === 'tema-01' ? 'Selecciona el Modelo de Examen (15 Preguntas Calibradas):' : 'Modelo de Evaluación:'}
+                        {topic.id === 'tema-01' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
                       </label>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
-                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#2563eb', 
+                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#2563eb', 
                         color: '#fff',
                         fontWeight: 700 
                       }}>
-                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-b' ? 'Modelo B (Docente)' : selectedModel === 'modelo-c' ? 'Modelo C (Docente)' : selectedModel === 'retrosintesis' ? 'Retrosíntesis (Docente)' : 'Modelo A (Oficial Previo)'}
+                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-fir' ? 'Modelo FIR (Oficial 2020-2025)' : selectedModel === 'modelo-b' ? 'Modelo B (Docente)' : selectedModel === 'modelo-c' ? 'Modelo C (Docente)' : selectedModel === 'retrosintesis' ? 'Retrosíntesis (Docente)' : 'Modelo A (Oficial Previo)'}
                       </span>
                     </div>
 
                     {topic.id === 'tema-01' && (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '12px' }}>
                         {/* Tarjeta Modelo E: Oficial 2026/27 (Sin Retrosíntesis) */}
                         <div
                           onClick={() => setSelectedModel('modelo-e')}
@@ -1034,6 +1042,58 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             </span>
                             <strong style={{ color: selectedModel === 'modelo-e' ? 'var(--navy)' : 'var(--text-muted)' }}>
                               {selectedModel === 'modelo-e' ? '● Seleccionado' : 'Elegir Modelo E'}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Tarjeta Modelo FIR: Preguntas Oficiales Convocatorias 2020-2025 */}
+                        <div
+                          onClick={() => setSelectedModel('modelo-fir')}
+                          style={{
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-lg)',
+                            border: selectedModel === 'modelo-fir' ? '2.5px solid var(--teal)' : '1.5px solid var(--border-color)',
+                            background: selectedModel === 'modelo-fir' ? 'rgba(13, 148, 136, 0.05)' : 'var(--surface)',
+                            boxShadow: selectedModel === 'modelo-fir' ? '0 3px 12px rgba(13, 148, 136, 0.15)' : 'none',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--teal)' }}>
+                                  Oficial Sanidad · FIR 2020–2025
+                                </span>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--teal)', margin: '2px 0 0 0' }}>
+                                  Modelo FIR (10 Preguntas)
+                                </h4>
+                              </div>
+                              {statsFir.completed ? (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                  ✓ Realizado · {statsFir.bestScore}/10
+                                </span>
+                              ) : (
+                                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem', fontWeight: 700 }}>
+                                  Oficial · 10P FIR
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                              Preguntas reales de las últimas 6 convocatorias: carbacol y estabilidad metabólica, succinilcolina como análogo blando, atracurio y eliminación de Hofmann, oximas y sarín, rivastigmina, donepezilo y pirenzepina.
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <span>
+                              {statsFir.completed ? `${statsFir.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                            </span>
+                            <strong style={{ color: selectedModel === 'modelo-fir' ? 'var(--teal)' : 'var(--text-muted)' }}>
+                              {selectedModel === 'modelo-fir' ? '● Seleccionado' : 'Elegir Modelo FIR'}
                             </strong>
                           </div>
                         </div>

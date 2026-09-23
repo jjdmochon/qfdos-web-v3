@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.11.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T15:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.12.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T15:40:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -1720,6 +1720,174 @@ export const MODELO_E_TEST_QUESTIONS: TestQuestion[] = [
   }
 ];
 
+export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
+  {
+    id: 't01-fir-01',
+    topicId: 'tema-01',
+    block: 'SAR Agonistas & Bioisosterismo',
+    badge: 'FIR 2021 · P14 (Ministerio de Sanidad)',
+    question: 'El carbacol es un análogo de acetilcolina que tiene en su estructura un grupo carbamato en lugar del grupo éster. ¿Qué consecuencias tiene esta sustitución?',
+    questionSmiles: 'C[N+](C)(C)CCOC(=O)N',
+    options: [
+      { text: 'El carbacol se hidroliza en medio ácido con mayor facilidad que la acetilcolina debido a la presencia del grupo carbamato.' },
+      { text: 'El grupo carbamato confiere al carbacol estabilidad química y metabólica.' },
+      { text: 'El grupo carbamato permite incrementar la afinidad por el receptor a través de una interacción π-π.' },
+      { text: 'La sustitución bioisostérica del metilo por el grupo amino en el carbacol incrementa el efecto estérico, aumentando la afinidad por su diana terapéutica.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción B): El grupo carbamato confiere al carbacol estabilidad química y metabólica. El par solitario del nitrógeno amínico del carbamato cede densidad electrónica por resonancia al carbono carbonílico (-O-CO-NH₂ ↔ -O-C(O⁻)=N⁺H₂). Esto deslocaliza la carga y neutraliza parcialmente la deficiencia electrónica del carbonilo, reduciendo drásticamente su susceptibilidad al ataque nucleofílico del residuo catalítico Ser-203 de la acetilcolinesterasa y frente a la hidrólisis acuosa.',
+    difficulty: 'Fácil'
+  },
+  {
+    id: 't01-fir-02',
+    topicId: 'tema-01',
+    block: 'SAR Agonistas & Bioisosterismo',
+    badge: 'FIR 2022 · P17 (Ministerio de Sanidad)',
+    question: 'En el diseño de fármacos, la sustitución de una función éster por un grupo carbamato, ¿qué consecuencia tiene?',
+    options: [
+      { text: 'Un aumento de la lipofilia y, por tanto, mejor absorción oral.' },
+      { text: 'Una disminución de la vida media plasmática.' },
+      { text: 'Un aumento de la estabilidad metabólica.' },
+      { text: 'Un incremento drástico del impedimento estérico.' }
+    ],
+    correctIndex: 2,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción C): Un aumento de la estabilidad metabólica. La sustitución bioisostérica de un enlace éster (-COO-) por un éster carbámico o carbamato (-O-CO-NH- o -O-CO-NR₂) reduce la velocidad de hidrólisis enzimática por esterasas plasmáticas y tisulares, prolongando la acción farmacológica. Esta estrategia es clave en colinérgicos (carbacol, betanecol) e inhibidores de AChE (neostigmina, rivastigmina).',
+    difficulty: 'Fácil'
+  },
+  {
+    id: 't01-fir-03',
+    topicId: 'tema-01',
+    block: 'Bloqueantes Neuromusculares',
+    badge: 'FIR 2020 · P4 (Ministerio de Sanidad)',
+    question: '¿Qué es el suxametonio (succinilcolina) respecto al decametonio?',
+    questionSmiles: 'C[N+](C)(C)CCOC(=O)CCC(=O)OCC[N+](C)(C)C',
+    options: [
+      { text: 'Un profármaco activable por esterasas.' },
+      { text: 'Un análogo blando.' },
+      { text: 'Un antagonista competitivo reversible.' },
+      { text: 'Un análogo más lipófilo para penetrar la barrera hematoencefálica.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción B): Un análogo blando (soft drug). El decametonio es un bloqueante neuromuscular despolarizante bis-amónico con cadena hidrocarbonada de 10 metilenos que producía parálisis prolongada no reversible. El suxametonio (succinilcolina) se diseñó incorporando dos funciones éster centrales que lo convierten en un fármaco biológicamente activo pero que sufre una metabolización predecible y ultra-rápida (5-10 minutos) por pseudocolinesterasas plasmáticas rindiendo succinato y colina inocuos.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-fir-04',
+    topicId: 'tema-01',
+    block: 'Bloqueantes Neuromusculares',
+    badge: 'FIR 2022 · P12 (Ministerio de Sanidad)',
+    question: 'El atracurio es un bloqueante neuromuscular análogo sintético de la tubocurarina que se inactiva rápidamente en la sangre (pH = 7.4) por una reacción de:',
+    questionSmiles: 'COc1cc2c(cc1OC)[C@@H](Cc1ccc(OC)c(OC)c1)N(C)(CCCOC(=O)CCCC(=O)OCCCC[N+]2(C)Cc1ccc(OC)c(OC)c1)C',
+    options: [
+      { text: 'Hidrólisis enzimática de un grupo carbamato.' },
+      { text: 'Desmetilación oxidativa de la sal de amonio cuaternario.' },
+      { text: 'Oxidación hepática del heterociclo tetrahidroisoquinolina por CYP3A4.' },
+      { text: 'Eliminación de Hofmann.' }
+    ],
+    correctIndex: 3,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción D): Eliminación de Hofmann. El atracurio fue diseñado para autoinactivarse a pH (7.4) y temperatura (37 °C) fisiológicos mediante una fragmentación de eliminación de Hofmann (β-eliminación facilitada por el grupo carbonilo electroatrayente vecino al carbono β). Este proceso no enzimático permite su empleo seguro en pacientes con insuficiencia renal o hepática grave.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-fir-05',
+    topicId: 'tema-01',
+    block: 'Bloqueantes Neuromusculares',
+    badge: 'FIR 2022 · P13 (Ministerio de Sanidad)',
+    question: '¿Cuáles de los siguientes fragmentos deben estar presentes en la estructura de los antagonistas nicotínicos de la placa motora?',
+    options: [
+      { text: 'Dos restos de acetilcolina situados a una determinada distancia el uno del otro.' },
+      { text: 'Un átomo de nitrógeno cuaternario, una función oxigenada y dos grupos apolares próximos a esta última.' },
+      { text: 'Dos átomos de nitrógeno cargados unidos por un espaciador, de manera que estén situados a una distancia determinada el uno del otro.' },
+      { text: 'Un nitrógeno cuaternario central y anillos aromáticos orto-sustituidos con grupos aceptores de electrones.' }
+    ],
+    correctIndex: 2,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción C): Dos átomos de nitrógeno cargados unidos por un espaciador, de manera que estén situados a una distancia determinada el uno del otro. El receptor nicotínico muscular pentamérico (α2βγδ) contiene dos sitios de unión ortostéricos situados en las interfases de las dos subunidades α. Los curares y bloqueantes neuromusculares bis-catiónicos exigen una distancia inter-nitrógeno rígida de ~1.4 nm (14 Ångstroms, o 10-12 carbonos) para puentear simultáneamente ambos sitios y provocar el bloqueo neuromuscular.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-fir-06',
+    topicId: 'tema-01',
+    block: 'Inhibidores & Reactivadores AChE',
+    badge: 'FIR 2021 · P16 (Ministerio de Sanidad)',
+    question: 'Para el diseño de los antídotos frente a los gases neurotóxicos organofosforados (sarín, tabún, somán), se utilizó la siguiente estrategia:',
+    questionSmiles: 'C[N+]1=CC=CC=C1C=NO',
+    options: [
+      { text: 'Diseñar compuestos derivados de hidroxilamina capaces de hidrolizar la posición fosforilada en la acetilcolinesterasa y reactivar así la enzima rápidamente.' },
+      { text: 'Diseñar compuestos derivados de hidroxilamina capaces de hidrolizar el residuo acetilado en la acetilcolinesterasa y reactivar así la enzima de forma controlada.' },
+      { text: 'Diseñar compuestos derivados de hidroxicloroquina que debido a su elevada electrofilia son capaces de hidrolizar el residuo carbamoilado en la acetilcolinesterasa reactivando rápidamente la enzima.' },
+      { text: 'Diseñar compuestos derivados de hidrazina capaces de hidrolizar la posición carbamoilada en la acetilcolinesterasa y reactivar la enzima rápidamente.' }
+    ],
+    correctIndex: 0,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción A): Diseñar compuestos derivados de hidroxilamina capaces de hidrolizar la posición fosforilada en la acetilcolinesterasa y reactivar así la enzima rápidamente. La pralidoxima (2-PAM) posee un catión piridínico que se orienta en el sitio aniónico libre y sitúa su grupo oxima (=N-OH, derivado de hidroxilamina) próximo al átomo de fósforo electrofílico unido a la Ser-203. El anión oximato efectúa un ataque nucleofílico favorecido por el efecto alfa, desplazando el residuo fosforilado y regenerando la enzima libre activa antes del proceso de envejecimiento (aging).',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-fir-07',
+    topicId: 'tema-01',
+    block: 'Antagonistas Muscarínicos',
+    badge: 'FIR 2024 · P9 (Ministerio de Sanidad)',
+    question: '¿Cuál de los siguientes fármacos con núcleo tricíclico ejerce su acción terapéutica principalmente por interacción antagonista con receptores muscarínicos (selectividad M1)?',
+    options: [
+      { text: 'Amitriptilina (derivado dibenzociclohepténico modulador de aminas).' },
+      { text: 'Imipramina (derivado dibenzoazepínico antidepresivo).' },
+      { text: 'Clomipramina (derivado cloro-dibenzoazepínico serotoninérgico).' },
+      { text: 'Pirenzepina (derivado piridobenzodiazepínico antisecretor gástrico).' }
+    ],
+    correctIndex: 3,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción D): Pirenzepina (Compuesto D en la lámina original FIR 2024). Aunque comparte un esqueleto tricíclico condensado (núcleo de piridobenzodiazepina) con los antidepresivos, la pirenzepina se diseñó como un antagonista selectivo de receptores muscarínicos M1. Bloquea los receptores muscarínicos en los ganglios intramurales gástricos reduciendo la secreción ácida gástrica sin penetrar en el SNC debido a su mayor polaridad hidrofílica.',
+    difficulty: 'Avanzado'
+  },
+  {
+    id: 't01-fir-08',
+    topicId: 'tema-01',
+    block: 'Inhibidores & Reactivadores AChE',
+    badge: 'FIR 2021 · P7 (Ministerio de Sanidad)',
+    question: 'En el estudio de inhibidores enzimáticos en química farmacéutica, ¿cómo se clasifica mecanísticamente la Rivastigmina (fármaco colinérgico para Alzheimer) frente a un inhibidor suicida como la Selegilina?',
+    questionSmiles: 'CCN(C)C(=O)Oc1cccc([C@@H](C)N(C)C)c1',
+    options: [
+      { text: 'La rivastigmina es un inhibidor suicida porque requiere activación metabólica microsomal previa.' },
+      { text: 'La rivastigmina es un inhibidor alostérico reversible no competitivo que no interacciona con la tríada catalítica.' },
+      { text: 'La rivastigmina es un inhibidor pseudoirreversible o de transición lenta, que carbamila covalentemente la Ser-203 pero se regenera por decarbamilación lenta.' },
+      { text: 'La rivastigmina es un análogo químicamente inerte que actúa exclusivamente como antagonista de canales de calcio.' }
+    ],
+    correctIndex: 2,
+    explanation: 'Respuesta oficial y fundamentación mecanística: La rivastigmina transfiere su grupo carbamilo al residuo nucleofílico Ser-203 de la acetilcolinesterasa y butirilcolinesterasa formando un intermediario carbamoil-enzima covalente. La decarbamilación hidrolítica posterior es extraordinariamente lenta (semivida de varias horas), por lo que se comporta como un inhibidor pseudoirreversible (sustrato suicida de carbamilación), a diferencia de la selegilina que es un inhibidor suicida irreversible que forma enlace covalente irreversible con el cofactor FAD de la MAO-B.',
+    difficulty: 'Medio'
+  },
+  {
+    id: 't01-fir-09',
+    topicId: 'tema-01',
+    block: 'Inhibidores & Reactivadores AChE',
+    badge: 'FIR 2025 · P18 (Ministerio de Sanidad)',
+    question: '¿Cuál de las siguientes afirmaciones describe con exactitud el mecanismo de interacción molecular del Donepezilo con la Acetilcolinesterasa (AChE)?',
+    questionSmiles: 'COc1cc2c(cc1OC)C(=O)CC2CC1CCN(Cc2ccccc2)CC1',
+    options: [
+      { text: 'Es un análogo del estado de transición que fosforila irreversiblemente el sitio activo.' },
+      { text: 'Es un inhibidor no covalente reversible mixto que se une simultáneamente al centro catalítico (CAS) mediante apilamiento π con Trp-86 y al sitio aniónico periférico (PAS) con Trp-286.' },
+      { text: 'Es un inhibidor suicida que forma un enlace covalente carbono-carbono con el cofactor enzimático.' },
+      { text: 'Es un fármaco que actúa exclusivamente bloqueando la síntesis presináptica de colina acetiltransferasa.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Respuesta y fundamentación estructural: El donepezilo es un inhibidor reversible no covalente de segunda generación para la enfermedad de Alzheimer. Su molécula alargada spanning se aloja a lo largo de toda la garganta hidrofóbica de 20 Å de la AChE: el anillo aromático de indanona interactúa en el sitio aniónico periférico (PAS) cerca de Trp-286 en la superficie, mientras que el anillo de bencilpiperidina se extiende hasta la base de la garganta interactuando con Trp-86 (CAS), bloqueando estéricamente el paso de acetilcolina sin formar enlaces covalentes.',
+    difficulty: 'Avanzado'
+  },
+  {
+    id: 't01-fir-10',
+    topicId: 'tema-01',
+    block: 'SAR Agonistas & Bioisosterismo',
+    badge: 'FIR 2025 · P3 (Ministerio de Sanidad)',
+    question: 'El cloruro de cetilpiridinio y ciertos antisépticos catiónicos de amonio cuaternario han sido modificados incorporando un enlace éster intermedio en la cadena alifática hidrófoba. ¿Qué concepto de diseño farmacoquímico representa esta estrategia?',
+    options: [
+      { text: 'Diseño de un profármaco hidrofílico para administración intravenosa.' },
+      { text: 'Diseño de un análogo blando (soft drug) para limitar la toxicidad sistémica mediante degradación metabólica predecible por esterasas.' },
+      { text: 'Diseño de un homólogo rígido para aumentar la selectividad por receptores nicotínicos.' },
+      { text: 'Diseño de un bioisóstero no clásico resistente a la oxidación microsomal hepática.' }
+    ],
+    correctIndex: 1,
+    explanation: 'Respuesta oficial del Ministerio de Sanidad (Opción B): Es un análogo blando. Los fármacos blandos (concepto introducido en química farmacéutica en derivados colinérgicos como la succinilcolina) son agentes terapéuticos activos diseñados de forma que contengan un punto de clivaje metabólico predecible (enlace éster lábil). Tras ejercer su acción tópica o superficial, las esterasas plasmáticas los escinden rápidamente en metabolitos inactivos no tóxicos, suprimiendo la absorción y toxicidad sistémica.',
+    difficulty: 'Medio'
+  }
+];
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
