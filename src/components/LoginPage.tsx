@@ -100,7 +100,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Divider */}
         <div className="login-divider">
-          <span>Acceso con @correo.ugr.es, @go.ugr.es o @gmail.com</span>
+          <span>Acceso con @go.ugr.es</span>
         </div>
 
         {/* Google login */}
@@ -139,7 +139,7 @@ export const LoginPage: React.FC = () => {
             <div>
               <strong>Estudiantes</strong>
               <p>
-                Entra con tu cuenta institucional (<code>@correo.ugr.es</code> o <code>@go.ugr.es</code>) o con tu cuenta de <code>@gmail.com</code>.
+                Entra con tu correo institucional (<code>@go.ugr.es</code>).
               </p>
             </div>
           </div>
