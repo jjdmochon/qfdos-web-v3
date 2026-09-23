@@ -83,7 +83,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
    * usar el mismo banco en modo estudio, con correccion pregunta a pregunta.
    */
   const [examMode, setExamMode] = useState<boolean>(true);
-  const isExamMode = isProfesor ? examMode : true;
+  const isExamMode = examMode;
 
   // Compute active question bank dynamically (E, FIR y A para alumnado; B, C y Retrosíntesis exclusivos para docente)
   const questions: TestQuestion[] = useMemo(() => {
@@ -1219,30 +1219,48 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </details>
                     )}
 
-                    {/* Modo de realizacion para el profesorado */}
-                    {isProfesor && (
-                      <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-title)' }}>
-                          Modo de realización docente:
-                        </span>
+                    {/* Selector de Modo: Preparación / Estudio vs Examen Oficial */}
+                    <div style={{
+                      marginTop: '12px',
+                      padding: '12px 14px',
+                      background: 'var(--surface-raised)',
+                      border: '1.5px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      flexWrap: 'wrap'
+                    }}>
+                      <div>
+                        <div style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-title)' }}>
+                          Modalidad de Realización:
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          {examMode 
+                            ? 'Examen evaluable: responde las preguntas sin ver la corrección y entrega al finalizar.' 
+                            : 'Preparación y estudio: comprueba cada respuesta de inmediato con su explicación pedagógica.'}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                           type="button"
                           onClick={() => setExamMode(true)}
                           className={examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
-                          style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                          style={{ fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px' }}
                         >
-                          Modo examen (sin ver respuestas)
+                          Modo Examen
                         </button>
                         <button
                           type="button"
                           onClick={() => setExamMode(false)}
-                          className={!examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
-                          style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                          className={!examMode ? 'btn btn-sm btn-teal' : 'btn btn-sm btn-outline'}
+                          style={{ fontSize: '0.78rem', fontWeight: 700, padding: '7px 14px' }}
                         >
-                          Modo estudio (con corrección inmediata)
+                          Modo Preparación / Estudio
                         </button>
                       </div>
-                    )}
+                    </div>
                   </div>
 
                   {/* Estado de realización e instrucciones */}
@@ -1258,29 +1276,39 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <>
                           <CheckCircle2 size={18} color="#059669" />
                           <strong style={{ fontSize: '0.92rem', color: '#065f46' }}>
-                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Ya Realizado (Mejor Calificación: {currentStats.bestScore}/10)
+                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Ya Realizado (Mejor Calificación: {currentStats.bestScore}/10)
                           </strong>
                         </>
                       ) : (
                         <>
                           <Clock size={18} color="var(--navy)" />
                           <strong style={{ fontSize: '0.92rem', color: 'var(--navy)' }}>
-                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Pendiente de Realización
+                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Pendiente de Realización
                           </strong>
                         </>
                       )}
                     </div>
                     <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.81rem', color: 'var(--text-main)', lineHeight: 1.6 }}>
-                      <li>Respondes sin ver la corrección durante la prueba; puedes navegar libremente entre las {questions.length} preguntas y cambiar respuestas en cualquier momento.</li>
-                      <li>Puedes entregar cuando quieras; las preguntas no respondidas computan como no acertadas.</li>
-                      <li>Al entregar, tu calificación y el desglose de respuestas se registran de inmediato en la hoja oficial de Google Sheets del profesorado y en tu pestaña de «Mis Calificaciones».</li>
+                      {examMode ? (
+                        <>
+                          <li><strong>Modo Examen:</strong> respondes sin ver la corrección durante la prueba; puedes navegar libremente entre las {questions.length} preguntas y cambiar respuestas en cualquier momento.</li>
+                          <li>Puedes entregar cuando quieras; las preguntas no respondidas computan como no acertadas.</li>
+                          <li>Al entregar, tu calificación y el desglose de respuestas se registran de inmediato en la hoja oficial de Google Sheets del profesorado y en tu pestaña de «Mis Calificaciones».</li>
+                        </>
+                      ) : (
+                        <>
+                          <li><strong>Modo Preparación / Estudio:</strong> compruebas cada respuesta al instante tras marcarla y accedes a la justificación teórica y distractor por distractor.</li>
+                          <li>Avanzas paso a paso afianzando conceptos clave antes de someterte al examen evaluable oficial.</li>
+                          <li>Al terminar las {questions.length} preguntas obtendrás tu balance formativo global y podrás repetir tantas veces como necesites.</li>
+                        </>
+                      )}
                       {currentStats.completed ? (
                         <li style={{ color: '#047857', fontWeight: 700 }}>
-                          Tienes {currentStats.count} intento(s) registrado(s){currentStats.lastDate ? ` (último: ${currentStats.lastDate})` : ''}. Puedes volver a realizar este modelo: el nuevo intento se añadirá a tu expediente en Google Sheets sin borrar tus notas anteriores.
+                          Tienes {currentStats.count} intento(s) registrado(s){currentStats.lastDate ? ` (último: ${currentStats.lastDate})` : ''}. Puedes volver a realizar este modelo: el nuevo intento se añadirá a tu expediente sin borrar tus notas anteriores.
                         </li>
                       ) : (
                         <li style={{ color: 'var(--navy)', fontWeight: 700 }}>
-                          Este modelo aún no ha sido entregado con tus datos. Tu primera calificación quedará asentada en la hoja oficial del curso.
+                          Este modelo aún no ha sido completado con tus datos en la plataforma.
                         </li>
                       )}
                     </ul>
@@ -1303,10 +1331,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
                         <strong>
-                          {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27:' : selectedModel === 'modelo-b' ? 'Modelo B Oficial:' : selectedModel === 'modelo-c' ? 'Modelo C Oficial:' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}
+                          {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27:' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (Sanidad):' : selectedModel === 'modelo-b' ? 'Modelo B Oficial:' : selectedModel === 'modelo-c' ? 'Modelo C Oficial:' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}
                         </strong>{' '}
                         {selectedModel === 'modelo-e'
                           ? '15 preguntas calibradas JEV System-1 (sin retrosíntesis): biosíntesis ChAT, SAR betanecol, eudismia metacolina, síntesis industrial directa, catálisis Ser/His de AChE, 2-PAM, aging, BHE y tubocurarina (1.4 nm).'
+                          : selectedModel === 'modelo-fir'
+                          ? '10 preguntas reales de exámenes del Ministerio de Sanidad (2020-2025): estabilidad de carbamatos, suxametonio/cetilpiridinio como fármacos blandos, atracurio y Hofmann, oximas y reactivación de AChE, donepezilo, rivastigmina y pirenzepina.'
                           : selectedModel === 'modelo-b'
                           ? '15 preguntas de diferenciación ionotrópica/metabotrópica, cinética de carbamoilación, envejecimiento de AChE y síntesis de derivados.'
                           : selectedModel === 'modelo-c'
@@ -1340,11 +1370,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     >
                       {currentStats.completed ? (
                         <>
-                          Repetir {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <RotateCcw size={16} style={{ marginLeft: '6px' }} />
+                          Repetir {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas · {examMode ? 'Examen' : 'Preparación'}) <RotateCcw size={16} style={{ marginLeft: '6px' }} />
                         </>
                       ) : (
                         <>
-                          Comenzar {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} style={{ marginLeft: '6px' }} />
+                          Comenzar {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas · {examMode ? 'Examen' : 'Preparación'}) <ArrowRight size={16} style={{ marginLeft: '6px' }} />
                         </>
                       )}
                     </button>
@@ -1377,11 +1407,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
-                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'retrosintesis' ? 'var(--teal)' : 'var(--navy)', 
+                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#2563eb', 
                         color: '#fff',
                         fontWeight: 700 
                       }}>
-                        {selectedModel === 'modelo-e' ? 'Modelo E' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'}
+                        {selectedModel === 'modelo-e' ? 'Modelo E' : selectedModel === 'modelo-fir' ? 'Modelo FIR' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'} · {isExamMode ? 'Examen' : 'Preparación'}
                       </span>
                       <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)' }}>
                         Pregunta {currentIndex + 1} de {questions.length}
@@ -1633,7 +1663,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     return (
                       <div className="qfdos-card" style={{ maxWidth: '420px', margin: '0 auto 1.25rem', padding: '1.25rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
-                          Calificación Oficial ({topic.title} · {selectedModel === 'modelo-e' ? 'Modelo E (15P)' : selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'}):
+                          Calificación ({topic.title} · {selectedModel === 'modelo-e' ? 'Modelo E (15P)' : selectedModel === 'modelo-fir' ? 'Modelo FIR (10P)' : selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'} · {isExamMode ? 'Modo Examen' : 'Modo Preparación'}):
                         </div>
                         <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal)' : 'var(--accent-red)', lineHeight: 1 }}>
                           {stats.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>
