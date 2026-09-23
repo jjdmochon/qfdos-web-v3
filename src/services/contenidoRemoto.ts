@@ -71,7 +71,8 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       const base1 = INITIAL_TOPICS.find(item => item.id === 'tema-01') || INITIAL_TOPICS[1];
       return {
         ...t,
-        testQuestions: base1.testQuestions
+        testQuestions: base1.testQuestions,
+        flashcards: base1.flashcards
       };
     }
     return t;

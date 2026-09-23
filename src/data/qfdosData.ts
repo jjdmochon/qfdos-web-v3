@@ -338,8 +338,8 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.9.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-22T16:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.10.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-23T14:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -2360,7 +2360,6 @@ flashcards: [
           { name: 'Serina (Ser)', smiles: 'N[C@@H](CO)C(=O)O', badge: 'Nucleófilo Catalítico' },
           { name: 'Histidina (His)', smiles: 'N[C@@H](Cc1c[nH]cn1)C(=O)O', badge: 'Ácido/Base General' }
         ],
-        imagePath: 'assets/tema-01/structure_image_47.png',
         difficulty: 'hard',
         category: 'Catálisis Enzimática'
       },
@@ -2425,7 +2424,7 @@ flashcards: [
         front: '¿Qué características estructurales definen a la Tubocurarina como bloqueante neuromuscular competitivo prototipo?',
         back: 'Es un alcaloide natural con **dos centros catiónicos separados por una distancia rígida de 1.4 nm (14 Å)**. Esta separación complementa con exactitud los dos bolsillos de unión de las dos subunidades alfa del receptor nicotínico muscular de la placa motora.',
         smiles: 'CN1CCC2=CC(=C3C=C2C1CC4=CC=C(C=C4)OC5=C6C(CC7=CC(=C(C=C7)O)O3)[N+](CCC6=CC(=C5O)OC)(C)C)OC',
-        imagePath: 'assets/tema-01/image_47.png',
+        imagePath: 'assets/tema-01/structure_image_47.png',
         difficulty: 'hard',
         category: 'Antagonistas Nicotínicos'
       }

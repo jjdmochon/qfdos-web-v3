@@ -84,20 +84,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [examMode, setExamMode] = useState<boolean>(true);
   const isExamMode = isProfesor ? examMode : true;
 
-  // Compute active question bank dynamically (Default is Modelo E para alumnos y profesor)
+  // Compute active question bank dynamically (Disponible para Alumnos y Profesor)
   const questions: TestQuestion[] = useMemo(() => {
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
     if (isTema1) {
-      // El alumnado tiene asignado el Modelo E oficial; el selector es del profesor
-      if (!isProfesor) return MODELO_E_TEST_QUESTIONS;
-      if (selectedModel === 'modelo-e') return MODELO_E_TEST_QUESTIONS;
       if (selectedModel === 'modelo-a') return MODELO_A_TEST_QUESTIONS;
+      if (selectedModel === 'modelo-b') return MODELO_B_TEST_QUESTIONS;
       if (selectedModel === 'modelo-c') return MODELO_C_TEST_QUESTIONS;
       if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
-      return MODELO_B_TEST_QUESTIONS;
+      return MODELO_E_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
-  }, [topic, selectedModel, isProfesor]);
+  }, [topic, selectedModel]);
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'quiz' | 'records'>('quiz');
@@ -276,7 +274,62 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     }
   }, [evaluationMode, user, isProfesor]);
 
-// Guard removed: Open for both students and teacher
+  /**
+   * Obtiene estadísticas de realización (estado, mejor nota, intentos, última fecha)
+   * para un modelo específico del tema actual, contrastando el historial de calificaciones.
+   */
+  const getModelStats = (model: QuizModelType) => {
+    const currentEmail = (studentEmail || user?.email || '').toLowerCase().trim();
+    const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
+
+    const matching = records.filter(r => {
+      const matchesTopic = r.topicId === topic.id || (isTema1 && (r.topicId === 'tema-1' || !r.topicId || r.topicId === 'tema-01'));
+      if (!matchesTopic) return false;
+
+      // Si no es profesor y hay correo, contrastar correo del alumno
+      if (!isProfesor && currentEmail) {
+        const rEmail = (r.studentEmail || '').toLowerCase().trim();
+        if (rEmail && rEmail !== currentEmail) return false;
+      }
+
+      const m = (r.modelName || '').toLowerCase();
+      if (model === 'modelo-e') {
+        return m.includes('modelo e');
+      }
+      if (model === 'modelo-b') {
+        return m.includes('modelo b');
+      }
+      if (model === 'modelo-c') {
+        return m.includes('modelo c');
+      }
+      if (model === 'retrosintesis') {
+        return m.includes('retrosíntesis') || m.includes('retrosintesis');
+      }
+      if (model === 'modelo-a') {
+        // En Tema 1, los intentos iniciales decían 'Modelo A' o no tenían subtipo de modelo
+        return m.includes('modelo a') || (!m.includes('modelo e') && !m.includes('modelo b') && !m.includes('modelo c') && !m.includes('retrosint'));
+      }
+      return false;
+    });
+
+    if (matching.length === 0) {
+      return { completed: false, count: 0, bestScore: null as number | null, lastScore: null as number | null, lastDate: null as string | null };
+    }
+
+    const scores = matching.map(r => typeof r.score === 'number' ? r.score : parseFloat(String(r.score)) || 0);
+    const bestScore = Math.max(...scores);
+    const latest = matching[0];
+    const lastScore = typeof latest.score === 'number' ? latest.score : parseFloat(String(latest.score)) || 0;
+    const lastDate = latest.timestamp ? formatearFechaVisual(latest.timestamp) : null;
+
+    return {
+      completed: true,
+      count: matching.length,
+      bestScore: Math.round(bestScore * 10) / 10,
+      lastScore: Math.round(lastScore * 10) / 10,
+      lastDate
+    };
+  };
 
   if (questions.length === 0) {
     return (
@@ -618,6 +671,14 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     return { total, avg, passCount, passRate, maxScore };
   }, [filteredRecords]);
 
+  // Model attempt statistics for active user / browser
+  const statsE = getModelStats('modelo-e');
+  const statsA = getModelStats('modelo-a');
+  const statsB = getModelStats('modelo-b');
+  const statsC = getModelStats('modelo-c');
+  const statsRetro = getModelStats('retrosintesis');
+  const currentStats = getModelStats(selectedModel);
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
@@ -898,210 +959,263 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Selector de Modelo de Examen Oficial (reservado al profesorado) */}
-                  {isProfesor && (
+                  {/* Selector de Modelo de Examen (Disponible para Alumnado y Docente) */}
                   <div style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', margin: 0 }}>
-                        {evaluationMode === 'docente_sesion' || isProfesor ? 'Modelo de Examen Seleccionado (15 Preguntas Calibradas):' : 'Modelo de Examen Oficial Asignado:'}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
+                        {topic.id === 'tema-01' ? 'Selecciona el Modelo de Examen (15 Preguntas Calibradas):' : 'Modelo de Evaluación:'}
                       </label>
-                      <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#3b82f6', color: '#fff' }}>
-                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial Activo)' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'}
+                      <span className="qfdos-badge" style={{ 
+                        fontSize: '0.68rem', 
+                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? 'var(--teal)' : '#2563eb', 
+                        color: '#fff',
+                        fontWeight: 700 
+                      }}>
+                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'}
                       </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: topic.id === 'tema-01' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr', gap: '10px' }}>
-                      {/* Modelo E: Oficial 2026/27 (Sin Retrosíntesis) */}
-                      {topic.id === 'tema-01' && (
-                        <button
-                          type="button"
+
+                    {topic.id === 'tema-01' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                        {/* Tarjeta Modelo E: Oficial 2026/27 (Sin Retrosíntesis) */}
+                        <div
                           onClick={() => setSelectedModel('modelo-e')}
                           style={{
-                            padding: '12px 14px',
-                            borderRadius: 'var(--radius-md)',
-                            border: selectedModel === 'modelo-e' ? '2px solid var(--navy)' : '1px solid var(--border-color)',
-                            background: selectedModel === 'modelo-e' ? 'var(--primary-bg)' : 'var(--surface)',
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-lg)',
+                            border: selectedModel === 'modelo-e' ? '2.5px solid var(--navy)' : '1.5px solid var(--border-color)',
+                            background: selectedModel === 'modelo-e' ? 'rgba(30, 58, 138, 0.05)' : 'var(--surface)',
+                            boxShadow: selectedModel === 'modelo-e' ? '0 3px 12px rgba(30, 58, 138, 0.12)' : 'none',
                             cursor: 'pointer',
                             textAlign: 'left',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <strong style={{ fontSize: '0.86rem', color: 'var(--navy)' }}>
-                              Modelo E: Oficial 2026/27 (15P)
-                            </strong>
-                            {selectedModel === 'modelo-e' && (
-                              <span className="qfdos-badge badge-navy" style={{ fontSize: '0.66rem' }}>Activo Alumnado</span>
-                            )}
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--navy)' }}>
+                                  Oficial 2026/27 · Sin Retrosíntesis
+                                </span>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy)', margin: '2px 0 0 0' }}>
+                                  Modelo E (15 Preguntas)
+                                </h4>
+                              </div>
+                              {statsE.completed ? (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                  ✓ Realizado · {statsE.bestScore}/10
+                                </span>
+                              ) : (
+                                <span className="qfdos-badge badge-amber" style={{ fontSize: '0.68rem', fontWeight: 700 }}>
+                                  Nuevo · Pendiente
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                              Biosíntesis ChAT, SAR betanecol, eudismia metacolina, síntesis industrial directa, catálisis Ser/His de AChE, 2-PAM, aging, BHE y tubocurarina (1.4 nm).
+                            </p>
                           </div>
-                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                            Sin retrosíntesis. Biosíntesis ChAT, SAR betanecol, eudismia, síntesis industrial directa, catálisis Ser/His de AChE, 2-PAM, aging y tubocurarina (1.4 nm).
-                          </p>
-                        </button>
-                      )}
 
-                      {/* Modelo A */}
-                      <button
-                        type="button"
-                        onClick={() => setSelectedModel('modelo-a')}
-                        style={{
-                          padding: '12px 14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: selectedModel === 'modelo-a' ? '2px solid var(--navy)' : '1px solid var(--border-color)',
-                          background: selectedModel === 'modelo-a' ? 'var(--primary-bg)' : 'var(--surface)',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'all 0.2s ease'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <strong style={{ fontSize: '0.86rem', color: 'var(--navy)' }}>
-                            Modelo A: Farmacología, MoA y Síntesis (15P)
-                          </strong>
-                          {selectedModel === 'modelo-a' && (
-                            <span className="qfdos-badge badge-navy" style={{ fontSize: '0.66rem' }}>Activo</span>
-                          )}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <span>
+                              {statsE.completed ? `${statsE.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                            </span>
+                            <strong style={{ color: selectedModel === 'modelo-e' ? 'var(--navy)' : 'var(--text-muted)' }}>
+                              {selectedModel === 'modelo-e' ? '● Seleccionado' : 'Elegir Modelo E'}
+                            </strong>
+                          </div>
                         </div>
-                        <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                          Fundamentos colinérgicos, receptores M/N, SAR de agonistas, inhibidores de AChE, reactivadores y síntesis directa.
-                        </p>
-                      </button>
 
-                      {/* Modelo B */}
-                      {topic.id === 'tema-01' && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedModel('modelo-b')}
+                        {/* Tarjeta Modelo A: Examen Previo */}
+                        <div
+                          onClick={() => setSelectedModel('modelo-a')}
                           style={{
-                            padding: '12px 14px',
-                            borderRadius: 'var(--radius-md)',
-                            border: selectedModel === 'modelo-b' ? '2px solid #8b5cf6' : '1px solid var(--border-color)',
-                            background: selectedModel === 'modelo-b' ? '#f5f3ff' : 'var(--surface)',
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-lg)',
+                            border: selectedModel === 'modelo-a' ? '2.5px solid var(--navy)' : '1.5px solid var(--border-color)',
+                            background: selectedModel === 'modelo-a' ? 'rgba(30, 58, 138, 0.05)' : 'var(--surface)',
+                            boxShadow: selectedModel === 'modelo-a' ? '0 3px 12px rgba(30, 58, 138, 0.12)' : 'none',
                             cursor: 'pointer',
                             textAlign: 'left',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <strong style={{ fontSize: '0.86rem', color: '#7c3aed' }}>
-                              Modelo B: Diferenciación y Cinética (15P)
-                            </strong>
-                            {selectedModel === 'modelo-b' && (
-                              <span className="qfdos-badge" style={{ fontSize: '0.66rem', background: '#8b5cf6', color: '#fff' }}>Activo</span>
-                            )}
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#2563eb' }}>
+                                  Examen Oficial Previo
+                                </span>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy)', margin: '2px 0 0 0' }}>
+                                  Modelo A (15 Preguntas)
+                                </h4>
+                              </div>
+                              {statsA.completed ? (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                  ✓ Realizado · {statsA.bestScore}/10
+                                </span>
+                              ) : (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: 'var(--surface-alt)', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                  No realizado
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                              Fundamentos colinérgicos, receptores muscarínicos y nicotínicos, SAR de agonistas, inhibidores de AChE, reactivadores y síntesis directa de metacolina y betanecol.
+                            </p>
                           </div>
-                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                            Receptores ionotrópicos vs metabotrópicos, cinética de carbamoilación, aging por organofosforados y síntesis de Mannich.
-                          </p>
-                        </button>
-                      )}
 
-                      {/* Modelo C */}
-                      {topic.id === 'tema-01' && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedModel('modelo-c')}
-                          style={{
-                            padding: '12px 14px',
-                            borderRadius: 'var(--radius-md)',
-                            border: selectedModel === 'modelo-c' ? '2px solid #ea580c' : '1px solid var(--border-color)',
-                            background: selectedModel === 'modelo-c' ? '#fff7ed' : 'var(--surface)',
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <strong style={{ fontSize: '0.86rem', color: '#c2410c' }}>
-                              Modelo C: Catálisis y Estereoquímica (15P)
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <span>
+                              {statsA.completed ? `${statsA.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                            </span>
+                            <strong style={{ color: selectedModel === 'modelo-a' ? 'var(--navy)' : 'var(--text-muted)' }}>
+                              {selectedModel === 'modelo-a' ? '● Seleccionado' : 'Elegir Modelo A'}
                             </strong>
-                            {selectedModel === 'modelo-c' && (
-                              <span className="qfdos-badge" style={{ fontSize: '0.66rem', background: '#ea580c', color: '#fff' }}>Activo</span>
-                            )}
                           </div>
-                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                            Tríada catalítica de AChE, eudismia con (+)-muscarina, selectividad cinética de tiotropio y síntesis de neostigmina.
-                          </p>
-                        </button>
-                      )}
-
-                      {/* Modelo Retrosíntesis */}
-                      {topic.id === 'tema-01' && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedModel('retrosintesis')}
-                          style={{
-                            padding: '12px 14px',
-                            borderRadius: 'var(--radius-md)',
-                            border: selectedModel === 'retrosintesis' ? '2px solid var(--teal)' : '1px solid var(--border-color)',
-                            background: selectedModel === 'retrosintesis' ? 'var(--secondary-bg)' : 'var(--surface)',
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <strong style={{ fontSize: '0.86rem', color: 'var(--teal)' }}>
-                              Modelo Retrosíntesis y Sintones (15P)
-                            </strong>
-                            {selectedModel === 'retrosintesis' && (
-                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem' }}>Activo</span>
-                            )}
-                          </div>
-                          <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                            Desconexiones C-C, sintones acilo-oxígeno, reactivo de Ivanov, expansión furánica y estructuras en opciones.
-                          </p>
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Modo de realizacion: examen (sin correccion) o estudio */}
-                    <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-title)' }}>
-                        Modo de realización:
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setExamMode(true)}
-                        className={examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
-                        style={{ fontSize: '0.76rem', fontWeight: 700 }}
-                      >
-                        Modo examen (sin ver respuestas)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setExamMode(false)}
-                        className={!examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
-                        style={{ fontSize: '0.76rem', fontWeight: 700 }}
-                      >
-                        Modo estudio (con corrección)
-                      </button>
-                    </div>
-                  </div>
-                  )}
-
-                  {/* Instrucciones del examen oficial para el alumnado */}
-                  {!isProfesor && (
-                    <div style={{
-                      marginBottom: '1.25rem',
-                      padding: '14px 16px',
-                      borderRadius: 'var(--radius-lg)',
-                      background: 'rgba(30, 58, 138, 0.06)',
-                      border: '1.5px solid var(--navy)'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                        <Clock size={17} color="var(--navy)" />
-                        <strong style={{ fontSize: '0.92rem', color: 'var(--navy)' }}>
-                          Examen Oficial Tema 1 · Modelo A (15 preguntas) · Modo examen
-                        </strong>
+                        </div>
                       </div>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.81rem', color: 'var(--text-main)', lineHeight: 1.6 }}>
-                        <li>Respondes sin ver la corrección: no se muestra la respuesta correcta ni la explicación durante la prueba.</li>
-                        <li>Puedes avanzar, retroceder y cambiar cualquier respuesta mientras el examen siga abierto.</li>
-                        <li>Puedes entregar en cualquier momento; las preguntas sin responder puntúan como falladas.</li>
-                        <li>Al entregar, la nota y el detalle de respuestas se registran en la hoja oficial de Google Sheets del profesorado.</li>
-                      </ul>
+                    )}
+
+                    {/* Modelos adicionales opcionales de entrenamiento */}
+                    {topic.id === 'tema-01' && (
+                      <details style={{ marginBottom: '14px', background: 'var(--surface-alt)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '8px 12px' }}>
+                        <summary style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', cursor: 'pointer' }}>
+                          Modelos complementarios de entrenamiento (Modelos B, C y Retrosíntesis)
+                        </summary>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '8px', marginTop: '10px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedModel('modelo-b')}
+                            style={{
+                              padding: '10px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedModel === 'modelo-b' ? '2px solid #8b5cf6' : '1px solid var(--border-color)',
+                              background: selectedModel === 'modelo-b' ? '#f5f3ff' : 'var(--surface)',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                              <strong style={{ fontSize: '0.8rem', color: '#7c3aed' }}>Modelo B: Cinética</strong>
+                              {statsB.completed && <span className="qfdos-badge" style={{ fontSize: '0.62rem', background: '#059669', color: '#fff' }}>✓ {statsB.bestScore}/10</span>}
+                            </div>
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: 0 }}>Ionotrópicos vs metabotrópicos, carbamoilación y aging.</p>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setSelectedModel('modelo-c')}
+                            style={{
+                              padding: '10px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedModel === 'modelo-c' ? '2px solid #ea580c' : '1px solid var(--border-color)',
+                              background: selectedModel === 'modelo-c' ? '#fff7ed' : 'var(--surface)',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                              <strong style={{ fontSize: '0.8rem', color: '#c2410c' }}>Modelo C: Catálisis</strong>
+                              {statsC.completed && <span className="qfdos-badge" style={{ fontSize: '0.62rem', background: '#059669', color: '#fff' }}>✓ {statsC.bestScore}/10</span>}
+                            </div>
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: 0 }}>Tríada catalítica de AChE, eudismia y síntesis neostigmina.</p>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setSelectedModel('retrosintesis')}
+                            style={{
+                              padding: '10px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedModel === 'retrosintesis' ? '2px solid var(--teal)' : '1px solid var(--border-color)',
+                              background: selectedModel === 'retrosintesis' ? 'var(--secondary-bg)' : 'var(--surface)',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                              <strong style={{ fontSize: '0.8rem', color: 'var(--teal)' }}>Retrosíntesis</strong>
+                              {statsRetro.completed && <span className="qfdos-badge" style={{ fontSize: '0.62rem', background: '#059669', color: '#fff' }}>✓ {statsRetro.bestScore}/10</span>}
+                            </div>
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: 0 }}>Desconexiones C-C, sintones acilo-oxígeno e Ivanov.</p>
+                          </button>
+                        </div>
+                      </details>
+                    )}
+
+                    {/* Modo de realizacion para el profesorado */}
+                    {isProfesor && (
+                      <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-title)' }}>
+                          Modo de realización docente:
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setExamMode(true)}
+                          className={examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
+                          style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                        >
+                          Modo examen (sin ver respuestas)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setExamMode(false)}
+                          className={!examMode ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline'}
+                          style={{ fontSize: '0.76rem', fontWeight: 700 }}
+                        >
+                          Modo estudio (con corrección inmediata)
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Estado de realización e instrucciones */}
+                  <div style={{
+                    marginBottom: '1.25rem',
+                    padding: '14px 16px',
+                    borderRadius: 'var(--radius-lg)',
+                    background: currentStats.completed ? 'rgba(16, 185, 129, 0.06)' : 'rgba(30, 58, 138, 0.06)',
+                    border: currentStats.completed ? '1.5px solid #059669' : '1.5px solid var(--navy)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      {currentStats.completed ? (
+                        <>
+                          <CheckCircle2 size={18} color="#059669" />
+                          <strong style={{ fontSize: '0.92rem', color: '#065f46' }}>
+                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Ya Realizado (Mejor Calificación: {currentStats.bestScore}/10)
+                          </strong>
+                        </>
+                      ) : (
+                        <>
+                          <Clock size={18} color="var(--navy)" />
+                          <strong style={{ fontSize: '0.92rem', color: 'var(--navy)' }}>
+                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Pendiente de Realización
+                          </strong>
+                        </>
+                      )}
                     </div>
-                  )}
+                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.81rem', color: 'var(--text-main)', lineHeight: 1.6 }}>
+                      <li>Respondes sin ver la corrección durante la prueba; puedes navegar libremente entre las {questions.length} preguntas y cambiar respuestas en cualquier momento.</li>
+                      <li>Puedes entregar cuando quieras; las preguntas no respondidas computan como no acertadas.</li>
+                      <li>Al entregar, tu calificación y el desglose de respuestas se registran de inmediato en la hoja oficial de Google Sheets del profesorado y en tu pestaña de «Mis Calificaciones».</li>
+                      {currentStats.completed ? (
+                        <li style={{ color: '#047857', fontWeight: 700 }}>
+                          Tienes {currentStats.count} intento(s) registrado(s){currentStats.lastDate ? ` (último: ${currentStats.lastDate})` : ''}. Puedes volver a realizar este modelo: el nuevo intento se añadirá a tu expediente en Google Sheets sin borrar tus notas anteriores.
+                        </li>
+                      ) : (
+                        <li style={{ color: 'var(--navy)', fontWeight: 700 }}>
+                          Este modelo aún no ha sido entregado con tus datos. Tu primera calificación quedará asentada en la hoja oficial del curso.
+                        </li>
+                      )}
+                    </ul>
+                  </div>
 
                   {/* Banner de resumen del examen */}
                   <div style={{
@@ -1155,7 +1269,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       className="btn btn-primary"
                       style={{ padding: '10px 24px', fontSize: '0.92rem', fontWeight: 700 }}
                     >
-                      Comenzar {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} />
+                      {currentStats.completed ? (
+                        <>
+                          Repetir {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <RotateCcw size={16} style={{ marginLeft: '6px' }} />
+                        </>
+                      ) : (
+                        <>
+                          Comenzar {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas) <ArrowRight size={16} style={{ marginLeft: '6px' }} />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1831,11 +1953,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 {rec.modelName && (
                                   <span className="qfdos-badge" style={{ 
                                     fontSize: '0.64rem',
-                                    background: rec.modelName.includes('Modelo B') ? '#f5f3ff' : rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : rec.modelName.includes('Modelo C') ? '#fff7ed' : 'rgba(30, 58, 138, 0.12)',
-                                    color: rec.modelName.includes('Modelo B') ? '#7c3aed' : rec.modelName.includes('Retrosíntesis') ? '#0d9488' : rec.modelName.includes('Modelo C') ? '#c2410c' : '#1e3a8a',
-                                    border: `1px solid ${rec.modelName.includes('Modelo B') ? '#8b5cf6' : rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : rec.modelName.includes('Modelo C') ? '#ea580c' : '#3b82f6'}`
+                                    background: rec.modelName.includes('Modelo E') ? 'rgba(30, 58, 138, 0.12)' : rec.modelName.includes('Modelo B') ? '#f5f3ff' : rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : rec.modelName.includes('Modelo C') ? '#fff7ed' : 'rgba(59, 130, 246, 0.12)',
+                                    color: rec.modelName.includes('Modelo E') ? 'var(--navy)' : rec.modelName.includes('Modelo B') ? '#7c3aed' : rec.modelName.includes('Retrosíntesis') ? '#0d9488' : rec.modelName.includes('Modelo C') ? '#c2410c' : '#2563eb',
+                                    border: `1px solid ${rec.modelName.includes('Modelo E') ? 'var(--navy)' : rec.modelName.includes('Modelo B') ? '#8b5cf6' : rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : rec.modelName.includes('Modelo C') ? '#ea580c' : '#93c5fd'}`
                                   }}>
-                                    {rec.modelName.includes('Modelo B') ? 'Modelo B' : rec.modelName.includes('Modelo C') ? 'Modelo C' : rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
+                                    {rec.modelName.includes('Modelo E') ? 'Modelo E' : rec.modelName.includes('Modelo B') ? 'Modelo B' : rec.modelName.includes('Modelo C') ? 'Modelo C' : rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
                                   </span>
                                 )}
                               </div>

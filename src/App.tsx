@@ -222,11 +222,22 @@ export const App: React.FC = () => {
     purgeStaleCourseCache();
     const raw = contenidoEnCache()?.topics ?? loadCached('qfdos_v3_topics', INITIAL_TOPICS);
     const normalized = normalizarTemas(raw);
-    // Auto-heal Tema 1 para garantizar que siempre tenga las 15 preguntas oficiales del Modelo A
+    // Auto-heal Tema 1 para garantizar que siempre tenga las 15 preguntas y las 10 flashcards canónicas
     const t1 = normalized.find(t => t.id === 'tema-01');
-    if (t1 && (!t1.testQuestions || t1.testQuestions.length !== 15)) {
-      t1.testQuestions = INITIAL_TOPICS[1].testQuestions;
-      localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
+    const base1 = INITIAL_TOPICS.find(t => t.id === 'tema-01') || INITIAL_TOPICS[1];
+    if (t1) {
+      let modified = false;
+      if (!t1.testQuestions || t1.testQuestions.length !== 15) {
+        t1.testQuestions = base1.testQuestions;
+        modified = true;
+      }
+      if (!t1.flashcards || t1.flashcards.length !== 10) {
+        t1.flashcards = base1.flashcards;
+        modified = true;
+      }
+      if (modified) {
+        localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
+      }
     }
     return normalized;
   });

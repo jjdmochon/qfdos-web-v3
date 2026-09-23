@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QfdosTopic, Flashcard } from '../data/qfdosData';
+import { QfdosTopic, Flashcard, INITIAL_TOPICS } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { recurso } from '../services/rutas';
 import { 
@@ -24,7 +24,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   topic,
   onClose
 }) => {
-  const cards: Flashcard[] = topic.flashcards || [];
+  const cards: Flashcard[] = React.useMemo(() => {
+    if (topic.id === 'tema-01' || topic.number === 'Tema 01') {
+      const base1 = INITIAL_TOPICS.find(t => t.id === 'tema-01') || INITIAL_TOPICS[1];
+      if (base1?.flashcards && base1.flashcards.length > 0) return base1.flashcards;
+    }
+    return topic.flashcards || [];
+  }, [topic]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardStats, setCardStats] = useState<{ [id: string]: 'easy' | 'medium' | 'hard' }>({});
