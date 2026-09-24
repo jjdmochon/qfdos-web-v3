@@ -1,25 +1,46 @@
 {
-  "name": "qfdos-web-v3",
-  "private": true,
-  "version": "3.17.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@react-oauth/google": "^0.12.1",
-    "lucide-react": "^1.16.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react-swc": "^3.8.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0"
-  }
+    "name": "qfdos-web-v3",
+    "private": true,
+    "version": "3.17.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "build:app": "vite build --mode app && cap sync",
+        "android:open": "cap open android",
+        "android:run": "cap run android",
+        "android:icons": "capacitor-assets generate --android"
+    },
+    "dependencies": {
+        "@capacitor/app": "^8.0.0",
+        "@capacitor/browser": "^8.0.0",
+        "@capacitor/core": "^8.0.0",
+        "@capacitor/filesystem": "^8.0.0",
+        "@capacitor/network": "^8.0.0",
+        "@capacitor/share": "^8.0.0",
+        "@capacitor/splash-screen": "^8.0.0",
+        "@capacitor/status-bar": "^8.0.0",
+        "@capgo/capacitor-social-login": "^8.5.11",
+        "@react-oauth/google": "^0.12.1",
+        "lucide-react": "^1.16.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
+    },
+    "devDependencies": {
+        "@capacitor/android": "^8.0.0",
+        "@capacitor/assets": "^3.0.5",
+        "@capacitor/cli": "^8.0.0",
+        "@types/node": "^24.13.3",
+        "@types/react": "^19.2.17",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react-swc": "^3.8.0",
+        "typescript": "~5.7.2",
+        "vite": "^6.2.0"
+    },
+    "allowScripts": {
+        "@swc/core": true,
+        "esbuild": true,
+        "sharp@0.32.6": true
+    }
 }

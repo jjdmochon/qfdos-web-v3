@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de la plataforma QFDOS (manifest.json · background_color) -->
+    <color name="qfdosFondo">#070E18</color>
+</resources>

@@ -40,3 +40,12 @@ Prácticas v4/
 !public/video-*.mp4
 !docs/video-*.mp4
 
+
+# App nativa (Capacitor)
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/capacitor-cordova-android-plugins/
+*.jks
+*.keystore
+

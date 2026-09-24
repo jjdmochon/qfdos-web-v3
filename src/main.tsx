@@ -6,6 +6,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 import './App.css';
+import { iniciarPuenteNativo } from './native/nativeBridge';
+
+iniciarPuenteNativo();
 
 // Set up your Google OAuth Client ID in .env.local:
 // VITE_GOOGLE_CLIENT_ID=your_client_id_here

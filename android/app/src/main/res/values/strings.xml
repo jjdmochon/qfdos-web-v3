@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QFDOS UGR</string>
+    <string name="title_activity_main">QFDOS UGR</string>
+    <string name="package_name">es.ugr.qfdos</string>
+    <string name="custom_url_scheme">es.ugr.qfdos</string>
+</resources>

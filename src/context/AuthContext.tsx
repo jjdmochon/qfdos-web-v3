@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getSesion, iniciarSesionServidor, renovarSiHaceFalta, borrarSesion } from '../services/sesion';
+import { esNativo } from '../native/nativeBridge';
 
 export type UserRole = 'profesor' | 'estudiante';
 
@@ -131,6 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     borrarSesion();
     setUser(null);
+    if (esNativo) import('../native/googleNativo').then(m => m.logoutGoogleNativo());
   };
 
   return (
