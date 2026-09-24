@@ -2650,6 +2650,22 @@ flashcards: [
         url: 'https://www.rcsb.org/3d-view/8J8L/1',
         size: '3.56 Å · RCSB 3D',
         date: '24/09/2026'
+      },
+      {
+        id: 'att-t02-estructuras-xlsx',
+        title: 'Base de Datos Oficial de Estructuras QFDOS — Tema 2 (49 fármacos · QFDOS-046 a 094)',
+        type: 'data',
+        url: 'estructuras/tema2/estructuras_qfdos.xlsx',
+        size: '841 KB',
+        date: '24/09/2026'
+      },
+      {
+        id: 'att-t02-propiedades-csv',
+        title: 'Tabla de Propiedades Físico-Químicas QFDOS — Tema 2 (RDKit / CSV)',
+        type: 'data',
+        url: 'estructuras/tema2/propiedades_qfdos.csv',
+        size: '40 KB',
+        date: '24/09/2026'
       }
     ],
     testQuestions: [
