@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { PwaUpdatePrompt } from './components/PwaUpdatePrompt';
 import './index.css';
 import './App.css';
 
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <AuthProvider>
           <App />
+          <PwaUpdatePrompt />
         </AuthProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>

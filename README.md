@@ -219,6 +219,19 @@ Si los borras todos, la lista se queda vacía en lugar de resucitarlos.
 
 ---
 
+## Instalable y sin conexión (PWA)
+
+La plataforma se instala como app desde el navegador: en Android, Chrome ofrece «Instalar aplicación»; en iPhone, Safari → Compartir → «Añadir a pantalla de inicio». La configuración está en `vite.config.ts` (`vite-plugin-pwa`).
+
+- **Al instalar** solo se descarga la aplicación (~1,9 MB). Imágenes, modelos 3D, RDKit, fuentes y respuestas de PubChem se guardan la primera vez que se abren.
+- **Sin cobertura** siguen disponibles los temas, el glosario, las flashcards, los cuestionarios y todo lo que ya se haya visto.
+- **Nunca se cachean** Apps Script (login, entregas, datos personales) ni Gemini: van siempre a la red. Los vídeos tampoco, por su peso.
+- **Al publicar una versión nueva**, quien tenga la plataforma abierta ve el aviso «Hay una versión nueva» y actualiza con un toque. No se fuerza la recarga para no perder una entrega a medio escribir.
+
+La app nativa de Android (Capacitor) está aparcada en la rama `app-android`.
+
+---
+
 ## Diseño
 
 - **Tipografía** — Newsreader (titulares), Public Sans (interfaz),
