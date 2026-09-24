@@ -2596,6 +2596,18 @@ flashcards: [
     spotifyPodcastUrl: '',
     drugs: [
       {
+        name: 'Levodopa (L-DOPA)',
+        smiles: 'C1=CC(=C(C=C1C[C@@H](C(=O)O)N)O)O',
+        role: 'Precursor biosintético de catecolaminas; sustrato de LAT1 para el cruce activo de la BHE',
+        mw: 197.19,
+        logP: -2.39,
+        hbd: 4,
+        hba: 4,
+        tpsa: 103.8,
+        rotBonds: 3,
+        pdbId: '8J8L'
+      },
+      {
         name: 'Salbutamol',
         smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1',
         role: 'Agonista selectivo β2 de acción corta (SABA)',
@@ -2630,7 +2642,16 @@ flashcards: [
         rotBonds: 7
       }
     ],
-    attachments: [],
+    attachments: [
+      {
+        id: 'att-t02-lat1-8j8l-3d',
+        title: 'Modelo 3D Crio-EM: Complejo LAT1 (SLC7A5) con L-DOPA (PDB 8J8L)',
+        type: 'model3d',
+        url: 'https://www.rcsb.org/3d-view/8J8L/1',
+        size: '3.56 Å · RCSB 3D',
+        date: '24/09/2026'
+      }
+    ],
     testQuestions: [
       {
         id: 't02-q1',

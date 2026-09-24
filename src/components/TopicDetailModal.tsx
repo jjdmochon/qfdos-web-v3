@@ -953,6 +953,87 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
+                      {/* Modelo 3D Tema 02: Complejo LAT1 (SLC7A5) con L-DOPA (PDB 8J8L) */}
+                      {topic.id === 'tema-02' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--teal)',
+                            boxShadow: '0 4px 16px rgba(13,148,136,0.18)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(30,58,138,0.3) 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Atom size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  Estructura 3D Crio-EM: Complejo LAT1 - L-DOPA (PDB 8J8L)
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                Cryo-EM · 3.56 Å
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '8px', lineHeight: 1.45 }}>
+                              Estructura tridimensional del transportador humano LAT1 (SLC7A5) en complejo con 4F2hc (SLC3A2) y L-DOPA ocluida. Demuestra el reconocimiento molecular del esqueleto de alfa-aminoácido para el transporte activo a través de la BHE (Pregunta oficial FIR 2025 · P15).
+                            </p>
+                            <p style={{ fontSize: '0.69rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.35 }}>
+                              RCSB PDB ID: <strong style={{ color: 'var(--text-title)' }}>8J8L</strong> · Yang et al. (2025) <em>J. Biol. Chem.</em>
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <a
+                              href="https://www.rcsb.org/3d-view/8J8L/1"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-sm btn-primary" 
+                              style={{ 
+                                flex: 1.2, 
+                                justifyContent: 'center', 
+                                fontSize: '0.78rem', 
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
+                                padding: '7px 8px',
+                                textDecoration: 'none',
+                                color: '#ffffff'
+                              }}
+                            >
+                              <Atom size={13} /> Ver en 3D interactivo (RCSB) <ExternalLink size={12} style={{ marginLeft: 4 }} />
+                            </a>
+                            <a
+                              href="https://www.rcsb.org/structure/8J8L"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline"
+                              style={{ 
+                                flex: 0.8,
+                                justifyContent: 'center', 
+                                fontSize: '0.74rem', 
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Ver ficha completa en RCSB PDB"
+                            >
+                              <Database size={12} /> Ficha RCSB
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
                     </div>
                   );
                 })()}
