@@ -55,6 +55,7 @@ interface AdminCmsModalProps {
   publicadoEn?: string;
   onPublicado?: (cuando: string) => void;
   onUpdateStudentQuestions: (updated: StudentQuestion[]) => void;
+  onOpenCartas?: () => void;
 }
 
 export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
@@ -70,7 +71,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   onUpdateResourceLinks,
   publicadoEn,
   onPublicado,
-  onUpdateStudentQuestions
+  onUpdateStudentQuestions,
+  onOpenCartas
 }) => {
   const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>('materials');
   const [materialsTopicId, setMaterialsTopicId] = useState<string>('');
@@ -1295,6 +1297,53 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
           {activeTab === 'drugs' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
+              {/* Acceso a Baraja Coleccionable Tema 1 */}
+              {onOpenCartas && (
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(13, 148, 136, 0.12) 100%)',
+                  border: '1.5px solid rgba(45, 212, 191, 0.45)',
+                  borderRadius: 'var(--radius-lg, 12px)',
+                  padding: '14px 18px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 12
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 8,
+                      background: 'var(--primary, #1e3a8a)',
+                      color: 'var(--tertiary, #2dd4bf)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 6px rgba(30, 58, 138, 0.25)'
+                    }}>
+                      <Layers size={18} />
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: '0.92rem', color: 'var(--text-title)', display: 'block' }}>
+                        Baraja Coleccionable de Fármacos · Tema 1 (15 Cartas)
+                      </strong>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        Material exclusivo del profesorado con escala docente comparativa de afinidad e índices SAR
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenCartas(); }}
+                    className="btn btn-sm btn-primary"
+                    style={{ fontSize: '0.78rem', padding: '6px 14px', fontWeight: 700 }}
+                  >
+                    Abrir Baraja Docente
+                  </button>
+                </div>
+              )}
+
               {/* Add Drug Form */}
               <div className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '10px' }}>

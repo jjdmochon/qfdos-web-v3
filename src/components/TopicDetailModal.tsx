@@ -5,6 +5,7 @@ import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
 import { RetrosintesisWorkshop } from './RetrosintesisWorkshop';
 import { Model3DViewerModal } from './Model3DViewerModal';
+import { CartasDeckView } from './cartas';
 import { 
   X, 
   Search,
@@ -38,7 +39,7 @@ import {
 
 interface TopicDetailModalProps {
   topic: QfdosTopic;
-  initialTab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis';
+  initialTab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas';
   onClose: () => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
@@ -57,7 +58,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onOpenAdmet,
   onUpdateTopic
 }) => {
-  const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis'>(initialTab || 'sar');
+  const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas'>(initialTab || 'sar');
   const { isProfesor } = useAuth();
 
   useEffect(() => {
@@ -324,6 +325,26 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 <GitBranch size={14} /> Taller de Retrosíntesis
                 <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px', fontWeight: 800 }}>
                   Slides 28-35
+                </span>
+              </button>
+            )}
+            {topic.id === 'tema-01' && isProfesor && (
+              <button
+                onClick={() => setActiveTab('cartas')}
+                className={`tab-btn ${activeTab === 'cartas' ? 'active' : ''}`}
+                style={{ 
+                  fontWeight: 800,
+                  background: activeTab === 'cartas' 
+                    ? 'var(--surface-raised)' 
+                    : 'linear-gradient(135deg, rgba(30, 58, 138, 0.12) 0%, rgba(13, 148, 136, 0.12) 100%)',
+                  border: '1.5px solid var(--tertiary, #2dd4bf)',
+                  color: 'var(--teal-ink)',
+                  boxShadow: '0 2px 8px rgba(30, 58, 138, 0.12)'
+                }}
+              >
+                <Layers size={14} /> Cartas Colinérgicas
+                <span className="qfdos-badge badge-mint" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px', fontWeight: 800 }}>
+                  Docente (15)
                 </span>
               </button>
             )}
@@ -1513,6 +1534,13 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             <RetrosintesisWorkshop isProfesor={isProfesor} />
           )}
 
+          {/* TAB 5: Cartas Coleccionables Docentes (Tema 1) */}
+          {activeTab === 'cartas' && topic.id === 'tema-01' && isProfesor && (
+            <div style={{ padding: '0.25rem 0' }}>
+              <CartasDeckView onOpenAdmet={onOpenAdmet} showDocenteBanner={true} />
+            </div>
+          )}
+
         </div>
 
         {/* Modal Footer */}
@@ -1541,6 +1569,21 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     >
                       <GitBranch size={14} /> Taller Retrosíntesis
                     </button>
+                    {isProfesor && (
+                      <button 
+                        onClick={() => setActiveTab('cartas')} 
+                        className={`btn btn-sm ${activeTab === 'cartas' ? 'btn-primary' : 'btn-secondary'}`}
+                        style={{ 
+                          fontWeight: 800,
+                          border: '1.5px solid var(--tertiary, #2dd4bf)',
+                          color: activeTab === 'cartas' ? '#ffffff' : 'var(--teal-ink)',
+                          boxShadow: '0 2px 8px rgba(30, 58, 138, 0.15)'
+                        }}
+                        title="Ver baraja docente de 15 cartas coleccionables"
+                      >
+                        <Layers size={14} /> Cartas Fármacos (15)
+                      </button>
+                    )}
                     <button 
                       onClick={() => setIs3DViewerOpen(true)}
                       className="btn btn-sm btn-outline"

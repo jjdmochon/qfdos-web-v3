@@ -44,6 +44,7 @@ import { ExamGeneratorModal } from './components/ExamGeneratorModal';
 import { FirSimulatorModal } from './components/FirSimulatorModal';
 import { AdminCmsModal } from './components/AdminCmsModal';
 import { Model3DViewerModal } from './components/Model3DViewerModal';
+import { CartasDocenteModal } from './components/cartas';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -281,7 +282,7 @@ export const App: React.FC = () => {
 
   // Modal states
   const [selectedTopicDetail, setSelectedTopicDetail] = useState<QfdosTopic | null>(null);
-  const [topicInitialTab, setTopicInitialTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | undefined>();
+  const [topicInitialTab, setTopicInitialTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas' | undefined>();
   const [selectedQuizTopic, setSelectedQuizTopic] = useState<QfdosTopic | null>(null);
   const [selectedFlashcardsTopic, setSelectedFlashcardsTopic] = useState<QfdosTopic | null>(null);
   const [selectedSpotifyAttachment, setSelectedSpotifyAttachment] = useState<CourseAttachment | null>(null);
@@ -293,6 +294,7 @@ export const App: React.FC = () => {
   const [isStudentQuestionOpen, setIsStudentQuestionOpen] = useState(false);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
   const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
+  const [isCartasModalOpen, setIsCartasModalOpen] = useState(false);
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
 
   const handleOpenAdmet = (drug: MoleculeDrug) => {
@@ -362,6 +364,13 @@ export const App: React.FC = () => {
       if (raw === 'fir' || raw === 'simulador-fir') {
         setIsFirModalOpen(true);
       }
+      if (raw === 'cartas' || raw === 'cartas-tema-01' || raw === 'baraja') {
+        if (isProfesor) {
+          setIsCartasModalOpen(true);
+        }
+      } else {
+        setIsCartasModalOpen(false);
+      }
       if (raw === '3d' || raw === 'nachr-3d' || raw === 'modelo-3d' || action === '3d' || sub === '3d') {
         setIsDirect3DModalOpen(true);
         const tema1 = topics.find(t => t.id === 'tema-01');
@@ -425,6 +434,7 @@ export const App: React.FC = () => {
         onOpenFirSimulator={() => setIsFirModalOpen(true)}
         onOpenStudentQuestion={() => setIsStudentQuestionOpen(true)}
         onOpenAdminCms={() => setIsAdminCmsOpen(true)}
+        onOpenCartas={() => setIsCartasModalOpen(true)}
       />
 
       {activeTab === 'hub' && (
@@ -467,6 +477,7 @@ export const App: React.FC = () => {
             }}
             onOpenQuiz={setSelectedQuizTopic}
             onOpenFlashcards={setSelectedFlashcardsTopic}
+            onOpenCartas={() => setIsCartasModalOpen(true)}
           />
         )}
         {activeTab === 'practicas' && (
@@ -591,6 +602,20 @@ export const App: React.FC = () => {
           publicadoEn={publicadoEn}
           onPublicado={(cuando: string) => setPublicadoEn(cuando)}
           onUpdateStudentQuestions={setStudentQuestions}
+          onOpenCartas={() => setIsCartasModalOpen(true)}
+        />
+      )}
+
+      {/* Baraja Coleccionable de Cartas: solo accesible al profesor */}
+      {isProfesor && isCartasModalOpen && (
+        <CartasDocenteModal
+          onClose={() => {
+            setIsCartasModalOpen(false);
+            if (window.location.hash.includes('cartas')) {
+              window.history.pushState(null, '', '#/temas');
+            }
+          }}
+          onOpenAdmet={handleOpenAdmet}
         />
       )}
 

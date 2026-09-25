@@ -1,0 +1,630 @@
+/* ==========================================================================
+   QFDOS Structural Affinity Identity System (v3.0) — Cartas de Fármacos
+   Tema 01: Acetilcolina y Neurotransmisión Colinérgica
+   Uso exclusivo: Perfil del Profesorado (Docente)
+   ========================================================================== */
+
+.qf-deck-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg, 24px);
+  width: 100%;
+}
+
+/* Banner de Cabecera Docente */
+.qf-deck-header-banner {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(13, 148, 136, 0.08) 100%);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  border-left: 4px solid var(--secondary, #0d9488);
+  border-radius: var(--radius-lg, 12px);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.qf-deck-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.qf-deck-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--primary, #1e3a8a);
+  color: var(--tertiary, #2dd4bf);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(30, 58, 138, 0.25);
+}
+
+.qf-deck-header-titles h2 {
+  font-family: var(--font-sans, 'Montserrat', sans-serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-title, #1e3a8a);
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.qf-deck-header-titles p {
+  font-size: 0.85rem;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+}
+
+.qf-deck-badge-docente {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 4px);
+  background: rgba(13, 148, 136, 0.15);
+  color: var(--secondary-dark, #0f766e);
+  border: 1px solid rgba(13, 148, 136, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Barra de Controles: Filtros de Grupo + Buscador + Botón Girar */
+.qf-deck-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.qf-deck-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qf-filtro-btn {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-main, #1e293b);
+  background: var(--surface, #ffffff);
+  border: 1px solid rgba(30, 58, 138, 0.18);
+  border-radius: var(--radius-sm, 4px);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.qf-filtro-btn:hover {
+  background: rgba(30, 58, 138, 0.06);
+  border-color: var(--primary, #1e3a8a);
+  transform: translateY(-1px);
+}
+
+.qf-filtro-btn.active {
+  background: var(--primary, #1e3a8a);
+  border-color: var(--primary, #1e3a8a);
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(30, 58, 138, 0.28);
+}
+
+.qf-filtro-count {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 1px 5px;
+  border-radius: 10px;
+}
+
+.qf-filtro-btn:not(.active) .qf-filtro-count {
+  background: rgba(30, 58, 138, 0.08);
+  color: var(--secondary-dark, #0f766e);
+}
+
+.qf-deck-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.qf-search-input-wrap {
+  position: relative;
+  min-width: 220px;
+}
+
+.qf-search-input-wrap input {
+  width: 100%;
+  font-family: var(--font-sans, 'Montserrat', sans-serif);
+  font-size: 0.82rem;
+  padding: 7px 12px 7px 32px;
+  border: 1px solid rgba(30, 58, 138, 0.2);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--surface, #ffffff);
+  color: var(--text-main, #000000);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.qf-search-input-wrap input:focus {
+  border-color: var(--secondary, #0d9488);
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+}
+
+.qf-search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #64748b);
+  pointer-events: none;
+}
+
+.qf-flip-all-btn {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--secondary-dark, #0f766e);
+  background: rgba(13, 148, 136, 0.08);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  border-radius: var(--radius-sm, 4px);
+  padding: 7px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 180ms ease;
+}
+
+.qf-flip-all-btn:hover {
+  background: rgba(13, 148, 136, 0.16);
+  border-color: var(--secondary, #0d9488);
+  transform: translateY(-1px);
+}
+
+/* Nota docente metodológica */
+.qf-deck-nota {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted, #64748b);
+  background: rgba(30, 58, 138, 0.03);
+  border: 1px solid rgba(30, 58, 138, 0.1);
+  border-radius: var(--radius-md, 8px);
+  padding: 10px 14px;
+}
+
+/* Rejilla de Cartas */
+.qf-cartas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: var(--space-lg, 24px);
+  width: 100%;
+}
+
+/* Estructura individual de la carta 3D */
+.qf-carta-item {
+  all: unset;
+  display: block;
+  cursor: pointer;
+  aspect-ratio: 5 / 7.85;
+  perspective: 1200px;
+  border-radius: var(--radius-lg, 12px);
+  position: relative;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qf-carta-item:hover {
+  transform: translateY(-5px);
+}
+
+.qf-carta-item:focus-visible {
+  outline: 3px solid var(--tertiary, #2dd4bf);
+  outline-offset: 4px;
+}
+
+.qf-carta-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.qf-carta-item.is-flipped .qf-carta-inner {
+  transform: rotateY(180deg);
+}
+
+/* Cara de la carta (Anverso y Dorso) */
+.qf-cara {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  padding: 16px 16px 14px;
+  background: linear-gradient(160deg, #1e3a8a 0%, #172554 48%, #0f172a 100%);
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.4), 0 4px 6px -2px rgba(30, 58, 138, 0.2);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.qf-carta-item:hover .qf-cara {
+  box-shadow: 0 16px 28px -6px rgba(15, 23, 42, 0.55), 0 0 14px rgba(45, 212, 191, 0.3);
+  border-color: rgba(45, 212, 191, 0.7);
+}
+
+/* Dorso específico */
+.qf-cara--dorso {
+  transform: rotateY(180deg);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(45, 212, 191, 0.5) transparent;
+  padding-bottom: 12px;
+}
+
+.qf-cara--dorso::-webkit-scrollbar {
+  width: 4px;
+}
+.qf-cara--dorso::-webkit-scrollbar-thumb {
+  background: rgba(45, 212, 191, 0.4);
+  border-radius: 4px;
+}
+
+/* Trama hexagonal de fondo de alta fidelidad */
+.qf-trama-mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  pointer-events: none;
+  background-size: 52px 45px;
+}
+
+/* Cabecera de la carta */
+.qf-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.qf-rel {
+  font-family: var(--font-sans, 'Montserrat', sans-serif);
+  font-size: 40px;
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.qf-rol {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--tertiary, #2dd4bf);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.qf-badge {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0b1b3f;
+  background: var(--tertiary, #2dd4bf);
+  border-radius: var(--radius-sm, 4px);
+  padding: 4px 7px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(45, 212, 191, 0.3);
+}
+
+/* Contenedor molecular 2D */
+.qf-estructura {
+  position: relative;
+  height: 112px;
+  margin: 10px 0 8px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  border-radius: var(--radius-md, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.qf-estructura img,
+.qf-estructura svg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Tipografía de la carta */
+.qf-nombre {
+  font-family: var(--font-sans, 'Montserrat', sans-serif);
+  font-size: 20px;
+  line-height: 23px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+}
+
+.qf-clase {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.04em;
+  color: #bcd0f3;
+  text-align: center;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.qf-regla {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(45, 212, 191, 0.6) 50%, transparent 100%);
+  margin: 10px 0 8px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Grid de Índices Comparativos */
+.qf-indices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.qf-indice {
+  display: grid;
+  grid-template-columns: 32px 1fr 24px;
+  align-items: center;
+  gap: 6px;
+}
+
+.qf-indice b {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #93c5fd;
+}
+
+.qf-indice i {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.qf-indice i span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2dd4bf 0%, #0d9488 100%);
+  transition: width 300ms ease;
+}
+
+.qf-indice em {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  font-style: normal;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #ffffff;
+}
+
+/* Pie de carta */
+.qf-pie {
+  margin-top: auto;
+  padding-top: 8px;
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 10px;
+  line-height: 14px;
+  color: #9fb6e4;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qf-flip-hint {
+  font-size: 9px;
+  color: var(--tertiary, #2dd4bf);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0.85;
+}
+
+/* Dorso: Detalles Farmacéuticos */
+.qf-smiles-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: var(--radius-sm, 4px);
+  padding: 4px 8px;
+  margin: 6px 0 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.qf-smiles-text {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 9px;
+  line-height: 13px;
+  color: var(--tertiary, #2dd4bf);
+  word-break: break-all;
+}
+
+.qf-smiles-copy-btn {
+  background: none;
+  border: none;
+  color: #93c5fd;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  transition: color 150ms ease;
+  flex-shrink: 0;
+}
+
+.qf-smiles-copy-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.qf-cara--dorso h3 {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tertiary, #2dd4bf);
+  margin: 0 0 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.qf-cara--dorso p {
+  font-family: var(--font-sans, 'Montserrat', sans-serif);
+  font-size: 11.5px;
+  line-height: 16px;
+  color: #e2e8f0;
+  margin: 0 0 9px;
+  position: relative;
+  z-index: 1;
+}
+
+.qf-cara--dorso .qf-nombre {
+  text-align: left;
+  font-size: 17px;
+  line-height: 20px;
+  margin-bottom: 2px;
+}
+
+.qf-examen {
+  background: rgba(45, 212, 191, 0.12);
+  border-left: 3px solid var(--tertiary, #2dd4bf);
+  border-radius: var(--radius-sm, 4px);
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 15px;
+  color: #f1f5f9;
+  position: relative;
+  z-index: 1;
+  margin: 6px 0 10px;
+}
+
+.qf-examen strong {
+  color: var(--tertiary, #2dd4bf);
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+/* Botones de acción en dorso */
+.qf-dorso-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  z-index: 1;
+}
+
+.qf-dorso-btn {
+  flex: 1;
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+
+.qf-dorso-btn--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.qf-dorso-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.qf-dorso-btn--mint {
+  background: var(--tertiary, #2dd4bf);
+  color: #0b1b3f;
+  border: 1px solid var(--tertiary, #2dd4bf);
+}
+
+.qf-dorso-btn--mint:hover {
+  background: var(--tertiary-light, #5eead4);
+  box-shadow: 0 2px 8px rgba(45, 212, 191, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qf-carta-inner {
+    transition: none;
+  }
+}
+
+@media (max-width: 580px) {
+  .qf-cartas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 14px;
+  }
+  .qf-rel {
+    font-size: 34px;
+  }
+  .qf-nombre {
+    font-size: 18px;
+  }
+}

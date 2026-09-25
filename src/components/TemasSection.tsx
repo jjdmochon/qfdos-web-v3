@@ -22,16 +22,18 @@ import {
 
 interface TemasSectionProps {
   topics: QfdosTopic[];
-  onSelectTopic: (topic: QfdosTopic, tab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis') => void;
+  onSelectTopic: (topic: QfdosTopic, tab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas') => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
+  onOpenCartas?: () => void;
 }
 
 export const TemasSection: React.FC<TemasSectionProps> = ({
   topics,
   onSelectTopic,
   onOpenQuiz,
-  onOpenFlashcards
+  onOpenFlashcards,
+  onOpenCartas
 }) => {
   const { isProfesor } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -257,6 +259,21 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       >
                         🧊 Modelo 3D (nAChR) ✓
                       </span>
+                      {isProfesor && (
+                        <span 
+                          style={{ 
+                            fontSize: '0.66rem', 
+                            padding: '2px 8px', 
+                            borderRadius: '4px', 
+                            background: 'linear-gradient(135deg, rgba(30,58,138,0.15) 0%, rgba(45,212,191,0.2) 100%)', 
+                            color: 'var(--primary, #1e3a8a)', 
+                            border: '1px solid rgba(45,212,191,0.5)',
+                            fontWeight: 800 
+                          }}
+                        >
+                          🎴 Baraja Docente (15) ✓
+                        </span>
+                      )}
                     </>
                   )}
                 </div>
@@ -384,6 +401,38 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         <Award size={13} /> Flashcards ({topic.flashcards.length})
                       </button>
                     )}
+                  </div>
+                )}
+
+                {/* Fila 3: Baraja Docente Exclusiva (Tema 01) */}
+                {topic.id === 'tema-01' && isProfesor && onOpenCartas && (
+                  <div style={{ display: 'flex', gap: '6px', width: '100%', marginTop: '2px' }}>
+                    <button
+                      onClick={onOpenCartas}
+                      className="btn btn-sm"
+                      style={{ 
+                        flex: 1, 
+                        minWidth: 0,
+                        fontSize: '0.74rem', 
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.08) 0%, rgba(13, 148, 136, 0.12) 100%)',
+                        color: 'var(--navy-ink)',
+                        border: '1.5px solid rgba(45, 212, 191, 0.45)',
+                        boxShadow: '0 2px 6px rgba(30, 58, 138, 0.08)',
+                        padding: '6px 8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        whiteSpace: 'nowrap'
+                      }}
+                      title="Baraja Coleccionable de Fármacos Colinérgicos · 15 cartas (Exclusivo Docente)"
+                    >
+                      <Layers size={13} color="var(--teal)" /> Cartas Fármacos
+                      <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', fontWeight: 800 }}>
+                        Docente (15)
+                      </span>
+                    </button>
                   </div>
                 )}
               </div>

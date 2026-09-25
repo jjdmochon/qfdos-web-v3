@@ -357,7 +357,7 @@ export const QFDOS_INFO = {
     tagline: "Ingeniería Digital & Ciencia Aplicada",
     url: "https://nexus-lab-team.netlify.app/"
   },
-  designSystem: "QFDOS Structural Affinity Identity v2.0",
+  designSystem: "QFDOS Structural Affinity Identity v3.0",
   evaluacion: {
     examenFinal: 70,
     examenParcial: 20,

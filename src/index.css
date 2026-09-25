@@ -56,6 +56,7 @@
   --text-on-dark: #ffffff;
 
   /* --- Bordes --- */
+  --line: #e2e8f0;
   --border-color: rgba(30, 58, 138, 0.12);
   --border-strong: rgba(30, 58, 138, 0.22);
   --border-focus: #0d9488;

@@ -40,3 +40,7 @@ Prácticas v4/
 !public/video-*.mp4
 !docs/video-*.mp4
 
+# Ficheros comprimidos
+*.zip
+
+

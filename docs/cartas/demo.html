@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cartas colinérgicas · Tema 1 · QFDOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- QFDOS Structural Affinity Identity System Tokens -->
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="cartas.css">
+  <style>
+    body { margin: 0; padding: 40px 20px 64px; background: #f8fafc; font-family: 'Montserrat', sans-serif; color: #000; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    h1 { font-size: 38px; font-weight: 800; color: #1e3a8a; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .eyebrow { font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.16em;
+               text-transform: uppercase; color: #0f766e; margin-bottom: 10px; }
+    .nota { font-size: 13px; line-height: 20px; color: #64748b; max-width: 70ch; margin: 0 0 24px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Tema 1 · Química Farmacéutica II</div>
+    <h1>Cartas colinérgicas</h1>
+    <p class="nota" id="nota"></p>
+    <div id="filtros"></div>
+    <div id="cartas"></div>
+  </div>
+
+  <script type="module">
+    import { montarCartas, montarFiltros } from './cartas.js';
+    const api = await montarCartas(document.querySelector('#cartas'), './farmacos-tema01.json');
+    montarFiltros(document.querySelector('#filtros'), api);
+    document.querySelector('#nota').textContent = api.datos.nota;
+  </script>
+</body>
+</html>

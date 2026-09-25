@@ -70,10 +70,17 @@ export const LoginPage: React.FC = () => {
         <div className="login-card-header">
           <div className="login-logo-ring">
             <img
-              src="https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png"
+              src={`${import.meta.env.BASE_URL}assets/Marca/qfdos-isotipo.png`}
               alt="QFDOS"
               style={{ width: 52, height: 52, borderRadius: 10 }}
-              onError={e => { e.currentTarget.style.display = 'none'; }}
+              onError={e => {
+                const target = e.currentTarget;
+                if (!target.src.includes('i.ibb.co')) {
+                  target.src = 'https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png';
+                } else {
+                  target.style.display = 'none';
+                }
+              }}
             />
           </div>
 

@@ -15,6 +15,7 @@ interface HeaderProps {
   onOpenFirSimulator: () => void;
   onOpenStudentQuestion: () => void;
   onOpenAdminCms: () => void;
+  onOpenCartas?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -24,7 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenExamGenerator,
   onOpenFirSimulator,
   onOpenStudentQuestion,
-  onOpenAdminCms
+  onOpenAdminCms,
+  onOpenCartas
 }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, isProfesor, isInstitucional, logout } = useAuth();
@@ -94,10 +96,17 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="header-logo-badge">
               <img
-                src="https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png"
+                src={`${import.meta.env.BASE_URL}assets/Marca/qfdos-isotipo.png`}
                 alt="QFDOS"
                 className="header-logo-img"
-                onError={e => { e.currentTarget.style.display = 'none'; }}
+                onError={e => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes('i.ibb.co')) {
+                    target.src = 'https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png';
+                  } else {
+                    target.style.display = 'none';
+                  }
+                }}
               />
             </div>
             <div style={{ lineHeight: 1.15, textAlign: 'left' }}>
@@ -123,6 +132,26 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Right tools */}
           <div className="header-tools">
+            {/* Baraja Coleccionable Tema 1 (Solo para profesores) */}
+            {isProfesor && onOpenCartas && (
+              <button
+                onClick={onOpenCartas}
+                className="btn btn-sm btn-header-action"
+                title="Baraja Coleccionable de Fármacos · Tema 1 (Uso Docente)"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.12) 0%, rgba(13, 148, 136, 0.12) 100%)',
+                  border: '1px solid rgba(45, 212, 191, 0.35)',
+                  color: 'var(--text-title)'
+                }}
+              >
+                <Layers size={14} color="var(--teal-ink)" />
+                <span className="tool-label">Cartas Tema 1</span>
+                <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', marginLeft: 3, fontWeight: 800 }}>
+                  Docente
+                </span>
+              </button>
+            )}
+
             {/* Generador Examen (Solo para profesores) */}
             {isProfesor && (
               <button

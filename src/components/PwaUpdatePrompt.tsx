@@ -17,7 +17,7 @@ export const PwaUpdatePrompt: React.FC = () => {
     needRefresh: [hayVersionNueva, setHayVersionNueva],
     updateServiceWorker
   } = useRegisterSW({
-    onRegisteredSW(_url, registro) {
+    onRegisteredSW(_url: string, registro?: ServiceWorkerRegistration) {
       if (registro) setInterval(() => registro.update().catch(() => undefined), UNA_HORA);
     }
   });

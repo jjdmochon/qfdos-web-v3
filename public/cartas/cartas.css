@@ -1,0 +1,93 @@
+/* QFDOS · Cartas de fármacos
+   Identidad: QFDOS Structural Affinity Identity.
+   Los colores se toman de tokens.css del sistema de diseño; los literales son solo respaldo. */
+
+.qf-cartas {
+  --carta-ancho-min: 248px;
+  --carta-primary: var(--primary, #1e3a8a);
+  --carta-primary-dark: var(--primary-dark, #172554);
+  --carta-teal: var(--secondary, #0d9488);
+  --carta-mint: var(--tertiary, #2dd4bf);
+  --carta-on-dark: var(--text-on-dark, #ffffff);
+  --carta-radius: var(--radius-lg, 12px);
+  --carta-radius-sm: var(--radius-sm, 4px);
+  --carta-radius-md: var(--radius-md, 8px);
+  --carta-sans: var(--font-sans, 'Montserrat', 'Helvetica Neue', Arial, sans-serif);
+  --carta-mono: var(--font-mono, 'Roboto Mono', 'Fira Code', monospace);
+  --carta-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--carta-ancho-min), 1fr));
+  gap: var(--space-lg, 24px);
+  font-family: var(--carta-sans);
+}
+
+.qf-filtros { display: flex; flex-wrap: wrap; gap: var(--space-sm, 8px); margin-bottom: var(--space-lg, 24px); }
+.qf-filtro {
+  font-family: var(--carta-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-main, #000); background: rgba(30, 58, 138, 0.06);
+  border: 1px solid rgba(30, 58, 138, 0.14); border-radius: var(--carta-radius-sm);
+  padding: 7px 12px; cursor: pointer;
+  transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+}
+.qf-filtro[aria-pressed="true"] { background: var(--carta-primary); border-color: var(--carta-primary); color: var(--carta-on-dark); }
+.qf-filtro:focus-visible, .qf-carta:focus-visible { outline: 3px solid var(--carta-mint); outline-offset: 3px; }
+
+.qf-carta { all: unset; display: block; cursor: pointer; aspect-ratio: 5 / 7.9; perspective: 1200px; border-radius: var(--carta-radius); }
+.qf-carta__inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 420ms var(--carta-ease); }
+.qf-carta[aria-pressed="true"] .qf-carta__inner { transform: rotateY(180deg); }
+
+.qf-cara {
+  position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: var(--carta-radius); overflow: hidden; padding: 16px 16px 14px;
+  background: linear-gradient(160deg, #24449b 0%, var(--carta-primary) 42%, var(--carta-primary-dark) 100%);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  box-shadow: var(--shadow-md, 0 8px 12px -3px rgba(30, 58, 138, 0.22));
+  color: var(--carta-on-dark); display: flex; flex-direction: column;
+}
+.qf-carta:hover .qf-cara { box-shadow: var(--shadow-hover, 0 15px 20px -5px rgba(30, 58, 138, 0.3)); }
+.qf-cara--dorso { transform: rotateY(180deg); overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(45, 212, 191, 0.5) transparent; }
+.qf-cara--dorso::after {
+  content: ''; position: sticky; bottom: -14px; display: block; height: 20px; margin: 0 -16px -14px;
+  flex: none; pointer-events: none;
+  background: linear-gradient(180deg, rgba(23, 37, 84, 0) 0%, rgba(20, 33, 76, 0.92) 100%);
+}
+
+.qf-trama { position: absolute; inset: 0; opacity: 0.16; pointer-events: none; }
+.qf-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; position: relative; }
+.qf-rel { font-size: 40px; line-height: 0.92; font-weight: 800; letter-spacing: -0.03em; }
+.qf-rol { font-family: var(--carta-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--carta-mint); margin-top: 4px; }
+.qf-badge { font-family: var(--carta-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+            color: #0b1b3f; background: var(--carta-mint); border-radius: var(--carta-radius-sm); padding: 4px 7px; white-space: nowrap; }
+
+.qf-estructura {
+  position: relative; height: 108px; margin: 10px 0 8px; padding: 4px;
+  background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(45, 212, 191, 0.22);
+  border-radius: var(--carta-radius-md); display: flex; align-items: center; justify-content: center;
+}
+.qf-estructura svg, .qf-estructura img { max-width: 100%; max-height: 100%; display: block; }
+
+.qf-nombre { font-size: 21px; line-height: 24px; font-weight: 800; letter-spacing: -0.01em; text-align: center; position: relative; text-wrap: balance; }
+.qf-clase { font-family: var(--carta-mono); font-size: 10.5px; line-height: 15px; letter-spacing: 0.05em; color: #bcd0f3; text-align: center; margin-top: 5px; position: relative; }
+.qf-regla { height: 1px; background: rgba(45, 212, 191, 0.45); margin: 12px 0 10px; position: relative; }
+
+.qf-indices { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; position: relative; }
+.qf-indice { display: grid; grid-template-columns: 34px 1fr 26px; align-items: center; gap: 6px; }
+.qf-indice b { font-family: var(--carta-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #bcd0f3; }
+.qf-indice i { display: block; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.18); overflow: hidden; }
+.qf-indice i span { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #2dd4bf 0%, #0d9488 100%); }
+.qf-indice em { font-family: var(--carta-mono); font-size: 11px; font-weight: 600; font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+
+.qf-pie { margin-top: auto; padding-top: 10px; font-family: var(--carta-mono); font-size: 10px; line-height: 15px;
+          color: #9fb6e4; position: relative; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+
+.qf-smiles { font-family: var(--carta-mono); font-size: 9.5px; line-height: 14px; color: var(--carta-mint); word-break: break-all; margin: 0 0 10px; position: relative; }
+.qf-cara--dorso h3 { font-family: var(--carta-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+                     text-transform: uppercase; color: var(--carta-mint); margin: 0 0 4px; position: relative; }
+.qf-cara--dorso p { font-size: 12px; line-height: 17px; margin: 0 0 10px; position: relative; }
+.qf-cara--dorso .qf-nombre { text-align: left; font-size: 18px; line-height: 21px; margin-bottom: 10px; }
+.qf-examen { margin-top: auto; background: rgba(45, 212, 191, 0.12); border-left: 3px solid var(--carta-mint);
+             border-radius: var(--carta-radius-sm); padding: 8px 10px; font-size: 12px; line-height: 17px; position: relative; }
+
+@media (prefers-reduced-motion: reduce) { .qf-carta__inner { transition: none; } }
+@media (max-width: 420px) { .qf-cartas { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; } }
