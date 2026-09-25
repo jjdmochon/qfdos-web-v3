@@ -246,7 +246,9 @@
   transform: rotateY(180deg);
 }
 
-/* Cara de la carta (Anverso y Dorso) */
+/* ==========================================================================
+   CARAS DE LA CARTA (MODO LIMPIO POR DEFECTO)
+   ========================================================================== */
 .qf-cara {
   position: absolute;
   inset: 0;
@@ -255,33 +257,43 @@
   border-radius: var(--radius-lg, 12px);
   overflow: hidden;
   padding: 16px 16px 14px;
-  background: linear-gradient(160deg, #1e3a8a 0%, #172554 48%, #0f172a 100%);
-  border: 1px solid rgba(45, 212, 191, 0.42);
-  box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.4), 0 4px 6px -2px rgba(30, 58, 138, 0.2);
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid var(--primary, #1e3a8a);
+  box-shadow: 0 4px 10px -2px rgba(30, 58, 138, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  color: #0f172a;
   display: flex;
   flex-direction: column;
+  transition: box-shadow 220ms ease, border-color 220ms ease;
 }
 
 .qf-carta-item:hover .qf-cara {
-  box-shadow: 0 16px 28px -6px rgba(15, 23, 42, 0.55), 0 0 14px rgba(45, 212, 191, 0.3);
-  border-color: rgba(45, 212, 191, 0.7);
+  box-shadow: 0 16px 28px -6px rgba(30, 58, 138, 0.14), 0 4px 12px rgba(13, 148, 136, 0.18);
+  border-color: rgba(13, 148, 136, 0.45);
 }
+
+/* Distintivo de color superior por grupo químico/farmacológico */
+.qf-carta-item[data-grupo="agonista"] .qf-cara { border-top-color: #0d9488; }
+.qf-carta-item[data-grupo="ache"] .qf-cara { border-top-color: #2563eb; }
+.qf-carta-item[data-grupo="antidoto"] .qf-cara { border-top-color: #d97706; }
+.qf-carta-item[data-grupo="antagonista"] .qf-cara { border-top-color: #7c3aed; }
 
 /* Dorso específico */
 .qf-cara--dorso {
   transform: rotateY(180deg);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(45, 212, 191, 0.5) transparent;
+  scrollbar-color: rgba(13, 148, 136, 0.35) transparent;
   padding-bottom: 12px;
+  background: #ffffff;
+  color: #1e293b;
 }
 
 .qf-cara--dorso::-webkit-scrollbar {
   width: 4px;
 }
 .qf-cara--dorso::-webkit-scrollbar-thumb {
-  background: rgba(45, 212, 191, 0.4);
+  background: rgba(13, 148, 136, 0.3);
   border-radius: 4px;
 }
 
@@ -289,7 +301,7 @@
 .qf-trama-mesh {
   position: absolute;
   inset: 0;
-  opacity: 0.14;
+  opacity: 0.05;
   pointer-events: none;
   background-size: 52px 45px;
 }
@@ -310,16 +322,15 @@
   line-height: 0.92;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--primary, #1e3a8a);
 }
 
 .qf-rol {
   font-family: var(--font-mono, 'Roboto Mono', monospace);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  color: var(--tertiary, #2dd4bf);
+  letter-spacing: 0.08em;
+  color: var(--secondary, #0d9488);
   margin-top: 4px;
   text-transform: uppercase;
 }
@@ -329,12 +340,13 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #0b1b3f;
-  background: var(--tertiary, #2dd4bf);
+  color: #0f766e;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
   border-radius: var(--radius-sm, 4px);
   padding: 4px 7px;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(45, 212, 191, 0.3);
+  box-shadow: 0 1px 3px rgba(13, 148, 136, 0.12);
 }
 
 /* Contenedor molecular 2D */
@@ -343,13 +355,14 @@
   height: 112px;
   margin: 10px 0 8px;
   padding: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(45, 212, 191, 0.25);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-md, 8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .qf-estructura img,
@@ -358,7 +371,12 @@
   max-height: 100%;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  filter: invert(0.9) hue-rotate(180deg) contrast(1.25);
+  transition: transform 200ms ease;
+}
+
+.qf-carta-item:hover .qf-estructura img {
+  transform: scale(1.03);
 }
 
 /* Tipografía de la carta */
@@ -371,7 +389,7 @@
   text-align: center;
   position: relative;
   z-index: 1;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .qf-clase {
@@ -379,7 +397,7 @@
   font-size: 10px;
   line-height: 14px;
   letter-spacing: 0.04em;
-  color: #bcd0f3;
+  color: #64748b;
   text-align: center;
   margin-top: 4px;
   position: relative;
@@ -388,7 +406,7 @@
 
 .qf-regla {
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(45, 212, 191, 0.6) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, #cbd5e1 50%, transparent 100%);
   margin: 10px 0 8px;
   position: relative;
   z-index: 1;
@@ -415,14 +433,14 @@
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #93c5fd;
+  color: var(--primary, #1e3a8a);
 }
 
 .qf-indice i {
   display: block;
   height: 5px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.18);
+  background: #e2e8f0;
   overflow: hidden;
 }
 
@@ -430,18 +448,18 @@
   display: block;
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, #2dd4bf 0%, #0d9488 100%);
+  background: linear-gradient(90deg, #0d9488 0%, #14b8a6 100%);
   transition: width 300ms ease;
 }
 
 .qf-indice em {
   font-family: var(--font-mono, 'Roboto Mono', monospace);
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 700;
   font-style: normal;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 /* Pie de carta */
@@ -451,10 +469,10 @@
   font-family: var(--font-mono, 'Roboto Mono', monospace);
   font-size: 10px;
   line-height: 14px;
-  color: #9fb6e4;
+  color: #64748b;
   position: relative;
   z-index: 1;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -462,11 +480,12 @@
 
 .qf-flip-hint {
   font-size: 9px;
-  color: var(--tertiary, #2dd4bf);
+  color: var(--secondary, #0d9488);
   display: flex;
   align-items: center;
   gap: 3px;
-  opacity: 0.85;
+  opacity: 0.9;
+  font-weight: 600;
 }
 
 /* Dorso: Detalles Farmacéuticos */
@@ -475,8 +494,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(45, 212, 191, 0.2);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-sm, 4px);
   padding: 4px 8px;
   margin: 6px 0 10px;
@@ -488,26 +507,27 @@
   font-family: var(--font-mono, 'Roboto Mono', monospace);
   font-size: 9px;
   line-height: 13px;
-  color: var(--tertiary, #2dd4bf);
+  color: #0f766e;
   word-break: break-all;
+  font-weight: 600;
 }
 
 .qf-smiles-copy-btn {
   background: none;
   border: none;
-  color: #93c5fd;
+  color: #64748b;
   cursor: pointer;
   padding: 2px;
   display: flex;
   align-items: center;
   border-radius: 3px;
-  transition: color 150ms ease;
+  transition: color 150ms ease, background 150ms ease;
   flex-shrink: 0;
 }
 
 .qf-smiles-copy-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  color: #0f766e;
+  background: #e2e8f0;
 }
 
 .qf-cara--dorso h3 {
@@ -516,7 +536,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--tertiary, #2dd4bf);
+  color: #0d9488;
   margin: 0 0 3px;
   position: relative;
   z-index: 1;
@@ -526,7 +546,7 @@
   font-family: var(--font-sans, 'Montserrat', sans-serif);
   font-size: 11.5px;
   line-height: 16px;
-  color: #e2e8f0;
+  color: #334155;
   margin: 0 0 9px;
   position: relative;
   z-index: 1;
@@ -537,23 +557,24 @@
   font-size: 17px;
   line-height: 20px;
   margin-bottom: 2px;
+  color: #0f172a;
 }
 
 .qf-examen {
-  background: rgba(45, 212, 191, 0.12);
-  border-left: 3px solid var(--tertiary, #2dd4bf);
+  background: #f0fdfa;
+  border-left: 3px solid #0d9488;
   border-radius: var(--radius-sm, 4px);
   padding: 8px 10px;
   font-size: 11px;
   line-height: 15px;
-  color: #f1f5f9;
+  color: #134e4a;
   position: relative;
   z-index: 1;
   margin: 6px 0 10px;
 }
 
 .qf-examen strong {
-  color: var(--tertiary, #2dd4bf);
+  color: #0f766e;
   display: block;
   font-size: 9px;
   text-transform: uppercase;
@@ -567,7 +588,7 @@
   gap: 6px;
   margin-top: auto;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid #e2e8f0;
   position: relative;
   z-index: 1;
 }
@@ -589,25 +610,194 @@
 }
 
 .qf-dorso-btn--secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.qf-dorso-btn--secondary:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.qf-dorso-btn--mint {
+  background: #0d9488;
+  color: #ffffff;
+  border: 1px solid #0d9488;
+}
+
+.qf-dorso-btn--mint:hover {
+  background: #0f766e;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.35);
+}
+
+/* Botón alternador de tema en toolbar */
+.qf-theme-toggle-btn {
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--primary, #1e3a8a);
+  background: rgba(30, 58, 138, 0.06);
+  border: 1px solid rgba(30, 58, 138, 0.2);
+  border-radius: var(--radius-sm, 4px);
+  padding: 7px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 180ms ease;
+}
+
+.qf-theme-toggle-btn:hover {
+  background: rgba(30, 58, 138, 0.12);
+  border-color: var(--primary, #1e3a8a);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   MODO MARINO OSCURO (.qf-deck--theme-dark)
+   ========================================================================== */
+.qf-deck--theme-dark .qf-cara {
+  background: linear-gradient(160deg, #1e3a8a 0%, #172554 48%, #0f172a 100%);
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-top-width: 1px;
+  box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.4), 0 4px 6px -2px rgba(30, 58, 138, 0.2);
+  color: #ffffff;
+}
+
+.qf-deck--theme-dark .qf-carta-item:hover .qf-cara {
+  box-shadow: 0 16px 28px -6px rgba(15, 23, 42, 0.55), 0 0 14px rgba(45, 212, 191, 0.3);
+  border-color: rgba(45, 212, 191, 0.7);
+}
+
+.qf-deck--theme-dark .qf-cara--dorso {
+  background: linear-gradient(160deg, #1e3a8a 0%, #172554 48%, #0f172a 100%);
+  color: #ffffff;
+  scrollbar-color: rgba(45, 212, 191, 0.5) transparent;
+}
+
+.qf-deck--theme-dark .qf-trama-mesh {
+  opacity: 0.14;
+}
+
+.qf-deck--theme-dark .qf-rel {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.qf-deck--theme-dark .qf-rol {
+  color: var(--tertiary, #2dd4bf);
+}
+
+.qf-deck--theme-dark .qf-badge {
+  color: #0b1b3f;
+  background: var(--tertiary, #2dd4bf);
+  border: none;
+  box-shadow: 0 2px 6px rgba(45, 212, 191, 0.3);
+}
+
+.qf-deck--theme-dark .qf-estructura {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  box-shadow: none;
+}
+
+.qf-deck--theme-dark .qf-estructura img,
+.qf-deck--theme-dark .qf-estructura svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.qf-deck--theme-dark .qf-nombre {
+  color: #ffffff;
+}
+
+.qf-deck--theme-dark .qf-clase {
+  color: #bcd0f3;
+}
+
+.qf-deck--theme-dark .qf-regla {
+  background: linear-gradient(90deg, transparent 0%, rgba(45, 212, 191, 0.6) 50%, transparent 100%);
+}
+
+.qf-deck--theme-dark .qf-indice b {
+  color: #93c5fd;
+}
+
+.qf-deck--theme-dark .qf-indice i {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.qf-deck--theme-dark .qf-indice i span {
+  background: linear-gradient(90deg, #2dd4bf 0%, #0d9488 100%);
+}
+
+.qf-deck--theme-dark .qf-indice em {
+  color: #ffffff;
+}
+
+.qf-deck--theme-dark .qf-pie {
+  color: #9fb6e4;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.qf-deck--theme-dark .qf-flip-hint {
+  color: var(--tertiary, #2dd4bf);
+}
+
+.qf-deck--theme-dark .qf-smiles-box {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+}
+
+.qf-deck--theme-dark .qf-smiles-text {
+  color: var(--tertiary, #2dd4bf);
+}
+
+.qf-deck--theme-dark .qf-smiles-copy-btn {
+  color: #93c5fd;
+}
+
+.qf-deck--theme-dark .qf-smiles-copy-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.qf-deck--theme-dark .qf-cara--dorso h3 {
+  color: var(--tertiary, #2dd4bf);
+}
+
+.qf-deck--theme-dark .qf-cara--dorso p {
+  color: #e2e8f0;
+}
+
+.qf-deck--theme-dark .qf-cara--dorso .qf-nombre {
+  color: #ffffff;
+}
+
+.qf-deck--theme-dark .qf-examen {
+  background: rgba(45, 212, 191, 0.12);
+  border-left: 3px solid var(--tertiary, #2dd4bf);
+  color: #f1f5f9;
+}
+
+.qf-deck--theme-dark .qf-examen strong {
+  color: var(--tertiary, #2dd4bf);
+}
+
+.qf-deck--theme-dark .qf-dorso-actions {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.qf-deck--theme-dark .qf-dorso-btn--secondary {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.qf-dorso-btn--secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.qf-dorso-btn--mint {
+.qf-deck--theme-dark .qf-dorso-btn--mint {
   background: var(--tertiary, #2dd4bf);
   color: #0b1b3f;
   border: 1px solid var(--tertiary, #2dd4bf);
-}
-
-.qf-dorso-btn--mint:hover {
-  background: var(--tertiary-light, #5eead4);
-  box-shadow: 0 2px 8px rgba(45, 212, 191, 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {

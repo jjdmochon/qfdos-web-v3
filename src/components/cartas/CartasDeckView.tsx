@@ -12,7 +12,9 @@ import {
   Layers,
   Activity,
   ShieldCheck,
-  Info
+  Info,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export interface FarmacoCartaIndices {
@@ -59,6 +61,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [cardTheme, setCardTheme] = useState<'clean' | 'dark'>('clean');
 
   const farmacos = useMemo(() => {
     return (rawData.farmacos || []) as FarmacoCarta[];
@@ -160,7 +163,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
   const isAnyFlipped = Object.values(flippedCards).some(Boolean);
 
   return (
-    <div className="qf-deck-container">
+    <div className={`qf-deck-container qf-deck--theme-${cardTheme}`}>
       {/* Cabecera Docente */}
       {showDocenteBanner && (
         <div className="qf-deck-header-banner">
@@ -253,6 +256,17 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
 
           <button
             type="button"
+            className="qf-theme-toggle-btn"
+            onClick={() => setCardTheme(t => t === 'clean' ? 'dark' : 'clean')}
+            title={cardTheme === 'clean' ? 'Cambiar a modo marino oscuro' : 'Cambiar a modo limpio'}
+            aria-label="Alternar diseño limpio u oscuro de las cartas"
+          >
+            {cardTheme === 'clean' ? <Moon size={13} /> : <Sun size={13} />}
+            <span>{cardTheme === 'clean' ? 'Modo Marino' : 'Modo Limpio'}</span>
+          </button>
+
+          <button
+            type="button"
             className="qf-flip-all-btn"
             onClick={handleToggleAll}
             title="Girar todas las cartas al anverso o dorso"
@@ -280,6 +294,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
               <div
                 key={f.id}
                 className={`qf-carta-item ${isFlipped ? 'is-flipped' : ''}`}
+                data-grupo={f.grupo}
                 onClick={(e) => toggleFlip(f.id, e)}
                 role="button"
                 tabIndex={0}
@@ -302,8 +317,8 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                           <polygon
                             points="13,0 39,0 52,22.5 39,45 13,45 0,22.5"
                             fill="none"
-                            stroke="#ffffff"
-                            strokeOpacity="0.4"
+                            stroke={cardTheme === 'clean' ? '#1e3a8a' : '#ffffff'}
+                            strokeOpacity={cardTheme === 'clean' ? '0.1' : '0.4'}
                             strokeWidth="1.2"
                           />
                         </pattern>

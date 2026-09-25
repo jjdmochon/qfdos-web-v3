@@ -8,7 +8,7 @@ const ORDEN = ['AFI', 'SEL', 'EST', 'ORA', 'SNC', 'DUR'];
 
 const TRAMA = `<svg class="qf-trama" viewBox="0 0 240 340" aria-hidden="true"><defs>
 <pattern id="qf-hex" width="52" height="45" patternUnits="userSpaceOnUse">
-<polygon points="13,0 39,0 52,22.5 39,45 13,45 0,22.5" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.2"/>
+<polygon points="13,0 39,0 52,22.5 39,45 13,45 0,22.5" fill="none" stroke="#1e3a8a" stroke-opacity="0.08" stroke-width="1.2"/>
 </pattern></defs><rect width="240" height="340" fill="url(#qf-hex)"/></svg>`;
 
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
