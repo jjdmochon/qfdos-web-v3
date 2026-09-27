@@ -165,6 +165,77 @@ export async function submitAttemptToGoogleSheets(
   }
 }
 
+export interface FlashcardRatingDetail {
+  cardId: string;
+  concept: string;
+  front: string;
+  rating: 'easy' | 'medium' | 'hard';
+}
+
+export interface FlashcardsRegistrationRecord {
+  studentName: string;
+  studentEmail: string;
+  studentDni?: string;
+  topicId: string;
+  topicNumber: string;
+  topicTitle: string;
+  totalCards: number;
+  easyCount: number;
+  hardCount: number;
+  mediumCount?: number;
+  ratings: FlashcardRatingDetail[];
+  timestamp?: string;
+}
+
+/**
+ * Registra una sesión de autoevaluación con Flashcards en la hoja oficial de Google Sheets.
+ * Mapea las valoraciones (Fácil / Difícil) al formato estructurado de Respuestas_QFDOS.
+ */
+export async function submitFlashcardsAttemptToGoogleSheets(
+  session: FlashcardsRegistrationRecord
+): Promise<GoogleSheetsSubmissionResult> {
+  const total = session.totalCards || (session.ratings.length > 0 ? session.ratings.length : 1);
+  const easy = session.easyCount;
+  const score = Number(((easy / total) * 10).toFixed(1));
+  const now = new Date();
+  const formattedTimestamp =
+    session.timestamp ||
+    now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+      ' ' +
+      now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+  const record: QuizRegistrationRecord = {
+    id: `fc_rec_${Date.now()}`,
+    studentName: session.studentName || 'Estudiante QFDOS',
+    studentEmail: session.studentEmail || 'sin-email@ugr.es',
+    studentDni: session.studentDni || '',
+    evaluator: session.studentName ? `${session.studentName} (Autoevaluación)` : 'Autoevaluación Flashcards',
+    evaluationMode: 'flashcards_autoevaluacion',
+    topicId: session.topicId,
+    topicNumber: session.topicNumber,
+    topicTitle: session.topicTitle,
+    modelName: 'Flashcards: Autoevaluación (Fácil / Difícil)',
+    score: score,
+    correctCount: easy,
+    totalQuestions: total,
+    timestamp: formattedTimestamp,
+    answersDetail: session.ratings.map((r, idx) => ({
+      questionId: r.cardId,
+      questionNumber: idx + 1,
+      questionText: `${r.concept} · ${r.front}`,
+      selectedOptionIndex: r.rating === 'easy' ? 0 : r.rating === 'hard' ? 2 : 1,
+      selectedOptionText: r.rating === 'easy' ? 'Fácil' : r.rating === 'hard' ? 'Difícil' : 'Regular',
+      correctOptionIndex: 0,
+      correctOptionText: 'Fácil',
+      isCorrect: r.rating === 'easy',
+      explanation: r.front || ''
+    }))
+  };
+
+  return submitAttemptToGoogleSheets(record);
+}
+
+
 // ==========================================================================
 // Historial propio
 //

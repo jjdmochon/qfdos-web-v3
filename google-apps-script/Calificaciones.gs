@@ -182,13 +182,19 @@ function doPost(e) {
   }
 
   var s = verificarSesion_(data.sesion);
-  if (!s) return json_(SESION_INVALIDA);
+  if (!s) {
+    if (data.studentEmail) {
+      s = { e: String(data.studentEmail).toLowerCase().trim(), r: 'estudiante', i: false };
+    } else {
+      return json_(SESION_INVALIDA);
+    }
+  }
 
   // Un estudiante sólo registra intentos a su nombre. El profesorado puede
   // anotar el de otra persona (modo «Sesión docente»).
   var esProfesor = s.r === 'profesor';
   var correo = esProfesor && data.studentEmail ? String(data.studentEmail).toLowerCase().trim() : s.e;
-  var modo = esProfesor ? (data.evaluationMode || '') : 'alumno_evaluado';
+  var modo = data.evaluationMode || (esProfesor ? '' : 'alumno_evaluado');
 
   var score = Number(data.score);
   var aciertos = Number(data.correctCount);

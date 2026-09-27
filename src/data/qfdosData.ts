@@ -89,7 +89,7 @@ export interface QuizAttempt {
   studentName: string;
   studentDni?: string;
   evaluator?: string;
-  evaluationMode?: 'docente_sesion' | 'alumno_evaluado';
+  evaluationMode?: 'docente_sesion' | 'alumno_evaluado' | 'flashcards_autoevaluacion';
   topicId: string;
   topicNumber?: string;
   topicTitle?: string;
