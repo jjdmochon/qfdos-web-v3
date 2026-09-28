@@ -250,7 +250,10 @@ function renovarSesion(p) {
  * cualquier nombre (incluida `_Contenido`, que es el temario publicado) y
  * cualquier `sheetId`, así que el endpoint servía para escribir donde fuera.
  */
-var HOJAS_ENTREGA = ['Cuaderno de parejas', 'normas de seguridad', 'Material'];
+var HOJAS_ENTREGA = ['Cuaderno de parejas', 'normas de seguridad', 'Material', 'Opiniones'];
+
+/** Pestañas que reciben filas pero no son entregas: no salen en «Mis entregas». */
+var HOJAS_NO_ENTREGA = ['Opiniones'];
 
 /** Campos que se descartan del formulario; `cuentaVerificada` la pone el servidor. */
 var CAMPOS_RESERVADOS = ['sheetId', 'sheetName', 'callback', 'accion', 'sesion', 'cuentaVerificada', 'recibidoEn'];
@@ -417,6 +420,7 @@ function misEntregas(p) {
   libro.getSheets().forEach(function (hoja) {
     var nombre = hoja.getName();
     if (nombre.charAt(0) === '_') return;          // hojas internas
+    if (HOJAS_NO_ENTREGA.indexOf(nombre) !== -1) return; // feedback, no entregas
     if (hoja.getLastRow() < 2) return;
 
     var datos = hoja.getDataRange().getValues();

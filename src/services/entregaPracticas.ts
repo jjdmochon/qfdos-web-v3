@@ -27,6 +27,9 @@ export function envioConfigurado(): boolean {
   );
 }
 
+/** Pestaña de la hoja de entregas donde llega el feedback del alumnado (no es una entrega). */
+export const HOJA_OPINIONES = 'Opiniones';
+
 export type EstadoEnvio = 'confirmado' | 'enviado-sin-confirmar' | 'no-configurado' | 'error';
 
 export interface ResultadoEnvio {
@@ -76,6 +79,7 @@ export async function enviarAHoja(
     };
   }
   const registrarEnCache = (filaNum?: number) => {
+    if (hoja === HOJA_OPINIONES) return; // una opinión no es una entrega
     const posiblesEmails = [datos.email, datos.email1, datos.email2, datos.cuentaDeEnvio].filter(Boolean);
     for (const em of posiblesEmails) {
       if (typeof em === 'string' && em.includes('@')) {

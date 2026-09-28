@@ -550,7 +550,7 @@ h4, h5, h6 { font-family: var(--font-primary); letter-spacing: -0.005em; }
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 .chip:hover { color: var(--text-main); border-color: var(--teal-ink); }
-.chip[aria-pressed='true'], .chip.is-active { background: var(--primary-bg); color: var(--navy-ink); border-color: var(--navy-ink); }
+.chip[aria-pressed='true'], .chip[aria-checked='true'], .chip.is-active { background: var(--primary-bg); color: var(--navy-ink); border-color: var(--navy-ink); }
 
 /* ========== Forms ========== */
 .form-input, .form-select, .form-textarea {
@@ -4050,3 +4050,14 @@ body:has(.mobile-tabbar) .aviso-cookies { bottom: calc(76px + env(safe-area-inse
   text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
 }
 .link-boton:hover { color: var(--teal-ink); }
+
+/* Opinión de dificultad al final de un test o de una baraja de flashcards */
+.opinion-box {
+  width: 100%; margin-top: 1rem; padding: 14px 16px; text-align: left;
+  border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--surface-raised);
+}
+.opinion-head { display: flex; align-items: center; gap: 8px; color: var(--text-title); font-size: var(--fs-md); }
+.opinion-nota { margin: 2px 0 10px; font-size: var(--fs-xs); color: var(--text-muted); }
+.opinion-escala { display: flex; flex-wrap: wrap; gap: 6px; }
+.opinion-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.opinion-contador { font-size: var(--fs-2xs); color: var(--text-muted); font-family: var(--font-mono); }

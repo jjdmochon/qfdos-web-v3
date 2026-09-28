@@ -4,6 +4,7 @@ import { Chem2DDrawer } from './Chem2DDrawer';
 import { recurso } from '../services/rutas';
 import { useAuth } from '../context/AuthContext';
 import { pulsable } from '../utils/a11y';
+import { OpinionDificultad } from './OpinionDificultad';
 import { 
   X, 
   Award, 
@@ -250,7 +251,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
             <User size={13} color="var(--teal)" />
             <span>
-              <strong>Repaso personal</strong> · no cuenta para la nota; tu valoración solo se guarda en este navegador
+              <strong>Repaso personal</strong> · no cuenta para la nota; al terminar puedes enviar al profesor tu opinión sobre la dificultad
             </span>
           </div>
 
@@ -300,7 +301,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   Resumen del repaso: {topic.title}
                 </h4>
                 <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: '0 0 12px 0' }}>
-                  Las flashcards son para estudiar: no se califican ni se envían al profesor. Repasa las difíciles hasta dominarlas.
+                  Las flashcards son para estudiar: no se califican. Si quieres, envía al profesor qué tarjetas te han resultado difíciles.
                 </p>
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', margin: '12px 0' }}>
@@ -325,6 +326,25 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   </button>
                 )}
               </div>
+
+              {/* Opinión: dificultad global + valoración de cada tarjeta, sin calificación */}
+              <OpinionDificultad
+                tipo="flashcards"
+                temaId={topic.id}
+                tema={`${topic.number} · ${topic.title}`}
+                pregunta="¿Qué dificultad global te han parecido estas flashcards?"
+                detalle={{
+                  tarjetasValoradas: String(ratedCount),
+                  totalTarjetas: String(allCards.length),
+                  faciles: String(easyCount),
+                  regulares: String(mediumCount),
+                  dificiles: String(hardCount),
+                  valoraciones: allCards
+                    .filter(c => cardStats[c.id])
+                    .map(c => `${c.id}=${cardStats[c.id] === 'easy' ? 'facil' : cardStats[c.id] === 'medium' ? 'regular' : 'dificil'}`)
+                    .join('; ')
+                }}
+              />
 
               {/* Desglose individual de cada tarjeta */}
               <div style={{ width: '100%' }}>
@@ -363,12 +383,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                               const updated = { ...cardStats, [c.id]: 'hard' as const };
                               setCardStats(updated);
                             }}
-                            className={`btn btn-sm ${st === 'hard' ? 'btn-secondary' : 'btn-outline'}`}
+                            className={`btn btn-sm ${st === 'hard' ? 'btn-danger' : 'btn-outline'}`}
+                            aria-pressed={st === 'hard'}
                             style={{
                               fontSize: '0.72rem',
                               padding: '2px 8px',
-                              borderColor: st === 'hard' ? 'var(--accent-red)' : undefined,
-                              color: st === 'hard' ? 'var(--accent-red)' : undefined,
                               fontWeight: st === 'hard' ? 700 : 400
                             }}
                           >
@@ -629,7 +648,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     ¿Cómo valoras este concepto?
                   </span>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    (Solo para organizar tu repaso: no cuenta para la nota)
+                    (No cuenta para la nota: organiza tu repaso y, si la envías, ayuda al profesor)
                   </span>
                 </div>
 
@@ -728,6 +747,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {!showSummary && ratedCount > 0 && (
+              <button type="button" onClick={() => setShowSummary(true)} className="btn btn-sm btn-secondary">
+                Terminar y opinar
+              </button>
+            )}
             <button onClick={onClose} className="btn btn-sm btn-outline">
               Cerrar Flashcards
             </button>

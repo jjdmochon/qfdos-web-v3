@@ -25,6 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { pulsable } from '../utils/a11y';
+import { OpinionDificultad } from './OpinionDificultad';
 import { 
   X, 
   HelpCircle, 
@@ -1945,6 +1946,20 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             </div>
                           )}
                         </div>
+
+                        {/* Opinión del alumnado sobre la dificultad del test (no es calificación) */}
+                        <OpinionDificultad
+                          tipo="test"
+                          temaId={topic.id}
+                          tema={`${topic.number} · ${topic.title}`}
+                          detalle={{
+                            modelo: selectedModel,
+                            nota: String(stats.score),
+                            aciertos: String(stats.correct),
+                            total: String(stats.total),
+                            modo: isExamMode ? 'examen' : 'preparacion'
+                          }}
+                        />
                       </div>
                     );
                   })()}
