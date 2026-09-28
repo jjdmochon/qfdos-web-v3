@@ -34,7 +34,8 @@ import {
   Upload,
   Settings,
   GitBranch,
-  ArrowRight
+  ArrowRight,
+  Edit3
 } from 'lucide-react';
 
 interface TopicDetailModalProps {
@@ -46,6 +47,7 @@ interface TopicDetailModalProps {
   onOpenSpotifyPlayer: (att: CourseAttachment) => void;
   onOpenAdmet?: (drug: MoleculeDrug) => void;
   onUpdateTopic?: (updatedTopic: QfdosTopic) => void;
+  onEditTopicInCms?: (topicId: string) => void;
 }
 
 export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
@@ -56,10 +58,12 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onOpenFlashcards,
   onOpenSpotifyPlayer,
   onOpenAdmet,
-  onUpdateTopic
+  onUpdateTopic,
+  onEditTopicInCms
 }) => {
   const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas'>(initialTab || 'sar');
   const { isProfesor } = useAuth();
+  const [driveSaveSuccess, setDriveSaveSuccess] = useState(false);
 
   useEffect(() => {
     if (initialTab) {
@@ -121,7 +125,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
       audioPodcastUrl: editAudioUrl.trim() || undefined
     };
     onUpdateTopic(updated);
-    setIsEditingDriveLinks(false);
+    setDriveSaveSuccess(true);
+    setTimeout(() => {
+      setDriveSaveSuccess(false);
+      setIsEditingDriveLinks(false);
+    }, 1500);
   };
 
   const [copiedSmiles, setCopiedSmiles] = useState<string | null>(null);
@@ -291,9 +299,24 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-outline" style={{ padding: '6px', flexShrink: 0 }} aria-label="Cerrar" title="Cerrar (Esc)">
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {isProfesor && onEditTopicInCms && (
+              <button
+                onClick={() => {
+                  onEditTopicInCms(topic.id);
+                  onClose();
+                }}
+                className="btn btn-sm btn-secondary"
+                style={{ fontSize: '0.76rem', padding: '5px 12px', gap: '5px', fontWeight: 700 }}
+                title="Editar este tema completo en el Panel CMS"
+              >
+                <Edit3 size={14} /> Editar Tema en CMS
+              </button>
+            )}
+            <button onClick={onClose} className="btn btn-sm btn-outline" style={{ padding: '6px', flexShrink: 0 }} aria-label="Cerrar" title="Cerrar (Esc)">
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}
@@ -466,7 +489,12 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         />
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {driveSaveSuccess && (
+                        <span style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <CheckCircle2 size={15} /> ¡Enlaces guardados con éxito!
+                        </span>
+                      )}
                       <button
                         type="button"
                         onClick={() => setIsEditingDriveLinks(false)}
@@ -478,8 +506,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         type="submit"
                         className="btn btn-sm btn-primary"
                         style={{ fontWeight: 700 }}
+                        disabled={driveSaveSuccess}
                       >
-                        Guardar Enlaces
+                        {driveSaveSuccess ? 'Guardado ✓' : 'Guardar Enlaces'}
                       </button>
                     </div>
                   </form>

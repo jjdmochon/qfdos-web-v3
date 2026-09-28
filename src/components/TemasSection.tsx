@@ -17,7 +17,9 @@ import {
   Calendar,
   Filter,
   ExternalLink,
-  GitBranch
+  GitBranch,
+  Edit3,
+  Settings
 } from 'lucide-react';
 
 interface TemasSectionProps {
@@ -26,6 +28,8 @@ interface TemasSectionProps {
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
   onOpenCartas?: () => void;
+  onEditTopic?: (topicId: string) => void;
+  onOpenAdminCms?: () => void;
 }
 
 export const TemasSection: React.FC<TemasSectionProps> = ({
@@ -33,7 +37,9 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
   onSelectTopic,
   onOpenQuiz,
   onOpenFlashcards,
-  onOpenCartas
+  onOpenCartas,
+  onEditTopic,
+  onOpenAdminCms
 }) => {
   const { isProfesor } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -84,18 +90,30 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
           </p>
         </div>
 
-        {/* Search Input */}
-        <div style={{ position: 'relative', minWidth: 'min(260px, 100%)', flex: '1 1 260px', maxWidth: 360 }}>
-          <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
-          <input
-            type="text"
-            placeholder="Buscar por tema, fármaco, diana..."
-            aria-label="Buscar en el temario"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="form-input"
-            style={{ paddingLeft: '32px', fontSize: '0.85rem' }}
-          />
+        {/* Search Input & Docent Action */}
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', minWidth: 'min(260px, 100%)', flex: '1 1 260px', maxWidth: 440, flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '180px' }}>
+            <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+            <input
+              type="text"
+              placeholder="Buscar por tema, fármaco, diana..."
+              aria-label="Buscar en el temario"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="form-input"
+              style={{ paddingLeft: '32px', fontSize: '0.85rem', width: '100%' }}
+            />
+          </div>
+          {isProfesor && onOpenAdminCms && (
+            <button
+              onClick={onOpenAdminCms}
+              className="btn btn-sm btn-secondary"
+              style={{ fontSize: '0.78rem', padding: '6px 12px', gap: '5px', fontWeight: 700, whiteSpace: 'nowrap' }}
+              title="Abrir el Panel CMS de Gestión Docente"
+            >
+              <Settings size={14} /> Panel CMS
+            </button>
+          )}
         </div>
       </div>
 
@@ -327,6 +345,33 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--border-color)', marginTop: 'auto', width: '100%' }}>
+                {/* Docent Action: Editar este tema directamente */}
+                {isProfesor && onEditTopic && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditTopic(topic.id);
+                    }}
+                    className="btn btn-sm btn-outline"
+                    style={{
+                      width: '100%',
+                      fontSize: '0.74rem',
+                      padding: '4px 8px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '5px',
+                      borderColor: 'var(--teal)',
+                      color: 'var(--teal-ink)',
+                      fontWeight: 700,
+                      background: 'rgba(13, 148, 136, 0.08)'
+                    }}
+                    title="Editar contenidos, enlaces, diapositivas y audios de este módulo en el CMS"
+                  >
+                    <Edit3 size={13} /> Editar Módulo en Panel CMS
+                  </button>
+                )}
+
                 {/* Fila 1: Materiales y Taller de Retrosíntesis */}
                 <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
                   <button

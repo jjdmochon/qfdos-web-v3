@@ -59,6 +59,8 @@ interface AdminCmsModalProps {
   onPublicado?: (cuando: string) => void;
   onUpdateStudentQuestions: (updated: StudentQuestion[]) => void;
   onOpenCartas?: () => void;
+  initialTab?: 'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey';
+  initialEditingTopicId?: string;
 }
 
 export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
@@ -75,10 +77,13 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   publicadoEn,
   onPublicado,
   onUpdateStudentQuestions,
-  onOpenCartas
+  onOpenCartas,
+  initialTab = 'modules',
+  initialEditingTopicId
 }) => {
-  const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>('materials');
+  const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>(initialTab);
   const [materialsTopicId, setMaterialsTopicId] = useState<string>('');
+  const [moduleSaveSuccess, setModuleSaveSuccess] = useState<string | null>(null);
 
   // API Key State
   const [apiKey, setApiKey] = useState(getStoredGeminiApiKey());
@@ -251,6 +256,16 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     setEditingModuleId(null);
   };
 
+  // Auto-edit topic if requested via initialEditingTopicId
+  React.useEffect(() => {
+    if (initialEditingTopicId) {
+      const topic = topics.find(t => t.id === initialEditingTopicId);
+      if (topic) {
+        handleStartEditModule(topic);
+      }
+    }
+  }, [initialEditingTopicId, topics]);
+
   // Open Edit Module
   const handleStartEditModule = (topic: QfdosTopic) => {
     setEditingModuleId(topic.id);
@@ -272,6 +287,13 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     setModWeightPercentage(topic.weightPercentage || 15);
     setModSubmissionInstructions(topic.submissionInstructions || '');
     setModStatus(topic.status || 'Publicado');
+
+    setTimeout(() => {
+      const formEl = document.getElementById('cms-module-form');
+      if (formEl) {
+        formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   // Save (Create or Update) Module
@@ -317,6 +339,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
       onUpdateTopics(updatedTopics);
       localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
+      setModuleSaveSuccess(`✓ Módulo "${modNumber} — ${modTitle}" guardado con éxito.`);
+      setTimeout(() => setModuleSaveSuccess(null), 5000);
     } else {
       // Create new module
       const newId = `mod_${Date.now()}`;
@@ -351,6 +375,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
       const updatedTopics = [...topics, newTopic];
       onUpdateTopics(updatedTopics);
       localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
+      setModuleSaveSuccess(`✓ Nuevo módulo "${newTopic.number} — ${newTopic.title}" creado y publicado en local.`);
+      setTimeout(() => setModuleSaveSuccess(null), 5000);
     }
 
     resetModuleForm();
@@ -758,6 +784,32 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
           {activeTab === 'modules' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
+              {/* Publicación remota directa desde la pestaña Módulos */}
+              <PublicarContenido
+                contenido={{ topics, announcements, glossary, resourceLinks }}
+                publicadoEn={publicadoEn}
+                onPublicado={onPublicado}
+              />
+
+              {/* Mensaje de éxito al guardar módulo */}
+              {moduleSaveSuccess && (
+                <div style={{
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid #10b981',
+                  color: '#065f46',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <CheckCircle2 size={16} color="#10b981" />
+                  {moduleSaveSuccess}
+                </div>
+              )}
+
               {/* Header Action */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
@@ -765,12 +817,18 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     Planificación Docente: Temas, Exámenes Oficiales y Trabajos
                   </h4>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    Cada módulo contiene diapositivas en PDF, apuntes oficiales en PDF, cuaderno Gemini Notebook y video podcast de Spotify.
+                    Gestiona títulos, apuntes oficiales, diapositivas, cuaderno Gemini Notebook y píldoras de audio de cada tema.
                   </p>
                 </div>
                 {!isCreatingModule && !editingModuleId && (
                   <button
-                    onClick={() => { setIsCreatingModule(true); setEditingModuleId(null); }}
+                    onClick={() => {
+                      setIsCreatingModule(true);
+                      setEditingModuleId(null);
+                      setTimeout(() => {
+                        document.getElementById('cms-module-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
                     className="btn btn-primary"
                   >
                     <Plus size={16} /> Añadir Nuevo Módulo / Examen / Trabajo
@@ -780,9 +838,10 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
               {/* Form for Creating or Editing Module */}
               {(isCreatingModule || editingModuleId) && (
-                <div className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
+                <div id="cms-module-form" className="qfdos-card card-teal" style={{ padding: '1.25rem', border: '2px solid var(--teal)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)' }}>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Edit3 size={16} color="var(--teal-ink)" />
                       {editingModuleId ? `Editar Módulo: ${modNumber}` : 'Crear Nuevo Módulo o Convocatoria'}
                     </h4>
                     <button onClick={resetModuleForm} className="btn btn-sm btn-outline">Cancelar</button>

@@ -318,6 +318,8 @@ export const App: React.FC = () => {
   const [isFirModalOpen, setIsFirModalOpen] = useState(false);
   const [isStudentQuestionOpen, setIsStudentQuestionOpen] = useState(false);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
+  const [cmsInitialTab, setCmsInitialTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>('modules');
+  const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
   const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
   const [isCartasModalOpen, setIsCartasModalOpen] = useState(false);
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
@@ -325,6 +327,12 @@ export const App: React.FC = () => {
   const handleOpenAdmet = (drug: MoleculeDrug) => {
     setSelectedAdmetDrug(drug);
     navigateTo('admet');
+  };
+
+  const handleOpenAdminCmsForTopic = (topicId?: string) => {
+    setCmsInitialTab('modules');
+    setCmsInitialEditingTopicId(topicId);
+    setIsAdminCmsOpen(true);
   };
 
   // Persist data
@@ -352,7 +360,27 @@ export const App: React.FC = () => {
     descargarContenido().then(remoto => {
       if (cancelado || !remoto) return;
       if (Array.isArray(remoto.topics) && remoto.topics.length) {
-        setTopics(normalizarTemas(remoto.topics));
+        setTopics(prev => {
+          const normalizedRemoto = normalizarTemas(remoto.topics);
+          // Si el usuario es docente, preservamos sus campos locales para que la hoja no pise sus ediciones locales
+          if (isProfesor) {
+            return normalizedRemoto.map(rt => {
+              const localTopic = prev.find(lt => lt.id === rt.id);
+              if (!localTopic) return rt;
+              return {
+                ...rt,
+                audioPodcastUrl: localTopic.audioPodcastUrl || rt.audioPodcastUrl,
+                audioPodcastName: localTopic.audioPodcastName || rt.audioPodcastName,
+                slidesPdfUrl: localTopic.slidesPdfUrl || rt.slidesPdfUrl,
+                notesPdfUrl: localTopic.notesPdfUrl || rt.notesPdfUrl,
+                geminiNotebookUrl: localTopic.geminiNotebookUrl || rt.geminiNotebookUrl,
+                spotifyPodcastUrl: localTopic.spotifyPodcastUrl || rt.spotifyPodcastUrl,
+                attachments: (localTopic.attachments && localTopic.attachments.length > 0) ? localTopic.attachments : rt.attachments,
+              };
+            });
+          }
+          return normalizedRemoto;
+        });
       }
       if (Array.isArray(remoto.announcements)) setAnnouncements(remoto.announcements);
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
@@ -361,7 +389,7 @@ export const App: React.FC = () => {
     });
 
     return () => { cancelado = true; };
-  }, []);
+  }, [isProfesor]);
 
   // Ctrl+K search shortcut
   useEffect(() => {
@@ -514,6 +542,8 @@ export const App: React.FC = () => {
             onOpenQuiz={t => { if (testHabilitado(t)) setSelectedQuizTopic(t); }}
             onOpenFlashcards={t => { if (flashcardsHabilitadas(t)) setSelectedFlashcardsTopic(t); }}
             onOpenCartas={() => setIsCartasModalOpen(true)}
+            onEditTopic={handleOpenAdminCmsForTopic}
+            onOpenAdminCms={() => handleOpenAdminCmsForTopic()}
           />
         )}
         {activeTab === 'practicas' && (
@@ -556,6 +586,7 @@ export const App: React.FC = () => {
             setTopics(prev => prev.map(t => t.id === updatedTopic.id ? updatedTopic : t));
             setSelectedTopicDetail(updatedTopic);
           }}
+          onEditTopicInCms={handleOpenAdminCmsForTopic}
           onOpenQuiz={t => { if (!testHabilitado(t)) return; setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
           onOpenFlashcards={t => { if (!flashcardsHabilitadas(t)) return; setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
@@ -641,6 +672,8 @@ export const App: React.FC = () => {
           onPublicado={(cuando: string) => setPublicadoEn(cuando)}
           onUpdateStudentQuestions={setStudentQuestions}
           onOpenCartas={() => setIsCartasModalOpen(true)}
+          initialTab={cmsInitialTab}
+          initialEditingTopicId={cmsInitialEditingTopicId}
         />
       )}
 
