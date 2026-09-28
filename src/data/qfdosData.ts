@@ -2534,10 +2534,11 @@ flashcards: [
         id: 'fc-01-08',
         topicId: 'tema-01',
         concept: 'Síntesis Industrial de Metacolina y Betanecol',
-        front: '¿Cómo se diferencian las síntesis industriales de Metacolina y Betanecol a partir del alcohol cuaternario?',
-        back: 'Ambas preparan el intermediario **1-(trimetilamonio)propan-2-ol**.\n• **Metacolina:** Se acila directamente con **anhídrido acético** ((CH₃CO)₂O).\n• **Betanecol:** Reacciona primero con **fosgeno (COCl₂)** dando un cloroformiato y luego con **amoniaco (NH₃)** rindiendo el carbamato terminal.',
+        front: '¿Cómo se diferencian las síntesis industriales de Metacolina y Betanecol a partir del alcohol secundario común?',
+        back: 'Ambas parten del mismo **alcohol secundario**, el **1-(trimetilamonio)propan-2-ol**: bromación de la acetona, cuaternización con trimetilamina y reducción con LiAlH₄.\n• **Metacolina:** Se acila directamente con **anhídrido acético** ((CH₃CO)₂O).\n• **Betanecol:** Reacciona primero con **fosgeno (COCl₂)** dando un cloroformiato y luego con **amoniaco (NH₃)** rindiendo el carbamato terminal.',
         smiles: 'CC(C[N+](C)(C)C)OC(=O)C',
         difficulty: 'medium',
+        imagePath: 'assets/tema-01/sintesis_metacolina_betanecol.png',
         category: 'Síntesis Orgánica'
       },
       {

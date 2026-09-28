@@ -18,7 +18,8 @@ import {
   setGoogleSheetsUrl,
   GOOGLE_APPS_SCRIPT_TEMPLATE,
   GoogleSheetsSubmissionResult,
-  misCalificaciones
+  misCalificaciones,
+  esIntentoDeTest
 } from '../services/googleSheetsService';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
@@ -672,7 +673,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Filtered records for dashboard
   const filteredRecords = useMemo(() => {
-    return records.filter(r => {
+    return records.filter(esIntentoDeTest).filter(r => {
       if (recordsFilterTopic === 'current' && r.topicId !== topic.id) {
         return false;
       }
@@ -827,7 +828,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               color: activeTab === 'records' ? '#fff' : 'var(--text-main)',
               fontWeight: 700 
             }}>
-              {records.length}
+              {records.filter(esIntentoDeTest).length}
             </span>
           </button>
         </div>

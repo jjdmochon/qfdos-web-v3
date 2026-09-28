@@ -332,6 +332,11 @@ const enVuelo = new Map<string, Promise<QuizRegistrationRecord[] | null>>();
  * distinguir «no hay intentos» de «no lo sabemos». Si el despliegue todavía
  * no expone la lectura, cae en la última copia conocida.
  */
+/** Las flashcards son repaso, no evaluación: sus registros no son calificaciones. */
+export function esIntentoDeTest(r: { evaluationMode?: string; modelName?: string }): boolean {
+  return r.evaluationMode !== 'flashcards_autoevaluacion' && !/^flashcards/i.test(r.modelName || '');
+}
+
 export async function misCalificaciones(email: string): Promise<QuizRegistrationRecord[] | null> {
   const norm = (email || '').toLowerCase().trim();
   const url = getGoogleSheetsUrl();
@@ -356,7 +361,8 @@ export async function misCalificaciones(email: string): Promise<QuizRegistration
         return getCachedCalificaciones(norm);
       }
 
-      const registros: QuizRegistrationRecord[] = (cuerpo.intentos as FilaCalificacion[]).map(f => ({
+      // Solo los test cuentan como calificación: las filas antiguas de flashcards se descartan
+      const registros: QuizRegistrationRecord[] = (cuerpo.intentos as FilaCalificacion[]).filter(f => esIntentoDeTest(f)).map(f => ({
         id: f.id || `sheet_${f.fila ?? Math.random()}`,
         studentEmail: f.studentEmail || norm,
         studentName: f.studentName || '',

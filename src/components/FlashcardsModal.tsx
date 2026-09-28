@@ -4,10 +4,6 @@ import { Chem2DDrawer } from './Chem2DDrawer';
 import { recurso } from '../services/rutas';
 import { useAuth } from '../context/AuthContext';
 import { pulsable } from '../utils/a11y';
-import {
-  submitFlashcardsAttemptToGoogleSheets,
-  GoogleSheetsSubmissionResult
-} from '../services/googleSheetsService';
 import { 
   X, 
   Award, 
@@ -40,9 +36,6 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // Alumno / Docente que realiza la autoevaluación
-  const [studentName, setStudentName] = useState<string>(user?.name || '');
-  const [studentEmail, setStudentEmail] = useState<string>(user?.email || '');
 
   // Tarjetas canónicas (Tema 01 tiene 10 tarjetas fundamentales)
   const allCards: Flashcard[] = useMemo(() => {
@@ -87,19 +80,12 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
 
-  // Estado de sincronización con Google Sheets (hoja oficial Respuestas_QFDOS)
-  const [sheetStatus, setSheetStatus] = useState<
-    'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'network_error' | 'no_url' | 'sesion_invalida'
-  >('idle');
-  const [statusMessage, setStatusMessage] = useState<string>('');
 
   // Estadísticas globales
   const easyCount = allCards.filter(c => cardStats[c.id] === 'easy').length;
   const hardCount = allCards.filter(c => cardStats[c.id] === 'hard').length;
   const mediumCount = allCards.filter(c => cardStats[c.id] === 'medium').length;
   const ratedCount = allCards.filter(c => !!cardStats[c.id]).length;
-  const scorePercent = allCards.length > 0 ? Math.round((easyCount / allCards.length) * 100) : 0;
-  const score10 = allCards.length > 0 ? ((easyCount / allCards.length) * 10).toFixed(1) : '0.0';
 
   if (allCards.length === 0) {
     return (
@@ -200,74 +186,15 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const handleRate = (rating: 'easy' | 'medium' | 'hard') => {
     const updated = { ...cardStats, [currentCard.id]: rating };
     setCardStats(updated);
-    if (sheetStatus === 'sent') { setSheetStatus('idle'); setStatusMessage(''); }
 
     // Si aún quedan tarjetas por ver en el orden, avanza a la siguiente
     if (safeIndex < displayCards.length - 1) {
       setIsFlipped(false);
       setCurrentIndex(prev => prev + 1);
     } else {
-      // Si llegó al final y están todas valoradas, sugerir sincronizar
+      // Al terminar la baraja se muestra el resumen del repaso
       const allRated = allCards.every(c => !!updated[c.id]);
-      if (allRated) {
-        setShowSummary(true);
-        // Autoregistrar en la hoja de cálculo oficial
-        handleSyncToSheets(updated);
-      }
-    }
-  };
-
-  // Enviar a la hoja oficial de Google Sheets (Respuestas_QFDOS)
-  const handleSyncToSheets = async (customStats?: { [id: string]: 'easy' | 'medium' | 'hard' }) => {
-    const statsToUse = customStats || cardStats;
-    const rated = allCards.filter(c => statsToUse[c.id]);
-
-    if (rated.length === 0) {
-      setStatusMessage('Valora al menos una tarjeta como Fácil o Difícil antes de registrar.');
-      return;
-    }
-
-    const emailFinal = (studentEmail || user?.email || '').trim() || 'estudiante@ugr.es';
-    const nameFinal = (studentName || user?.name || '').trim() || 'Estudiante QFDOS';
-
-    setSheetStatus('sending');
-    setStatusMessage('Enviando respuestas y valoración a la hoja oficial de calificaciones...');
-
-    try {
-      const eCount = allCards.filter(c => statsToUse[c.id] === 'easy').length;
-      const hCount = allCards.filter(c => statsToUse[c.id] === 'hard').length;
-      const mCount = allCards.filter(c => statsToUse[c.id] === 'medium').length;
-
-      const res: GoogleSheetsSubmissionResult = await submitFlashcardsAttemptToGoogleSheets({
-        studentName: nameFinal,
-        studentEmail: emailFinal,
-        topicId: topic.id,
-        topicNumber: topic.number,
-        topicTitle: topic.title,
-        totalCards: allCards.length,
-        easyCount: eCount,
-        hardCount: hCount,
-        mediumCount: mCount,
-        ratings: allCards.map(c => ({
-          cardId: c.id,
-          concept: c.concept,
-          front: c.front,
-          rating: statsToUse[c.id] || 'hard'
-        }))
-      });
-
-      setSheetStatus(res.status);
-      if (res.status === 'sent') {
-        setStatusMessage('✓ Valoración registrada con éxito en la hoja oficial de calificaciones (Respuestas_QFDOS).');
-      } else if (res.status === 'sent_unconfirmed') {
-        setStatusMessage('Valoración enviada, pero no se ha podido confirmar en la hoja. Si tu sesión ha caducado, vuelve a entrar y registra de nuevo.');
-      } else {
-        setStatusMessage(res.message || 'Error al conectar con Google Sheets.');
-      }
-    } catch (err) {
-      console.error('Error enviando flashcards a Google Sheets:', err);
-      setSheetStatus('network_error');
-      setStatusMessage('Error de conexión con Google Sheets. La autoevaluación queda guardada en tu dispositivo.');
+      if (allRated) setShowSummary(true);
     }
   };
 
@@ -322,41 +249,9 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
             <User size={13} color="var(--teal)" />
-            {user?.email ? (
-              <span>
-                <strong>{user.name}</strong> ({user.email}) · <span style={{ color: 'var(--accent-emerald)', fontWeight: 600 }}>Cuenta UGR verificada</span>
-              </span>
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Registrar como:</span>
-                <input
-                  type="text"
-                  placeholder="Tu nombre"
-                  value={studentName}
-                  onChange={e => setStudentName(e.target.value)}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-color)',
-                    background: 'var(--surface)'
-                  }}
-                />
-                <input
-                  type="email"
-                  placeholder="correo@ugr.es"
-                  value={studentEmail}
-                  onChange={e => setStudentEmail(e.target.value)}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-color)',
-                    background: 'var(--surface)'
-                  }}
-                />
-              </div>
-            )}
+            <span>
+              <strong>Repaso personal</strong> · no cuenta para la nota; tu valoración solo se guarda en este navegador
+            </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -391,7 +286,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
           
           {showSummary ? (
             /* ============================================================== */
-            /* VISTA DE RESUMEN Y REGISTRO EN GOOGLE SHEETS                   */
+            /* VISTA DE RESUMEN DEL REPASO (sin calificación)                  */
             /* ============================================================== */
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{
@@ -402,21 +297,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 textAlign: 'center'
               }}>
                 <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '4px' }}>
-                  Resumen de Autoevaluación: {topic.title}
+                  Resumen del repaso: {topic.title}
                 </h4>
                 <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: '0 0 12px 0' }}>
-                  Resultados consolidados para la hoja oficial de evaluación continua (Respuestas_QFDOS).
+                  Las flashcards son para estudiar: no se califican ni se envían al profesor. Repasa las difíciles hasta dominarlas.
                 </p>
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', margin: '12px 0' }}>
-                  <div style={{ background: 'var(--surface)', padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Dominio Estimado</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy-ink)' }}>{scorePercent}%</div>
-                  </div>
-                  <div style={{ background: 'var(--surface)', padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Nota / 10</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--teal-ink)' }}>{score10}</div>
-                  </div>
                   <div style={{ background: 'var(--surface)', padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', fontWeight: 700 }}>Fáciles (Dominadas)</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>{easyCount}</div>
@@ -427,32 +314,16 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   </div>
                 </div>
 
-                {/* Sincronización en la Hoja Oficial */}
-                <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                {hardCount > 0 && (
                   <button
-                    onClick={() => handleSyncToSheets()}
-                    disabled={sheetStatus === 'sending'}
+                    type="button"
+                    onClick={() => { setShowSummary(false); setFilterHardOnly(true); setCurrentIndex(0); setIsFlipped(false); }}
                     className="btn btn-primary"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontWeight: 700,
-                      padding: '8px 18px',
-                      fontSize: '0.88rem'
-                    }}
+                    style={{ marginTop: '10px' }}
                   >
-                    <Send size={15} />
-                    {sheetStatus === 'sending' ? 'Enviando a Google Sheets...' : 'Registrar en Hoja Oficial de Calificaciones'}
+                    Repasar las {hardCount} difíciles
                   </button>
-
-                  {statusMessage && (
-                    <div className={`status-msg ${sheetStatus === 'sent' ? 'status-msg--ok' : sheetStatus === 'sending' ? 'status-msg--info' : sheetStatus === 'sent_unconfirmed' || sheetStatus === 'no_url' ? 'status-msg--warn' : sheetStatus === 'idle' ? 'status-msg--warn' : 'status-msg--bad'}`} role={sheetStatus === 'network_error' ? 'alert' : 'status'}>
-                      {sheetStatus === 'sent' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                      {statusMessage}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
 
               {/* Desglose individual de cada tarjeta */}
@@ -729,7 +600,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                         <img
                           src={recurso(currentCard.imagePath)}
                           alt={currentCard.concept}
-                          style={{ maxHeight: '240px', maxWidth: '100%', objectFit: 'contain', borderRadius: '6px' }}
+                          style={{ maxHeight: '360px', maxWidth: '100%', objectFit: 'contain', borderRadius: '6px' }}
                         />
                       </div>
                     )}
@@ -758,7 +629,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     ¿Cómo valoras este concepto?
                   </span>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    (Se registra en la hoja oficial de calificaciones)
+                    (Solo para organizar tu repaso: no cuenta para la nota)
                   </span>
                 </div>
 
@@ -837,13 +708,6 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 </div>
               </div>
 
-              {/* Status Banner si se ha enviado o está enviando a Sheets */}
-              {statusMessage && (
-                <div className={`status-msg ${sheetStatus === 'sent' ? 'status-msg--ok' : sheetStatus === 'sending' ? 'status-msg--info' : sheetStatus === 'sent_unconfirmed' || sheetStatus === 'no_url' ? 'status-msg--warn' : sheetStatus === 'idle' ? 'status-msg--warn' : 'status-msg--bad'}`} style={{ width: '100%' }} role={sheetStatus === 'network_error' ? 'alert' : 'status'}>
-                  {sheetStatus === 'sent' ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
-                  <span>{statusMessage}</span>
-                </div>
-              )}
             </>
           )}
 
@@ -864,17 +728,6 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
           </div>
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => handleSyncToSheets()}
-              disabled={sheetStatus === 'sending' || sheetStatus === 'sent' || ratedCount === 0}
-              aria-busy={sheetStatus === 'sending'}
-              className="btn btn-sm btn-primary"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}
-              title="Guardar en la hoja de cálculo oficial de Google Sheets"
-            >
-              <Send size={14} />
-              {sheetStatus === 'sending' ? 'Enviando...' : sheetStatus === 'sent' ? 'Registrado ✓' : 'Registrar en Hoja Oficial'}
-            </button>
             <button onClick={onClose} className="btn btn-sm btn-outline">
               Cerrar Flashcards
             </button>
