@@ -27,6 +27,11 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
   // Si no es profesor, denegar acceso completamente
   if (!isProfesor) return null;
 
+  const handleAdmetFromDeck = (drug: MoleculeDrug) => {
+    onClose();
+    onOpenAdmet?.(drug);
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -56,18 +61,31 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 8,
-                background: 'linear-gradient(135deg, var(--primary, #1e3a8a) 0%, var(--secondary, #0d9488) 100%)',
-                color: '#ffffff',
+                width: 42,
+                height: 42,
+                borderRadius: 9,
+                background: '#ffffff',
+                border: '1px solid var(--border-color, #e2e8f0)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(30, 58, 138, 0.25)'
+                boxShadow: '0 2px 8px rgba(30, 58, 138, 0.12)',
+                overflow: 'hidden',
+                flexShrink: 0,
+                padding: 3
               }}
             >
-              <Layers size={18} />
+              <img
+                src={`${import.meta.env.BASE_URL}assets/Marca/qfdos-isotipo.png`}
+                alt="Logo QFDOS"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes('i.ibb.co')) {
+                    target.src = 'https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png';
+                  }
+                }}
+              />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -106,7 +124,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
             background: 'var(--neutral-bg, #f8fafc)'
           }}
         >
-          <CartasDeckView onOpenAdmet={onOpenAdmet} showDocenteBanner={true} />
+          <CartasDeckView onOpenAdmet={handleAdmetFromDeck} showDocenteBanner={true} />
         </div>
 
         {/* Pie del Modal */}

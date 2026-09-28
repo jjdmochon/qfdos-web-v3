@@ -1537,7 +1537,13 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           {/* TAB 5: Cartas Coleccionables Docentes (Tema 1) */}
           {activeTab === 'cartas' && topic.id === 'tema-01' && isProfesor && (
             <div style={{ padding: '0.25rem 0' }}>
-              <CartasDeckView onOpenAdmet={onOpenAdmet} showDocenteBanner={true} />
+              <CartasDeckView
+                onOpenAdmet={(drug) => {
+                  onClose();
+                  onOpenAdmet?.(drug);
+                }}
+                showDocenteBanner={true}
+              />
             </div>
           )}
 

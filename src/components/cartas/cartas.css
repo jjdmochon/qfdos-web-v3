@@ -278,23 +278,84 @@
 .qf-carta-item[data-grupo="antidoto"] .qf-cara { border-top-color: #d97706; }
 .qf-carta-item[data-grupo="antagonista"] .qf-cara { border-top-color: #7c3aed; }
 
-/* Dorso específico */
+/* Dorso específico: flex layout con cabecera y acciones fijas, y scroll central */
 .qf-cara--dorso {
   transform: rotateY(180deg);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(13, 148, 136, 0.35) transparent;
-  padding-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 14px 16px 12px;
   background: #ffffff;
   color: #1e293b;
 }
 
-.qf-cara--dorso::-webkit-scrollbar {
+.qf-dorso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  padding-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.qf-dorso-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(13, 148, 136, 0.35) transparent;
+  position: relative;
+  z-index: 1;
+  padding-right: 4px;
+  cursor: default;
+}
+
+.qf-dorso-scroll::-webkit-scrollbar {
   width: 4px;
 }
-.qf-cara--dorso::-webkit-scrollbar-thumb {
+.qf-dorso-scroll::-webkit-scrollbar-thumb {
   background: rgba(13, 148, 136, 0.3);
   border-radius: 4px;
+}
+
+/* Sello oficial QFDOS en cabeceras de anverso y dorso */
+.qf-cabecera-der {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.qf-card-brand-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+  padding: 1.5px 5.5px;
+  border-radius: var(--radius-sm, 4px);
+  background: rgba(30, 58, 138, 0.05);
+  border: 1px solid rgba(30, 58, 138, 0.15);
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--primary, #1e3a8a);
+  user-select: none;
+}
+
+.qf-card-brand-stamp img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.qf-deck--theme-dark .qf-card-brand-stamp {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #67e8f9;
 }
 
 /* Trama hexagonal de fondo de alta fidelidad */
@@ -586,11 +647,12 @@
 .qf-dorso-actions {
   display: flex;
   gap: 6px;
-  margin-top: auto;
+  flex-shrink: 0;
+  margin-top: 6px;
   padding-top: 8px;
   border-top: 1px solid #e2e8f0;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .qf-dorso-btn {

@@ -167,7 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
             {isProfesor && onOpenCartas && (
               <button
                 onClick={onOpenCartas}
-                className="btn btn-sm btn-header-action"
+                className="btn btn-sm btn-header-action btn-header-cartas"
                 title="Baraja Coleccionable de Fármacos · Tema 1 (Uso Docente)"
                 style={{
                   background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.12) 0%, rgba(13, 148, 136, 0.12) 100%)',
@@ -177,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Layers size={14} color="var(--teal-ink)" />
                 <span className="tool-label">Cartas Tema 1</span>
-                <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', marginLeft: 3, fontWeight: 800 }}>
+                <span className="qfdos-badge badge-mint tool-badge" style={{ fontSize: '0.58rem', padding: '1px 5px', marginLeft: 3, fontWeight: 800 }}>
                   Docente
                 </span>
               </button>

@@ -43,4 +43,7 @@ Prácticas v4/
 # Ficheros comprimidos
 *.zip
 
+# Artefactos temporales
+brag-output*
+
 

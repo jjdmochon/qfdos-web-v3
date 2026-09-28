@@ -53,6 +53,25 @@ export interface CartasDeckViewProps {
 
 const ORDEN_INDICES = ['AFI', 'SEL', 'EST', 'ORA', 'SNC', 'DUR'] as const;
 
+/** Mapeo a denominación INN / IUPAC en inglés para búsqueda directa y carga en 3D en MolView (PubChem) */
+const FARMACOS_MOLVIEW_MAP: Record<string, string> = {
+  acetilcolina: 'acetylcholine',
+  metacolina: 'methacholine',
+  carbacol: 'carbachol',
+  betanecol: 'bethanechol',
+  pilocarpina: 'pilocarpine',
+  muscarina: 'muscarine',
+  nicotina: 'nicotine',
+  neostigmina: 'neostigmine',
+  donepezilo: 'donepezil',
+  organofosforados: 'parathion',
+  pralidoxima: 'pralidoxime',
+  atropina: 'atropine',
+  butilescopolamina: 'butylscopolamine',
+  trihexifenidilo: 'trihexyphenidyl',
+  atracurio: 'atracurium'
+};
+
 export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
   onOpenAdmet,
   showDocenteBanner = true
@@ -140,15 +159,18 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
     setTimeout(() => setCopiedId(null), 1800);
   };
 
-  // Abrir en MolView 3D
-  const handleOpen3D = (smiles: string, e: React.MouseEvent) => {
+  // Abrir en MolView 3D (búsqueda automática en PubChem 3D)
+  const handleOpen3D = (f: FarmacoCarta, e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open(`https://molview.org/?smiles=${encodeURIComponent(smiles)}`, '_blank', 'noopener,noreferrer');
+    e.preventDefault();
+    const query = FARMACOS_MOLVIEW_MAP[f.id] || f.nombre;
+    window.open(`https://molview.org/?q=${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer');
   };
 
   // Abrir en ADMET
   const handleAdmetClick = (f: FarmacoCarta, e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (onOpenAdmet) {
       onOpenAdmet({
         name: f.nombre,
@@ -168,8 +190,26 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
       {showDocenteBanner && (
         <div className="qf-deck-header-banner">
           <div className="qf-deck-header-info">
-            <div className="qf-deck-header-icon">
-              <Layers size={22} />
+            <div
+              className="qf-deck-header-icon"
+              style={{
+                background: '#ffffff',
+                border: '1px solid rgba(30, 58, 138, 0.15)',
+                padding: 3,
+                overflow: 'hidden'
+              }}
+            >
+              <img
+                src={`${cleanBase}assets/Marca/qfdos-isotipo.png`}
+                alt="Logo QFDOS"
+                style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes('i.ibb.co')) {
+                    target.src = 'https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png';
+                  }
+                }}
+              />
             </div>
             <div className="qf-deck-header-titles">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -326,13 +366,28 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                       <rect width="240" height="340" fill={`url(#qf-hex-${f.id})`} />
                     </svg>
 
-                    {/* Cabecera: Relevancia, Rol y Badge */}
+                    {/* Cabecera: Relevancia, Rol y Badge con sello oficial QFDOS */}
                     <div className="qf-cabecera">
                       <div>
                         <div className="qf-rel">{f.relevancia}</div>
                         <div className="qf-rol">{f.rol}</div>
                       </div>
-                      <span className="qf-badge">{f.badge}</span>
+                      <div className="qf-cabecera-der">
+                        <span className="qf-badge">{f.badge}</span>
+                        <div className="qf-card-brand-stamp" title="Química Farmacéutica II (Grupo E)">
+                          <img
+                            src={`${cleanBase}assets/Marca/qfdos-isotipo.png`}
+                            alt="QFDOS"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (!target.src.includes('i.ibb.co')) {
+                                target.src = 'https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png';
+                              }
+                            }}
+                          />
+                          <span>QFDOS</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Contenedor Molecular con SVG de RDKit */}
@@ -392,48 +447,72 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                       <rect width="240" height="340" fill={`url(#qf-hex-${f.id})`} />
                     </svg>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
+                    {/* Cabecera Dorso */}
+                    <div className="qf-dorso-header" onClick={(e) => toggleFlip(f.id, e)} title="Pulsar para voltear al anverso">
                       <div className="qf-nombre">{f.nombre}</div>
-                      <span className="qf-badge" style={{ fontSize: '9px', padding: '2px 6px' }}>{f.badge}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span className="qf-badge" style={{ fontSize: '9px', padding: '2px 6px' }}>{f.badge}</span>
+                        <div className="qf-card-brand-stamp" title="Química Farmacéutica II (Grupo E)">
+                          <img
+                            src={`${cleanBase}assets/Marca/qfdos-isotipo.png`}
+                            alt="QFDOS"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (!target.src.includes('i.ibb.co')) {
+                                target.src = 'https://i.ibb.co/HLCYDc3c/Logo-primario-QFDOS.png';
+                              }
+                            }}
+                          />
+                          <span>QFDOS</span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* SMILES con botón de copiado */}
-                    <div className="qf-smiles-box">
-                      <span className="qf-smiles-text">{f.smiles}</span>
-                      <button
-                        type="button"
-                        className="qf-smiles-copy-btn"
-                        onClick={(e) => handleCopySmiles(f.id, f.smiles, e)}
-                        title="Copiar código SMILES"
-                      >
-                        {copiedId === f.id ? <Check size={12} color="#2dd4bf" /> : <Copy size={12} />}
-                      </button>
+                    {/* Contenido Desplazable del Dorso */}
+                    <div className="qf-dorso-scroll" onClick={(e) => e.stopPropagation()}>
+                      {/* SMILES con botón de copiado */}
+                      <div className="qf-smiles-box">
+                        <span className="qf-smiles-text">{f.smiles}</span>
+                        <button
+                          type="button"
+                          className="qf-smiles-copy-btn"
+                          onClick={(e) => handleCopySmiles(f.id, f.smiles, e)}
+                          title="Copiar código SMILES al portapapeles"
+                        >
+                          {copiedId === f.id ? <Check size={12} color="#0d9488" /> : <Copy size={12} />}
+                        </button>
+                      </div>
+
+                      <h3>Acción Farmacológica</h3>
+                      <p>{f.accion}</p>
+
+                      <h3>Indicación Clínica</h3>
+                      <p>{f.indicacion}</p>
+
+                      <h3>Clave de Diseño Molecular</h3>
+                      <p>{f.diseno}</p>
+
+                      <div className="qf-examen">
+                        <strong>
+                          <Sparkles size={11} style={{ marginRight: 4, verticalAlign: 'middle' }} />
+                          Clave Examen QFDOS
+                        </strong>
+                        {f.examen}
+                      </div>
                     </div>
 
-                    <h3>Acción Farmacológica</h3>
-                    <p>{f.accion}</p>
-
-                    <h3>Indicación Clínica</h3>
-                    <p>{f.indicacion}</p>
-
-                    <h3>Clave de Diseño Molecular</h3>
-                    <p>{f.diseno}</p>
-
-                    <div className="qf-examen">
-                      <strong>Clave Examen QFDOS</strong>
-                      {f.examen}
-                    </div>
-
-                    {/* Botones de acción en dorso */}
-                    <div className="qf-dorso-actions">
-                      <button
-                        type="button"
+                    {/* Botones de acción fijos en dorso */}
+                    <div className="qf-dorso-actions" onClick={(e) => e.stopPropagation()}>
+                      <a
+                        href={`https://molview.org/?q=${encodeURIComponent(FARMACOS_MOLVIEW_MAP[f.id] || f.nombre)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="qf-dorso-btn qf-dorso-btn--secondary"
-                        onClick={(e) => handleOpen3D(f.smiles, e)}
                         title="Ver conformación tridimensional en MolView"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink size={11} /> 3D MolView
-                      </button>
+                      </a>
 
                       {onOpenAdmet && (
                         <button

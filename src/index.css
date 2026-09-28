@@ -1162,9 +1162,10 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1 1 auto;
-  min-width: 0;
-  max-width: 460px;
+  flex: 0 1 360px;
+  min-width: 38px;
+  max-width: 360px;
+  overflow: hidden;
   /* Se pega a la marca y empuja las herramientas al extremo: el hueco queda
      todo a la derecha en vez de partirse a los dos lados. */
   margin-right: auto;
@@ -1645,9 +1646,26 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
 
 
 /* Responsive Header Media Queries */
-@media (max-width: 1200px) {
+@media (max-width: 1420px) {
+  .header-search-kbd,
+  .header-search kbd { display: none !important; }
   .brand-sub { display: none; }
-  .tool-label, .admin-btn-label { display: none; }
+}
+
+@media (max-width: 1220px) {
+  .header-search-texto { display: none !important; }
+  .header-search {
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: var(--radius-md) !important;
+  }
+  .tool-label, .admin-btn-label, .tool-badge { display: none !important; }
+  .btn-header-action, .btn-header-admin, .btn-header-fir {
+    padding: 7px 10px !important;
+  }
 }
 /* El `order: 3` que había aquí mandaba el buscador detrás de las
    herramientas y contradecía la escalera de arriba: a 900 px se reduce a su
