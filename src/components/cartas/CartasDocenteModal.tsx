@@ -24,9 +24,6 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  // Si no es profesor, denegar acceso completamente
-  if (!isProfesor) return null;
-
   const handleAdmetFromDeck = (drug: MoleculeDrug) => {
     onClose();
     onOpenAdmet?.(drug);
@@ -93,8 +90,8 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
                   Baraja de Fármacos QFDOS · Tema 1
                 </h3>
                 <span className="qfdos-badge badge-mint" style={{ fontSize: '0.62rem', padding: '1px 6px', fontWeight: 800 }}>
-                  <ShieldCheck size={11} style={{ marginRight: 3, verticalAlign: 'middle' }} />
-                  Exclusivo Docente
+                  <Layers size={11} style={{ marginRight: 3, verticalAlign: 'middle' }} />
+                  Colección Oficial · 15 Cartas
                 </span>
               </div>
               <p style={{ margin: 0, fontSize: '0.76rem', color: 'var(--text-muted)' }}>

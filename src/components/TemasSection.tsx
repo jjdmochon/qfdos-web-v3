@@ -402,8 +402,8 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                 )}
 
-                {/* Fila 3: Baraja Docente Exclusiva (Tema 01) */}
-                {topic.id === 'tema-01' && isProfesor && onOpenCartas && (
+                {/* Fila 3: Baraja Coleccionable (Tema 01) */}
+                {topic.id === 'tema-01' && onOpenCartas && (
                   <div style={{ display: 'flex', gap: '6px', width: '100%', marginTop: '2px' }}>
                     <button
                       onClick={onOpenCartas}
@@ -424,11 +424,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         gap: '6px',
                         whiteSpace: 'nowrap'
                       }}
-                      title="Baraja Coleccionable de Fármacos Colinérgicos · 15 cartas (Exclusivo Docente)"
+                      title="Baraja Coleccionable de Fármacos Colinérgicos · 15 cartas"
                     >
                       <Layers size={13} color="var(--teal)" /> Cartas Fármacos
                       <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', fontWeight: 800 }}>
-                        Docente (15)
+                        15 Cartas
                       </span>
                     </button>
                   </div>

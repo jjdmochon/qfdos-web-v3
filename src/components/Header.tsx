@@ -163,12 +163,12 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Right tools */}
           <div className="header-tools">
-            {/* Baraja Coleccionable Tema 1 (Solo para profesores) */}
-            {isProfesor && onOpenCartas && (
+            {/* Baraja Coleccionable Tema 1 (Accesible a todos) */}
+            {onOpenCartas && (
               <button
                 onClick={onOpenCartas}
                 className="btn btn-sm btn-header-action btn-header-cartas"
-                title="Baraja Coleccionable de Fármacos · Tema 1 (Uso Docente)"
+                title="Baraja Coleccionable de Fármacos · Tema 1"
                 style={{
                   background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.12) 0%, rgba(13, 148, 136, 0.12) 100%)',
                   border: '1px solid rgba(45, 212, 191, 0.35)',
@@ -178,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <Layers size={14} color="var(--teal-ink)" />
                 <span className="tool-label">Cartas Tema 1</span>
                 <span className="qfdos-badge badge-mint tool-badge" style={{ fontSize: '0.58rem', padding: '1px 5px', marginLeft: 3, fontWeight: 800 }}>
-                  Docente
+                  15 Cartas
                 </span>
               </button>
             )}
@@ -404,7 +404,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
                   </button>
                 </li>
-                {isProfesor && onOpenCartas && (
+                {onOpenCartas && (
                   <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenCartas)}><Layers size={18} /> Cartas Tema 1</button></li>
                 )}
                 {isProfesor && (

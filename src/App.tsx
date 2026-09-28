@@ -389,9 +389,7 @@ export const App: React.FC = () => {
         setIsFirModalOpen(true);
       }
       if (raw === 'cartas' || raw === 'cartas-tema-01' || raw === 'baraja') {
-        if (isProfesor) {
-          setIsCartasModalOpen(true);
-        }
+        setIsCartasModalOpen(true);
       } else {
         setIsCartasModalOpen(false);
       }
@@ -644,8 +642,8 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Baraja Coleccionable de Cartas: solo accesible al profesor */}
-      {isProfesor && isCartasModalOpen && (
+      {/* Baraja Coleccionable de Cartas: accesible a todos */}
+      {isCartasModalOpen && (
         <CartasDocenteModal
           onClose={() => {
             setIsCartasModalOpen(false);

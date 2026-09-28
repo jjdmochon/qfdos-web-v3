@@ -328,7 +328,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 </span>
               </button>
             )}
-            {topic.id === 'tema-01' && isProfesor && (
+            {topic.id === 'tema-01' && (
               <button
                 onClick={() => setActiveTab('cartas')}
                 className={`tab-btn ${activeTab === 'cartas' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'cartas'}
@@ -344,7 +344,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               >
                 <Layers size={14} /> Cartas Colinérgicas
                 <span className="qfdos-badge badge-mint" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px', fontWeight: 800 }}>
-                  Docente (15)
+                  15 Cartas
                 </span>
               </button>
             )}
@@ -1534,8 +1534,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             <RetrosintesisWorkshop isProfesor={isProfesor} />
           )}
 
-          {/* TAB 5: Cartas Coleccionables Docentes (Tema 1) */}
-          {activeTab === 'cartas' && topic.id === 'tema-01' && isProfesor && (
+          {/* TAB 5: Cartas Coleccionables (Tema 1) */}
+          {activeTab === 'cartas' && topic.id === 'tema-01' && (
             <div style={{ padding: '0.25rem 0' }}>
               <CartasDeckView
                 onOpenAdmet={(drug) => {
@@ -1577,21 +1577,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                     >
                       <GitBranch size={14} /> Taller Retrosíntesis
                     </button>
-                    {isProfesor && (
-                      <button 
-                        onClick={() => setActiveTab('cartas')} 
-                        className={`btn btn-sm ${activeTab === 'cartas' ? 'btn-primary' : 'btn-secondary'}`}
-                        style={{ 
-                          fontWeight: 800,
-                          border: '1.5px solid var(--tertiary, #2dd4bf)',
-                          color: activeTab === 'cartas' ? '#ffffff' : 'var(--teal-ink)',
-                          boxShadow: '0 2px 8px rgba(30, 58, 138, 0.15)'
-                        }}
-                        title="Ver baraja docente de 15 cartas coleccionables"
-                      >
-                        <Layers size={14} /> Cartas Fármacos (15)
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => setActiveTab('cartas')} 
+                      className={`btn btn-sm ${activeTab === 'cartas' ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{ 
+                        fontWeight: 800,
+                        border: '1.5px solid var(--tertiary, #2dd4bf)',
+                        color: activeTab === 'cartas' ? '#ffffff' : 'var(--teal-ink)',
+                        boxShadow: '0 2px 8px rgba(30, 58, 138, 0.15)'
+                      }}
+                      title="Ver baraja de 15 cartas coleccionables de fármacos"
+                    >
+                      <Layers size={14} /> Cartas Fármacos (15)
+                    </button>
                     <button 
                       onClick={() => setIs3DViewerOpen(true)}
                       className="btn btn-sm btn-outline"

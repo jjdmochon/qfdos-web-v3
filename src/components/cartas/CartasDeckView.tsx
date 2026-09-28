@@ -170,7 +170,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <h2>Cartas Coleccionables de Fármacos · Tema 1</h2>
                 <span className="qf-deck-badge-docente">
-                  <ShieldCheck size={13} /> Material Exclusivo Profesorado
+                  <Sparkles size={13} /> Material Oficial de Estudio · QFDOS
                 </span>
               </div>
               <p>
