@@ -83,6 +83,9 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
       flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
       drugs: (Array.isArray(t.drugs) && t.drugs.length >= (base.drugs?.length || 0)) ? t.drugs : (base.drugs || []),
+      // Habilitar test y flashcards se decide en el código, no en lo publicado
+      testDisponible: base.testDisponible,
+      flashcardsDisponibles: base.flashcardsDisponibles,
     };
   });
 }

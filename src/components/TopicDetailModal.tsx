@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { QfdosTopic, CourseAttachment, MoleculeDrug } from '../data/qfdosData';
+import { QfdosTopic, CourseAttachment, MoleculeDrug, testHabilitado, flashcardsHabilitadas } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
@@ -687,7 +687,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       )}
 
                       {/* 5. Examen Oficial del Tema (Modelo A en modo examen + Google Sheets) */}
-                      {topic.id !== 'tema-00' && topic.testQuestions && topic.testQuestions.length > 0 && (
+                      {topic.id !== 'tema-00' && testHabilitado(topic) && (
                         <div className="qfdos-card card-amber resource-card is-active">
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -714,8 +714,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales (cuatro modelos disponibles). Calificaciones volcadas en Google Sheets.`
-                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions.length} preguntas oficiales calibradas. Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
+                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (cuatro modelos disponibles). Calificaciones volcadas en Google Sheets.`
+                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales calibradas. Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
                               }
                             </p>
                           </div>
@@ -730,7 +730,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       )}
 
                       {/* 6. Flashcards Interactivas */}
-                      {topic.id !== 'tema-00' && topic.flashcards && topic.flashcards.length > 0 && (
+                      {topic.id !== 'tema-00' && flashcardsHabilitadas(topic) && (
                         <div className="qfdos-card card-teal resource-card is-active">
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -754,7 +754,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               </span>
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              {topic.flashcards.length} tarjetas de memorización con estructuras 2D.
+                              {topic.flashcards?.length ?? 0} tarjetas de memorización con estructuras 2D.
                             </p>
                           </div>
                           <button 
@@ -1548,14 +1548,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {topic.id !== 'tema-00' && (
               <>
-                {isProfesor && (
+                {isProfesor && testHabilitado(topic) && (
                   <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
                     <HelpCircle size={14} /> {topic.id === 'tema-01' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
                   </button>
                 )}
-                <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">
-                  <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
-                </button>
+                {flashcardsHabilitadas(topic) && (
+                  <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">
+                    <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
+                  </button>
+                )}
                 {topic.id === 'tema-01' && (
                   <>
                     <button 

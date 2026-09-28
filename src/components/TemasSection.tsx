@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QfdosTopic } from '../data/qfdosData';
+import { QfdosTopic, testHabilitado, flashcardsHabilitadas } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -347,10 +347,16 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   )}
                 </div>
 
+                {topic.id !== 'tema-00' && !bloqueado && !testHabilitado(topic) && !flashcardsHabilitadas(topic) &&
+                  (topic.testDisponible === false || topic.flashcardsDisponibles === false) && (
+                  <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0 }}>
+                    Test y flashcards: disponibles próximamente.
+                  </p>
+                )}
                 {/* Fila 2: Herramientas de Estudio (Test y Flashcards) */}
-                {topic.id !== 'tema-00' && !bloqueado && ((topic.testQuestions && topic.testQuestions.length > 0) || (topic.flashcards && topic.flashcards.length > 0)) && (
+                {topic.id !== 'tema-00' && !bloqueado && (testHabilitado(topic) || flashcardsHabilitadas(topic)) && (
                   <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                    {topic.testQuestions && topic.testQuestions.length > 0 && (
+                    {testHabilitado(topic) && (
                       <button
                         onClick={() => onOpenQuiz(topic)}
                         disabled={bloqueado}
@@ -372,7 +378,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       </button>
                     )}
 
-                    {topic.flashcards && topic.flashcards.length > 0 && (
+                    {flashcardsHabilitadas(topic) && (
                       <button
                         onClick={() => onOpenFlashcards(topic)}
                         disabled={bloqueado}
@@ -390,7 +396,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         }}
                         title="Repasar flashcards de memoria activa"
                       >
-                        <Award size={13} /> Flashcards ({topic.flashcards.length})
+                        <Award size={13} /> Flashcards ({topic.flashcards?.length ?? 0})
                       </button>
                     )}
                   </div>

@@ -158,6 +158,20 @@ export interface QfdosTopic {
   testQuestions?: TestQuestion[];
   flashcards?: Flashcard[];
   lectureAudios?: LectureAudioNote[];
+  /** false = el test existe pero aún no se ofrece al alumnado */
+  testDisponible?: boolean;
+  /** false = las flashcards existen pero aún no se ofrecen al alumnado */
+  flashcardsDisponibles?: boolean;
+}
+
+/** ¿Se puede abrir el test de este tema? */
+export function testHabilitado(t: QfdosTopic): boolean {
+  return t.testDisponible !== false && (t.testQuestions?.length ?? 0) > 0;
+}
+
+/** ¿Se pueden abrir las flashcards de este tema? */
+export function flashcardsHabilitadas(t: QfdosTopic): boolean {
+  return t.flashcardsDisponibles !== false && (t.flashcards?.length ?? 0) > 0;
 }
 
 export interface QfdosGlossaryTerm {
@@ -2582,6 +2596,9 @@ flashcards: [
     pdbTargetId: '2RH1',
     targetName: 'Receptor β2-Adrenérgico Humano unido a Timolol',
     status: 'Próximamente',
+    // Parte 1 publicada (sep. 2026): test y flashcards todavía en preparación
+    testDisponible: false,
+    flashcardsDisponibles: false,
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 02: Diapositivas Oficiales Sistema Adrenérgico.pdf',
     notesPdfUrl: '',
@@ -2590,50 +2607,209 @@ flashcards: [
     spotifyPodcastUrl: '',
     drugs: [
       {
-        name: 'Levodopa (L-DOPA)',
-        smiles: 'C1=CC(=C(C=C1C[C@@H](C(=O)O)N)O)O',
-        role: 'Precursor biosintético de catecolaminas; sustrato de LAT1 para el cruce activo de la BHE',
+        name: 'L-Tirosina',
+        smiles: 'N[C@@H](Cc1ccc(O)cc1)C(=O)O',
+        formula: 'C9H11NO3',
+        mw: 181.19,
+        logP: 0.35,
+        hbd: 3,
+        hba: 3,
+        tpsa: 83.55,
+        rotBonds: 3,
+        role: 'Aminoácido precursor inicial de la biosíntesis de catecolaminas'
+      },
+      {
+        name: 'L-DOPA (Levodopa)',
+        smiles: 'N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O',
+        formula: 'C9H11NO4',
         mw: 197.19,
-        logP: -2.39,
+        logP: 0.05,
         hbd: 4,
         hba: 4,
-        tpsa: 103.8,
+        tpsa: 103.78,
         rotBonds: 3,
+        role: 'Precursor de las catecolaminas; sustrato de LAT1, cruza la BHE (tratamiento del Parkinson)',
         pdbId: '8J8L'
       },
       {
-        name: 'Salbutamol',
-        smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1',
-        role: 'Agonista selectivo β2 de acción corta (SABA)',
-        mw: 239.31,
-        logP: 0.64,
+        name: 'Dopamina',
+        smiles: 'NCCc1ccc(O)c(O)c1',
+        formula: 'C8H11NO2',
+        mw: 153.18,
+        logP: 0.6,
         hbd: 3,
-        hba: 4,
-        tpsa: 72.7,
-        rotBonds: 5,
-        pdbId: '2RH1'
-      },
-      {
-        name: 'Propranolol',
-        smiles: 'CC(C)NCC(O)COc1cccc2ccccc12',
-        role: 'Antagonista β-adrenérgico no selectivo clásico',
-        mw: 259.34,
-        logP: 2.60,
-        hbd: 2,
         hba: 3,
-        tpsa: 41.5,
-        rotBonds: 6
+        tpsa: 66.48,
+        rotBonds: 2,
+        role: 'Neurotransmisor central y periférico, precursor biosintético directo de la noradrenalina mediante la dopamina beta-hidroxilasa (DbH)'
       },
       {
-        name: 'Atenolol',
-        smiles: 'CC(C)NCC(O)COc1ccc(CC(=O)N)cc1',
-        role: 'Antagonista β1 cardio-selectivo hidrofílico',
-        mw: 266.34,
-        logP: 0.16,
-        hbd: 3,
+        name: 'Noradrenalina (Norepinefrina)',
+        smiles: 'NC[C@H](O)c1ccc(O)c(O)c1',
+        formula: 'C8H11NO3',
+        mw: 169.18,
+        logP: 0.09,
+        hbd: 4,
         hba: 4,
-        tpsa: 84.6,
-        rotBonds: 7
+        tpsa: 86.71,
+        rotBonds: 2,
+        role: 'Neurotransmisor principal de las terminaciones postganglionares del sistema simpático y prototipo funcional del Tema 2'
+      },
+      {
+        name: 'Adrenalina (Epinefrina)',
+        smiles: 'CNC[C@H](O)c1ccc(O)c(O)c1',
+        formula: 'C9H13NO3',
+        mw: 183.21,
+        logP: 0.35,
+        hbd: 4,
+        hba: 4,
+        tpsa: 72.72,
+        rotBonds: 3,
+        role: 'Hormona de la médula adrenal producida por N-metilación de la noradrenalina mediante la feniletanolamina N-metiltransferasa (PNMT)'
+      },
+      {
+        name: 'α-Metiltirosina (Metirosina)',
+        smiles: 'C[C@](N)(Cc1ccc(O)cc1)C(=O)O',
+        formula: 'C10H13NO3',
+        mw: 195.22,
+        logP: 0.74,
+        hbd: 3,
+        hba: 3,
+        tpsa: 83.55,
+        rotBonds: 3,
+        role: 'Inhibidor competitivo de la tirosina hidroxilasa'
+      },
+      {
+        name: 'α-Metildopa',
+        smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O',
+        formula: 'C10H13NO4',
+        mw: 211.22,
+        logP: 0.44,
+        hbd: 4,
+        hba: 4,
+        tpsa: 103.78,
+        rotBonds: 3,
+        role: 'Pro-fármaco antihipertensivo de elección en la hipertensión del embarazo'
+      },
+      {
+        name: 'α-Metildopamina',
+        smiles: 'CC(N)Cc1ccc(O)c(O)c1',
+        formula: 'C9H13NO2',
+        mw: 167.21,
+        logP: 0.99,
+        hbd: 3,
+        hba: 3,
+        tpsa: 66.48,
+        rotBonds: 2,
+        role: 'Metabolito de la α-metildopa formado por la L-DOPA descarboxilasa'
+      },
+      {
+        name: 'α-Metilnoradrenalina (Corbasil)',
+        smiles: 'C[C@H](N)[C@H](O)c1ccc(O)c(O)c1',
+        formula: 'C9H13NO3',
+        mw: 183.21,
+        logP: 0.48,
+        hbd: 4,
+        hba: 4,
+        tpsa: 86.71,
+        rotBonds: 2,
+        role: 'Falso neurotransmisor: sustituye a la NA en las vesículas (metabolito activo de la α-metildopa)'
+      },
+      {
+        name: 'Carbidopa',
+        smiles: 'C[C@](NN)(Cc1ccc(O)c(O)c1)C(=O)O',
+        formula: 'C10H14N2O4',
+        mw: 226.23,
+        logP: -0.05,
+        hbd: 5,
+        hba: 5,
+        tpsa: 115.81,
+        rotBonds: 4,
+        role: 'Inhibidor periférico de la L-DOPA descarboxilasa (AADC, aminoácido aromático descarboxilasa)'
+      },
+      {
+        name: 'Disulfiramo',
+        smiles: 'CCN(CC)C(=S)SSC(=S)N(CC)CC',
+        formula: 'C10H20N2S4',
+        mw: 296.55,
+        logP: 3.62,
+        hbd: 0,
+        hba: 4,
+        tpsa: 6.48,
+        rotBonds: 4,
+        role: 'Inhibidor de la dopamina β-hidroxilasa por quelación de su cobre catalítico'
+      },
+      {
+        name: 'Reserpina',
+        smiles: 'COC(=O)[C@H]1[C@H]2C[C@@H]3c4[nH]c5cc(OC)ccc5c4CCN3C[C@H]2C[C@@H](OC(=O)c2cc(OC)c(OC)c(OC)c2)[C@@H]1OC',
+        formula: 'C33H40N2O9',
+        mw: 608.69,
+        logP: 4.17,
+        hbd: 1,
+        hba: 10,
+        tpsa: 117.78,
+        rotBonds: 8,
+        role: 'Alcaloide de Rauwolfia: bloquea VMAT-2 y vacía las vesículas de noradrenalina'
+      },
+      {
+        name: 'Rescinamina',
+        smiles: 'COC(=O)[C@H]1[C@H]2C[C@@H]3c4[nH]c5cc(OC)ccc5c4CCN3C[C@H]2C[C@@H](OC(=O)/C=C/c2cc(OC)c(OC)c(OC)c2)[C@@H]1OC',
+        formula: 'C35H42N2O9',
+        mw: 634.73,
+        logP: 4.57,
+        hbd: 1,
+        hba: 10,
+        tpsa: 117.78,
+        rotBonds: 9,
+        role: 'Alcaloide de Rauwolfia con éster 3,4,5-trimetoxicinámico: ejemplo de vinilogía natural'
+      },
+      {
+        name: 'Mediodespidina (Deserpidina)',
+        smiles: 'COC(=O)[C@H]1[C@H]2C[C@@H]3c4[nH]c5ccccc5c4CCN3C[C@H]2C[C@@H](OC(=O)c2cc(OC)c(OC)c(OC)c2)[C@@H]1OC',
+        formula: 'C32H38N2O8',
+        mw: 578.66,
+        logP: 4.16,
+        hbd: 1,
+        hba: 9,
+        tpsa: 108.55,
+        rotBonds: 7,
+        role: '11-Desmetoxirreserpina: hipotensora como la reserpina, con menor depresión central'
+      },
+      {
+        name: 'Guanidina',
+        smiles: 'NC(N)=N',
+        formula: 'CH5N3',
+        mw: 59.07,
+        logP: -1.16,
+        hbd: 3,
+        hba: 1,
+        tpsa: 75.89,
+        rotBonds: 0,
+        role: 'Base muy fuerte (pKa 13,6): el catión guanidinio se estabiliza por resonancia'
+      },
+      {
+        name: 'Guanetidina',
+        smiles: 'N=C(N)NCCN1CCCCCCC1',
+        formula: 'C10H22N4',
+        mw: 198.31,
+        logP: 0.74,
+        hbd: 3,
+        hba: 2,
+        tpsa: 65.14,
+        rotBonds: 3,
+        role: 'Bloqueante neuronal presináptico que vacía las reservas de noradrenalina'
+      },
+      {
+        name: 'Cloruro de S-metilisotiuronio',
+        smiles: 'CSC(N)=[NH2+].[Cl-]',
+        formula: 'C2H7ClN2S',
+        mw: 126.61,
+        logP: -4.57,
+        hbd: 2,
+        hba: 1,
+        tpsa: 51.61,
+        rotBonds: 0,
+        role: 'Reactivo de guanidinación en la síntesis de la guanetidina'
       }
     ],
     attachments: [

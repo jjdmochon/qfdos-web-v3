@@ -14,8 +14,7 @@ import {
   StudentQuestion,
   CourseAttachment,
   TestQuestion,
-  MoleculeDrug
-} from './data/qfdosData';
+  MoleculeDrug, testHabilitado, flashcardsHabilitadas } from './data/qfdosData';
 import { useAuth } from './context/AuthContext';
 import { descargarContenido, contenidoEnCache, normalizarTemas } from './services/contenidoRemoto';
 import { ExternalLink } from 'lucide-react';
@@ -512,8 +511,8 @@ export const App: React.FC = () => {
               setSelectedTopicDetail(topic); 
               navigateTo('temas', topic.id); 
             }}
-            onOpenQuiz={setSelectedQuizTopic}
-            onOpenFlashcards={setSelectedFlashcardsTopic}
+            onOpenQuiz={t => { if (testHabilitado(t)) setSelectedQuizTopic(t); }}
+            onOpenFlashcards={t => { if (flashcardsHabilitadas(t)) setSelectedFlashcardsTopic(t); }}
             onOpenCartas={() => setIsCartasModalOpen(true)}
           />
         )}
@@ -557,8 +556,8 @@ export const App: React.FC = () => {
             setTopics(prev => prev.map(t => t.id === updatedTopic.id ? updatedTopic : t));
             setSelectedTopicDetail(updatedTopic);
           }}
-          onOpenQuiz={t => { setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
-          onOpenFlashcards={t => { setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
+          onOpenQuiz={t => { if (!testHabilitado(t)) return; setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
+          onOpenFlashcards={t => { if (!flashcardsHabilitadas(t)) return; setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
           onOpenAdmet={handleOpenAdmet}
         />
