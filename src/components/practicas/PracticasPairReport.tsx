@@ -507,7 +507,7 @@ export const PracticasPairReport: React.FC = () => {
 
   // Reset to demo data
   const handleResetToDemoData = () => {
-    if (window.confirm('¿Deseas restaurar los informes de demostración predeterminados?')) {
+    if (window.confirm('¿Vaciar todos los informes guardados en este navegador? Esta acción no se puede deshacer.')) {
       setReports(LAB_PAIR_REPORTS_DEFAULT);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(LAB_PAIR_REPORTS_DEFAULT));
     }
@@ -585,14 +585,17 @@ export const PracticasPairReport: React.FC = () => {
               <Sparkles size={16} />
               <span><strong>Modo Pareja de Prácticas:</strong> Rellenad los datos conjuntos del puesto, calculad vuestros rendimientos experimentales y pulsad <strong>"Enviar Informe al Profesor"</strong> al finalizar la semana.</span>
             </div>
-            <button
-              type="button"
-              onClick={handleLoadStudentDemo}
-              className="btn btn-xs btn-outline"
-              style={{ fontSize: '0.72rem' }}
-            >
-              Cargar Datos de Ejemplo (Puesto 4)
-            </button>
+            {isProfesor && (
+              <button
+                type="button"
+                onClick={handleLoadStudentDemo}
+                className="btn btn-xs btn-outline"
+                style={{ fontSize: '0.72rem' }}
+                title="Solo profesorado: rellena el formulario con datos ficticios para enseñarlo en clase"
+              >
+                Cargar datos de ejemplo (demostración)
+              </button>
+            )}
           </div>
         ) : (
           <div style={{
@@ -625,7 +628,7 @@ export const PracticasPairReport: React.FC = () => {
                 className="btn btn-xs btn-ghost"
                 style={{ fontSize: '0.72rem' }}
               >
-                Restaurar Demos
+                Vaciar informes
               </button>
             </div>
           </div>
@@ -640,9 +643,9 @@ export const PracticasPairReport: React.FC = () => {
           
           {submitSuccess && (
             <div style={{
-              background: '#ecfdf5',
+              background: 'var(--ok-bg)',
               border: '1.5px solid #10b981',
-              color: '#065f46',
+              color: 'var(--ok-ink)',
               padding: '1rem 1.25rem',
               borderRadius: '8px',
               display: 'flex',
@@ -652,7 +655,7 @@ export const PracticasPairReport: React.FC = () => {
               fontSize: '0.9rem'
             }}>
               <CheckCircle2 size={20} color="#10b981" />
-              <span>¡Informe de prácticas enviado al profesor Juanjo con éxito! ID de Entrega: <strong>{currentReport.id}</strong> ({currentReport.submittedAt})</span>
+              <span>Informe guardado en este navegador (ID <strong>{currentReport.id}</strong>, {currentReport.submittedAt}). Para que le llegue al profesor, usa <strong>Enviar al profesor</strong> más abajo.</span>
             </div>
           )}
 
@@ -665,7 +668,7 @@ export const PracticasPairReport: React.FC = () => {
               </h3>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
               <div>
                 <label className="label-text" style={{ fontSize: '0.78rem', fontWeight: 700 }}>Puesto Asignado *</label>
                 <select
@@ -789,7 +792,7 @@ export const PracticasPairReport: React.FC = () => {
               producto={{ nombre: 'Naftoximetiloxirano', smiles: 'C(C1CO1)Oc1cccc2ccccc12', detalle: 'PM 200,24' }}
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label className="label-text" style={{ fontSize: '0.76rem' }}>Masa 1-Naftol pesada (g)</label>
                 <input
@@ -884,7 +887,7 @@ export const PracticasPairReport: React.FC = () => {
               producto={{ nombre: 'Propranolol', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12', detalle: 'PM 259,34 · Pf 94-96 °C' }}
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label className="label-text" style={{ fontSize: '0.76rem' }}>Masa Oxirano puesto (g)</label>
                 <input
@@ -1019,7 +1022,7 @@ export const PracticasPairReport: React.FC = () => {
               }
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '1rem', marginBottom: '1rem' }}>
               <div>
                 <label className="label-text" style={{ fontSize: '0.76rem', fontWeight: 700 }}>Compuesto Sintetizado *</label>
                 <select
@@ -1257,7 +1260,7 @@ export const PracticasPairReport: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Summary Metrics Bar */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '1rem' }}>
             <div className="qfdos-card" style={{ padding: '1rem', borderLeft: '4px solid var(--navy)' }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>TOTAL ENTREGAS</span>
               <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy-ink)' }}>
@@ -1267,7 +1270,7 @@ export const PracticasPairReport: React.FC = () => {
 
             <div className="qfdos-card" style={{ padding: '1rem', borderLeft: '4px solid #10b981' }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>INFORMES CALIFICADOS</span>
-              <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: '#10b981' }}>
+              <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: 'var(--ok-ink)' }}>
                 {reports.filter(r => r.status === 'Calificado').length}
               </h3>
             </div>
@@ -1294,7 +1297,7 @@ export const PracticasPairReport: React.FC = () => {
 
           {/* Filter and Search Bar */}
           <div className="qfdos-card" style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '240px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 'min(240px, 100%)' }}>
               <Search size={16} color="var(--text-muted)" />
               <input
                 type="text"
@@ -1362,16 +1365,16 @@ export const PracticasPairReport: React.FC = () => {
                     </td>
                     <td style={{ padding: '0.75rem' }}>
                       {rep.status === 'Calificado' ? (
-                        <span className="qfdos-badge" style={{ background: '#dcfce7', color: '#15803d', fontSize: '0.72rem', fontWeight: 700 }}>
+                        <span className="qfdos-badge" style={{ background: 'var(--ok-bg)', color: 'var(--ok-ink)', fontSize: '0.72rem', fontWeight: 700 }}>
                           ✓ Calificado
                         </span>
                       ) : (
-                        <span className="qfdos-badge" style={{ background: '#fef3c7', color: '#b45309', fontSize: '0.72rem', fontWeight: 700 }}>
+                        <span className="qfdos-badge" style={{ background: 'var(--warn-bg)', color: 'var(--warn-ink)', fontSize: '0.72rem', fontWeight: 700 }}>
                           ⏱️ Entregado
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '0.75rem', fontWeight: 900, fontSize: '1rem', color: rep.profesorGrade !== undefined ? 'var(--navy)' : 'var(--text-muted)' }}>
+                    <td style={{ padding: '0.75rem', fontWeight: 900, fontSize: '1rem', color: rep.profesorGrade !== undefined ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
                       {rep.profesorGrade !== undefined ? `${rep.profesorGrade.toFixed(1)}/10` : '--'}
                     </td>
                     <td style={{ padding: '0.75rem', textAlign: 'center' }}>
@@ -1432,7 +1435,7 @@ export const PracticasPairReport: React.FC = () => {
               </div>
 
               {/* Experimental Data Review Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
                 {/* Stage 1 */}
                 <div style={{ background: 'var(--surface-muted)', padding: '0.85rem', borderRadius: '8px' }}>
                   <h4 style={{ margin: '0 0 0.4rem 0', fontSize: '0.84rem', fontWeight: 800, color: 'var(--teal-ink)' }}>

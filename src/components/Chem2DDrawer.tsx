@@ -32,6 +32,7 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
 }) => {
   const [svg, setSvg] = useState<string | null>(null);
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
+  const [intento, setIntento] = useState(0);
   const mounted = useRef(true);
   const { theme } = useTheme();
   const dark = theme === 'dark';
@@ -77,11 +78,12 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
 
     run();
     return () => { cancelled = true; };
-  }, [smiles, width, height, highlightSmarts, dark]);
+  }, [smiles, width, height, highlightSmarts, dark, intento]);
 
   const frameStyle: React.CSSProperties = bare
-    ? { display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }
+    ? { display: 'inline-flex', flexDirection: 'column', alignItems: 'center', maxWidth: '100%' }
     : {
+        maxWidth: '100%',
         display: 'inline-flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -98,8 +100,11 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
     <div style={frameStyle} className={`chem-2d-container ${className}`}>
       <div
         style={{
+          // Se encoge con su contenedor en móvil sin perder la proporción
           width,
-          height,
+          maxWidth: '100%',
+          aspectRatio: `${width} / ${height}`,
+          height: 'auto',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -107,7 +112,7 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
         }}
       >
         {status === 'loading' && (
-          <div className="chem-skeleton" style={{ width: width - 12, height: height - 12 }} />
+          <div className="chem-skeleton" style={{ width: 'calc(100% - 12px)', height: 'calc(100% - 12px)' }} role="status" aria-label="Cargando estructura" />
         )}
 
         {status === 'error' && (
@@ -125,13 +130,16 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
           >
             <AlertTriangle size={16} color="var(--accent-amber)" />
             <span>Estructura no representable</span>
+            <button type="button" className="btn btn-xs btn-outline" onClick={() => setIntento(n => n + 1)}>
+              Reintentar
+            </button>
           </div>
         )}
 
         {status === 'ok' && svg && (
           <div
             className="chem-svg-host"
-            style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             dangerouslySetInnerHTML={{ __html: svg }}
           />
         )}

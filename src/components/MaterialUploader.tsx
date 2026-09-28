@@ -36,9 +36,13 @@ export const MaterialUploader: React.FC<MaterialUploaderProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
-    const [list, use] = await Promise.all([listFiles(topicId), getUsage()]);
-    setFiles(list);
-    setUsage(use);
+    try {
+      const [list, use] = await Promise.all([listFiles(topicId), getUsage()]);
+      setFiles(list);
+      setUsage(use);
+    } catch (e) {
+      setError(`No se pudo leer el almacenamiento del navegador: ${e instanceof Error ? e.message : String(e)}`);
+    }
   }, [topicId]);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -58,8 +62,11 @@ export const MaterialUploader: React.FC<MaterialUploaderProps> = ({
     }
 
     if (problems.length) setError(problems.join(' · '));
-    await refresh();
-    setBusy(false);
+    try {
+      await refresh();
+    } finally {
+      setBusy(false);
+    }
   };
 
   const onDrop = (e: React.DragEvent) => {
@@ -77,7 +84,11 @@ export const MaterialUploader: React.FC<MaterialUploaderProps> = ({
 
   const handleDelete = async (f: StoredFileMeta) => {
     if (!window.confirm(`¿Eliminar "${f.name}" definitivamente?`)) return;
-    await deleteFile(f.id);
+    try {
+      await deleteFile(f.id);
+    } catch (e) {
+      setError(`No se pudo eliminar «${f.name}»: ${e instanceof Error ? e.message : String(e)}`);
+    }
     await refresh();
   };
 
@@ -89,10 +100,12 @@ export const MaterialUploader: React.FC<MaterialUploaderProps> = ({
         onDragOver={e => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => { if (!busy) inputRef.current?.click(); }}
         role="button"
         tabIndex={0}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click(); }}
+        aria-busy={busy}
+        aria-disabled={busy || undefined}
+        onKeyDown={e => { if (!busy && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); inputRef.current?.click(); } }}
         style={compact ? { padding: '1.1rem 1rem' } : undefined}
       >
         <input

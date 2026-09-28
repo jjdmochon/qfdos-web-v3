@@ -174,9 +174,9 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <Activity size={24} color="var(--teal-ink)" />
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)', letterSpacing: '-0.02em', margin: 0 }}>
+            <h1 className="page-title">
               Calculadora ADMET & Reglas de Lipinski / Veber (Drug-Likeness)
-            </h2>
+            </h1>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.3rem 0 0 0', maxWidth: '840px', lineHeight: 1.5 }}>
             Evalúa en tiempo real las propiedades físico-químicas, biodisponibilidad oral teórica y permeabilidad celular de los fármacos del curso según los criterios de Lipinski (Rule of 5) y Veber.
@@ -216,7 +216,7 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
       </div>
 
       {/* Main Grid: Sliders, Radar Chart & 2D Drawer */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: '1.5rem' }}>
         
         {/* Left: Sliders */}
         <div className="qfdos-card" style={{ gap: '1.15rem' }}>
@@ -229,12 +229,13 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, marginBottom: '3px' }}>
                 <span>Peso Molecular (MW):</span>
-                <span className="font-mono" style={{ color: customMw > 500 ? 'var(--accent-red)' : 'var(--navy)' }}>
+                <span className="font-mono" style={{ color: customMw > 500 ? 'var(--bad-ink)' : 'var(--navy-ink)' }}>
                   {customMw.toFixed(1)} Da
                 </span>
               </div>
               <input
                 type="range"
+                aria-label="Peso molecular (MW)"
                 min="100"
                 max="750"
                 step="5"
@@ -253,12 +254,13 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, marginBottom: '3px' }}>
                 <span>Coeficiente Lipofilia (LogP):</span>
-                <span className="font-mono" style={{ color: customLogP > 5 ? 'var(--accent-red)' : 'var(--teal)' }}>
+                <span className="font-mono" style={{ color: customLogP > 5 ? 'var(--bad-ink)' : 'var(--teal-ink)' }}>
                   {customLogP.toFixed(2)}
                 </span>
               </div>
               <input
                 type="range"
+                aria-label="Coeficiente de lipofilia (LogP)"
                 min="-2"
                 max="7"
                 step="0.1"
@@ -281,6 +283,7 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
               </div>
               <input
                 type="range"
+                aria-label="Dadores de enlace de H (HBD)"
                 min="0"
                 max="8"
                 step="1"
@@ -298,6 +301,7 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
               </div>
               <input
                 type="range"
+                aria-label="Aceptores de enlace de H (HBA)"
                 min="0"
                 max="14"
                 step="1"
@@ -311,12 +315,13 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, marginBottom: '3px' }}>
                 <span>Área Superficial Polar (TPSA):</span>
-                <span className="font-mono" style={{ color: customTpsa > 140 ? 'var(--accent-red)' : 'var(--navy)' }}>
+                <span className="font-mono" style={{ color: customTpsa > 140 ? 'var(--bad-ink)' : 'var(--navy-ink)' }}>
                   {customTpsa.toFixed(1)} Å²
                 </span>
               </div>
               <input
                 type="range"
+                aria-label="Área superficial polar (TPSA)"
                 min="10"
                 max="200"
                 step="5"
@@ -330,12 +335,13 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, marginBottom: '3px' }}>
                 <span>Enlaces Rotables (Flexibilidad):</span>
-                <span className="font-mono" style={{ color: customRotB > 10 ? 'var(--accent-red)' : 'var(--teal)' }}>
+                <span className="font-mono" style={{ color: customRotB > 10 ? 'var(--bad-ink)' : 'var(--teal-ink)' }}>
                   {customRotB}
                 </span>
               </div>
               <input
                 type="range"
+                aria-label="Enlaces rotables"
                 min="0"
                 max="15"
                 step="1"
@@ -363,7 +369,7 @@ export const AdmetCalculator: React.FC<AdmetCalculatorProps> = ({ initialDrug })
                 <AlertTriangle size={26} color="#dc2626" />
               )}
               <div>
-                <h4 style={{ fontSize: '1rem', fontWeight: 700, color: isRo5Compliant ? '#047857' : '#b91c1c' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 700, color: isRo5Compliant ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                   {isRo5Compliant ? 'Cumple Criterios de Lipinski & Veber' : 'Alerta: Violaciones de Drug-Likeness'}
                 </h4>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>

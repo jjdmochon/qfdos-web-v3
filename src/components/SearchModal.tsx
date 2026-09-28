@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { QfdosTopic, QfdosGlossaryTerm, MoleculeDrug } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
+import { pulsable, normalizarBusqueda } from '../utils/a11y';
 import { 
   Search, 
   X, 
@@ -57,15 +58,16 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const cleanQuery = query.toLowerCase().trim();
+  // Sin tildes: «colinergico» encuentra «colinérgico»
+  const cleanQuery = normalizarBusqueda(query).trim();
 
   // Matched Topics
   const matchedTopics = cleanQuery
     ? topics.filter(t => 
-        t.title.toLowerCase().includes(cleanQuery) ||
-        t.subtitle.toLowerCase().includes(cleanQuery) ||
-        t.number.toLowerCase().includes(cleanQuery) ||
-        t.keyConcepts.some(c => c.toLowerCase().includes(cleanQuery))
+        normalizarBusqueda(t.title).includes(cleanQuery) ||
+        normalizarBusqueda(t.subtitle).includes(cleanQuery) ||
+        normalizarBusqueda(t.number).includes(cleanQuery) ||
+        t.keyConcepts.some(c => normalizarBusqueda(c).includes(cleanQuery))
       )
     : [];
 
@@ -74,7 +76,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   if (cleanQuery) {
     topics.forEach(t => {
       t.drugs.forEach(d => {
-        if (d.name.toLowerCase().includes(cleanQuery) || d.role.toLowerCase().includes(cleanQuery)) {
+        if (normalizarBusqueda(d.name).includes(cleanQuery) || normalizarBusqueda(d.role).includes(cleanQuery)) {
           matchedDrugs.push({ drug: d, topic: t });
         }
       });
@@ -84,9 +86,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   // Matched Glossary Terms
   const matchedGlossary = cleanQuery
     ? glossary.filter(g => 
-        g.term.toLowerCase().includes(cleanQuery) ||
-        g.definition.toLowerCase().includes(cleanQuery) ||
-        g.category.toLowerCase().includes(cleanQuery)
+        normalizarBusqueda(g.term).includes(cleanQuery) ||
+        normalizarBusqueda(g.definition).includes(cleanQuery) ||
+        normalizarBusqueda(g.category).includes(cleanQuery)
       )
     : [];
 
@@ -99,7 +101,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   ];
 
   const matchedTools = cleanQuery
-    ? SYSTEM_TOOLS.filter(tool => tool.title.toLowerCase().includes(cleanQuery) || tool.desc.toLowerCase().includes(cleanQuery))
+    ? SYSTEM_TOOLS.filter(tool => normalizarBusqueda(tool.title).includes(cleanQuery) || normalizarBusqueda(tool.desc).includes(cleanQuery))
     : SYSTEM_TOOLS;
 
   return (
@@ -124,6 +126,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             placeholder="Buscar temas, fármacos, dianas PDB, biofísica, glosario..."
             value={query}
             onChange={e => setQuery(e.target.value)}
+            onFocus={e => e.currentTarget.select()}
+            onKeyDown={e => {
+              // Enter abre el primer resultado; ↓ baja a la lista
+              const primero = e.currentTarget.closest('.modal-container')?.querySelector<HTMLElement>('[role="button"]');
+              if (e.key === 'Enter' && primero) { e.preventDefault(); primero.click(); }
+              if (e.key === 'ArrowDown' && primero) { e.preventDefault(); primero.focus(); }
+            }}
+            aria-label="Buscar en la plataforma"
             autoFocus
             style={{
               flex: 1,
@@ -159,7 +169,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         onClose();
                         if (tool.tab) onNavigateToTab(tool.tab);
                         if (tool.action) tool.action();
-                      }}
+                      }} {...pulsable(() => {
+                        onClose();
+                        if (tool.tab) onNavigateToTab(tool.tab);
+                        if (tool.action) tool.action();
+                      })}
                       style={{
                         padding: '8px 12px',
                         borderRadius: 'var(--radius-md)',
@@ -203,7 +217,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                     onClick={() => {
                       onClose();
                       onSelectTopic(t);
-                    }}
+                    }} {...pulsable(() => {
+                      onClose();
+                      onSelectTopic(t);
+                    })}
                     style={{
                       padding: '8px 12px',
                       borderRadius: 'var(--radius-md)',
@@ -262,7 +279,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                       onClick={() => {
                         onClose();
                         onSelectTopic(topic);
-                      }}
+                      }} {...pulsable(() => {
+                        onClose();
+                        onSelectTopic(topic);
+                      })}
                       style={{ cursor: 'pointer', flex: 1 }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -350,7 +370,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                     onClick={() => {
                       onClose();
                       onNavigateToTab('glosario');
-                    }}
+                    }} {...pulsable(() => {
+                      onClose();
+                      onNavigateToTab('glosario');
+                    })}
                     style={{
                       padding: '8px 12px',
                       borderRadius: 'var(--radius-md)',
@@ -416,7 +439,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
         {/* Footer info */}
         <div style={{ padding: '8px 16px', background: 'var(--surface-raised)', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-          <span>Navega con ratón o teclado · ESC para cerrar</span>
+          <span>Enter abre el primer resultado · Tab o ↓ para recorrer la lista · Esc para cerrar</span>
           <span className="font-mono">Ctrl/Cmd + K</span>
         </div>
 

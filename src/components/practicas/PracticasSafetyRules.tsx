@@ -32,6 +32,8 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
     return false;
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState('');
+  const [envioError, setEnvioError] = useState('');
 
   // El envio real vive en services/entregaPracticas: alli se distingue entre
   // "enviado sin confirmar" y "no configurado", en vez de fingir exito siempre.
@@ -104,15 +106,13 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
 
   const handleConfirmAndSign = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!allChecked || !studentName.trim() || !studentEmail.trim() || !initials.trim()) {
-      alert('Por favor, marca todas las 16 normas de seguridad e introduce tu nombre, email e iniciales para firmar el compromiso.');
+    if (!allChecked || !studentName.trim() || !studentEmail.trim() || !initials.trim()) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentEmail.trim())) {
+      setEmailError('Introduce un correo válido, por ejemplo alumno@correo.ugr.es.');
       return;
     }
-    if (!studentEmail.includes('@')) {
-      alert('Por favor, introduce un email válido (ej. alumno@correo.ugr.es).');
-      return;
-    }
-
+    setEmailError('');
+    setEnvioError('');
     setIsSubmitting(true);
     const nowISO = new Date().toISOString();
     const payload = {
@@ -124,7 +124,7 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
     };
 
     // Send to Google Sheets 'normas de seguridad'
-    await sendToGoogleSheet('normas de seguridad', {
+    const r = await sendToGoogleSheet('normas de seguridad', {
       nombre: studentName.trim(),
       email: studentEmail.trim(),
       iniciales: initials.trim(),
@@ -135,6 +135,17 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
 
     localStorage.setItem('qfdos_practicas_safety_accepted', JSON.stringify(payload));
     setIsSubmitting(false);
+    // Si la hoja no ha recibido la firma, se dice aquí en vez de dar la firma por registrada
+    if (r.estado === 'error') {
+      setEnvioError(r.mensaje);
+      return;
+    }
+    setHasSubmitted(true);
+    onAcceptAndProceed();
+  };
+
+  const continuarSinRegistrar = () => {
+    setEnvioError('');
     setHasSubmitted(true);
     onAcceptAndProceed();
   };
@@ -226,7 +237,7 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '1rem' }}>
           {REACTIVOS_PRECAUCIONES.map((r, idx) => {
             const isToxic = r.dangerType === 'toxic' || r.dangerType === 'cancerigen';
             const isFlammable = r.dangerType === 'flammable';
@@ -323,10 +334,10 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
         {/* Progress Bar */}
         <div style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, marginBottom: '4px' }}>
-            <span style={{ color: allChecked ? '#10b981' : 'var(--text-title)' }}>
+            <span style={{ color: allChecked ? 'var(--ok-ink)' : 'var(--text-title)' }}>
               Progreso de Verificación: {currentCheckedCount} de {totalRules} normas revisadas
             </span>
-            <span style={{ color: allChecked ? '#10b981' : 'var(--navy)' }}>
+            <span style={{ color: allChecked ? 'var(--ok-ink)' : 'var(--navy-ink)' }}>
               {Math.round((currentCheckedCount / totalRules) * 100)}%
             </span>
           </div>
@@ -374,6 +385,7 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
                     accentColor: 'var(--teal)'
                   }}
                   onClick={e => e.stopPropagation()}
+                  aria-label={`Norma ${norma.id}: ${norma.title}`}
                 />
 
                 <div style={{ flex: 1 }}>
@@ -381,7 +393,7 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
                     <span className="font-tech" style={{
                       fontWeight: 800,
                       fontSize: '0.78rem',
-                      color: isChecked ? 'var(--teal)' : 'var(--text-muted)'
+                      color: isChecked ? 'var(--teal-ink)' : 'var(--text-muted)'
                     }}>
                       Norma #{norma.id}
                     </span>
@@ -435,12 +447,13 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
           </em>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
+            <label htmlFor="firma-nombre" style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
               Nombre y Apellidos del Alumno/a *:
             </label>
             <input
+              id="firma-nombre"
               type="text"
               required
               value={studentName}
@@ -452,25 +465,30 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
+            <label htmlFor="firma-email" style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
               Correo Electrónico Universitario *:
             </label>
             <input
+              id="firma-email"
               type="email"
               required
               value={studentEmail}
-              onChange={e => setStudentEmail(e.target.value)}
+              onChange={e => { setStudentEmail(e.target.value); if (emailError) setEmailError(''); }}
               placeholder="Ej. alumno@correo.ugr.es"
               className="qfdos-input"
               style={{ width: '100%', fontSize: '0.84rem' }}
+              aria-invalid={!!emailError}
+              aria-describedby={emailError ? 'firma-email-error' : undefined}
             />
+            {emailError && <p id="firma-email-error" className="field-error">{emailError}</p>}
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
+            <label htmlFor="firma-iniciales" style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
               Iniciales de Conformidad *:
             </label>
             <input
+              id="firma-iniciales"
               type="text"
               required
               maxLength={4}
@@ -484,7 +502,7 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ fontSize: '0.78rem', color: allChecked ? '#10b981' : '#ef4444', fontWeight: 600 }}>
+          <div style={{ fontSize: '0.78rem', color: allChecked ? 'var(--ok-ink)' : 'var(--bad-ink)', fontWeight: 600 }}>
             {allChecked
               ? '✓ Todas las normas marcadas. Listo para firmar.'
               : `⚠️ Debes marcar las ${totalRules - currentCheckedCount} normas restantes antes de firmar.`}
@@ -508,6 +526,16 @@ export const PracticasSafetyRules: React.FC<PracticasSafetyRulesProps> = ({
             <CheckCircle2 size={16} /> {isSubmitting ? 'Registrando...' : 'Firmar Compromiso y Acceder al Módulo de Prácticas'}
           </button>
         </div>
+
+        {envioError && (
+          <div className="status-msg status-msg--bad" role="alert" style={{ marginTop: '1rem' }}>
+            <span>No se ha podido registrar la firma en la hoja del profesor. {envioError}</span>
+            <button type="submit" className="btn btn-sm btn-outline" disabled={isSubmitting}>Reintentar</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={continuarSinRegistrar}>
+              Continuar (queda guardada en este navegador)
+            </button>
+          </div>
+        )}
       </form>
 
     </div>

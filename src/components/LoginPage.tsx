@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, GraduationCap, FlaskConical, Atom, Layers, ExternalLink } from 'lucide-react';
+import { AlertCircle, GraduationCap, FlaskConical, Atom } from 'lucide-react';
 
+import { abrirPreferencias } from '../services/consentimiento';
 export const LoginPage: React.FC = () => {
   const { loginWithGoogle } = useAuth();
   const [error, setError] = useState<string | null>(null);
@@ -85,23 +86,14 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div className="login-badge-row">
-            <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>2627 QFDOS E</span>
+            <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>Grupo E · Farmacia UGR</span>
             <span className="qfdos-badge badge-mint" style={{ fontSize: '0.68rem' }}>Curso 2026/2027</span>
           </div>
 
           <h1 className="login-title">Química Farmacéutica II</h1>
           <p className="login-subtitle">
-            Plataforma desarrollada por{' '}
-            <a
-              href="https://nexus-lab-team.netlify.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nexus-login-link"
-              style={{ color: '#0d9488', fontWeight: 800, textDecoration: 'none' }}
-            >
-              NEXUS.LAB
-            </a>{' '}
-            · Grado en Farmacia, UGR
+            El espacio de Química Farmacéutica II del Grupo E: temas, prácticas, test y notas.
+            Entra con tu cuenta de la UGR.
           </p>
         </div>
 
@@ -150,43 +142,12 @@ export const LoginPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="login-info-box login-info-box--professor">
-            <Layers size={18} color="var(--navy-ink)" />
-            <div>
-              <strong>Profesorado</strong>
-              <p>El panel de administración admite <code>juandiaz@go.ugr.es</code> o <code>juandiaz@ugr.es</code></p>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
         <div className="login-footer-note" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           <div>Universidad de Granada · Departamento de Química Farmacéutica y Orgánica</div>
-          <a
-            href="https://nexus-lab-team.netlify.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nexus-login-badge"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.78rem',
-              color: 'var(--text-muted)',
-              textDecoration: 'none',
-              marginTop: '4px',
-              padding: '3px 10px',
-              borderRadius: '20px',
-              background: 'rgba(13, 148, 136, 0.07)',
-              border: '1px solid rgba(13, 148, 136, 0.18)'
-            }}
-          >
-            <span>Desarrollado por</span>
-            <strong style={{ color: 'var(--teal-ink)', letterSpacing: '-0.2px' }}>
-              NEXUS<span style={{ color: '#00bcd4' }}>.LAB</span>
-            </strong>
-            <ExternalLink size={12} style={{ opacity: 0.7 }} />
-          </a>
+          <button type="button" className="link-boton" onClick={abrirPreferencias}>Preferencias de cookies</button>
         </div>
       </div>
     </div>

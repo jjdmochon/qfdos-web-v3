@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QfdosGlossaryTerm } from '../data/qfdosData';
-import { BookOpen, Search, Filter, Tag, Check, Copy } from 'lucide-react';
+import { BookOpen, Search, Filter, Tag, Check, Copy, SearchX } from 'lucide-react';
+import { normalizarBusqueda } from '../utils/a11y';
 
 interface GlossarySectionProps {
   glossary: QfdosGlossaryTerm[];
@@ -10,22 +11,32 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyFailedId, setCopyFailedId] = useState<string | null>(null);
 
-  const categories = ['todos', 'Afinidad & Receptor', 'SNC & Neuro', 'Cardiovascular', 'ADMET & Profiling'];
+  // Las categorías salen de los propios términos: no se ofrece un filtro vacío
+  const categories = ['todos', ...Array.from(new Set(glossary.map(t => t.category).filter(Boolean)))];
 
+  const q = normalizarBusqueda(searchTerm).trim();
   const filtered = glossary.filter(term => {
-    const matchesSearch = term.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      term.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      term.clinicalRelevance.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = !q ||
+      normalizarBusqueda(term.term).includes(q) ||
+      normalizarBusqueda(term.definition).includes(q) ||
+      normalizarBusqueda(term.clinicalRelevance).includes(q);
 
     const matchesCategory = selectedCategory === 'todos' || term.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const handleCopy = (t: QfdosGlossaryTerm) => {
-    navigator.clipboard.writeText(`${t.term}: ${t.definition} (Relevancia: ${t.clinicalRelevance})`);
-    setCopiedId(t.id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopy = async (t: QfdosGlossaryTerm) => {
+    try {
+      await navigator.clipboard.writeText(`${t.term}: ${t.definition} (Relevancia: ${t.clinicalRelevance})`);
+      setCopiedId(t.id);
+      setCopyFailedId(null);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      setCopyFailedId(t.id);
+      setTimeout(() => setCopyFailedId(null), 3000);
+    }
   };
 
   return (
@@ -35,9 +46,9 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
           <BookOpen size={24} color="var(--navy-ink)" />
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)' }}>
+          <h1 className="page-title">
             Glosario Farmacológico & Biofísico Oficial
-          </h2>
+          </h1>
         </div>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
           Términos clave, constantes cinético-termodinámicas, conceptos SAR y mecanismos moleculares de Química Farmacéutica II.
@@ -53,8 +64,8 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`btn btn-sm ${selectedCategory === cat ? 'btn-primary' : 'btn-outline'}`}
-              style={{ fontSize: '0.78rem' }}
+              className="chip"
+              aria-pressed={selectedCategory === cat}
             >
               {cat === 'todos' ? 'Todas las Categorías' : cat}
             </button>
@@ -62,11 +73,12 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
         </div>
 
         {/* Search */}
-        <div style={{ position: 'relative', minWidth: '260px' }}>
+        <div style={{ position: 'relative', minWidth: 'min(260px, 100%)', flex: '1 1 260px', maxWidth: 360 }}>
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             placeholder="Filtrar conceptos..."
+            aria-label="Filtrar conceptos del glosario"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className="form-input"
@@ -76,7 +88,20 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
       </div>
 
       {/* Glossary Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+      <p className="eyebrow" role="status" style={{ marginBottom: '0.75rem' }}>
+        {filtered.length} {filtered.length === 1 ? 'término' : 'términos'}
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(320px, 100%), 1fr))', gap: '1.25rem' }}>
+        {filtered.length === 0 && (
+          <div className="state-panel">
+            <SearchX size={28} />
+            <h3>Ningún término coincide</h3>
+            <p>Prueba con otra palabra o quita el filtro de categoría.</p>
+            <button type="button" className="btn btn-sm btn-outline" onClick={() => { setSearchTerm(''); setSelectedCategory('todos'); }}>
+              Ver todo el glosario
+            </button>
+          </div>
+        )}
         {filtered.map(t => (
           <div key={t.id} className="qfdos-card card-teal" style={{ justifyContent: 'space-between', padding: '1.25rem' }}>
             <div>
@@ -87,10 +112,11 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
                 <button
                   onClick={() => handleCopy(t)}
                   className="btn btn-sm btn-outline"
-                  style={{ padding: '2px 6px', fontSize: '0.7rem' }}
-                  title="Copiar definición"
+                  style={{ padding: '6px', fontSize: '0.7rem' }}
+                  title={copyFailedId === t.id ? 'No se pudo copiar' : 'Copiar definición'}
+                  aria-label={copiedId === t.id ? 'Definición copiada' : copyFailedId === t.id ? 'No se pudo copiar la definición' : `Copiar definición de ${t.term}`}
                 >
-                  {copiedId === t.id ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                  {copiedId === t.id ? <Check size={14} color="var(--ok-ink)" /> : <Copy size={14} color={copyFailedId === t.id ? 'var(--bad-ink)' : undefined} />}
                 </button>
               </div>
 
@@ -98,7 +124,7 @@ export const GlossarySection: React.FC<GlossarySectionProps> = ({ glossary }) =>
                 {t.term}
               </h3>
 
-              {t.technicalCode && (
+              {t.technicalCode && !/^[A-Z]+(-[A-Z0-9]+)+$/.test(t.technicalCode) && (
                 <div style={{
                   padding: '4px 8px',
                   background: 'var(--surface-alt)',

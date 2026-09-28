@@ -127,9 +127,27 @@ export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr, onSa
         </div>
       )}
 
-      {/* Lista de tareas */}
-      <div className="progreso-lista">
-        {tareas.map(t => (
+      {error && !cargando && (
+        <div className="status-msg status-msg--bad" role="alert">
+          <AlertCircle size={15} style={{ flexShrink: 0 }} />
+          <span>No se ha podido consultar el registro central. La lista de abajo solo refleja lo hecho en este navegador.</span>
+          <button onClick={cargar} className="btn btn-sm btn-outline">
+            <RefreshCw size={13} /> Reintentar
+          </button>
+        </div>
+      )}
+
+      {/* Lista de tareas: mientras carga no se marcan como pendientes */}
+      <div className="progreso-lista" aria-busy={cargando && !entregas}>
+        {cargando && !entregas ? [0, 1, 2].map(i => (
+          <div key={i} className="progreso-item" aria-hidden="true">
+            <div className="chem-skeleton" style={{ width: 19, height: 19, borderRadius: '50%' }} />
+            <div style={{ flex: 1 }}>
+              <div className="chem-skeleton" style={{ width: '45%', height: 12, marginBottom: 6 }} />
+              <div className="chem-skeleton" style={{ width: '80%', height: 10 }} />
+            </div>
+          </div>
+        )) : tareas.map(t => (
           <div key={t.id} className={`progreso-item ${t.hecho ? 'is-hecho' : ''}`}>
             {t.hecho
               ? <CheckCircle2 size={19} color="var(--accent-emerald)" style={{ flexShrink: 0 }} />

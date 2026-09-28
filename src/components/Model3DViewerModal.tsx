@@ -289,7 +289,7 @@ export const Model3DViewerModal: React.FC<Model3DViewerModalProps> = ({
 
         {/* Ficha Molecular y Científica */}
         <div style={{ padding: '1.2rem 1.6rem', background: 'var(--surface-raised)', borderTop: '1px solid var(--border-color)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '12px' }}>
             
             <div style={{ background: 'var(--surface-card)', padding: '10px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--teal-ink)', marginBottom: '4px' }}>

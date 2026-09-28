@@ -67,21 +67,26 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <BookOpen size={22} color="var(--navy-ink)" />
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)' }}>
+            <h1 className="page-title">
               Temario Oficial, Exámenes y Trabajos QFDOS
-            </h2>
+            </h1>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-            Módulos teóricos ({theoryCount}), Convocatorias de examen ({examCount}) y Proyectos ({projectCount}) · Curso 2026/2027 · UGR
+            {[
+              `${theoryCount} temas de teoría`,
+              examCount > 0 && `${examCount} convocatorias de examen`,
+              projectCount > 0 && `${projectCount} trabajos`
+            ].filter(Boolean).join(' · ')} · Curso 2026/2027 · UGR
           </p>
         </div>
 
         {/* Search Input */}
-        <div style={{ position: 'relative', minWidth: '260px' }}>
+        <div style={{ position: 'relative', minWidth: 'min(260px, 100%)', flex: '1 1 260px', maxWidth: 360 }}>
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             placeholder="Buscar por tema, fármaco, diana..."
+            aria-label="Buscar en el temario"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className="form-input"
@@ -90,43 +95,45 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <div style={{ marginBottom: '1.75rem', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
-          <Filter size={14} /> Filtrar por:
-        </span>
-        <button
-          onClick={() => setSelectedCategory('all')}
-          className={`tab-btn ${selectedCategory === 'all' ? 'active' : ''}`}
-          style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem' }}
-        >
-          Todos los Módulos ({topics.length})
-        </button>
-        <button
-          onClick={() => setSelectedCategory('teoria')}
-          className={`tab-btn ${selectedCategory === 'teoria' ? 'active' : ''}`}
-          style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem' }}
-        >
-          🔬 Teoría (Temas 00-10) ({theoryCount})
-        </button>
-        <button
-          onClick={() => setSelectedCategory('examen')}
-          className={`tab-btn ${selectedCategory === 'examen' ? 'active' : ''}`}
-          style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem' }}
-        >
-          📝 Exámenes Oficiales ({examCount})
-        </button>
-        <button
-          onClick={() => setSelectedCategory('trabajo')}
-          className={`tab-btn ${selectedCategory === 'trabajo' ? 'active' : ''}`}
-          style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem' }}
-        >
-          💼 Trabajos & Proyectos ({projectCount})
-        </button>
-      </div>
+      {/* Category chips: solo si hay más de una categoría con contenido */}
+      {[theoryCount, examCount, projectCount].filter(n => n > 0).length > 1 && (
+        <div role="group" aria-label="Filtrar por tipo" style={{ marginBottom: '1.75rem', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
+            <Filter size={14} /> Filtrar por:
+          </span>
+          <button onClick={() => setSelectedCategory('all')} className="chip" aria-pressed={selectedCategory === 'all'}>
+            Todos ({topics.length})
+          </button>
+          {theoryCount > 0 && (
+            <button onClick={() => setSelectedCategory('teoria')} className="chip" aria-pressed={selectedCategory === 'teoria'}>
+              🔬 Teoría ({theoryCount})
+            </button>
+          )}
+          {examCount > 0 && (
+            <button onClick={() => setSelectedCategory('examen')} className="chip" aria-pressed={selectedCategory === 'examen'}>
+              📝 Exámenes oficiales ({examCount})
+            </button>
+          )}
+          {projectCount > 0 && (
+            <button onClick={() => setSelectedCategory('trabajo')} className="chip" aria-pressed={selectedCategory === 'trabajo'}>
+              💼 Trabajos y proyectos ({projectCount})
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Topics Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: '1.5rem' }}>
+        {filteredTopics.length === 0 && (
+          <div className="state-panel">
+            <Search size={28} />
+            <h3>Ningún tema coincide con «{searchTerm}»</h3>
+            <p>Busca por número de tema, fármaco o diana, o borra el filtro.</p>
+            <button type="button" className="btn btn-sm btn-outline" onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}>
+              Ver todo el temario
+            </button>
+          </div>
+        )}
         {filteredTopics.map((topic, idx) => {
           const isExam = topic.category === 'examen';
           const isProject = topic.category === 'trabajo';
@@ -219,16 +226,16 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
 
                 {/* 4 Materials Quick Indicators */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.slidesPdfUrl ? 'rgba(30,58,138,0.1)' : 'var(--surface-alt)', color: topic.slidesPdfUrl ? 'var(--navy)' : 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.slidesPdfUrl ? 'rgba(30,58,138,0.1)' : 'var(--surface-alt)', color: topic.slidesPdfUrl ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
                     📑 Diapositivas {topic.slidesPdfUrl ? '✓' : ''}
                   </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.notesPdfUrl ? 'rgba(13,148,136,0.1)' : 'var(--surface-alt)', color: topic.notesPdfUrl ? 'var(--teal)' : 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.notesPdfUrl ? 'rgba(13,148,136,0.1)' : 'var(--surface-alt)', color: topic.notesPdfUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                     📝 Apuntes {topic.notesPdfUrl ? '✓' : ''}
                   </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal)' : 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                     📓 Notebook {topic.geminiNotebookUrl ? '✓' : ''}
                   </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? '#1db954' : 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
                     🎙️ Video Podcast {topic.spotifyPodcastUrl ? '✓' : ''}
                   </span>
                   {topic.id === 'tema-01' && (
@@ -312,7 +319,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     onClick={() => onSelectTopic(topic, 'sar')}
                     disabled={bloqueado}
                     title={bloqueado ? 'Este tema aún no está publicado' : undefined}
-                    className="btn btn-sm btn-primary"
+                    className={`btn btn-sm ${bloqueado ? 'btn-ghost' : 'btn-primary'}`}
                     style={{ 
                       flex: 1, 
                       minWidth: 0,
@@ -331,23 +338,8 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   {topic.id === 'tema-01' && (
                     <button
                       onClick={() => onSelectTopic(topic, 'retrosintesis')}
-                      className="btn btn-sm"
-                      style={{ 
-                        flex: 1, 
-                        minWidth: 0,
-                        fontSize: '0.76rem', 
-                        fontWeight: 800,
-                        background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
-                        color: '#ffffff',
-                        border: 'none',
-                        boxShadow: '0 2px 8px rgba(13,148,136,0.25)',
-                        padding: '7px 8px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '5px',
-                        whiteSpace: 'nowrap'
-                      }}
+                      className="btn btn-sm btn-outline"
+                      style={{ flex: 1, minWidth: 0, fontSize: '0.76rem', padding: '7px 8px', whiteSpace: 'nowrap' }}
                       title="Acceso directo al Taller de Retrosíntesis (Slides 28-35)"
                     >
                       <GitBranch size={13} /> Retrosíntesis

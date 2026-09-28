@@ -1,11 +1,19 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import {
   Sun, Moon, Search, FileText, HelpCircle, Settings,
   GraduationCap, BookOpen, Activity, Award, Layers,
-  LogOut, ChevronDown, ShieldCheck, Compass, FlaskConical, ExternalLink
+  LogOut, ChevronDown, ShieldCheck, Compass, FlaskConical, Menu, X
 } from 'lucide-react';
+
+/** Atajo de búsqueda con la tecla modificadora de cada plataforma */
+const ES_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
+const ATAJO_BUSCAR = ES_MAC ? '⌘K' : 'Ctrl K';
+
+/** Pestañas fijas de la barra inferior en móvil; el resto vive en «Menú» */
+const TABBAR_IDS = ['hub', 'temas', 'practicas', 'evaluacion'];
 
 interface HeaderProps {
   activeTab: string;
@@ -31,7 +39,9 @@ export const Header: React.FC<HeaderProps> = ({
   const { theme, toggleTheme } = useTheme();
   const { user, isProfesor, isInstitucional, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const chipRef = useRef<HTMLButtonElement>(null);
 
   /* Regla de ocupación: una barra que se acopla bajo la pestaña activa.
      Se mide sobre el DOM en vez de calcularse, porque el ancho de cada
@@ -46,7 +56,11 @@ export const Header: React.FC<HeaderProps> = ({
       const el = nav.querySelector<HTMLElement>('.nav-tab.active');
       if (!el) { setOcc(o => ({ ...o, on: 0 })); return; }
       setOcc({ x: el.offsetLeft, w: el.offsetWidth, on: 1 });
-      el.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+      // Desplaza solo la tira de pestañas (scrollIntoView movía también el punto de
+      // partida del foco: el primer Tab saltaba el enlace «Saltar al contenido»)
+      if (nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({ left: el.offsetLeft - nav.clientWidth / 2 + el.offsetWidth / 2 });
+      }
     };
     medir();
     const ro = new ResizeObserver(medir);
@@ -64,9 +78,25 @@ export const Header: React.FC<HeaderProps> = ({
         setMenuOpen(false);
       }
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && menuRef.current?.querySelector('.user-dropdown')) {
+        setMenuOpen(false);
+        chipRef.current?.focus();
+      }
+    };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('keydown', onKey);
+    };
   }, []);
+
+  // El menú móvil se cierra al cambiar de sección (también con Atrás)
+  useEffect(() => { setDrawerOpen(false); }, [activeTab]);
+
+  const irA = (tab: string) => { setActiveTab(tab); setDrawerOpen(false); };
+  const abrirDesdeMenu = (fn: () => void) => () => { setDrawerOpen(false); fn(); };
 
   const NAV_ITEMS = [
     { id: 'hub',        label: 'Hub',             icon: <Layers size={14} /> },
@@ -82,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
-    : 'JJ';
+    : '?';
 
   return (
     <header className="qfdos-header-root">
@@ -123,11 +153,12 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenSearch}
             className="header-search"
-            title="Búsqueda global (Ctrl+K)"
+            title={`Búsqueda global (${ATAJO_BUSCAR})`}
+            aria-label="Buscar en la plataforma"
           >
             <Search size={15} className="header-search-icon" />
             <span className="header-search-texto">Buscar dianas, fármacos, cinética, RMN…</span>
-            <kbd className="header-search-kbd">⌘K</kbd>
+            <kbd className="header-search-kbd">{ATAJO_BUSCAR}</kbd>
           </button>
 
           {/* Right tools */}
@@ -177,6 +208,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenStudentQuestion}
               className="btn btn-sm btn-ghost-clean"
               title="Buzón de Consultas y Tutorías"
+              aria-label="Buzón de consultas y tutorías"
             >
               <HelpCircle size={16} />
             </button>
@@ -198,6 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={toggleTheme}
               className="btn btn-sm btn-ghost-clean"
               title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             >
               {theme === 'dark'
                 ? <Sun size={16} color="#fbbf24" />
@@ -206,11 +239,23 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* User chip with dropdown */}
-            <div ref={menuRef} style={{ position: 'relative' }}>
+            <div
+              ref={menuRef}
+              className="user-menu-wrap"
+              style={{ position: 'relative' }}
+              onBlur={e => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setMenuOpen(false);
+              }}
+            >
               <button
+                ref={chipRef}
                 onClick={() => setMenuOpen(o => !o)}
                 className="user-chip"
                 style={{ cursor: 'pointer' }}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-controls="menu-usuario"
+                aria-label={`Cuenta de ${user?.name || 'usuario'}`}
               >
                 {user?.avatarUrl ? (
                   <img src={user.avatarUrl} alt="avatar" className="user-avatar" />
@@ -218,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="user-avatar-fallback">{initials}</div>
                 )}
                 <div className="user-chip-text">
-                  <div className="user-chip-name">{user?.name?.split(' ')[0] || 'Profesor'}</div>
+                  <div className="user-chip-name">{user?.name?.split(' ')[0] || ''}</div>
                   <div className="user-chip-role">
                     {!isInstitucional && (
                       <span
@@ -238,7 +283,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {menuOpen && (
-                <div style={{
+                <div id="menu-usuario" className="user-dropdown" style={{
                   position: 'absolute',
                   top: 'calc(100% + 8px)',
                   right: 0,
@@ -248,7 +293,7 @@ export const Header: React.FC<HeaderProps> = ({
                   boxShadow: 'var(--shadow-lg)',
                   minWidth: 230,
                   overflow: 'hidden',
-                  animation: 'slideUp 160ms var(--ease-out)',
+                  animation: 'dropIn 160ms var(--ease-out)',
                   zIndex: 200
                 }}>
                   <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-color)', background: 'var(--surface-alt)' }}>
@@ -261,40 +306,9 @@ export const Header: React.FC<HeaderProps> = ({
                       </div>
                     )}
                   </div>
-                  <a
-                    href="https://nexus-lab-team.netlify.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="header-dropdown-nexus"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--teal-ink)' }}>
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                      </svg>
-                      <span>Desarrollo: <strong>NEXUS.LAB</strong></span>
-                    </span>
-                    <ExternalLink size={12} style={{ opacity: 0.7 }} />
-                  </a>
-
                   <button
                     onClick={() => { logout(); setMenuOpen(false); }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      width: '100%',
-                      padding: '10px 14px',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: 'var(--accent-red)',
-                      fontSize: '0.84rem',
-                      fontWeight: 700,
-                      transition: 'background var(--transition-fast)'
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                    className="menu-item menu-item--danger"
                   >
                     <LogOut size={15} /> Cerrar sesión
                   </button>
@@ -328,6 +342,86 @@ export const Header: React.FC<HeaderProps> = ({
           />
         </nav>
       </div>
+
+      {/* Fuera de la cabecera: position:fixed no debe depender de sus estilos */}
+      {createPortal(<>
+      {/* ---------- Móvil (<= 768 px): barra inferior + hoja «Menú» ---------- */}
+      <nav className="mobile-tabbar" aria-label="Secciones principales">
+        {NAV_ITEMS.filter(i => TABBAR_IDS.includes(i.id)).map(item => (
+          <button
+            key={item.id}
+            onClick={() => irA(item.id)}
+            className={`mobile-tab ${activeTab === item.id ? 'active' : ''}`}
+            aria-current={activeTab === item.id ? 'page' : undefined}
+          >
+            {React.cloneElement(item.icon, { size: 20 })}
+            <span>{item.id === 'evaluacion' ? 'Notas' : item.label}</span>
+          </button>
+        ))}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className={`mobile-tab ${!TABBAR_IDS.includes(activeTab) ? 'active' : ''}`}
+          aria-haspopup="dialog"
+          aria-expanded={drawerOpen}
+        >
+          <Menu size={20} />
+          <span>Menú</span>
+        </button>
+      </nav>
+
+      {drawerOpen && (
+        <div className="modal-overlay mobile-drawer-overlay" onClick={() => setDrawerOpen(false)}>
+          <div className="modal-container mobile-drawer" onClick={e => e.stopPropagation()} aria-label="Menú">
+            <div className="mobile-drawer-head">
+              <h2>Menú</h2>
+              <button className="btn btn-ghost btn-icon" onClick={() => setDrawerOpen(false)} aria-label="Cerrar menú">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="mobile-drawer-body">
+              <p className="eyebrow">Secciones</p>
+              <ul className="mobile-drawer-list">
+                {NAV_ITEMS.map(item => (
+                  <li key={item.id}>
+                    <button
+                      className={`menu-item ${activeTab === item.id ? 'active' : ''}`}
+                      aria-current={activeTab === item.id ? 'page' : undefined}
+                      onClick={() => irA(item.id)}
+                    >
+                      {React.cloneElement(item.icon, { size: 18 })} {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <p className="eyebrow">Herramientas</p>
+              <ul className="mobile-drawer-list">
+                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenSearch)}><Search size={18} /> Buscar</button></li>
+                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenFirSimulator)}><Award size={18} /> Simulador FIR</button></li>
+                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenStudentQuestion)}><HelpCircle size={18} /> Buzón de consultas</button></li>
+                <li>
+                  <button className="menu-item" onClick={toggleTheme}>
+                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    {theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+                  </button>
+                </li>
+                {isProfesor && onOpenCartas && (
+                  <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenCartas)}><Layers size={18} /> Cartas Tema 1</button></li>
+                )}
+                {isProfesor && (
+                  <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenExamGenerator)}><FileText size={18} /> Generador de examen</button></li>
+                )}
+                {isProfesor && (
+                  <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenAdminCms)}><Settings size={18} /> Gestión docente</button></li>
+                )}
+              </ul>
+              <button className="menu-item menu-item--danger" onClick={() => { setDrawerOpen(false); logout(); }}>
+                <LogOut size={18} /> Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      </>, document.body)}
     </header>
   );
 };

@@ -120,7 +120,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content, classNa
           margin: '1.25rem 0',
           color: 'var(--text-main)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, color: '#b45309', fontSize: '1rem', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, color: 'var(--warn-ink)', fontSize: '1rem', marginBottom: '4px' }}>
             <span>📝</span> {trimmed.replace(/^#+\s*/, '')}
           </div>
         </div>

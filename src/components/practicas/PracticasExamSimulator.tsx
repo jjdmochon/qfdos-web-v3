@@ -186,7 +186,7 @@ export const PracticasExamSimulator: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: timeLeft < 180 ? '#ef4444' : 'var(--navy)', fontWeight: 800, fontSize: '0.9rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: timeLeft < 180 ? 'var(--bad-ink)' : 'var(--navy-ink)', fontWeight: 800, fontSize: '0.9rem' }}>
               <Clock size={16} />
               <span className="font-tech">{formatTime(timeLeft)}</span>
             </div>
@@ -265,7 +265,7 @@ export const PracticasExamSimulator: React.FC = () => {
                 </div>
 
                 {/* Grid of Structure Cards */}
-                <div className="panel-claro" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+                <div className="panel-claro" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '0.75rem' }}>
                   {currentQ.structures.map((st, sIdx) => {
                     const isProduct = st.role === 'producto_deseado';
                     return (
@@ -289,7 +289,7 @@ export const PracticasExamSimulator: React.FC = () => {
                             fontWeight: 700,
                             marginBottom: '4px',
                             background: isProduct ? '#eff6ff' : '#f0fdf4',
-                            color: isProduct ? 'var(--navy)' : '#15803d'
+                            color: isProduct ? 'var(--navy-ink)' : 'var(--ok-ink)'
                           }}
                         >
                           {isProduct ? '★ PRODUCTO FINAL' : st.amount ? `REACTIVO (${st.amount})` : 'REACTIVO'}
@@ -456,7 +456,7 @@ export const PracticasExamSimulator: React.FC = () => {
               fontSize: '3.5rem',
               fontWeight: 900,
               fontFamily: 'Montserrat, sans-serif',
-              color: scoreResults.isPassed ? '#059669' : '#dc2626',
+              color: scoreResults.isPassed ? 'var(--ok-ink)' : 'var(--bad-ink)',
               margin: '0.5rem 0'
             }}>
               {scoreResults.scoreOver10} <span style={{ fontSize: '1.4rem', color: 'var(--text-muted)' }}>/ 10.0</span>
@@ -502,7 +502,7 @@ export const PracticasExamSimulator: React.FC = () => {
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: '0.85rem', color: isCorrect ? '#059669' : '#dc2626' }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.85rem', color: isCorrect ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                         {isCorrect ? '✓ PREGUNTA CORRECTA' : '✗ PREGUNTA INCORRECTA'} #{idx + 1}
                       </span>
                       <span className="qfdos-badge" style={{ fontSize: '0.68rem' }}>
@@ -517,7 +517,7 @@ export const PracticasExamSimulator: React.FC = () => {
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
                       <div>Tu respuesta: <strong>{userAns !== undefined && q.options ? `${String.fromCharCode(65 + userAns)}) ${q.options[userAns]}` : 'No respondida'}</strong></div>
                       {!isCorrect && q.correctOptionIndex !== undefined && q.options && (
-                        <div style={{ color: '#059669', marginTop: '2px' }}>
+                        <div style={{ color: 'var(--ok-ink)', marginTop: '2px' }}>
                           Respuesta correcta: <strong>{String.fromCharCode(65 + q.correctOptionIndex)}) {q.options[q.correctOptionIndex]}</strong>
                         </div>
                       )}

@@ -246,20 +246,20 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div 
         className="modal-container" 
-        style={{ maxWidth: '1020px', height: '90vh' }} 
+        style={{ maxWidth: '1020px', height: '90dvh' }} 
         onClick={e => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div className="modal-header" style={{ padding: '1.25rem 1.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Modal Header: el título cede ancho y el botón de cerrar nunca sale de pantalla */}
+        <div className="modal-header" style={{ padding: '1.25rem 1.75rem', gap: '12px', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
             {topic.id !== 'tema-00' && topic.number && (
               <span className={`qfdos-badge ${topic.category === 'examen' ? 'badge-amber' : topic.category === 'trabajo' ? 'badge-emerald' : 'badge-navy'}`} style={{ fontSize: '0.85rem', padding: '4px 10px' }}>
                 {topic.number}
               </span>
             )}
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-title)', lineHeight: 1.2, margin: 0 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-title)', lineHeight: 1.2, margin: 0, overflowWrap: 'anywhere' }}>
                   {topic.title}
                 </h2>
                 {topic.category && topic.category !== 'teoria' && (
@@ -286,24 +286,24 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               </span>
             </div>
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-outline" style={{ padding: '6px' }}>
+          <button onClick={onClose} className="btn btn-sm btn-outline" style={{ padding: '6px', flexShrink: 0 }} aria-label="Cerrar" title="Cerrar (Esc)">
             <X size={18} />
           </button>
         </div>
 
         {/* Tab Navigation */}
         <div style={{ padding: '0 1.75rem', background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-color)' }}>
-          <div className="tabs-container" style={{ margin: 0 }}>
+          <div className="tabs-container" style={{ margin: 0 }} role="tablist" aria-label="Secciones del tema">
             <button
               onClick={() => setActiveTab('sar')}
-              className={`tab-btn ${activeTab === 'sar' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'sar' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'sar'}
             >
               <BookOpen size={14} /> Contenido & Guía Docente
             </button>
             {topic.drugs && topic.drugs.length > 0 && (
               <button
                 onClick={() => setActiveTab('drugs')}
-                className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`}
+                className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'drugs'}
               >
                 <Layers size={14} /> Fármacos & Quimioinformática ({drugSearchTerm.trim() ? `${filteredDrugs.length}/${topic.drugs.length}` : topic.drugs.length})
               </button>
@@ -311,7 +311,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             {topic.id === 'tema-01' && (
               <button
                 onClick={() => setActiveTab('retrosintesis')}
-                className={`tab-btn ${activeTab === 'retrosintesis' ? 'active' : ''}`}
+                className={`tab-btn ${activeTab === 'retrosintesis' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'retrosintesis'}
                 style={{ 
                   fontWeight: 800,
                   background: activeTab === 'retrosintesis' 
@@ -331,7 +331,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             {topic.id === 'tema-01' && isProfesor && (
               <button
                 onClick={() => setActiveTab('cartas')}
-                className={`tab-btn ${activeTab === 'cartas' ? 'active' : ''}`}
+                className={`tab-btn ${activeTab === 'cartas' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'cartas'}
                 style={{ 
                   fontWeight: 800,
                   background: activeTab === 'cartas' 
@@ -352,7 +352,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="modal-body" style={{ padding: '1.5rem 1.75rem' }}>
+        <div className="modal-body tab-panel-enter" key={activeTab} role="tabpanel" style={{ padding: '1.5rem 1.75rem' }}>
           
           {/* TAB 1: Contenido & Guía Docente */}
           {activeTab === 'sar' && (
@@ -394,7 +394,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       </strong>
                       <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem' }}>Modo Docente</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
                       <div>
                         <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
                           📄 Enlace Google Drive · Apuntes Oficiales (PDF)
@@ -474,7 +474,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   const hasSpotify = !!(topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http'));
 
                   return (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '14px' }}>
                       
                       {/* 1. Apuntes PDF */}
                       <div className={`qfdos-card card-teal resource-card ${hasNotes ? 'is-active' : 'is-inactive'}`}>
@@ -1137,7 +1137,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '10px' }}>
                   Conceptos Clave de la Unidad:
                 </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '8px' }}>
                   {topic.keyConcepts?.map((c, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.84rem' }}>
                       <CheckCircle2 size={15} color="var(--teal-ink)" style={{ flexShrink: 0, marginTop: '2px' }} />
@@ -1243,7 +1243,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
 
               {/* Grid de Fármacos Filtrados */}
               {filteredDrugs.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: '1.25rem' }}>
                   {filteredDrugs.map((drug, i) => (
                     <div key={drug.name + '-' + i} className="qfdos-card card-teal" style={{ padding: '1.25rem', overflow: 'hidden', boxSizing: 'border-box' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
@@ -1300,7 +1300,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             fontSize: '0.68rem',
                             height: 'auto',
                             background: copiedSmiles === drug.name ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-card)',
-                            color: copiedSmiles === drug.name ? '#059669' : 'var(--text-body)',
+                            color: copiedSmiles === drug.name ? 'var(--ok-ink)' : 'var(--text-body)',
                             border: '1px solid ' + (copiedSmiles === drug.name ? '#10b981' : 'var(--border-color)'),
                             borderRadius: '4px',
                             cursor: 'pointer',
@@ -1448,7 +1448,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               className="btn btn-sm"
                               style={{
                                 background: 'rgba(16, 185, 129, 0.08)',
-                                color: '#047857',
+                                color: 'var(--ok-ink)',
                                 border: '1px solid rgba(16, 185, 129, 0.2)',
                                 fontSize: '0.74rem',
                                 padding: '4px 6px',

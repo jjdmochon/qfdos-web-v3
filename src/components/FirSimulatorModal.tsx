@@ -29,6 +29,7 @@ import {
 } from '../data/firQuestionsData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 
+import { pulsable } from '../utils/a11y';
 interface FirSimulatorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -87,6 +88,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
     setCurrentIndex(0);
     setSelectedOption(null);
     setShowExplanation(false);
+    setBloqueTerminado(false);
   }, [selectedYear, selectedTopic, searchQuery]);
 
   const currentQ: FirQuestion | undefined = filteredQuestions[currentIndex];
@@ -100,6 +102,22 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
     if (selectedOption === null || !currentQ) return;
     setShowExplanation(true);
     setAnswers(prev => ({ ...prev, [currentQ.id]: selectedOption }));
+  };
+
+  const [bloqueTerminado, setBloqueTerminado] = useState(false);
+
+  // Última pregunta: «Finalizar Bloque» muestra el resumen en vez de no hacer nada
+  const handleFinish = () => {
+    setBloqueTerminado(true);
+    setSelectedOption(null);
+    setShowExplanation(false);
+  };
+
+  const handleRestartBlock = () => {
+    const ids = new Set(filteredQuestions.map(q => q.id));
+    setAnswers(prev => Object.fromEntries(Object.entries(prev).filter(([id]) => !ids.has(id))));
+    setCurrentIndex(0);
+    setBloqueTerminado(false);
   };
 
   const handleNext = () => {
@@ -183,7 +201,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
         style={{
           maxWidth: isFullscreen ? '98vw' : '1100px',
           width: '95vw',
-          height: isFullscreen ? '96vh' : '90vh',
+          height: isFullscreen ? '96dvh' : '90dvh',
           display: 'flex',
           flexDirection: 'column',
           padding: 0,
@@ -201,11 +219,12 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexWrap: 'wrap',
             gap: '12px',
             flexShrink: 0
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: '1 1 220px' }}>
             <div
               style={{
                 width: '36px',
@@ -269,10 +288,11 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
               className="btn btn-sm btn-outline"
               style={{ padding: '6px' }}
               title={isFullscreen ? 'Restaurar tamaño' : 'Pantalla completa'}
+              aria-label={isFullscreen ? 'Restaurar tamaño' : 'Pantalla completa'}
             >
               {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
             </button>
-            <button onClick={onClose} className="btn btn-sm btn-outline" style={{ padding: '6px' }}>
+            <button onClick={onClose} className="btn btn-sm btn-outline" style={{ padding: '6px' }} aria-label="Cerrar" title="Cerrar (Esc)">
               <X size={18} />
             </button>
           </div>
@@ -280,13 +300,15 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
 
         {/* Tab Navigation */}
         <div
+          role="tablist"
           style={{
             display: 'flex',
             borderBottom: '1px solid var(--border-color)',
             background: 'var(--surface)',
             padding: '0 16px',
             gap: '8px',
-            flexShrink: 0
+            flexShrink: 0,
+            overflowX: 'auto'
           }}
         >
           <button
@@ -442,7 +464,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
               </div>
 
               {/* Search filter */}
-              <div style={{ position: 'relative', flex: 1, minWidth: '180px' }}>
+              <div style={{ position: 'relative', flex: 1, minWidth: 'min(180px, 100%)' }}>
                 <Search
                   size={13}
                   style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
@@ -496,7 +518,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
                 }}
               >
                 <span style={{ color: 'var(--text-muted)' }}>Baremo Sanidad:</span>
-                <strong style={{ color: stats.ministerialScore >= 0 ? 'var(--teal-ink)' : '#ef4444' }}>
+                <strong style={{ color: stats.ministerialScore >= 0 ? 'var(--teal-ink)' : 'var(--bad-ink)' }}>
                   {stats.ministerialScore > 0 ? `+${stats.ministerialScore}` : stats.ministerialScore} pts
                 </strong>
                 <span style={{ color: 'var(--text-muted)' }}>
@@ -518,6 +540,28 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
                 >
                   Restablecer filtros
                 </button>
+              </div>
+            ) : bloqueTerminado ? (
+              <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+                <div className="state-panel" role="status" style={{ maxWidth: 520, margin: '0 auto' }}>
+                  <Award size={34} color="var(--teal-ink)" />
+                  <h3>Bloque terminado</h3>
+                  <p>
+                    Has respondido <strong>{stats.answered}</strong> de {filteredQuestions.length} preguntas:
+                    {' '}<strong style={{ color: 'var(--ok-ink)' }}>{stats.correct} aciertos</strong> y
+                    {' '}<strong style={{ color: 'var(--bad-ink)' }}>{stats.incorrect} fallos</strong>.
+                  </p>
+                  <div className="font-mono" style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--navy-ink)' }}>
+                    {stats.ministerialScore} puntos
+                  </div>
+                  <p style={{ fontSize: '0.78rem' }}>Baremo oficial FIR: +3 por acierto, −1 por fallo.</p>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <button type="button" className="btn btn-primary" onClick={handleRestartBlock}>Repetir el bloque</button>
+                    <button type="button" className="btn btn-outline" onClick={() => { setBloqueTerminado(false); setCurrentIndex(0); }}>
+                      Revisar respuestas
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : currentQ ? (
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
@@ -598,7 +642,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
                         alignItems: 'center',
                         cursor: 'pointer'
                       }}
-                      onClick={() => setZoomedImage(`${baseUrl}${currentQ.imagePath}`)}
+                      onClick={() => setZoomedImage(`${baseUrl}${currentQ.imagePath}`)} {...pulsable(() => setZoomedImage(`${baseUrl}${currentQ.imagePath}`))}
                       title="Haz clic para ampliar la figura oficial"
                     >
                       <img
@@ -660,7 +704,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
                     return (
                       <div
                         key={idx}
-                        onClick={() => handleSelectOption(idx)}
+                        onClick={() => handleSelectOption(idx)} {...pulsable(() => handleSelectOption(idx))}
                         style={{
                           padding: '12px 16px',
                           borderRadius: '10px',
@@ -788,7 +832,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
                   </button>
                 ) : (
                   <button
-                    onClick={handleNext}
+                    onClick={currentIndex < filteredQuestions.length - 1 ? handleNext : handleFinish}
                     className="btn btn-sm btn-primary"
                     style={{
                       padding: '8px 20px',
@@ -819,7 +863,7 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
               </p>
 
               {/* Core High-Yield Pillars */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(250px, 100%), 1fr))', gap: '16px', marginBottom: '24px' }}>
                 {[
                   {
                     title: '1. Relaciones Estructura-Actividad (SAR)',

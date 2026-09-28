@@ -39,9 +39,9 @@ export const AffinitySimulator: React.FC = () => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <Award size={24} color="var(--navy-ink)" />
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)', letterSpacing: '-0.02em', margin: 0 }}>
+            <h1 className="page-title">
               Simulador de Afinidad Estructural & Ecuación de Cheng-Prusoff
-            </h2>
+            </h1>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.3rem 0 0 0', maxWidth: '840px', lineHeight: 1.5 }}>
             Calcula en tiempo real la constante de afinidad (Kd), constante de inhibición (Ki), valor experimental de IC50 mediante la ecuación de Cheng-Prusoff, energía libre de Gibbs de unión (ΔG°) y eficiencia de ligando (LE).
@@ -52,7 +52,7 @@ export const AffinitySimulator: React.FC = () => {
         </span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: '1.5rem' }}>
         
         {/* Left Column: Interactive Parameters */}
         <div className="qfdos-card" style={{ gap: '1.25rem' }}>
@@ -182,7 +182,7 @@ export const AffinitySimulator: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           
           {/* Main Results Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '1rem' }}>
             
             {/* IC50 Box */}
             <div className="qfdos-card card-teal" style={{ padding: '1.15rem' }}>
@@ -215,7 +215,7 @@ export const AffinitySimulator: React.FC = () => {
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>
                 Eficiencia de Ligando (LE)
               </span>
-              <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f766e', margin: '4px 0' }}>
+              <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--teal-ink)', margin: '4px 0' }}>
                 {ligandEfficiency.toFixed(2)} <span style={{ fontSize: '0.85rem' }}>kcal/(mol·átomo)</span>
               </div>
               <span className={`qfdos-badge ${ligandEfficiency >= 0.3 ? 'badge-emerald' : 'badge-amber'}`} style={{ fontSize: '0.68rem', width: 'fit-content' }}>

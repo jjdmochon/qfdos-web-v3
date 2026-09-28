@@ -197,10 +197,7 @@ export const PracticasLabEquipment: React.FC = () => {
   }, [user]);
 
   const sendMaterialReport = async () => {
-    if (missingItems.size === 0 || !reporterName.trim() || !reporterEmail.trim() || !puestoNumber.trim()) {
-      alert('Completa tu nombre, email, numero de puesto y selecciona al menos un elemento que falta.');
-      return;
-    }
+    if (missingItems.size === 0 || !reporterName.trim() || !reporterEmail.trim() || !puestoNumber.trim()) return;
     setIsReportSubmitting(true);
     const resultado = await enviarAHoja('Material', {
       nombre: reporterName.trim(),
@@ -383,7 +380,7 @@ export const PracticasLabEquipment: React.FC = () => {
               </div>
 
               {/* Key Diagram Legend Badges */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))', gap: '0.5rem' }}>
                 {currentSetup.keyNotes.map((kn, kIdx) => (
                   <div
                     key={kIdx}
@@ -479,7 +476,7 @@ export const PracticasLabEquipment: React.FC = () => {
                 <div className="qfdos-card" style={{ padding: '1.1rem', borderLeft: '4px solid #ef4444', background: 'rgba(239, 68, 68, 0.03)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.4rem' }}>
                     <AlertTriangle size={15} color="#ef4444" />
-                    <h4 style={{ margin: 0, fontWeight: 700, fontSize: '0.84rem', color: '#b91c1c' }}>
+                    <h4 style={{ margin: 0, fontWeight: 700, fontSize: '0.84rem', color: 'var(--bad-ink)' }}>
                       Puntos Críticos de Seguridad
                     </h4>
                   </div>
@@ -613,8 +610,8 @@ export const PracticasLabEquipment: React.FC = () => {
                 <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-title)', margin: '4px 0' }}>
                   Informe enviado correctamente
                 </p>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-                  {missingItems.size} elemento(s) reportado(s) como faltante(s). El profesor recibirá la notificación.
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }} role="status">
+                  {missingItems.size} elemento(s) reportado(s) como faltante(s). {reportStatus}
                 </p>
                 <button 
                   onClick={() => { setReportSubmitted(false); setMissingItems(new Set()); }}
@@ -672,7 +669,7 @@ export const PracticasLabEquipment: React.FC = () => {
                 {/* Checklist of all items */}
                 <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(min(220px, 100%), 1fr))', 
                   gap: '0.4rem', 
                   marginBottom: '1rem',
                   padding: '0.75rem',
@@ -735,6 +732,11 @@ export const PracticasLabEquipment: React.FC = () => {
                     {isReportSubmitting ? 'Enviando...' : 'Enviar Informe al Profesor'}
                   </button>
                 </div>
+                {reportStatus && !reportSubmitted && (
+                  <div className="status-msg status-msg--bad" role="alert" style={{ marginTop: '0.75rem' }}>
+                    <AlertTriangle size={14} /> <span>{reportStatus}</span>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -846,7 +848,7 @@ export const PracticasLabEquipment: React.FC = () => {
               background: selectedAnswer === EQUIPMENT_QUIZ[quizIdx].correct ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
               border: `1px solid ${selectedAnswer === EQUIPMENT_QUIZ[quizIdx].correct ? '#10b981' : '#ef4444'}`
             }}>
-              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: selectedAnswer === EQUIPMENT_QUIZ[quizIdx].correct ? '#059669' : '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: selectedAnswer === EQUIPMENT_QUIZ[quizIdx].correct ? 'var(--ok-ink)' : 'var(--bad-ink)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {selectedAnswer === EQUIPMENT_QUIZ[quizIdx].correct ? <CheckCircle2 size={16} /> : <Info size={16} />}
                 {selectedAnswer === EQUIPMENT_QUIZ[quizIdx].correct ? '¡Explicación Correcta!' : 'Explicación del Concepto:'}
               </div>

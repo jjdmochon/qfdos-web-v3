@@ -396,13 +396,6 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
     priority: 'alta'
   },
   {
-    id: 'ann-1',
-    title: '🚀 Bienvenida al Curso 2026/2027: Portal QFDOS v3 desarrollado por NEXUS LAB',
-    content: 'Plataforma desarrollada por NEXUS LAB para el Prof. Mochón y el alumnado del Grupo E. Estructuras 2D renderizadas con RDKit y descriptores calculados sobre la marcha, podcasts en Spotify, flashcards con repetición espaciada y generador de exámenes.',
-    date: '10 Septiembre 2026',
-    priority: 'alta'
-  },
-  {
     id: 'ann-2',
     title: '📊 Simuladores Biofísicos de Afinidad y Criterios ADMET de Lipinski / Veber',
     content: 'Disponibles las herramientas de cálculo en tiempo real para constantes termodinámicas (ΔG°, Kd, Ki), ecuación de Cheng-Prusoff (IC50) y perfilado de permeabilidad celular.',

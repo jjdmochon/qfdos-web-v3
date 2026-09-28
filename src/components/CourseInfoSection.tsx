@@ -85,9 +85,9 @@ export const CourseInfoSection: React.FC = () => {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <BookOpen size={24} color="var(--navy-ink)" />
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)', letterSpacing: '-0.02em', margin: 0 }}>
+            <h1 className="page-title">
               {subject.name}
-            </h2>
+            </h1>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: '0.3rem 0 1rem 0', maxWidth: '720px' }}>
             {subject.degree} • {subject.faculty} • {subject.university}. 
@@ -99,9 +99,9 @@ export const CourseInfoSection: React.FC = () => {
               href={links.geminiNotebook}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-teal"
+              className="btn btn-sm btn-outline"
               style={{
-                fontWeight: 800,
+                fontWeight: 700,
                 fontSize: '0.82rem',
                 padding: '8px 16px',
                 borderRadius: '8px',
@@ -117,7 +117,7 @@ export const CourseInfoSection: React.FC = () => {
               href={links.teachingGuide}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-sm btn-outline"
+              className="btn btn-sm btn-primary"
               style={{
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -137,7 +137,7 @@ export const CourseInfoSection: React.FC = () => {
         {/* Tarjeta de horario rápido */}
         <div className="qfdos-card" style={{
           padding: '1.1rem 1.25rem',
-          minWidth: '260px',
+          minWidth: 'min(260px, 100%)',
           boxShadow: 'var(--shadow-sm)',
           border: '1px solid var(--border-color)',
           background: 'var(--surface)'
@@ -191,7 +191,7 @@ export const CourseInfoSection: React.FC = () => {
 
       {/* PESTAÑA 1: INFORMACIÓN GENERAL & HORARIOS */}
       {activeTab === 'info' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: '1.5rem' }}>
           
           {/* Card: Clases Teóricas */}
           <div className="qfdos-card card-navy">
@@ -268,58 +268,6 @@ export const CourseInfoSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Card: Desarrollo Tecnológico y Plataforma — NEXUS.LAB */}
-          <div className="qfdos-card" style={{ borderLeft: '3px solid #00bcd4', background: 'var(--surface)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(0, 188, 212, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00bcd4' }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                </svg>
-              </div>
-              <div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                  Desarrollo de la Plataforma
-                </h3>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Ingeniería Digital & Algoritmia Biofísica</span>
-              </div>
-            </div>
-
-            <div style={{ marginTop: '0.75rem', padding: '12px 14px', background: 'var(--surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-title)' }}>
-                  NEXUS<span style={{ color: 'var(--teal-ink)' }}>.LAB</span>
-                </span>
-                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>Tech Partner</span>
-              </div>
-              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '4px' }}>
-                Plataforma interactiva diseñada y desarrollada por <strong>NEXUS.LAB</strong>. Sinergia académico-industrial para la docencia en farmacia, algoritmia biofísica y quimioinformática.
-              </div>
-              <div style={{ marginTop: '10px' }}>
-                <a
-                  href="https://nexus-lab-team.netlify.app/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    color: 'var(--navy-ink)',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    textDecoration: 'none'
-                  }}
-                >
-                  <span>Conocer más sobre NEXUS.LAB</span>
-                  <ExternalLink size={13} />
-                </a>
-              </div>
-            </div>
-
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '0.25rem', background: 'var(--neutral-bg)', padding: '10px', borderRadius: '8px' }}>
-              🌐 <strong>Web Oficial:</strong> <a href="https://nexus-lab-team.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', fontWeight: 700 }}>nexus-lab-team.netlify.app</a>
-            </div>
-          </div>
-
           {/* Card: Calendario Oficial de Exámenes (Teoría) - Rediseño Editorial de Alta Gama */}
           <div className="qfdos-card card-navy" style={{ gridColumn: '1 / -1', padding: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1.25rem' }}>
@@ -357,7 +305,7 @@ export const CourseInfoSection: React.FC = () => {
             </div>
 
             {/* Grid de Eventos / Exámenes con diseño visual moderno */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1.25rem' }}>
               {examSchedule.map((ex, idx) => {
                 const isFinal = ex.tipo.includes('Ordinaria') || ex.tipo.includes('Final');
                 const isParcial = ex.tipo.includes('Parcial');
@@ -556,7 +504,7 @@ export const CourseInfoSection: React.FC = () => {
               Tabla 1. Sistemas de evaluación y porcentajes sobre la calificación final:
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
               {COURSE_EVALUATION_GUIDE.tabla1Continua.map((item, idx) => {
                 const cardAccentColors = ['#1a2b4c', '#0d9488', '#059669', '#7c3aed'];
                 const accentColor = cardAccentColors[idx % cardAccentColors.length];
@@ -618,7 +566,7 @@ export const CourseInfoSection: React.FC = () => {
             </div>
 
             {/* Normas Teóricas y Prácticas de Evaluación Continua */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1rem' }}>
               <div style={{ padding: '1rem', background: 'var(--surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                 <h5 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--navy-ink)', marginBottom: '6px' }}>
                   I. Teoría (Examen Parcial + Examen Final):
@@ -640,7 +588,7 @@ export const CourseInfoSection: React.FC = () => {
           </div>
 
           {/* 2. CONVOCATORIAS OFICIALES: EXTRAORDINARIA, ÚNICA FINAL Y ESPECIAL DE NOVIEMBRE */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1.5rem' }}>
             
             {/* 2. Convocatoria Extraordinaria */}
             <div className="qfdos-card card-purple" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -731,7 +679,7 @@ export const CourseInfoSection: React.FC = () => {
                       4. Especial de Noviembre
                     </h3>
                   </div>
-                  <span className="qfdos-badge" style={{ background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a', fontWeight: 800, fontSize: '0.72rem' }}>
+                  <span className="qfdos-badge" style={{ background: 'var(--warn-bg)', color: 'var(--warn-ink)', border: '1px solid #fde68a', fontWeight: 800, fontSize: '0.72rem' }}>
                     Finalización Grado
                   </span>
                 </div>
@@ -808,7 +756,7 @@ export const CourseInfoSection: React.FC = () => {
               el alumno/a dispone de un <strong>plazo máximo de 12 días naturales</strong> para contactar por correo electrónico con el profesor/a y el Director/a de Departamento.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '10px' }}>
               {COURSE_EVALUATION_GUIDE.incidencias.map((inc, i) => (
                 <div key={i} style={{ padding: '12px', background: 'var(--surface-alt)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                   {/* «Incidencia N» es corto y fijo, así que se ancla él y es el
@@ -835,7 +783,7 @@ export const CourseInfoSection: React.FC = () => {
             <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '10px' }}>
               Tabla 2. Códigos informativos de los distintos sistemas de evaluación de la Guía Docente:
             </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '8px' }}>
               {COURSE_EVALUATION_GUIDE.tabla2Codigos.map((cod, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}>
                   <span className="qfdos-badge badge-teal" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', padding: '1px 5px', flexShrink: 0 }}>
@@ -868,7 +816,7 @@ export const CourseInfoSection: React.FC = () => {
             </div>
 
             {/* Franjas Horarias */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '1rem', marginTop: '1rem' }}>
               {tutoring.hours.map((h, i) => (
                 <div key={i} style={{
                   padding: '1.2rem',
@@ -893,7 +841,7 @@ export const CourseInfoSection: React.FC = () => {
               Modalidades y Sedes de Realización:
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: '1rem' }}>
               
               {/* Sede 1: Farmacia */}
               <div style={{ padding: '1rem', background: 'var(--surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
@@ -1043,11 +991,11 @@ export const CourseInfoSection: React.FC = () => {
               >
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
                   <div style={{
-                    minWidth: '130px',
+                    minWidth: 'min(130px, 100%)',
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.84rem',
                     fontWeight: 700,
-                    color: event.important ? 'var(--teal)' : 'var(--text-title)',
+                    color: event.important ? 'var(--teal-ink)' : 'var(--text-title)',
                     paddingTop: '2px'
                   }}>
                     {formatDate(event.date, event.endDate)}

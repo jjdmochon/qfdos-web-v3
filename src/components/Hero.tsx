@@ -11,13 +11,15 @@ interface HeroProps {
   onNavigateToSimulador: () => void;
   onOpenDrugSearch: () => void;
   onOpenFirSimulator?: () => void;
+  /** Número de temas publicados en el temario */
+  numTemas?: number;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   onNavigateToTemas,
   onNavigateToSimulador,
   onOpenDrugSearch,
-  onOpenFirSimulator
+  numTemas
 }) => {
   const { user, isProfesor } = useAuth();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -149,30 +151,19 @@ export const Hero: React.FC<HeroProps> = ({
             )}
 
             <p className="qfdos-hero-description">
-              Diseño racional de fármacos, afinidad termodinámica (ΔG°, Kd, Ki), relaciones SAR, quimioinformática 2D/3D y evaluación continua.
+              Temas, prácticas, test de repaso y calificaciones de Química Farmacéutica II (Grupo E, UGR), todo en un sitio.
             </p>
 
             <div className="qfdos-hero-cta-group">
               <button onClick={onNavigateToTemas} className="btn-hero-pill-primary">
                 <BookOpen size={16} />
-                <span>Explorar 11 Temas</span>
+                <span>{numTemas ? `Explorar los ${numTemas} temas` : 'Explorar el temario'}</span>
                 <ChevronRight size={15} className="cta-arrow" />
               </button>
               <button onClick={onNavigateToSimulador} className="btn-hero-pill-secondary">
                 <Award size={16} />
                 <span>Simulador Biofísico</span>
               </button>
-              {onOpenFirSimulator && (
-                <button
-                  onClick={onOpenFirSimulator}
-                  className="btn-hero-pill-secondary"
-                  style={{ background: 'rgba(13, 148, 136, 0.22)', borderColor: 'rgba(45, 212, 191, 0.45)', color: '#2dd4bf' }}
-                  title="Simulador Oficial Examen FIR (2020-2025)"
-                >
-                  <Award size={16} />
-                  <span>Simulador FIR</span>
-                </button>
-              )}
               <button
                 onClick={onOpenDrugSearch}
                 className="btn-hero-pill-tertiary"

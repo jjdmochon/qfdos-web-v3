@@ -66,6 +66,9 @@ export function loadRDKit(): Promise<RDKitModule> {
     attempt();
   });
 
+  // Un fallo (sin red, CDN caído) no se queda cacheado: el siguiente intento vuelve a probar
+  rdkitPromise.catch(() => { rdkitPromise = null; });
+
   return rdkitPromise;
 }
 

@@ -45,6 +45,7 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
   const [difficulty, setDifficulty] = useState<'Fácil' | 'Medio' | 'Avanzado'>('Medio');
   const [focusArea, setFocusArea] = useState<ExamFocusArea>('sintesis_reactividad');
   const [isLoading, setIsLoading] = useState(false);
+  const [genError, setGenError] = useState('');
   const [generatedQuestions, setGeneratedQuestions] = useState<TestQuestion[]>([]);
   const [addedSuccess, setAddedSuccess] = useState(false);
   const [topicFiles, setTopicFiles] = useState<StoredFileMeta[]>([]);
@@ -77,6 +78,7 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
   const handleGenerate = async () => {
     setIsLoading(true);
     setAddedSuccess(false);
+    setGenError('');
 
     try {
       const filesDesc = topicFiles.length > 0
@@ -93,8 +95,13 @@ export const ExamGeneratorModal: React.FC<ExamGeneratorModalProps> = ({
         uploadedMaterialsContext: filesDesc
       });
       setGeneratedQuestions(results);
+      // Si Gemini falla, el servicio devuelve el banco predefinido: se avisa en vez de callarlo
+      if (results.length > 0 && results.every(q => String(q.id).startsWith('fallback-'))) {
+        setGenError('Gemini no ha respondido (clave, cuota o red). Se muestran preguntas del banco predefinido, no generadas con IA.');
+      }
     } catch (e) {
       console.error('Error generating exam questions', e);
+      setGenError('No se han podido generar las preguntas. Revisa la conexión y vuelve a intentarlo.');
     } finally {
       setIsLoading(false);
     }
@@ -199,22 +206,22 @@ ${q.options.map((opt, oIdx) => {
 
         {/* Tab Switcher */}
         <div style={{ padding: '0 1.75rem', background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-color)' }}>
-          <div className="tabs-container" style={{ margin: 0 }}>
+          <div className="tabs-container" style={{ margin: 0 }} role="tablist">
             <button
               onClick={() => setActiveTab('ai')}
-              className={`tab-btn ${activeTab === 'ai' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'ai' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'ai'}
             >
               <Sparkles size={14} /> Generación con IA & Aprendizaje Continuo
             </button>
             <button
               onClick={() => setActiveTab('fir')}
-              className={`tab-btn ${activeTab === 'fir' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'fir' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'fir'}
             >
               <Award size={14} /> Banco Oficial FIR (136 Preguntas)
             </button>
             <button
               onClick={() => setActiveTab('manual')}
-              className={`tab-btn ${activeTab === 'manual' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'manual' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'manual'}
             >
               <Edit3 size={14} /> Redacción Manual con Estructuras 2D
             </button>
@@ -249,7 +256,7 @@ ${q.options.map((opt, oIdx) => {
                       padding: '2px 8px', 
                       borderRadius: '999px', 
                       background: 'rgba(16, 185, 129, 0.2)', 
-                      color: '#047857',
+                      color: 'var(--ok-ink)',
                       border: '1px solid rgba(16, 185, 129, 0.3)'
                     }}>
                       ACTIVO & SINCRONIZADO
@@ -334,7 +341,7 @@ ${q.options.map((opt, oIdx) => {
               </div>
               {/* Controls Bar */}
               <div className="qfdos-card" style={{ padding: '1.25rem', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '10px' }}>
                   {/* Topic */}
                   <div>
                     <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '3px' }}>
@@ -429,13 +436,22 @@ ${q.options.map((opt, oIdx) => {
                 </button>
               </div>
 
+              {genError && (
+                <div className="status-msg status-msg--warn" role="alert">
+                  <span>{genError}</span>
+                  <button type="button" className="btn btn-sm btn-outline" onClick={handleGenerate} disabled={isLoading}>
+                    Reintentar con Gemini
+                  </button>
+                </div>
+              )}
+
               {/* Generated Questions List */}
               {generatedQuestions.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <span className="qfdos-badge badge-emerald" style={{ fontSize: '0.75rem' }}>
-                      ✓ {generatedQuestions.length} Preguntas Generadas para {selectedTopic.number} (Nivel {difficulty})
+                      ✓ {generatedQuestions.length} {genError ? 'Preguntas del banco' : 'Preguntas generadas'} para {selectedTopic.number} (Nivel {difficulty})
                     </span>
 
                     <div style={{ display: 'flex', gap: '6px' }}>
@@ -492,7 +508,7 @@ ${q.options.map((opt, oIdx) => {
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span className="font-mono" style={{ fontWeight: 700, color: isCorrect ? '#047857' : 'var(--text-muted)' }}>
+                                <span className="font-mono" style={{ fontWeight: 700, color: isCorrect ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
                                   {String.fromCharCode(65 + oIdx)})
                                 </span>
                                 <span>{text}</span>
@@ -627,7 +643,7 @@ ${q.options.map((opt, oIdx) => {
                 </div>
 
                 {addedSuccess && (
-                  <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#047857', padding: '8px 12px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--ok-ink)', padding: '8px 12px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <CheckCircle2 size={16} /> Preguntas oficiales FIR agregadas correctamente al temario.
                   </div>
                 )}
@@ -699,7 +715,7 @@ ${q.options.map((opt, oIdx) => {
                           )}
 
                           {/* Options preview */}
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '6px', marginTop: '8px' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '6px', marginTop: '8px' }}>
                             {fir.options.map((opt, oIdx) => (
                               <div
                                 key={oIdx}
@@ -714,7 +730,7 @@ ${q.options.map((opt, oIdx) => {
                                   gap: '6px'
                                 }}
                               >
-                                <strong style={{ color: oIdx === fir.correctIndex ? '#047857' : 'var(--text-muted)', fontSize: '0.72rem' }}>
+                                <strong style={{ color: oIdx === fir.correctIndex ? 'var(--ok-ink)' : 'var(--text-muted)', fontSize: '0.72rem' }}>
                                   {String.fromCharCode(65 + oIdx)})
                                 </strong>
                                 <span style={{ color: 'var(--text-title)' }}>{opt}</span>

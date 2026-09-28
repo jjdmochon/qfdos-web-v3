@@ -28,6 +28,16 @@ const CATEGORY_ACCENT: Record<string, string> = {
   'Divulgación': 'var(--accent-blue)'
 };
 
+/* El acento pinta el borde; como texto va la tinta legible en ambos temas */
+const CATEGORY_INK: Record<string, string> = {
+  'Casos de éxito': 'var(--ok-ink)',
+  'Descubrimiento de fármacos': 'var(--teal-ink)',
+  'Impacto en pacientes': 'var(--purple-ink)',
+  'Regulación & seguridad': 'var(--warn-ink)',
+  'Industria & carrera profesional': 'var(--navy-ink)',
+  'Divulgación': 'var(--info-ink)'
+};
+
 export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
   links,
   onOpenAdminCms
@@ -67,9 +77,9 @@ export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
       <div style={{ marginBottom: '1.75rem', maxWidth: '72ch' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
           <Compass size={24} color="var(--teal-ink)" />
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 600, color: 'var(--text-title)' }}>
+          <h1 className="page-title">
             Enlaces de interés
-          </h2>
+          </h1>
         </div>
         <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.65 }}>
           Lecturas, informes y casos reales que muestran para qué sirve todo esto:
@@ -153,7 +163,7 @@ export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
                 style={{ borderTopColor: accent }}
               >
                 <div className="resource-card-top">
-                  <span className="resource-cat" style={{ color: accent, background: `color-mix(in srgb, ${accent} 12%, transparent)` }}>
+                  <span className="resource-cat" style={{ color: CATEGORY_INK[link.category] ?? 'var(--teal-ink)', background: `color-mix(in srgb, ${accent} 12%, transparent)` }}>
                     {link.category}
                   </span>
                   {link.featured && (

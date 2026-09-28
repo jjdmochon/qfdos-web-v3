@@ -18,7 +18,8 @@ import {
   UserCheck,
   ShieldCheck,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  AlertCircle
 } from 'lucide-react';
 
 // La hoja es privada: sólo se usa para el enlace «Abrir hoja» del profesor.
@@ -54,6 +55,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
 
   const [loadingSheet, setLoadingSheet] = useState<boolean>(false);
   const [sheetSyncStatus, setSheetSyncStatus] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [editExamenFinal, setEditExamenFinal] = useState<number>(0);
@@ -64,6 +66,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
   // Sincronización con la hoja de evaluación, vía Apps Script
   const syncFromGoogleSheet = async () => {
     setLoadingSheet(true);
+    setSyncError(false);
     setSheetSyncStatus('Sincronizando con Google Sheets...');
     try {
       const r = await leerEvaluacion();
@@ -144,7 +147,8 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
       }
     } catch (err: any) {
       console.warn('Error fetching Google Sheet, using stored data:', err);
-      setSheetSyncStatus(`Nota: no se pudo sincronizar con Google Sheets (${err.message}). Mostrando la última copia guardada.`);
+      setSyncError(true);
+      setSheetSyncStatus(`No se pudo sincronizar con Google Sheets (${err.message}). Se muestra la última copia guardada.`);
     } finally {
       setLoadingSheet(false);
     }
@@ -302,10 +306,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <GraduationCap size={26} color="var(--navy)" />
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-title)', letterSpacing: '-0.02em' }}>
+            <GraduationCap size={26} color="var(--navy-ink)" />
+            <h1 className="page-title">
               {isProfesor ? 'Matriz de Evaluación Continua & Actas Oficiales' : 'Mi Expediente y Calificaciones de Evaluación Continua'}
-            </h2>
+            </h1>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
             Ponderación Oficial Guía Docente UGR (Grupo E): <strong>70% Examen Final</strong> (mín. 5.0) · <strong>20% Examen Parcial</strong> · <strong>5% Prácticas</strong> · <strong>5% Trabajos/Seminarios</strong>
@@ -365,21 +369,21 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
         )}
       </div>
 
-      {sheetSyncStatus && isProfesor && (
-        <div style={{
-          background: sheetSyncStatus.startsWith('✓') ? 'rgba(16, 185, 129, 0.10)' : 'rgba(30, 58, 138, 0.08)',
-          border: `1px solid ${sheetSyncStatus.startsWith('✓') ? '#10b981' : 'var(--border-color)'}`,
-          borderRadius: '8px',
-          padding: '8px 14px',
-          fontSize: '0.8rem',
-          color: sheetSyncStatus.startsWith('✓') ? '#065f46' : 'var(--navy)',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <CheckCircle2 size={15} color={sheetSyncStatus.startsWith('✓') ? '#10b981' : 'var(--navy)'} />
+      {sheetSyncStatus && (isProfesor || syncError || loadingSheet) && (
+        <div
+          className={`status-msg ${loadingSheet ? 'status-msg--info' : syncError ? 'status-msg--bad' : sheetSyncStatus.startsWith('✓') ? 'status-msg--ok' : ''}`}
+          role={syncError ? 'alert' : 'status'}
+          style={{ marginBottom: '1.5rem' }}
+        >
+          {loadingSheet
+            ? <RefreshCw size={15} className="spin" />
+            : syncError ? <AlertCircle size={15} /> : <CheckCircle2 size={15} />}
           <span>{sheetSyncStatus}</span>
+          {syncError && !loadingSheet && (
+            <button type="button" className="btn btn-sm btn-outline" onClick={syncFromGoogleSheet}>
+              <RefreshCw size={13} /> Reintentar
+            </button>
+          )}
         </div>
       )}
 
@@ -399,8 +403,8 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
             gap: '1rem'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--teal-ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--secondary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
               <Award size={24} />
             </div>
             <div>
@@ -417,7 +421,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
           </div>
           <button 
             onClick={onOpenFirSimulator} 
-            className="btn btn-primary"
+            className="btn btn-outline"
             style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, padding: '10px 18px' }}
           >
             <Award size={16} /> Abrir Simulador FIR
@@ -426,13 +430,13 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
       )}
 
       {/* 4 Official Criteria Breakdown Cards (70 / 20 / 5 / 5) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         
         <div className="qfdos-card card-navy" style={{ padding: '1.25rem', borderTop: '4px solid var(--navy)' }}>
           <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
             Examen Final Oficial
           </span>
-          <div className="font-mono" style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--navy)', margin: '4px 0' }}>
+          <div className="font-mono" style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--navy-ink)', margin: '4px 0' }}>
             70%
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -444,7 +448,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
           <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
             Examen Parcial
           </span>
-          <div className="font-mono" style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--teal)', margin: '4px 0' }}>
+          <div className="font-mono" style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--teal-ink)', margin: '4px 0' }}>
             20%
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -456,7 +460,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
           <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
             Prácticas de Laboratorio
           </span>
-          <div className="font-mono" style={{ fontSize: '2.1rem', fontWeight: 800, color: '#10b981', margin: '4px 0' }}>
+          <div className="font-mono" style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--ok-ink)', margin: '4px 0' }}>
             5%
           </div>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -492,7 +496,21 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
             </div>
           </div>
 
-          {!myStudentProfile ? (
+          {!myStudentProfile && loadingSheet ? (
+            <div className="state-panel" role="status" aria-busy="true">
+              <RefreshCw size={26} className="spin" />
+              <h3>Consultando tus calificaciones…</h3>
+            </div>
+          ) : !myStudentProfile && syncError ? (
+            <div className="state-panel state-panel--bad" role="alert">
+              <AlertCircle size={28} />
+              <h3>No se han podido cargar tus calificaciones</h3>
+              <p>Puede que tu sesión haya caducado o que no haya conexión. Vuelve a intentarlo o cierra sesión y entra de nuevo.</p>
+              <button type="button" className="btn btn-sm btn-primary" onClick={syncFromGoogleSheet}>
+                <RefreshCw size={13} /> Reintentar
+              </button>
+            </div>
+          ) : !myStudentProfile ? (
             <div style={{ padding: '2rem', textAlign: 'center', background: 'var(--surface-alt)', borderRadius: '8px' }}>
               <Lock size={32} color="var(--text-muted)" style={{ margin: '0 auto 10px' }} />
               <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
@@ -508,20 +526,20 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
               {(() => {
                 const { finalExamScore, parcialScore, labScore, trabajosScore, finalScore, isPassed, isExamMinimumMet, isLabApproved } = calculateOfficialGrade(myStudentProfile);
                 return (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                     <div style={{ background: 'var(--surface-alt)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid var(--navy)' }}>
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>Examen Final (70%)</span>
-                      <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: isExamMinimumMet ? 'var(--navy)' : 'var(--accent-red)' }}>
+                      <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: isExamMinimumMet ? 'var(--navy-ink)' : 'var(--accent-red)' }}>
                         {finalExamScore}
                       </div>
-                      <span style={{ fontSize: '0.7rem', color: isExamMinimumMet ? '#059669' : '#dc2626' }}>
+                      <span style={{ fontSize: '0.7rem', color: isExamMinimumMet ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                         {isExamMinimumMet ? '✓ Mínimo superado (≥ 5.0)' : '⚠ Requiere ≥ 5.0'}
                       </span>
                     </div>
 
                     <div style={{ background: 'var(--surface-alt)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid var(--teal)' }}>
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>Parcial (20%)</span>
-                      <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--teal)' }}>
+                      <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--teal-ink)' }}>
                         {parcialScore}
                       </div>
                       <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Pondera un 20%</span>
@@ -529,10 +547,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
 
                     <div style={{ background: 'var(--surface-alt)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>Laboratorio (5%)</span>
-                      <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: '#10b981' }}>
+                      <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--ok-ink)' }}>
                         {labScore}
                       </div>
-                      <span style={{ fontSize: '0.7rem', color: isLabApproved ? '#059669' : '#dc2626' }}>
+                      <span style={{ fontSize: '0.7rem', color: isLabApproved ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                         {isLabApproved ? '✓ Prácticas aprobadas' : '⚠ Obligatorio aprobar'}
                       </span>
                     </div>
@@ -554,10 +572,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                       flexDirection: 'column',
                       justifyContent: 'center'
                     }}>
-                      <span style={{ fontSize: '0.74rem', fontWeight: 800, color: isPassed ? '#065f46' : '#991b1b', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '0.74rem', fontWeight: 800, color: isPassed ? 'var(--ok-ink)' : 'var(--bad-ink)', textTransform: 'uppercase' }}>
                         Calificación Final Ponderada
                       </span>
-                      <div className="font-mono" style={{ fontSize: '1.9rem', fontWeight: 800, color: isPassed ? '#047857' : '#b91c1c' }}>
+                      <div className="font-mono" style={{ fontSize: '1.9rem', fontWeight: 800, color: isPassed ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                         {finalScore}
                       </div>
                       <span className="qfdos-badge" style={{ alignSelf: 'flex-start', background: isPassed ? '#10b981' : '#ef4444', color: '#fff', fontSize: '0.7rem', fontWeight: 700 }}>
@@ -585,7 +603,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
               </span>
             </div>
 
-            <div style={{ position: 'relative', minWidth: '240px' }}>
+            <div style={{ position: 'relative', minWidth: 'min(240px, 100%)' }}>
               <Search size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
@@ -665,7 +683,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                               style={{ width: '55px', padding: '2px 4px', fontSize: '0.8rem', textAlign: 'center' }}
                             />
                           ) : (
-                            <span style={{ color: isExamMinimumMet ? 'var(--navy)' : 'var(--accent-red)', fontWeight: 700 }}>
+                            <span style={{ color: isExamMinimumMet ? 'var(--navy-ink)' : 'var(--accent-red)', fontWeight: 700 }}>
                               {finalExamScore}
                             </span>
                           )}
@@ -718,7 +736,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                           )}
                         </td>
                         <td style={{ padding: '10px 12px', textAlign: 'center' }} className="font-mono">
-                          <strong style={{ fontSize: '1rem', color: isPassed ? 'var(--navy)' : 'var(--accent-red)' }}>
+                          <strong style={{ fontSize: '1rem', color: isPassed ? 'var(--navy-ink)' : 'var(--accent-red)' }}>
                             {finalScore}
                           </strong>
                         </td>

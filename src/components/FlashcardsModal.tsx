@@ -3,6 +3,7 @@ import { QfdosTopic, Flashcard, INITIAL_TOPICS } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { recurso } from '../services/rutas';
 import { useAuth } from '../context/AuthContext';
+import { pulsable } from '../utils/a11y';
 import {
   submitFlashcardsAttemptToGoogleSheets,
   GoogleSheetsSubmissionResult
@@ -88,7 +89,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
   // Estado de sincronización con Google Sheets (hoja oficial Respuestas_QFDOS)
   const [sheetStatus, setSheetStatus] = useState<
-    'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'network_error' | 'no_url'
+    'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'network_error' | 'no_url' | 'sesion_invalida'
   >('idle');
   const [statusMessage, setStatusMessage] = useState<string>('');
 
@@ -152,7 +153,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     {parts.map((part, partIdx) => {
                       if (part.startsWith('**') && part.endsWith('**')) {
                         return (
-                          <strong key={partIdx} style={{ color: 'var(--navy)', fontWeight: 700 }}>
+                          <strong key={partIdx} style={{ color: 'var(--navy-ink)', fontWeight: 700 }}>
                             {part.slice(2, -2)}
                           </strong>
                         );
@@ -199,6 +200,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const handleRate = (rating: 'easy' | 'medium' | 'hard') => {
     const updated = { ...cardStats, [currentCard.id]: rating };
     setCardStats(updated);
+    if (sheetStatus === 'sent') { setSheetStatus('idle'); setStatusMessage(''); }
 
     // Si aún quedan tarjetas por ver en el orden, avanza a la siguiente
     if (safeIndex < displayCards.length - 1) {
@@ -258,7 +260,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
       if (res.status === 'sent') {
         setStatusMessage('✓ Valoración registrada con éxito en la hoja oficial de calificaciones (Respuestas_QFDOS).');
       } else if (res.status === 'sent_unconfirmed') {
-        setStatusMessage('✓ Valoración enviada a la hoja oficial de calificaciones.');
+        setStatusMessage('Valoración enviada, pero no se ha podido confirmar en la hoja. Si tu sesión ha caducado, vuelve a entrar y registra de nuevo.');
       } else {
         setStatusMessage(res.message || 'Error al conectar con Google Sheets.');
       }
@@ -271,7 +273,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div 
+      <div
+        onKeyDown={e => {
+          const t = e.target as HTMLElement;
+          if (t.closest('input, textarea, select')) return;
+          if (e.key === 'ArrowRight') { e.preventDefault(); handleNext(); }
+          else if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); }
+        }} 
         className="modal-container" 
         style={{ maxWidth: '820px', width: '96vw', maxHeight: '92vh', display: 'flex', flexDirection: 'column' }} 
         onClick={e => e.stopPropagation()}
@@ -403,11 +411,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', margin: '12px 0' }}>
                   <div style={{ background: 'var(--surface)', padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Dominio Estimado</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy)' }}>{scorePercent}%</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy-ink)' }}>{scorePercent}%</div>
                   </div>
                   <div style={{ background: 'var(--surface)', padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Nota / 10</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--teal)' }}>{score10}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--teal-ink)' }}>{score10}</div>
                   </div>
                   <div style={{ background: 'var(--surface)', padding: '10px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', fontWeight: 700 }}>Fáciles (Dominadas)</div>
@@ -439,15 +447,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   </button>
 
                   {statusMessage && (
-                    <div style={{
-                      fontSize: '0.82rem',
-                      fontWeight: 600,
-                      color: sheetStatus === 'sent' || sheetStatus === 'sent_unconfirmed' ? 'var(--accent-emerald)' : sheetStatus === 'network_error' ? 'var(--accent-amber)' : 'var(--text-main)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}>
-                      {sheetStatus === 'sent' || sheetStatus === 'sent_unconfirmed' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                    <div className={`status-msg ${sheetStatus === 'sent' ? 'status-msg--ok' : sheetStatus === 'sending' ? 'status-msg--info' : sheetStatus === 'sent_unconfirmed' || sheetStatus === 'no_url' ? 'status-msg--warn' : sheetStatus === 'idle' ? 'status-msg--warn' : 'status-msg--bad'}`} role={sheetStatus === 'network_error' ? 'alert' : 'status'}>
+                      {sheetStatus === 'sent' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                       {statusMessage}
                     </div>
                   )}
@@ -478,7 +479,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0, paddingRight: '8px' }}>
                           <span style={{ fontWeight: 700, color: 'var(--text-muted)', width: '22px' }}>#{idx + 1}</span>
-                          <span style={{ fontWeight: 600, color: 'var(--navy)' }}>{c.concept}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--navy-ink)' }}>{c.concept}</span>
                           {c.category && (
                             <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>
                               {c.category}
@@ -576,7 +577,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                           borderRadius: '6px',
                           border: isCurrent ? '2px solid var(--navy)' : '1px solid transparent',
                           background: isCurrent && !st ? 'var(--primary-bg)' : bg,
-                          color: isCurrent && !st ? 'var(--navy)' : color,
+                          color: isCurrent && !st ? 'var(--navy-ink)' : color,
                           fontSize: '0.72rem',
                           fontWeight: 700,
                           cursor: 'pointer',
@@ -602,8 +603,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     </span>
                   )}
                   {cardStats[currentCard.id] && (
-                    <span className={`qfdos-badge ${cardStats[currentCard.id] === 'easy' ? 'badge-emerald' : 'badge-coral'}`} style={{ fontSize: '0.72rem' }}>
-                      {cardStats[currentCard.id] === 'easy' ? 'FÁCIL ✓' : 'DIFÍCIL'}
+                    <span className={`qfdos-badge ${cardStats[currentCard.id] === 'easy' ? 'badge-emerald' : cardStats[currentCard.id] === 'medium' ? 'badge-amber' : 'badge-red'}`} style={{ fontSize: '0.72rem' }}>
+                      {cardStats[currentCard.id] === 'easy' ? 'FÁCIL ✓' : cardStats[currentCard.id] === 'medium' ? 'REGULAR' : 'DIFÍCIL'}
                     </span>
                   )}
                 </div>
@@ -611,7 +612,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
               {/* Interactive Flip Card Container */}
               <div
-                onClick={() => setIsFlipped(!isFlipped)}
+                onClick={() => setIsFlipped(!isFlipped)} {...pulsable(() => setIsFlipped(!isFlipped))} aria-pressed={isFlipped} aria-label={isFlipped ? 'Tarjeta girada: ver anverso' : 'Girar tarjeta'}
                 style={{
                   width: '100%',
                   flexShrink: 0,
@@ -652,7 +653,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   </div>
                   <span style={{
                     fontSize: '0.75rem',
-                    color: isFlipped ? 'var(--teal)' : 'var(--navy)',
+                    color: isFlipped ? 'var(--teal-ink)' : 'var(--navy-ink)',
                     fontWeight: 700,
                     display: 'flex',
                     alignItems: 'center',
@@ -681,7 +682,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                       <div style={{
                         marginTop: '16px',
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(min(135px, 100%), 1fr))',
                         gap: '12px',
                         background: 'var(--surface-alt)',
                         padding: '12px',
@@ -691,7 +692,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                         {currentCard.structures.map((st, i) => (
                           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'var(--surface)', padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--navy)' }}>
+                              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--navy-ink)' }}>
                                 {st.name}
                               </span>
                               {st.badge && (
@@ -801,7 +802,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                       justifyContent: 'center',
                       gap: '6px',
                       borderColor: 'var(--accent-amber)',
-                      color: cardStats[currentCard.id] === 'medium' ? '#ffffff' : '#b45309',
+                      color: cardStats[currentCard.id] === 'medium' ? '#ffffff' : 'var(--warn-ink)',
                       background: cardStats[currentCard.id] === 'medium' ? 'var(--accent-amber)' : 'transparent'
                     }}
                     title="Marcar como regular"
@@ -838,19 +839,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
               {/* Status Banner si se ha enviado o está enviando a Sheets */}
               {statusMessage && (
-                <div style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  background: sheetStatus === 'sent' || sheetStatus === 'sent_unconfirmed' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-                  border: `1px solid ${sheetStatus === 'sent' || sheetStatus === 'sent_unconfirmed' ? 'var(--accent-emerald)' : 'var(--accent-red)'}`,
-                  fontSize: '0.78rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: 'var(--text-title)'
-                }}>
-                  {sheetStatus === 'sent' || sheetStatus === 'sent_unconfirmed' ? <CheckCircle2 size={15} color="var(--accent-emerald)" /> : <AlertCircle size={15} color="var(--accent-red)" />}
+                <div className={`status-msg ${sheetStatus === 'sent' ? 'status-msg--ok' : sheetStatus === 'sending' ? 'status-msg--info' : sheetStatus === 'sent_unconfirmed' || sheetStatus === 'no_url' ? 'status-msg--warn' : sheetStatus === 'idle' ? 'status-msg--warn' : 'status-msg--bad'}`} style={{ width: '100%' }} role={sheetStatus === 'network_error' ? 'alert' : 'status'}>
+                  {sheetStatus === 'sent' ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
                   <span>{statusMessage}</span>
                 </div>
               )}
@@ -861,7 +851,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
         {/* Footer with Persistent Navigation Controls */}
         <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0.85rem 1.5rem', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button onClick={handlePrev} className="btn btn-sm btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
               <ChevronLeft size={16} /> Anterior
             </button>
@@ -873,10 +863,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
             </button>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={() => handleSyncToSheets()}
-              disabled={sheetStatus === 'sending' || ratedCount === 0}
+              disabled={sheetStatus === 'sending' || sheetStatus === 'sent' || ratedCount === 0}
+              aria-busy={sheetStatus === 'sending'}
               className="btn btn-sm btn-primary"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}
               title="Guardar en la hoja de cálculo oficial de Google Sheets"

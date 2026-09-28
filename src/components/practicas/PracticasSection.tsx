@@ -379,10 +379,9 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Sparkles size={16} color="var(--mint, #5eead4)" />
                   <span className="qfdos-matrix-title">
-                    Resumen de Laboratorio
+                    Contenido del módulo
                   </span>
                 </div>
-                <span className="qfdos-matrix-pct-total">100%</span>
               </div>
 
               <div className="qfdos-matrix-items">
@@ -395,10 +394,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
                   <div key={item.label} className="qfdos-matrix-row">
                     <div className="qfdos-matrix-label-row">
                       <span className="qfdos-matrix-item-name">{item.label}</span>
-                      <span className="qfdos-matrix-item-pct">{item.pct}%</span>
-                    </div>
-                    <div className="qfdos-matrix-track">
-                      <div className={`qfdos-matrix-fill ${item.barClass}`} style={{ width: `${item.pct}%` }} />
+                      <span className="qfdos-matrix-item-pct">Incluido</span>
                     </div>
                   </div>
                 ))}
@@ -458,8 +454,8 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
           <div
             style={{
-              background: '#fef3c7',
-              color: '#b45309',
+              background: 'var(--warn-bg)',
+              color: 'var(--warn-ink)',
               padding: '8px',
               borderRadius: '10px',
               display: 'flex',
@@ -476,9 +472,9 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
               <span
                 style={{
                   background: '#f59e0b',
-                  color: '#ffffff',
+                  color: '#1c1917',
                   fontWeight: 800,
-                  fontSize: '0.68rem',
+                  fontSize: '0.6875rem',
                   letterSpacing: '0.04em',
                   padding: '2px 8px',
                   borderRadius: '999px',
@@ -539,7 +535,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
 
       {/* Sub-Navigation Navigation Bar */}
       <div className="qfdos-card" style={{ padding: '0.6rem 0.8rem', background: 'var(--surface)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(170px, 100%), 1fr))', gap: '0.5rem' }}>
           {SUB_TABS.map(tab => {
             const isActive = activeSubTab === tab.id;
             const isLocked = tab.locked;
@@ -565,7 +561,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
                   opacity: isLocked ? 0.65 : 1
                 }}
               >
-                <div style={{ color: isActive ? 'var(--mint)' : (isLocked ? 'var(--text-muted)' : 'var(--teal)'), display: 'flex', alignItems: 'center' }}>
+                <div style={{ color: isActive ? 'var(--mint)' : (isLocked ? 'var(--text-muted)' : 'var(--teal-ink)'), display: 'flex', alignItems: 'center' }}>
                   {isLocked ? <Lock size={14} /> : tab.icon}
                 </div>
                 <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
@@ -597,7 +593,7 @@ export const PracticasSection: React.FC<PracticasSectionProps> = ({
         </div>
       )}
 
-      <div>
+      <div key={activeSubTab} className="tab-panel-enter">
         {activeSubTab === 'progreso' && (
           <LimiteDeError zona="Mi progreso">
             <PracticasProgreso

@@ -45,6 +45,9 @@ import { FirSimulatorModal } from './components/FirSimulatorModal';
 import { AdminCmsModal } from './components/AdminCmsModal';
 import { Model3DViewerModal } from './components/Model3DViewerModal';
 import { CartasDocenteModal } from './components/cartas';
+import { LimiteDeError } from './components/LimiteDeError';
+import { hayModalAbierto } from './services/modalA11y';
+import { abrirPreferencias } from './services/consentimiento';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -165,6 +168,26 @@ const TAB_TO_HASH: Record<TabType, string> = {
   evaluacion: 'evaluacion'
 };
 
+/** Título de pestaña y descripción por sección (el sitio es una SPA con rutas hash) */
+const PAGE_META: Record<TabType, { title: string; description: string }> = {
+  hub: { title: 'Inicio', description: 'Avisos, examen abierto y accesos a temas, prácticas y herramientas de Química Farmacéutica II.' },
+  info: { title: 'Curso y horarios', description: 'Horario de clase, tutorías, guía docente y calendario del curso 2026/27.' },
+  temas: { title: 'Temario', description: 'Los temas con diapositivas, apuntes, podcasts, test y flashcards.' },
+  practicas: { title: 'Prácticas de laboratorio', description: 'Normas, protocolos de síntesis, cálculos de rendimiento, espectros y entrega del cuaderno.' },
+  simulador: { title: 'Simulador de afinidad', description: 'Calcula Kd, Ki, IC50 (Cheng-Prusoff), ΔG° y eficiencia de ligando.' },
+  admet: { title: 'Calculadora ADMET', description: 'Comprueba las reglas de Lipinski y Veber de los fármacos del curso.' },
+  glosario: { title: 'Glosario', description: 'Definiciones de afinidad, SAR, ADMET y farmacología del temario.' },
+  enlaces: { title: 'Enlaces de interés', description: 'Lecturas y casos reales de descubrimiento y regulación de fármacos.' },
+  evaluacion: { title: 'Mis calificaciones', description: 'Ponderación de la evaluación continua y tus notas registradas.' }
+};
+const SITE_NAME = 'Química Farmacéutica II · Grupo E · UGR';
+
+function aplicarMetaPagina(tab: TabType) {
+  const meta = PAGE_META[tab] ?? PAGE_META.hub;
+  document.title = `${meta.title} · ${SITE_NAME}`;
+  document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description);
+}
+
 const HASH_TO_TAB: Record<string, TabType> = {
   '': 'hub',
   hub: 'hub',
@@ -227,6 +250,7 @@ export const App: React.FC = () => {
     }
     const hashPrefix = TAB_TO_HASH[tab] || 'hub';
     const targetHash = subRoute ? `#/${hashPrefix}/${subRoute}` : `#/${hashPrefix}`;
+    aplicarMetaPagina(tab);
     if (window.location.hash !== targetHash) {
       if (replace) {
         window.history.replaceState({ tab, subRoute }, '', targetHash);
@@ -341,9 +365,10 @@ export const App: React.FC = () => {
   // Ctrl+K search shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setIsSearchOpen(prev => !prev);
+        // No se apila la búsqueda encima de otro modal abierto
+        setIsSearchOpen(prev => (prev ? false : hayModalAbierto() ? prev : true));
       }
     };
     window.addEventListener('keydown', handler);
@@ -379,6 +404,11 @@ export const App: React.FC = () => {
         setIsDirect3DModalOpen(false);
       }
       setActiveTab(tab);
+      aplicarMetaPagina(tab);
+      if (tab !== 'temas' && raw !== '3d' && raw !== 'nachr-3d' && raw !== 'modelo-3d' && action !== '3d' && sub !== '3d') {
+        // Atrás desde #/temario/tema-xx: el modal del tema se cierra con la ruta
+        setSelectedTopicDetail(null);
+      }
       if (tab === 'practicas') {
         setPracticasSubTab(sub);
       } else if (tab === 'temas') {
@@ -405,6 +435,7 @@ export const App: React.FC = () => {
 
     if (!window.location.hash) {
       window.history.replaceState({ tab: 'hub' }, '', '#/hub');
+      aplicarMetaPagina('hub');
     } else {
       handleHashSync();
     }
@@ -425,6 +456,10 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <a href="#contenido" className="skip-link" onClick={e => {
+        e.preventDefault();
+        document.getElementById('contenido')?.focus();
+      }}>Saltar al contenido</a>
 
       <Header
         activeTab={activeTab}
@@ -442,11 +477,13 @@ export const App: React.FC = () => {
           onNavigateToTemas={() => navigateTo('temas')}
           onNavigateToSimulador={() => navigateTo('simulador')}
           onOpenDrugSearch={() => setIsDrugSearchOpen(true)}
-          onOpenFirSimulator={() => setIsFirModalOpen(true)}
+          numTemas={topics.length}
         />
       )}
 
-      <main style={{ flex: 1 }}>
+      <main id="contenido" tabIndex={-1} className="app-main" style={{ flex: 1 }}>
+        <LimiteDeError zona={PAGE_META[activeTab]?.title ?? 'esta sección'} key={activeTab}>
+        <div className="tab-panel-enter">
         {activeTab === 'hub' && (
           <HubDashboard
             topics={topics}
@@ -500,6 +537,8 @@ export const App: React.FC = () => {
             onOpenFirSimulator={() => setIsFirModalOpen(true)} 
           />
         )}
+        </div>
+        </LimiteDeError>
       </main>
 
       {/* Modals */}
@@ -722,29 +761,12 @@ export const App: React.FC = () => {
           {/* Subfooter de copyright y acceso institucional */}
           <div className="qfdos-footer-sub">
             <div>
-              Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E) · Desarrollada por{' '}
-              <a
-                href="https://nexus-lab-team.netlify.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nexus-footer-inline-link"
-              >
-                <strong>NEXUS.LAB</strong>
-              </a>
+              Universidad de Granada (UGR) · Grado en Farmacia · Asignatura: Química Farmacéutica II (Grupo E)
             </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <span>Acceso: @go.ugr.es / @gmail.com</span>
               <span>•</span>
-              <a
-                href="https://nexus-lab-team.netlify.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nexus-footer-inline-link"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-              >
-                <span>Desarrollado por <strong>NEXUS.LAB</strong></span>
-                <ExternalLink size={11} />
-              </a>
+              <button type="button" className="link-boton" onClick={abrirPreferencias}>Preferencias de cookies</button>
               <span>•</span>
               <span>Plataforma QFDOS v3.2</span>
             </div>

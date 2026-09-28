@@ -38,6 +38,7 @@ export const EntregaProfesor: React.FC<EntregaProfesorProps> = ({
   const [estado, setEstado] = useState<EstadoEnvio | null>(null);
   const [mensaje, setMensaje] = useState('');
   const [copiado, setCopiado] = useState(false);
+  const [copiaFallida, setCopiaFallida] = useState(false);
 
   const configurado = envioConfigurado();
 
@@ -54,6 +55,7 @@ export const EntregaProfesor: React.FC<EntregaProfesorProps> = ({
   const handleCopiar = async () => {
     const ok = await copiarInforme(titulo, datos);
     setCopiado(ok);
+    setCopiaFallida(!ok);
     if (ok) setTimeout(() => setCopiado(false), 2200);
   };
 
@@ -84,6 +86,7 @@ export const EntregaProfesor: React.FC<EntregaProfesorProps> = ({
 
       <div className="entrega-acciones">
         <button
+          type="button"
           onClick={() => enviarPorCorreo(titulo, titulo, datos)}
           className="btn btn-sm btn-primary"
           disabled={deshabilitado}
@@ -93,15 +96,20 @@ export const EntregaProfesor: React.FC<EntregaProfesorProps> = ({
 
         {configurado && (
           <button
+            type="button"
             onClick={handleEnviar}
             className="btn btn-sm btn-secondary"
-            disabled={deshabilitado || enviando}
+            disabled={deshabilitado || enviando || estado === 'confirmado'}
+            aria-busy={enviando}
           >
-            <Send size={14} /> {enviando ? 'Enviando…' : 'Enviar a la hoja'}
+            {estado === 'confirmado'
+              ? <><Check size={14} /> Enviado</>
+              : <><Send size={14} className={enviando ? 'spin' : undefined} /> {enviando ? 'Enviando…' : 'Enviar a la hoja'}</>}
           </button>
         )}
 
         <button
+          type="button"
           onClick={() => descargarInforme(nombreFichero, titulo, datos)}
           className="btn btn-sm btn-outline"
           disabled={deshabilitado}
@@ -110,6 +118,7 @@ export const EntregaProfesor: React.FC<EntregaProfesorProps> = ({
         </button>
 
         <button
+          type="button"
           onClick={handleCopiar}
           className="btn btn-sm btn-outline"
           disabled={deshabilitado}
@@ -118,13 +127,21 @@ export const EntregaProfesor: React.FC<EntregaProfesorProps> = ({
         </button>
       </div>
 
+      {copiaFallida && (
+        <div className="entrega-aviso entrega-aviso--error" role="alert">
+          <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+          <span>No se pudo copiar al portapapeles. Usa <strong>Descargar</strong> o <strong>Enviar por correo</strong>.</span>
+        </div>
+      )}
+
       {estado && (
         <div
           className={`entrega-aviso ${
             estado === 'confirmado' ? 'entrega-aviso--ok'
               : estado === 'enviado-sin-confirmar' ? 'entrega-aviso--warn'
-              : 'entrega-aviso--warn'
+              : 'entrega-aviso--error'
           }`}
+          role={estado === 'confirmado' ? 'status' : 'alert'}
         >
           {estado === 'confirmado'
             ? <Check size={14} style={{ flexShrink: 0, marginTop: 1 }} />

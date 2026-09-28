@@ -23,6 +23,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
+import { pulsable } from '../utils/a11y';
 import { 
   X, 
   HelpCircle, 
@@ -129,7 +130,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Records / Grading Dashboard State
   // Google Sheets Integration State
-  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error'>('idle');
+  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida'>('idle');
+  const ultimoIntentoRef = React.useRef<QuizRegistrationRecord | null>(null);
+  const reenviarAHoja = () => {
+    const intento = ultimoIntentoRef.current;
+    if (!intento) return;
+    setSheetSubmitStatus('sending');
+    submitAttemptToGoogleSheets(intento)
+      .then((res: GoogleSheetsSubmissionResult) => setSheetSubmitStatus(res.status))
+      .catch(() => setSheetSubmitStatus('network_error'));
+  };
   const [showSheetsConfig, setShowSheetsConfig] = useState<boolean>(false);
   const [sheetsUrlInput, setSheetsUrlInput] = useState<string>(getGoogleSheetsUrl());
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
@@ -499,6 +509,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       }
 
       // Enviar de forma asíncrona a Google Sheets
+      ultimoIntentoRef.current = finalAttempt;
       setSheetSubmitStatus('sending');
       submitAttemptToGoogleSheets(finalAttempt)
         .then((res: GoogleSheetsSubmissionResult) => {
@@ -699,8 +710,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const statsRetro = getModelStats('retrosintesis');
   const currentStats = getModelStats(selectedModel);
 
+  // Fondo o Escape en mitad de un examen: se pregunta antes de perder las respuestas
+  const cerrarConGuarda = () => {
+    if (isStarted && !isCompleted &&
+        !window.confirm('¿Salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) return;
+    onClose();
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) cerrarConGuarda(); }}>
       <div 
         className="modal-container" 
         style={{ 
@@ -721,7 +739,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--navy)',
+              color: 'var(--navy-ink)',
               flexShrink: 0
             }}>
               <GraduationCap size={20} />
@@ -763,7 +781,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               padding: '8px 16px',
               border: 'none',
               background: activeTab === 'quiz' ? 'var(--surface)' : 'transparent',
-              color: activeTab === 'quiz' ? 'var(--navy)' : 'var(--text-muted)',
+              color: activeTab === 'quiz' ? 'var(--navy-ink)' : 'var(--text-muted)',
               fontWeight: activeTab === 'quiz' ? 800 : 600,
               fontSize: '0.84rem',
               borderRadius: '8px 8px 0 0',
@@ -787,7 +805,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               padding: '8px 16px',
               border: 'none',
               background: activeTab === 'records' ? 'var(--surface)' : 'transparent',
-              color: activeTab === 'records' ? 'var(--navy)' : 'var(--text-muted)',
+              color: activeTab === 'records' ? 'var(--navy-ink)' : 'var(--text-muted)',
               fontWeight: activeTab === 'records' ? 800 : 600,
               fontSize: '0.84rem',
               borderRadius: '8px 8px 0 0',
@@ -831,7 +849,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                       <UserCheck size={20} color="var(--navy)" />
-                      <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: 0 }}>
+                      <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy-ink)', margin: 0 }}>
                         {isProfesor ? 'Registro de Identificación para la Evaluación' : 'Identificación Oficial del Alumno · Evaluación Continua'}
                       </h4>
                     </div>
@@ -849,7 +867,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '8px' }}>
                       Modalidad de Evaluación:
                     </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '10px' }}>
                       <button
                         type="button"
                         onClick={() => {
@@ -922,7 +940,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                   {/* Formulario de datos */}
                   <div className="qfdos-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', background: 'var(--surface)' }}>
-                    <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '12px' }}>
+                    <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '14px', marginBottom: '12px' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
                           Nombre Completo del Evaluado *
@@ -976,7 +994,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           color: 'var(--text-main)',
                           fontWeight: 600
                         }}>
-                          {user?.name ? `${user.name} (Grupo E)` : 'Dr. Juan José Díaz-Mochón (Grupo E)'}
+                          {isProfesor && user?.name ? `${user.name} (Grupo E)` : 'Dr. Juan José Díaz-Mochón (Grupo E)'}
                         </div>
                       </div>
                     </div>
@@ -1001,10 +1019,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     </div>
 
                     {topic.id === 'tema-01' && (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
                         {/* Tarjeta Modelo E: Oficial 2026/27 (Sin Retrosíntesis) */}
                         <div
-                          onClick={() => setSelectedModel('modelo-e')}
+                          onClick={() => setSelectedModel('modelo-e')} {...pulsable(() => setSelectedModel('modelo-e'))}
                           style={{
                             padding: '14px 16px',
                             borderRadius: 'var(--radius-lg)',
@@ -1022,10 +1040,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           <div>
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
                               <div>
-                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--navy)' }}>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--navy-ink)' }}>
                                   Oficial 2026/27 · Sin Retrosíntesis
                                 </span>
-                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy)', margin: '2px 0 0 0' }}>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy-ink)', margin: '2px 0 0 0' }}>
                                   Modelo E (15 Preguntas)
                                 </h4>
                               </div>
@@ -1048,7 +1066,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             <span>
                               {statsE.completed ? `${statsE.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
                             </span>
-                            <strong style={{ color: selectedModel === 'modelo-e' ? 'var(--navy)' : 'var(--text-muted)' }}>
+                            <strong style={{ color: selectedModel === 'modelo-e' ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
                               {selectedModel === 'modelo-e' ? '● Seleccionado' : 'Elegir Modelo E'}
                             </strong>
                           </div>
@@ -1056,7 +1074,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                         {/* Tarjeta Modelo FIR: Preguntas Oficiales Convocatorias 2020-2025 */}
                         <div
-                          onClick={() => setSelectedModel('modelo-fir')}
+                          onClick={() => setSelectedModel('modelo-fir')} {...pulsable(() => setSelectedModel('modelo-fir'))}
                           style={{
                             padding: '14px 16px',
                             borderRadius: 'var(--radius-lg)',
@@ -1074,10 +1092,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           <div>
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
                               <div>
-                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--teal)' }}>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--teal-ink)' }}>
                                   Oficial Sanidad · FIR 2020–2025
                                 </span>
-                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--teal)', margin: '2px 0 0 0' }}>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--teal-ink)', margin: '2px 0 0 0' }}>
                                   Modelo FIR (10 Preguntas)
                                 </h4>
                               </div>
@@ -1100,7 +1118,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             <span>
                               {statsFir.completed ? `${statsFir.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
                             </span>
-                            <strong style={{ color: selectedModel === 'modelo-fir' ? 'var(--teal)' : 'var(--text-muted)' }}>
+                            <strong style={{ color: selectedModel === 'modelo-fir' ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                               {selectedModel === 'modelo-fir' ? '● Seleccionado' : 'Elegir Modelo FIR'}
                             </strong>
                           </div>
@@ -1108,7 +1126,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
                         {/* Tarjeta Modelo A: Examen Previo */}
                         <div
-                          onClick={() => setSelectedModel('modelo-a')}
+                          onClick={() => setSelectedModel('modelo-a')} {...pulsable(() => setSelectedModel('modelo-a'))}
                           style={{
                             padding: '14px 16px',
                             borderRadius: 'var(--radius-lg)',
@@ -1129,7 +1147,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#2563eb' }}>
                                   Examen Oficial Previo
                                 </span>
-                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy)', margin: '2px 0 0 0' }}>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy-ink)', margin: '2px 0 0 0' }}>
                                   Modelo A (15 Preguntas)
                                 </h4>
                               </div>
@@ -1152,7 +1170,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             <span>
                               {statsA.completed ? `${statsA.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
                             </span>
-                            <strong style={{ color: selectedModel === 'modelo-a' ? 'var(--navy)' : 'var(--text-muted)' }}>
+                            <strong style={{ color: selectedModel === 'modelo-a' ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
                               {selectedModel === 'modelo-a' ? '● Seleccionado' : 'Elegir Modelo A'}
                             </strong>
                           </div>
@@ -1166,7 +1184,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <summary style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', cursor: 'pointer' }}>
                           Modelos complementarios de demostración docente (Modelos B, C y Retrosíntesis · Solo Profesor)
                         </summary>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '8px', marginTop: '10px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(230px, 100%), 1fr))', gap: '8px', marginTop: '10px' }}>
                           <button
                             type="button"
                             onClick={() => setSelectedModel('modelo-b')}
@@ -1218,7 +1236,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                              <strong style={{ fontSize: '0.8rem', color: 'var(--teal)' }}>Retrosíntesis</strong>
+                              <strong style={{ fontSize: '0.8rem', color: 'var(--teal-ink)' }}>Retrosíntesis</strong>
                               {statsRetro.completed && <span className="qfdos-badge" style={{ fontSize: '0.62rem', background: '#059669', color: '#fff' }}>✓ {statsRetro.bestScore}/10</span>}
                             </div>
                             <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', margin: 0 }}>Desconexiones C-C, sintones acilo-oxígeno e Ivanov.</p>
@@ -1253,10 +1271,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                               <Sparkles size={16} />
                             </span>
                             <div>
-                              <strong style={{ fontSize: '0.92rem', color: '#92400e', display: 'block' }}>
+                              <strong style={{ fontSize: '0.92rem', color: 'var(--warn-ink)', display: 'block' }}>
                                 ⭐ Sección Bonus: Claves Farmacoquímicas Avanzadas del FIR
                               </strong>
-                              <span style={{ fontSize: '0.74rem', color: '#b45309' }}>
+                              <span style={{ fontSize: '0.74rem', color: 'var(--warn-ink)' }}>
                                 4 conceptos de química médica de alta especialización (evaluados en el FIR y no vistos en las diapositivas del Tema 1)
                               </span>
                             </div>
@@ -1270,7 +1288,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           Al auditar las 10 preguntas del Ministerio de Sanidad frente al temario impartido, 5 de ellas requieren fundamentación farmacoquímica avanzada que trasciende las presentaciones de clase. Consulta estas 4 píldoras antes de responder:
                         </p>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '10px' }}>
                           {/* Píldora 1: Fármacos Blandos (Soft Drugs) */}
                           <div style={{
                             background: 'var(--surface)',
@@ -1280,7 +1298,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                               <Lightbulb size={14} color="#d97706" />
-                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                              <strong style={{ fontSize: '0.8rem', color: 'var(--warn-ink)' }}>
                                 1. Estrategia de Fármaco Blando (Soft Drug)
                               </strong>
                             </div>
@@ -1302,7 +1320,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                               <Lightbulb size={14} color="#d97706" />
-                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                              <strong style={{ fontSize: '0.8rem', color: 'var(--warn-ink)' }}>
                                 2. Selectividad de Subtipo M1 (Pirenzepina)
                               </strong>
                             </div>
@@ -1324,7 +1342,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                               <Lightbulb size={14} color="#d97706" />
-                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                              <strong style={{ fontSize: '0.8rem', color: 'var(--warn-ink)' }}>
                                 3. Cinética de Inhibición: Carbamatos vs Suicidas
                               </strong>
                             </div>
@@ -1346,7 +1364,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                               <Lightbulb size={14} color="#d97706" />
-                              <strong style={{ fontSize: '0.8rem', color: '#92400e' }}>
+                              <strong style={{ fontSize: '0.8rem', color: 'var(--warn-ink)' }}>
                                 4. Garganta de 20 Å de AChE: CAS y PAS (Donepezilo)
                               </strong>
                             </div>
@@ -1377,7 +1395,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       gap: '12px',
                       flexWrap: 'wrap'
                     }}>
-                      <div style={{ flex: 1, minWidth: '220px' }}>
+                      <div style={{ flex: 1, minWidth: 'min(220px, 100%)' }}>
                         <div style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-title)' }}>
                           Modalidad de Realización:
                         </div>
@@ -1420,14 +1438,14 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       {currentStats.completed ? (
                         <>
                           <CheckCircle2 size={18} color="#059669" />
-                          <strong style={{ fontSize: '0.92rem', color: '#065f46' }}>
+                          <strong style={{ fontSize: '0.92rem', color: 'var(--ok-ink)' }}>
                             {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Ya Realizado (Mejor Calificación: {currentStats.bestScore}/10)
                           </strong>
                         </>
                       ) : (
                         <>
                           <Clock size={18} color="var(--navy)" />
-                          <strong style={{ fontSize: '0.92rem', color: 'var(--navy)' }}>
+                          <strong style={{ fontSize: '0.92rem', color: 'var(--navy-ink)' }}>
                             {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Pendiente de Realización
                           </strong>
                         </>
@@ -1448,11 +1466,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         </>
                       )}
                       {currentStats.completed ? (
-                        <li style={{ color: '#047857', fontWeight: 700 }}>
+                        <li style={{ color: 'var(--ok-ink)', fontWeight: 700 }}>
                           Tienes {currentStats.count} intento(s) registrado(s){currentStats.lastDate ? ` (último: ${currentStats.lastDate})` : ''}. Puedes volver a realizar este modelo: el nuevo intento se añadirá a tu expediente sin borrar tus notas anteriores.
                         </li>
                       ) : (
-                        <li style={{ color: 'var(--navy)', fontWeight: 700 }}>
+                        <li style={{ color: 'var(--navy-ink)', fontWeight: 700 }}>
                           Este modelo aún no ha sido completado con tus datos en la plataforma.
                         </li>
                       )}
@@ -1472,8 +1490,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     flexWrap: 'wrap',
                     gap: '12px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: '220px' }}>
-                      <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy)', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 'min(220px, 100%)' }}>
+                      <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--navy-ink)', flexShrink: 0 }}>
                         {questions.length}
                       </span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
@@ -1564,7 +1582,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       }}>
                         {selectedModel === 'modelo-e' ? 'Modelo E' : selectedModel === 'modelo-fir' ? 'Modelo FIR' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'} · {isExamMode ? 'Examen' : 'Preparación'}
                       </span>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy)', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy-ink)', whiteSpace: 'nowrap' }}>
                         Pregunta {currentIndex + 1} de {questions.length}
                       </span>
                     </div>
@@ -1605,7 +1623,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                               fontWeight: 800,
                               border: activa ? '2px solid var(--navy)' : '1px solid var(--border-color)',
                               background: contestada ? 'rgba(16, 185, 129, 0.16)' : 'var(--surface)',
-                              color: contestada ? '#047857' : 'var(--text-muted)'
+                              color: contestada ? 'var(--ok-ink)' : 'var(--text-muted)'
                             }}
                           >
                             {idx + 1}
@@ -1742,7 +1760,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       return (
                         <div
                           key={idx}
-                          onClick={() => handleSelectOption(idx)}
+                          onClick={() => handleSelectOption(idx)} {...pulsable(() => handleSelectOption(idx), showExplanation)} aria-pressed={selectedOption === idx}
                           style={{
                             padding: '12px 16px',
                             borderRadius: 'var(--radius-md)',
@@ -1806,7 +1824,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                         <BookOpen size={16} color={selectedOption === currentQ.correctIndex ? '#059669' : '#dc2626'} />
-                        <strong style={{ fontSize: '0.88rem', color: selectedOption === currentQ.correctIndex ? '#047857' : '#b91c1c' }}>
+                        <strong style={{ fontSize: '0.88rem', color: selectedOption === currentQ.correctIndex ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                           {selectedOption === currentQ.correctIndex ? '¡Respuesta Correcta!' : 'Explicación Pedagógica:'}
                         </strong>
                       </div>
@@ -1815,7 +1833,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </p>
                       {selectedModel === 'modelo-fir' && ['t01-fir-03', 't01-fir-07', 't01-fir-08', 't01-fir-09', 't01-fir-10'].includes(currentQ.id) && (
                         <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed rgba(217, 119, 6, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                          <span style={{ fontSize: '0.74rem', color: '#92400e', fontWeight: 600 }}>
+                          <span style={{ fontSize: '0.74rem', color: 'var(--warn-ink)', fontWeight: 600 }}>
                             ⭐ Esta pregunta evalúa conceptos avanzados no vistos en las diapositivas de clase.
                           </span>
                           <button
@@ -1852,8 +1870,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '4px' }}>
                     ¡Autoevaluación Calibrada Finalizada!
                   </h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-                    La calificación y el desglose de respuestas se han registrado en el portal docente.
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }} role="status">
+                    {sheetSubmitStatus === 'sent'
+                      ? 'La calificación y el desglose de respuestas se han registrado en el portal docente.'
+                      : sheetSubmitStatus === 'sending'
+                        ? 'Enviando la calificación al portal docente…'
+                        : 'La calificación queda guardada en este navegador. Revisa abajo el estado del envío al profesor.'}
                   </p>
 
                   {/* Ficha de Calificación */}
@@ -1866,7 +1888,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
                           Calificación ({topic.title} · {selectedModel === 'modelo-e' ? 'Modelo E (15P)' : selectedModel === 'modelo-fir' ? 'Modelo FIR (10P)' : selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'} · {isExamMode ? 'Modo Examen' : 'Modo Preparación'}):
                         </div>
-                        <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal)' : 'var(--accent-red)', lineHeight: 1 }}>
+                        <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal-ink)' : 'var(--accent-red)', lineHeight: 1 }}>
                           {stats.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>
                         </div>
                         <div style={{ marginTop: '8px', fontSize: '0.84rem', fontWeight: 700, color: isAprobado ? 'var(--secondary-dark)' : 'var(--accent-red)' }}>
@@ -1888,29 +1910,37 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         {/* Estado de Sincronización Google Sheets */}
                         <div style={{ marginTop: '12px' }}>
                           {sheetSubmitStatus === 'sending' && (
-                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', color: '#1d4ed8', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', color: 'var(--info-ink)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <Clock size={15} /> Sincronizando con la hoja oficial de Google Sheets del docente...
                             </div>
                           )}
                           {sheetSubmitStatus === 'sent' && (
-                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid #10b981', color: '#065f46', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid #10b981', color: 'var(--ok-ink)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <CheckCircle2 size={16} color="#10b981" /> <span><strong>Sincronizado:</strong> Respuestas y nota volcadas en Google Sheets.</span>
                             </div>
                           )}
                           {sheetSubmitStatus === 'sent_unconfirmed' && (
                             <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--semantic-warn-bg)', border: '1px solid var(--accent-amber)', color: 'var(--text-main)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <AlertCircle size={15} color="var(--accent-amber)" />
-                              <span><strong>Enviado.</strong> No se ha podido releer la hoja para confirmarlo; el intento queda también en este navegador.</span>
+                              <span><strong>Enviado sin confirmar.</strong> No se ha podido releer la hoja para comprobarlo; el intento queda también en este navegador. Si tu sesión ha caducado, vuelve a entrar y pulsa Reintentar.</span>
+                              <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar</button>
                             </div>
                           )}
                           {sheetSubmitStatus === 'no_url' && (
-                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid #f59e0b', color: '#92400e', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid #f59e0b', color: 'var(--warn-ink)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <AlertCircle size={15} color="#f59e0b" /> <span>Intento guardado localmente en tu historial.</span>
                             </div>
                           )}
+                          {sheetSubmitStatus === 'sesion_invalida' && (
+                            <div className="status-msg status-msg--bad" role="alert" style={{ justifyContent: 'center' }}>
+                              <AlertCircle size={15} /> <span>Tu sesión ha caducado: el intento está guardado en este navegador. Cierra sesión, vuelve a entrar y pulsa Reintentar.</span>
+                              <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar envío</button>
+                            </div>
+                          )}
                           {sheetSubmitStatus === 'network_error' && (
-                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', color: '#991b1b', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', color: 'var(--bad-ink)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <AlertCircle size={15} color="#ef4444" /> <span>Guardado localmente (sin conexión con Google Sheets).</span>
+                              <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar envío</button>
                             </div>
                           )}
                         </div>
@@ -1952,7 +1982,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               {/* Header de controles */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy)', margin: '0 0 2px 0' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--navy-ink)', margin: '0 0 2px 0' }}>
                     {isProfesor ? 'Historial de Autoevaluaciones Registradas' : 'Mis Evaluaciones Realizadas'}
                   </h4>
                   <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: 0 }}>
@@ -2056,7 +2086,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Sheet size={18} color="#059669" />
-                      <h5 style={{ fontSize: '0.92rem', fontWeight: 800, color: '#065f46', margin: 0 }}>
+                      <h5 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ok-ink)', margin: 0 }}>
                         Vincular con Google Sheets (Evaluación Continua Docente)
                       </h5>
                     </div>
@@ -2115,31 +2145,31 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               {/* Estadísticas Resumen */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))', 
                 gap: '10px', 
                 marginBottom: '1.25rem' 
               }}>
                 <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Total Evaluaciones</span>
-                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy)' }}>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy-ink)' }}>
                     {dashboardStats.total}
                   </span>
                 </div>
                 <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Nota Media</span>
-                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: Number(dashboardStats.avg) >= 5 ? 'var(--teal)' : 'var(--accent-red)' }}>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: Number(dashboardStats.avg) >= 5 ? 'var(--teal-ink)' : 'var(--accent-red)' }}>
                     {dashboardStats.avg} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ 10</span>
                   </span>
                 </div>
                 <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Aprobados</span>
-                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--teal)' }}>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--teal-ink)' }}>
                     {dashboardStats.passCount} ({dashboardStats.passRate})
                   </span>
                 </div>
                 <div className="qfdos-card" style={{ padding: '10px 14px', background: 'var(--surface-raised)' }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block' }}>Puntuación Máxima</span>
-                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy)' }}>
+                  <span className="font-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--navy-ink)' }}>
                     {dashboardStats.maxScore} <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/ 10</span>
                   </span>
                 </div>
@@ -2147,7 +2177,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
               {/* Barra de Filtros */}
               <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+                <div style={{ position: 'relative', flex: 1, minWidth: 'min(220px, 100%)' }}>
                   <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
                     type="text"
@@ -2231,7 +2261,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 justifyContent: 'center',
                                 background: isPass ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
                                 border: `1.5px solid ${isPass ? '#10b981' : '#ef4444'}`,
-                                color: isPass ? '#047857' : '#b91c1c',
+                                color: isPass ? 'var(--ok-ink)' : 'var(--bad-ink)',
                                 flexShrink: 0
                               }}
                             >
@@ -2254,7 +2284,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   <span className="qfdos-badge" style={{ 
                                     fontSize: '0.64rem',
                                     background: rec.modelName.includes('Modelo E') ? 'rgba(30, 58, 138, 0.12)' : rec.modelName.includes('Modelo B') ? '#f5f3ff' : rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : rec.modelName.includes('Modelo C') ? '#fff7ed' : 'rgba(59, 130, 246, 0.12)',
-                                    color: rec.modelName.includes('Modelo E') ? 'var(--navy)' : rec.modelName.includes('Modelo B') ? '#7c3aed' : rec.modelName.includes('Retrosíntesis') ? '#0d9488' : rec.modelName.includes('Modelo C') ? '#c2410c' : '#2563eb',
+                                    color: rec.modelName.includes('Modelo E') ? 'var(--navy-ink)' : rec.modelName.includes('Modelo B') ? '#7c3aed' : rec.modelName.includes('Retrosíntesis') ? 'var(--teal-ink)' : rec.modelName.includes('Modelo C') ? '#c2410c' : '#2563eb',
                                     border: `1px solid ${rec.modelName.includes('Modelo E') ? 'var(--navy)' : rec.modelName.includes('Modelo B') ? '#8b5cf6' : rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : rec.modelName.includes('Modelo C') ? '#ea580c' : '#93c5fd'}`
                                   }}>
                                     {rec.modelName.includes('Modelo E') ? 'Modelo E' : rec.modelName.includes('Modelo B') ? 'Modelo B' : rec.modelName.includes('Modelo C') ? 'Modelo C' : rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
@@ -2276,7 +2306,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           {/* Métricas y Botones de Acción */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{ textAlign: 'right', marginRight: '6px' }}>
-                              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy)' }}>
+                              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--navy-ink)' }}>
                                 {rec.correctCount} / {rec.totalQuestions} aciertos
                               </div>
                               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
@@ -2320,7 +2350,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             paddingTop: '12px', 
                             borderTop: '1px dashed var(--border-color)' 
                           }}>
-                            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--navy-ink)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <BookOpen size={14} /> Desglose de las 15 Preguntas del Examen:
                             </div>
 
@@ -2343,7 +2373,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                       </strong>
                                       <span style={{ 
                                         fontWeight: 800, 
-                                        color: item.isCorrect ? '#047857' : '#b91c1c', 
+                                        color: item.isCorrect ? 'var(--ok-ink)' : 'var(--bad-ink)', 
                                         flexShrink: 0,
                                         marginLeft: '8px'
                                       }}>
@@ -2354,7 +2384,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                       <strong>Respuesta del Alumno:</strong> {item.selectedOptionText}
                                     </div>
                                     {!item.isCorrect && (
-                                      <div style={{ color: '#047857', marginBottom: '2px' }}>
+                                      <div style={{ color: 'var(--ok-ink)', marginBottom: '2px' }}>
                                         <strong>Respuesta Correcta Oficial:</strong> {item.correctOptionText}
                                       </div>
                                     )}
@@ -2541,7 +2571,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                   <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>1</span>
-                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--warn-ink)' }}>
                     Estrategia de Fármaco Blando (Soft Drug) · Nicholas Bodor
                   </strong>
                 </div>
@@ -2558,7 +2588,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                   <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>2</span>
-                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--warn-ink)' }}>
                     Selectividad de Subtipo M1: Pirenzepina (FIR 2024 · P9)
                   </strong>
                 </div>
@@ -2575,7 +2605,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                   <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>3</span>
-                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--warn-ink)' }}>
                     Cinética de Inhibición: Rivastigmina vs Inhibidores Suicidas (FIR 2021 · P7)
                   </strong>
                 </div>
@@ -2593,7 +2623,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', background: 'var(--surface-raised)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                   <span style={{ background: '#d97706', color: '#fff', width: '20px', height: '20px', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: 800 }}>4</span>
-                  <strong style={{ fontSize: '0.88rem', color: '#92400e' }}>
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--warn-ink)' }}>
                     Topografía de la Garganta de 20 Å de la AChE: CAS y PAS (FIR 2025 · P18)
                   </strong>
                 </div>

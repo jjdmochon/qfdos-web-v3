@@ -486,46 +486,46 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
         {/* Tab Navigation */}
         <div style={{ padding: '0 1.75rem', background: 'var(--surface-raised)', borderBottom: '1px solid var(--border-color)' }}>
-          <div className="tabs-container" style={{ margin: 0 }}>
+          <div className="tabs-container" style={{ margin: 0 }} role="tablist">
             <button
               onClick={() => setActiveTab('materials')}
-              className={`tab-btn ${activeTab === 'materials' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'materials' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'materials'}
             >
               <Upload size={14} /> Materiales
             </button>
             <button
               onClick={() => setActiveTab('modules')}
-              className={`tab-btn ${activeTab === 'modules' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'modules' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'modules'}
             >
               <BookOpen size={14} /> Módulos, Exámenes & Trabajos ({topics.length})
             </button>
             <button
               onClick={() => setActiveTab('announcements')}
-              className={`tab-btn ${activeTab === 'announcements' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'announcements' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'announcements'}
             >
               <Bell size={14} /> Tablón de Avisos ({announcements.length})
             </button>
             <button
               onClick={() => setActiveTab('links')}
-              className={`tab-btn ${activeTab === 'links' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'links' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'links'}
             >
               <Compass size={14} /> Enlaces de Interés ({resourceLinks.length})
             </button>
             <button
               onClick={() => setActiveTab('drugs')}
-              className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'drugs'}
             >
               <Layers size={14} /> Fármacos & SMILES
             </button>
             <button
               onClick={() => setActiveTab('questions')}
-              className={`tab-btn ${activeTab === 'questions' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'questions' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'questions'}
             >
               <MessageSquare size={14} /> Dudas de Alumnos ({studentQuestions.length})
             </button>
             <button
               onClick={() => setActiveTab('apikey')}
-              className={`tab-btn ${activeTab === 'apikey' ? 'active' : ''}`}
+              className={`tab-btn ${activeTab === 'apikey' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'apikey'}
             >
               <Key size={14} /> Clave API Gemini
             </button>
@@ -643,7 +643,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                   <form onSubmit={handleSaveModule} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     
                     {/* Category and Code */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '10px' }}>
                       <div>
                         <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '4px' }}>
                           Tipo / Categoría del Módulo
@@ -694,7 +694,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     </div>
 
                     {/* Title & Subtitle */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '10px' }}>
                       <div>
                         <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '4px' }}>
                           Título Principal
@@ -759,7 +759,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       <h5 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--teal-ink)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Upload size={16} /> Recursos y Enlaces Obligatorios por Módulo
                       </h5>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '10px' }}>
                         
                         {/* 1. Diapositivas PDF */}
                         <div>
@@ -825,7 +825,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     </div>
 
                     {/* Crystallographic Target & Dates */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '10px' }}>
                       <div>
                         <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '3px' }}>
                           Código PDB Diana (ej: 2HA4, 2RH1)
@@ -939,7 +939,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                         gap: '12px'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: '280px', flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 'min(280px, 100%)', flex: 1 }}>
                         <span className={`qfdos-badge ${topic.category === 'examen' ? 'badge-amber' : topic.category === 'trabajo' ? 'badge-emerald' : 'badge-navy'}`}>
                           {topic.number}
                         </span>
@@ -960,13 +960,13 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
                           {/* Quick Resource Indicators */}
                           <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.slidesPdfUrl ? 'rgba(30,58,138,0.1)' : 'var(--surface-alt)', color: topic.slidesPdfUrl ? 'var(--navy)' : 'var(--text-muted)' }}>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.slidesPdfUrl ? 'rgba(30,58,138,0.1)' : 'var(--surface-alt)', color: topic.slidesPdfUrl ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
                               📑 Diapositivas {topic.slidesPdfUrl ? '✓' : '✗'}
                             </span>
-                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.notesPdfUrl ? 'rgba(13,148,136,0.1)' : 'var(--surface-alt)', color: topic.notesPdfUrl ? 'var(--teal)' : 'var(--text-muted)' }}>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.notesPdfUrl ? 'rgba(13,148,136,0.1)' : 'var(--surface-alt)', color: topic.notesPdfUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                               📝 Apuntes {topic.notesPdfUrl ? '✓' : '✗'}
                             </span>
-                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal)' : 'var(--text-muted)' }}>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                               📓 Gemini Notebook {topic.geminiNotebookUrl ? '✓' : '✗'}
                             </span>
                             <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? '#1db954' : 'var(--text-muted)' }}>
@@ -988,7 +988,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                         <button
                           onClick={() => handleDeleteModule(topic.id)}
                           className="btn btn-sm btn-outline"
-                          style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
+                          style={{ color: 'var(--bad-ink)', borderColor: 'rgba(239,68,68,0.3)' }}
                           title="Eliminar módulo"
                         >
                           <Trash2 size={14} />
@@ -1087,7 +1087,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     <button
                       onClick={() => handleDeleteAnnouncement(ann.id)}
                       className="btn btn-sm btn-outline"
-                      style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
+                      style={{ color: 'var(--bad-ink)', borderColor: 'rgba(239,68,68,0.3)' }}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -1351,7 +1351,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                 </h4>
 
                 <form onSubmit={handleAddDrug} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '10px' }}>
                     <div>
                       <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '2px' }}>
                         Unidad Temática de Destino
@@ -1417,7 +1417,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '10px' }}>
                     <div>
                       <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '2px' }}>
                         Peso Molecular (MW en Da)
@@ -1486,7 +1486,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                           <span style={{ color: 'var(--text-muted)' }}>({d.role})</span>
                           <button
                             onClick={() => handleDeleteDrug(t.id, d.name)}
-                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '2px' }}
+                            style={{ background: 'none', border: 'none', color: 'var(--bad-ink)', cursor: 'pointer', padding: '2px' }}
                           >
                             <Trash2 size={12} />
                           </button>

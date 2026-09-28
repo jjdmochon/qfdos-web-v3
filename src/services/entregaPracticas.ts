@@ -39,11 +39,16 @@ export interface ResultadoEnvio {
 /**
  * Envía una fila a la hoja del profesor.
  *
- * Un Apps Script desplegado con acceso «Cualquier usuario» responde con CORS
- * abierto a una petición GET simple, así que aquí SÍ se lee la respuesta y se
- * confirma la recepción con el número de fila. Sólo si esa lectura falla —por
- * ejemplo, porque el despliegue quedó restringido— se reintenta a ciegas con
- * `no-cors`, y entonces se dice claramente que no hay confirmación.
+ * Va por POST con el cuerpo en JSON (`text/plain`, así no hay preflight CORS):
+ * nombres, correos, datos del cuaderno y la sesión no aparecen en la URL, que
+ * queda en historiales y registros, y un cuaderno largo no choca con el límite
+ * de longitud de una URL. El Apps Script responde con CORS abierto, así que se
+ * lee la respuesta y se confirma la recepción con el número de fila.
+ *
+ * Si la respuesta no se puede leer, el envío puede haber llegado igualmente:
+ * NO se reintenta (duplicaría la fila) y se dice claramente que falta la
+ * confirmación. Con un script aún sin actualizar (no conoce `anotarFila` por
+ * POST) se usa el envío antiguo por GET, para no romper nada mientras tanto.
  */
 export async function enviarAHoja(
   hoja: string,
@@ -70,75 +75,85 @@ export async function enviarAHoja(
         'el informe, y vuelve a entrar para el envío automático.'
     };
   }
-  const params = new URLSearchParams({ ...datos, sheetName: hoja, sesion });
-  const url = `${WEBAPP_URL}?${params.toString()}`;
+  const registrarEnCache = (filaNum?: number) => {
+    const posiblesEmails = [datos.email, datos.email1, datos.email2, datos.cuentaDeEnvio].filter(Boolean);
+    for (const em of posiblesEmails) {
+      if (typeof em === 'string' && em.includes('@')) {
+        addCachedEntrega(em, {
+          hoja,
+          fila: filaNum || 0,
+          datos: { ...datos, recibidoEn: new Date().toISOString() }
+        });
+      }
+    }
+  };
+
+  const interpretar = (cuerpo: any): ResultadoEnvio | null => {
+    if (cuerpo?.ok && cuerpo.fila) {
+      registrarEnCache(cuerpo.fila);
+      return {
+        estado: 'confirmado',
+        fila: cuerpo.fila,
+        mensaje: `Recibido y anotado en la hoja «${hoja}», fila ${cuerpo.fila}.`
+      };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return {
+        estado: 'error',
+        mensaje:
+          'El servidor no reconoce tu sesión. No cierres esta página: usa «Enviar por correo» ' +
+          'o descarga el informe, y vuelve a entrar para el envío automático.'
+      };
+    }
+    // Script antiguo: responde con la ficha del servicio porque no sabe qué es anotarFila
+    if (cuerpo?.ok && cuerpo.servicio) return null;
+    return {
+      estado: 'error',
+      mensaje: `La hoja rechazó el envío: ${cuerpo?.error ?? 'respuesta inesperada'}.`
+    };
+  };
 
   try {
-    const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
-    const registrarEnCache = (filaNum?: number) => {
-      const posiblesEmails = [datos.email, datos.email1, datos.email2, datos.cuentaDeEnvio].filter(Boolean);
-      for (const em of posiblesEmails) {
-        if (typeof em === 'string' && em.includes('@')) {
-          addCachedEntrega(em, {
-            hoja,
-            fila: filaNum || 0,
-            datos: { ...datos, recibidoEn: new Date().toISOString() }
-          });
-        }
-      }
-    };
+    // Sin respuesta en 20 s se avisa, en vez de dejar «Enviando…» colgado
+    const resp = await fetch(`${WEBAPP_URL}?accion=anotarFila`, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ ...datos, sheetName: hoja, sesion }),
+      signal: AbortSignal.timeout(20000)
+    });
+    if (!resp.ok) return { estado: 'error', mensaje: `El servidor respondió ${resp.status}.` };
+    const cuerpo = await resp.json().catch(() => null);
+    const r = interpretar(cuerpo);
+    if (r) return r;
 
-    if (resp.ok) {
-      const cuerpo = await resp.json().catch(() => null);
-      if (cuerpo?.ok) {
-        registrarEnCache(cuerpo.fila);
-        return {
-          estado: 'confirmado',
-          fila: cuerpo.fila,
-          mensaje: `Recibido y anotado en la hoja «${hoja}», fila ${cuerpo.fila}.`
-        };
-      }
-      if (esSesionInvalida(cuerpo)) {
-        return {
-          estado: 'error',
-          mensaje:
-            'El servidor no reconoce tu sesión. No cierres esta página: usa «Enviar por correo» ' +
-            'o descarga el informe, y vuelve a entrar para el envío automático.'
-        };
-      }
+    // Compatibilidad con el despliegue anterior (GET con los datos en la URL)
+    const params = new URLSearchParams({ ...datos, sheetName: hoja, sesion });
+    const viejo = await fetch(`${WEBAPP_URL}?${params.toString()}`, {
+      method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(20000)
+    });
+    if (!viejo.ok) return { estado: 'error', mensaje: `El servidor respondió ${viejo.status}.` };
+    return interpretar(await viejo.json().catch(() => null)) ?? {
+      estado: 'error', mensaje: 'La hoja no ha confirmado la recepción.'
+    };
+  } catch (err) {
+    if ((err as Error)?.name === 'TimeoutError') {
       return {
         estado: 'error',
-        mensaje: `La hoja rechazó el envío: ${cuerpo?.error ?? 'respuesta inesperada'}.`
-      };
-    }
-    return { estado: 'error', mensaje: `El servidor respondió ${resp.status}.` };
-  } catch {
-    // CORS bloqueado: el envío puede haber llegado igualmente, pero no se sabe
-    try {
-      await fetch(url, { method: 'GET', mode: 'no-cors' });
-      const posiblesEmails = [datos.email, datos.email1, datos.email2, datos.cuentaDeEnvio].filter(Boolean);
-      for (const em of posiblesEmails) {
-        if (typeof em === 'string' && em.includes('@')) {
-          addCachedEntrega(em, {
-            hoja,
-            fila: 0,
-            datos: { ...datos, recibidoEn: new Date().toISOString() }
-          });
-        }
-      }
-      return {
-        estado: 'enviado-sin-confirmar',
         mensaje:
-          'Enviado, pero el navegador no ha podido confirmar la recepción. Suele ocurrir ' +
-          'cuando el script de Google está desplegado como «Solo yo» en vez de «Cualquier ' +
-          'usuario». Guarda una copia y avisa al profesor.'
-      };
-    } catch (err2) {
-      return {
-        estado: 'error',
-        mensaje: `No se pudo enviar: ${err2 instanceof Error ? err2.message : String(err2)}`
+          'El servidor no ha respondido en 20 s. Puede que el envío haya llegado: comprueba «Mis entregas» ' +
+          'antes de repetirlo, o usa «Enviar por correo».'
       };
     }
+    // La petición salió pero su respuesta no se pudo leer (CORS, red que se corta):
+    // puede estar ya en la hoja, así que no se repite.
+    registrarEnCache(0);
+    return {
+      estado: 'enviado-sin-confirmar',
+      mensaje:
+        'Enviado, pero el navegador no ha podido confirmar la recepción. Comprueba «Mis entregas» ' +
+        'dentro de un momento antes de repetirlo; si no aparece, avisa al profesor.'
+    };
   }
 }
 

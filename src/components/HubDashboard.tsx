@@ -118,7 +118,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             boxShadow: '0 6px 18px rgba(30, 58, 138, 0.22)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: '260px', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 'min(260px, 100%)', flex: 1 }}>
             <Award size={26} color="#fff" style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: 4 }}>
@@ -143,7 +143,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             className="btn btn-sm"
             style={{
               background: '#fff',
-              color: 'var(--navy)',
+              color: '#1e3a8a',
               fontWeight: 800,
               padding: '10px 18px',
               fontSize: '0.88rem',
@@ -158,10 +158,10 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
       {/* Cifras del curso */}
       <div className="course-stats">
         {[
-          { value: topics.length, label: 'Módulos', accent: 'var(--navy)' },
-          { value: totalDrugs, label: 'Fármacos con estructura', accent: 'var(--teal)' },
-          { value: totalQuestions, label: 'Preguntas de test', accent: 'var(--accent-purple)' },
-          { value: totalCards, label: 'Flashcards', accent: 'var(--accent-emerald)' }
+          { value: topics.length, label: 'Módulos', accent: 'var(--navy-ink)' },
+          { value: totalDrugs, label: 'Fármacos con estructura', accent: 'var(--teal-ink)' },
+          { value: totalQuestions, label: 'Preguntas de test', accent: 'var(--purple-ink)' },
+          { value: totalCards, label: 'Flashcards', accent: 'var(--ok-ink)' }
         ].map(s => (
           <div key={s.label} className="course-stat">
             <span className="stat-value" style={{ color: s.accent }}>{s.value}</span>
@@ -192,9 +192,9 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {announcements.map(ann => (
                 <div key={ann.id} className={`ann-card ${ann.priority === 'alta' ? 'ann-alta' : 'ann-normal'}`}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 3, gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 3, gap: 8 }}>
                     <span style={{ fontWeight: 700, fontSize: '0.84rem', color: 'var(--text-title)' }}>{ann.title}</span>
-                    <span className="tabular" style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', flexShrink: 0 }}>
+                    <span className="tabular" style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                       {ann.date}
                     </span>
                   </div>
@@ -205,7 +205,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
           </div>
 
           {/* Herramientas */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '1rem' }}>
             <button
               onClick={onNavigateToCourseInfo}
               className="qfdos-card card-teal tool-card"
@@ -223,7 +223,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                     </p>
                   </div>
                 </div>
-                <span className="tool-card-cta" style={{ color: 'var(--teal-ink)', whiteSpace: 'nowrap', marginLeft: '8px' }}>
+                <span className="tool-card-cta" style={{ color: 'var(--teal-ink)', whiteSpace: 'nowrap' }}>
                   Consultar <ArrowRight size={13} />
                 </span>
               </div>
@@ -265,7 +265,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
               <Activity size={22} color="var(--secondary-light)" />
               <h4>ADMET & Lipinski</h4>
               <p>Perfilado Lipinski / Veber con descriptores RDKit.</p>
-              <span className="tool-card-cta" style={{ color: 'var(--secondary-light)' }}>
+              <span className="tool-card-cta" style={{ color: 'var(--teal-ink)' }}>
                 Evaluar <ArrowRight size={12} />
               </span>
             </button>
@@ -276,11 +276,11 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                 className="qfdos-card card-teal tool-card"
                 style={{ gridColumn: '1 / -1', background: 'linear-gradient(135deg, rgba(30,58,138,0.08) 0%, rgba(45,212,191,0.12) 100%)', borderLeft: '4px solid #2dd4bf' }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Award size={24} color="var(--teal)" />
-                    <div style={{ textAlign: 'left' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: '1 1 240px' }}>
+                    <Award size={24} color="var(--teal-ink)" style={{ flexShrink: 0 }} />
+                    <div style={{ textAlign: 'left', minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                         <h4 style={{ margin: 0, fontSize: '1.02rem', fontWeight: 700, color: 'var(--navy-ink)' }}>
                           Simulador Oficial Examen FIR (2020-2025)
                         </h4>
@@ -358,7 +358,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
               <MolPropertyStrip smiles={spotlight.drug.smiles} />
 
               {/* External DB links for spotlight drug */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '6px' }}>
                 <button
                   onClick={() => window.open(`https://pubchem.ncbi.nlm.nih.gov/#query=${encodeURIComponent(spotlight.drug.name)}`, '_blank', 'noopener,noreferrer')}
                   className="btn btn-sm"
@@ -426,7 +426,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '1.15rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(270px, 100%), 1fr))', gap: '1.15rem' }}>
         {topics.slice(0, 4).map((t, idx) => {
           const bloqueado = (t.status === 'Próximamente') && !isProfesor;
           const abrir = () => { if (!bloqueado) onSelectTopic(t); };
@@ -440,7 +440,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             role={bloqueado ? undefined : 'button'}
             tabIndex={bloqueado ? -1 : 0}
             aria-disabled={bloqueado || undefined}
-            onKeyDown={e => { if (e.key === 'Enter') abrir(); }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); } }}
           >
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -481,7 +481,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
               <span className="tabular" style={{ fontSize: '0.71rem', color: 'var(--text-muted)' }}>
                 {t.drugs?.length || 0} fármacos · {t.testQuestions?.length || 0} preguntas
               </span>
-              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: bloqueado ? 'var(--text-muted)' : 'var(--navy)', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: bloqueado ? 'var(--text-muted)' : 'var(--navy-ink)', display: 'flex', alignItems: 'center', gap: 3 }}>
                 {bloqueado
                   ? <><Lock size={12} /> Próximamente</>
                   : <>Entrar <ArrowRight size={12} /></>}

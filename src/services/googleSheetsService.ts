@@ -5,7 +5,7 @@
  */
 
 import { QuizRegistrationRecord } from '../data/qfdosData';
-import { tokenSesion, renovarSiHaceFalta } from './sesion';
+import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 import calificacionesGs from '../../google-apps-script/Calificaciones.gs?raw';
 
 const STORAGE_KEY_WEBHOOK = 'qfdos_google_sheets_webhook_url';
@@ -57,12 +57,14 @@ export interface GoogleSheetsSubmissionResult {
    * podido releer: es el estado honesto mientras el despliegue no exponga la
    * lectura.
    */
-  status: 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error';
+  status: 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida';
 }
 
 /**
- * Envía el registro del intento a Google Sheets vía POST.
- * Emplea mode: 'no-cors' para garantizar compatibilidad con los 302 redirects de Google Apps Script.
+ * Envía el registro del intento a Google Sheets vía POST (`text/plain`, sin
+ * preflight) y LEE la respuesta: así se sabe si la fila se escribió o si el
+ * servidor rechazó la sesión. Si la respuesta no se puede leer, no se reenvía
+ * (duplicaría la nota) y se confirma releyendo el historial.
  */
 export async function submitAttemptToGoogleSheets(
   attempt: QuizRegistrationRecord
@@ -79,6 +81,13 @@ export async function submitAttemptToGoogleSheets(
   }
 
   await renovarSiHaceFalta();
+  if (!tokenSesion()) {
+    return {
+      success: false,
+      status: 'sesion_invalida',
+      message: 'Tu sesión ha caducado. El intento queda guardado en este navegador: cierra sesión, vuelve a entrar y pulsa Reintentar.'
+    };
+  }
   const payload = {
     action: 'record_quiz_attempt',
     // El servidor toma de aquí el correo y el rol; studentEmail sólo cuenta
@@ -107,20 +116,46 @@ export async function submitAttemptToGoogleSheets(
   };
 
   try {
-    // Se mantiene `no-cors` a propósito. En modo normal, si el navegador
-    // rechaza la respuesta la petición YA ha llegado al servidor, y reintentar
-    // escribiría la nota dos veces en la hoja del profesor. Duplicar una
-    // calificación es peor que no poder leer la confirmación.
-    await fetch(url, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload)
-    });
+    // Apps Script responde con CORS abierto tras su redirección 302, así que la
+    // respuesta se puede leer. Si aun así el navegador la bloquea, la petición
+    // YA ha llegado: no se reintenta (duplicaría la nota) y se relee abajo.
+    let cuerpo: any = null;
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(20000)
+      });
+      cuerpo = await resp.json().catch(() => null);
+    } catch {
+      cuerpo = null;
+    }
 
-    // La confirmación se obtiene releyendo, que no escribe nada.
+    if (cuerpo?.ok) {
+      return {
+        success: true,
+        status: 'sent',
+        message: `Calificación registrada en la hoja oficial${cuerpo.fila ? ` (fila ${cuerpo.fila})` : ''}.`
+      };
+    }
+    if (esSesionInvalida(cuerpo)) {
+      return {
+        success: false,
+        status: 'sesion_invalida',
+        message: 'El servidor no reconoce tu sesión. El intento queda guardado en este navegador: cierra sesión, vuelve a entrar y pulsa Reintentar.'
+      };
+    }
+    if (cuerpo && cuerpo.ok === false) {
+      return {
+        success: false,
+        status: 'network_error',
+        message: `La hoja rechazó el envío: ${cuerpo.error ?? 'respuesta inesperada'}. El intento queda guardado en este navegador.`
+      };
+    }
+
+    // Respuesta ilegible: la confirmación se obtiene releyendo, que no escribe nada.
     const registrados = await misCalificaciones(attempt.studentEmail);
     const parseMinutos = (ts?: string): number => {
       if (!ts) return 0;

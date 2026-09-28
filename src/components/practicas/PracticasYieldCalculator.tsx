@@ -205,6 +205,7 @@ export const PracticasYieldCalculator: React.FC = () => {
   // Student measured values
   const [experimentalMass, setExperimentalMass] = useState<number>(0);
   const [observedMp, setObservedMp] = useState<string>('');
+  const [guardado, setGuardado] = useState<{ tipo: 'ok' | 'warn' | 'bad'; texto: string } | null>(null);
   const [studentName, setStudentName] = useState<string>('');
   const [studentGroup, setStudentGroup] = useState<string>('');
   const [savedRecords, setSavedRecords] = useState<any[]>(() => {
@@ -283,9 +284,10 @@ export const PracticasYieldCalculator: React.FC = () => {
 
   const handleSaveToNotebook = () => {
     if (experimentalMass <= 0) {
-      alert('Introduce primero la masa obtenida en gramos para guardar el registro.');
+      setGuardado({ tipo: 'bad', texto: 'Introduce primero la masa obtenida (en gramos, mayor que 0) para guardar el registro.' });
       return;
     }
+    let sincronizado = true;
     const newRecord = {
       id: Date.now().toString(),
       date: new Date().toLocaleDateString('es-ES'),
@@ -358,9 +360,12 @@ export const PracticasYieldCalculator: React.FC = () => {
       localStorage.setItem('qfdos_pair_report_draft', JSON.stringify(updatedDraft));
     } catch (err) {
       console.error('Error sincronizando con el borrador del cuaderno', err);
+      sincronizado = false;
     }
 
-    alert('✓ Registro guardado y sincronizado en el «Apartado 7: Cuaderno de Parejas» listo para la entrega.');
+    setGuardado(sincronizado
+      ? { tipo: 'ok', texto: 'Registro guardado y copiado al «Apartado 7: Cuaderno de Parejas», listo para la entrega.' }
+      : { tipo: 'warn', texto: 'Registro guardado, pero no se pudo copiar al borrador del cuaderno. Añádelo a mano en el Apartado 7.' });
   };
 
   return (
@@ -587,14 +592,14 @@ export const PracticasYieldCalculator: React.FC = () => {
                       </div>
 
                       {isLimiting && (
-                        <span className="qfdos-badge" style={{ background: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5', fontSize: '0.68rem', fontWeight: 800 }}>
+                        <span className="qfdos-badge" style={{ background: 'var(--bad-bg)', color: 'var(--bad-ink)', border: '1px solid #fca5a5', fontSize: '0.68rem', fontWeight: 800 }}>
                           ★ REACTIVO LIMITANTE
                         </span>
                       )}
                     </div>
 
                     {/* Inputs Row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))', gap: '0.75rem' }}>
                       
                       {/* Amount Input */}
                       <div>
@@ -656,7 +661,7 @@ export const PracticasYieldCalculator: React.FC = () => {
                       fontSize: '0.76rem'
                     }}>
                       <span style={{ color: 'var(--text-muted)' }}>Masa pura = <strong>{calcItem?.pureMass.toFixed(3)} g</strong></span>
-                      <span className="font-tech" style={{ color: isLimiting ? '#b91c1c' : 'var(--teal)', fontWeight: 700 }}>
+                      <span className="font-tech" style={{ color: isLimiting ? 'var(--bad-ink)' : 'var(--teal-ink)', fontWeight: 700 }}>
                         {calcItem?.mmoles.toFixed(2)} mmol (n/coef = {calcItem?.normalizedRatio.toFixed(4)})
                       </span>
                     </div>
@@ -678,7 +683,7 @@ export const PracticasYieldCalculator: React.FC = () => {
               </div>
               <div style={{ padding: '8px 12px', background: 'var(--surface-muted)', borderRadius: '6px', fontFamily: 'Roboto Mono, monospace', fontSize: '0.76rem' }}>
                 {calculationData.items.map((item, i) => (
-                  <div key={i} style={{ color: calculationData.limitingIdx === i ? '#b91c1c' : 'var(--text-main)', fontWeight: calculationData.limitingIdx === i ? 700 : 400 }}>
+                  <div key={i} style={{ color: calculationData.limitingIdx === i ? 'var(--bad-ink)' : 'var(--text-main)', fontWeight: calculationData.limitingIdx === i ? 700 : 400 }}>
                     • {item.reagent.name}: {item.mmoles.toFixed(2)} mmol / {item.stoichiometry} = {item.normalizedRatio.toFixed(4)} {calculationData.limitingIdx === i ? '← MENOR VALOR (LIMITANTE)' : ''}
                   </div>
                 ))}
@@ -753,7 +758,7 @@ export const PracticasYieldCalculator: React.FC = () => {
                   fontSize: '2.5rem',
                   fontWeight: 900,
                   fontFamily: 'Montserrat, sans-serif',
-                  color: calculationData.yieldPercent > 100 ? '#ef4444' : calculationData.yieldPercent >= 70 ? '#10b981' : calculationData.yieldPercent >= 40 ? 'var(--teal)' : 'var(--navy)',
+                  color: calculationData.yieldPercent > 100 ? 'var(--bad-ink)' : calculationData.yieldPercent >= 70 ? 'var(--ok-ink)' : calculationData.yieldPercent >= 40 ? 'var(--teal-ink)' : 'var(--navy-ink)',
                   margin: '0.2rem 0'
                 }}>
                   {calculationData.yieldPercent.toFixed(1)} %
@@ -778,22 +783,22 @@ export const PracticasYieldCalculator: React.FC = () => {
                     <span style={{ color: 'var(--text-muted)' }}>Introduce la masa pesada para ver tu evaluación.</span>
                   )}
                   {calculationData.yieldPercent > 0 && calculationData.yieldPercent < 40 && (
-                    <span style={{ color: '#d97706', fontWeight: 600 }}>Rendimiento bajo: Revisa posibles pérdidas en extracciones o lavados.</span>
+                    <span style={{ color: 'var(--warn-ink)', fontWeight: 600 }}>Rendimiento bajo: Revisa posibles pérdidas en extracciones o lavados.</span>
                   )}
                   {calculationData.yieldPercent >= 40 && calculationData.yieldPercent <= 80 && (
-                    <span style={{ color: '#0d9488', fontWeight: 600 }}>✓ Rendimiento óptimo típico de prácticas de laboratorio farmacéutico.</span>
+                    <span style={{ color: 'var(--teal-ink)', fontWeight: 600 }}>✓ Rendimiento óptimo típico de prácticas de laboratorio farmacéutico.</span>
                   )}
                   {calculationData.yieldPercent > 80 && calculationData.yieldPercent <= 100 && (
-                    <span style={{ color: '#059669', fontWeight: 700 }}>★ ¡Excelente rendimiento de síntesis y aislamiento!</span>
+                    <span style={{ color: 'var(--ok-ink)', fontWeight: 700 }}>★ ¡Excelente rendimiento de síntesis y aislamiento!</span>
                   )}
                   {calculationData.yieldPercent > 100 && (
-                    <span style={{ color: '#dc2626', fontWeight: 700 }}>⚠ Rendimiento &gt; 100%: El producto contiene humedad/disolvente o sales residuales. ¡Secar más al rotavapor!</span>
+                    <span style={{ color: 'var(--bad-ink)', fontWeight: 700 }}>⚠ Rendimiento &gt; 100%: El producto contiene humedad/disolvente o sales residuales. ¡Secar más al rotavapor!</span>
                   )}
                 </div>
               </div>
 
               {/* Student Metadata & Save Button */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '0.5rem' }}>
                 <input
                   type="text"
                   placeholder="Nombre Alumno/a"
@@ -819,6 +824,11 @@ export const PracticasYieldCalculator: React.FC = () => {
               >
                 <Save size={15} /> Guardar en Cuaderno de Prácticas
               </button>
+              {guardado && (
+                <div className={`status-msg status-msg--${guardado.tipo}`} role={guardado.tipo === 'bad' ? 'alert' : 'status'} style={{ marginTop: '0.6rem' }}>
+                  {guardado.texto}
+                </div>
+              )}
 
             </div>
           </div>
@@ -836,7 +846,7 @@ export const PracticasYieldCalculator: React.FC = () => {
                     setSavedRecords([]);
                   }}
                   className="btn btn-xs btn-ghost"
-                  style={{ color: '#ef4444', fontSize: '0.7rem' }}
+                  style={{ color: 'var(--bad-ink)', fontSize: '0.7rem' }}
                 >
                   Borrar historial
                 </button>

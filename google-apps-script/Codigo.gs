@@ -74,20 +74,40 @@ function manejar(e) {
     if (accion === 'misEntregas')      return misEntregas(p);
     if (accion === 'evaluacion')       return evaluacion(p);
     if (accion === 'guardarEvaluacion') return guardarEvaluacion(p, e);
+    // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
+    if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
     if (!p.sheetName) {
       return json({
         ok: true,
         servicio: 'QFDOS',
         version: 3,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion'],
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
+    // Formato antiguo (GET con los campos en la URL). Se mantiene mientras
+    // queden navegadores con la versión anterior de la web en caché; retirar
+    // cuando todos hayan actualizado.
     return anotarFila(p);
   } catch (err) {
     return json({ ok: false, error: String(err) });
   }
+}
+
+/**
+ * Cuerpo JSON de un POST enviado como text/plain (sin preflight CORS).
+ * Solo se aceptan valores de texto o número, como en un formulario.
+ */
+function cuerpoJson_(e) {
+  var d;
+  try { d = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (err) { d = {}; }
+  var p = {};
+  Object.keys(d || {}).forEach(function (k) {
+    var v = d[k];
+    if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') p[k] = String(v);
+  });
+  return p;
 }
 
 /* ------------------------------------------------------------------ */

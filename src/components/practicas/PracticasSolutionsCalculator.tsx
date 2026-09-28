@@ -220,7 +220,7 @@ export const PracticasSolutionsCalculator: React.FC = () => {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '0.75rem' }}>
                 <div>
                   <label style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '3px' }}>
                     Peso Molecular (PM, g/mol):
@@ -249,7 +249,7 @@ export const PracticasSolutionsCalculator: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '0.75rem' }}>
                 <div>
                   <label style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '3px' }}>
                     Volumen Deseado (mL):
@@ -391,7 +391,7 @@ export const PracticasSolutionsCalculator: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '0.75rem' }}>
                 <div>
                   <label style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '3px' }}>
                     Volumen Final Deseado (mL):
@@ -453,7 +453,7 @@ export const PracticasSolutionsCalculator: React.FC = () => {
                 2. V₁ = (M₂ × V₂) / M₁ = ({liquidTargetM} M × {liquidTargetVolMl} mL) / {liquidCommercialMolarity.toFixed(2)} M = <strong>{liquidNeededVolMl.toFixed(2)} mL</strong>
               </div>
               
-              <div style={{ marginTop: '0.5rem', padding: '8px 12px', background: '#fee2e2', borderRadius: '6px', borderLeft: '3px solid #ef4444', fontSize: '0.78rem', color: '#b91c1c' }}>
+              <div style={{ marginTop: '0.5rem', padding: '8px 12px', background: 'var(--bad-bg)', borderRadius: '6px', borderLeft: '3px solid #ef4444', fontSize: '0.78rem', color: 'var(--bad-ink)' }}>
                 ⚠ <strong>REGLA DE SEGURIDAD CRÍTICA:</strong> ¡Añadir SIEMPRE el ácido concentrado sobre agua en campana de extracción, NUNCA agua sobre ácido!
               </div>
             </div>
@@ -635,7 +635,7 @@ export const PracticasSolutionsCalculator: React.FC = () => {
                 background: feedback.isCorrect ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
                 border: `1px solid ${feedback.isCorrect ? '#10b981' : '#ef4444'}`
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, color: feedback.isCorrect ? '#059669' : '#dc2626', fontSize: '0.92rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, color: feedback.isCorrect ? 'var(--ok-ink)' : 'var(--bad-ink)', fontSize: '0.92rem' }}>
                   {feedback.isCorrect ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
                   {feedback.message}
                 </div>

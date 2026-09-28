@@ -30,7 +30,7 @@ const pwa = VitePWA({
   injectRegister: false,
   manifest: {
     id: base,
-    name: 'QFDOS v3 · Química Farmacéutica II UGR',
+    name: 'Química Farmacéutica II · Grupo E (UGR)',
     short_name: 'QFDOS UGR',
     description:
       'Plataforma de Química Farmacéutica II (Grupo E) y cuaderno de prácticas interactivo, Universidad de Granada.',

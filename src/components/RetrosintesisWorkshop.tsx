@@ -18,6 +18,7 @@ import { RETROSINTHESIS_CASE_STUDIES, RetrosynthesisCaseStudy } from '../data/re
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 
+import { pulsable } from '../utils/a11y';
 interface RetrosintesisWorkshopProps {
   isProfesor: boolean;
 }
@@ -151,7 +152,7 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           
           {/* Navegación entre casos */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '8px' }}>
             {RETROSINTHESIS_CASE_STUDIES.map((c, idx) => {
               const isSelected = c.id === selectedCaseId;
               return (
@@ -188,7 +189,7 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
             
             {/* Cabecera del Caso */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-              <div style={{ flex: 1, minWidth: '280px' }}>
+              <div style={{ flex: 1, minWidth: 'min(280px, 100%)' }}>
                 <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem', fontWeight: 700, marginBottom: '6px' }}>
                   {currentCase.title.split(':')[0]}
                 </span>
@@ -208,7 +209,7 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
             </div>
 
             {/* Contexto Clínico & Reto del Problema */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1rem' }}>
               <div style={{ background: 'var(--surface-alt)', padding: '1rem', borderRadius: 'var(--radius-md)', borderLeft: '3px solid var(--teal)' }}>
                 <h4 style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Sparkles size={14} color="var(--teal-ink)" /> Contexto Clínico & Aplicación
@@ -340,7 +341,7 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
                         {step.type}
                       </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px', fontSize: '0.82rem', marginBottom: '6px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '8px', fontSize: '0.82rem', marginBottom: '6px' }}>
                       <div>
                         <span style={{ fontWeight: 700, color: 'var(--text-muted)' }}>Sintones: </span>
                         <code style={{ background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px' }}>{step.synthons}</code>
@@ -398,15 +399,15 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
             </div>
 
             {/* Errores Típicos del Alumnado & Conclusiones SAR */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '1rem' }}>
               <div style={{ background: 'rgba(239, 68, 68, 0.06)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                <h4 style={{ fontSize: '0.84rem', fontWeight: 800, color: '#ef4444', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h4 style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--bad-ink)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <ShieldAlert size={14} color="#ef4444" /> Trampas Comunes en Exámenes de Retrosíntesis
                 </h4>
                 <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
                   {currentCase.criticalStudentMistakes.map((m, idx) => (
                     <li key={idx} style={{ marginBottom: '6px' }}>
-                      <strong style={{ color: '#b91c1c' }}>{m.mistake}</strong>
+                      <strong style={{ color: 'var(--bad-ink)' }}>{m.mistake}</strong>
                       <p style={{ margin: '2px 0 0', color: 'var(--text-muted)' }}>{m.chemicalReason}</p>
                     </li>
                   ))}
@@ -414,7 +415,7 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
               </div>
 
               <div style={{ background: 'rgba(16, 185, 129, 0.06)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                <h4 style={{ fontSize: '0.84rem', fontWeight: 800, color: '#10b981', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h4 style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--ok-ink)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <CheckCircle2 size={14} color="#10b981" /> Relevancia SAR & Perfil Farmacocinético
                 </h4>
                 <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
@@ -434,7 +435,7 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
       {/* SUBVISTA 2: GALERÍA DE LAS 8 DIAPOSITIVAS RDKit */}
       {subTab === 'slides' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: '1rem' }}>
             {SLIDE_CARDS.map((slide) => (
               <div 
                 key={slide.slideNum}
@@ -453,7 +454,12 @@ export const RetrosintesisWorkshop: React.FC<RetrosintesisWorkshopProps> = ({ is
                   title: slide.title,
                   subtitle: slide.subtitle,
                   tag: `Slide ${slide.slideNum} • ${slide.tag}`
-                })}
+                })} {...pulsable(() => setLightboxImage({
+                  src: `${import.meta.env.BASE_URL || '/'}${slide.image.replace(/^\//, '')}`,
+                  title: slide.title,
+                  subtitle: slide.subtitle,
+                  tag: `Slide ${slide.slideNum} • ${slide.tag}`
+                }))}
               >
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>

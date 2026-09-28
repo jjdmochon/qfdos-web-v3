@@ -73,7 +73,7 @@ export const MolPropertyStrip: React.FC<MolPropertyStripProps> = ({
             textAlign: 'center',
             fontSize: '0.7rem',
             marginTop: 5,
-            color: violations === 0 ? 'var(--accent-emerald)' : violations === 1 ? 'var(--accent-amber)' : 'var(--accent-red)',
+            color: violations === 0 ? 'var(--ok-ink)' : violations === 1 ? 'var(--warn-ink)' : 'var(--bad-ink)',
             fontWeight: 600
           }}
         >

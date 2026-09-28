@@ -117,13 +117,13 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
             </h4>
 
             {isSubmitted && (
-              <div style={{ padding: '8px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-md)', color: '#047857', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <div style={{ padding: '8px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-md)', color: 'var(--ok-ink)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
                 <CheckCircle2 size={16} /> Se ha abierto tu correo con la duda preparada: pulsa Enviar para que llegue al profesor.
               </div>
             )}
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '10px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '2px' }}>
                     Unidad Temática:
@@ -221,7 +221,7 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
                       {q.response}
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#b45309', fontSize: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--warn-ink)', fontSize: '0.75rem' }}>
                       <Clock size={13} /> Pendiente de revisión docente
                     </div>
                   )}

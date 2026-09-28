@@ -181,14 +181,10 @@ function doPost(e) {
     return json_({ ok: false, status: 'error', error: 'JSON no válido.' });
   }
 
+  // Sin sesión válida no se escribe nada. Antes se aceptaba el studentEmail
+  // del cuerpo, y cualquiera podía anotar notas a nombre de otra persona.
   var s = verificarSesion_(data.sesion);
-  if (!s) {
-    if (data.studentEmail) {
-      s = { e: String(data.studentEmail).toLowerCase().trim(), r: 'estudiante', i: false };
-    } else {
-      return json_(SESION_INVALIDA);
-    }
-  }
+  if (!s) return json_(SESION_INVALIDA);
 
   // Un estudiante sólo registra intentos a su nombre. El profesorado puede
   // anotar el de otra persona (modo «Sesión docente»).

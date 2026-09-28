@@ -5,6 +5,10 @@ import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { PwaUpdatePrompt } from './components/PwaUpdatePrompt';
+import { LimiteDeError } from './components/LimiteDeError';
+import { instalarModalA11y } from './services/modalA11y';
+import { iniciarConsentimiento } from './services/consentimiento';
+import { AvisoCookies } from './components/AvisoCookies';
 import './index.css';
 import './App.css';
 
@@ -19,13 +23,22 @@ import './App.css';
 // 5. Copy the Client ID here
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
+// Diálogo accesible, Escape, foco atrapado y animación de salida para todos los modales
+instalarModalA11y();
+
+// Analytics solo si ya se aceptó en una visita anterior
+iniciarConsentimiento();
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <ThemeProvider>
         <AuthProvider>
-          <App />
+          <LimiteDeError zona="la plataforma">
+            <App />
+          </LimiteDeError>
           <PwaUpdatePrompt />
+          <AvisoCookies />
         </AuthProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>

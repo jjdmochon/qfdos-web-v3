@@ -219,7 +219,7 @@ export const PracticasProtocols: React.FC = () => {
           <div className="qfdos-card" style={{ padding: '1.25rem', borderLeft: '4px solid #ef4444', background: 'rgba(239, 68, 68, 0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
               <AlertTriangle size={17} color="#ef4444" />
-              <h4 style={{ margin: 0, fontWeight: 700, fontSize: '0.9rem', color: '#b91c1c' }}>
+              <h4 style={{ margin: 0, fontWeight: 700, fontSize: '0.9rem', color: 'var(--bad-ink)' }}>
                 Medidas de Seguridad Críticas
               </h4>
             </div>

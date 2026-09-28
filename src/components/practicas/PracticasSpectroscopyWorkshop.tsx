@@ -280,7 +280,7 @@ export const PracticasSpectroscopyWorkshop: React.FC = () => {
                 <h5 style={{ margin: '0 0 0.5rem 0', fontWeight: 700, fontSize: '0.84rem', color: 'var(--text-title)' }}>
                   Señales Principales Identificadas en el Espectro:
                 </h5>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '0.5rem' }}>
                   {getCurrentPeaks().map((sig: SpectrumPeak, sIdx: number) => (
                     <div
                       key={sIdx}
@@ -437,7 +437,7 @@ export const PracticasSpectroscopyWorkshop: React.FC = () => {
               Comparativa Clave: DHPP vs Nifedipina en ¹H RMN
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '1rem' }}>
               <div className="panel-claro" style={{ padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                 <h5 style={{ margin: '0 0 0.5rem 0', fontWeight: 700, color: 'var(--navy-ink)', fontSize: '0.9rem' }}>
                   DHPP (4-Fenildihidropiridina)
@@ -574,7 +574,7 @@ export const PracticasSpectroscopyWorkshop: React.FC = () => {
               background: parseInt(quizAnswer) === QUIZ_QUESTIONS[currentQuizQIdx].correctIdx ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
               border: `1px solid ${parseInt(quizAnswer) === QUIZ_QUESTIONS[currentQuizQIdx].correctIdx ? '#10b981' : '#ef4444'}`
             }}>
-              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: parseInt(quizAnswer) === QUIZ_QUESTIONS[currentQuizQIdx].correctIdx ? '#059669' : '#dc2626', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.88rem', color: parseInt(quizAnswer) === QUIZ_QUESTIONS[currentQuizQIdx].correctIdx ? 'var(--ok-ink)' : 'var(--bad-ink)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {parseInt(quizAnswer) === QUIZ_QUESTIONS[currentQuizQIdx].correctIdx ? <CheckCircle2 size={16} /> : <Info size={16} />}
                 {parseInt(quizAnswer) === QUIZ_QUESTIONS[currentQuizQIdx].correctIdx ? '¡Respuesta Correcta!' : 'Respuesta Incorrecta'}
               </div>

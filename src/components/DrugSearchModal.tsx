@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { QfdosTopic, MoleculeDrug } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { pulsable } from '../utils/a11y';
 import {
   searchPubChemByName,
   searchPubChemBySmiles,
@@ -165,9 +166,13 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
         setPubchemError(err.message || 'Error de conexión con el servicio PUG REST de PubChem');
       }
     } finally {
-      setPubchemLoading(false);
+      // Una búsqueda abortada no apaga el indicador de la búsqueda que la sustituyó
+      if (!signal.aborted) setPubchemLoading(false);
     }
   };
+
+  // Al cerrar el modal se cancela cualquier consulta en vuelo
+  useEffect(() => () => abortControllerRef.current?.abort(), []);
 
   const handleCopySmiles = (smiles: string) => {
     navigator.clipboard.writeText(smiles);
@@ -307,6 +312,7 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
               <button
                 onClick={() => { setSearchTerm(''); setPubchemResult(null); setPubchemError(null); setPubchemSynonyms([]); setPubchemDesc(null); }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                aria-label="Borrar la búsqueda"
               >
                 <X size={16} />
               </button>
@@ -317,9 +323,11 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
               className="btn btn-sm btn-secondary"
               style={{ fontSize: '0.78rem', gap: '6px' }}
               title="Consultar API oficial de PubChem (PUG-REST)"
+              aria-label="Consultar PubChem"
+              aria-busy={pubchemLoading}
             >
-              {pubchemLoading ? <RefreshCw size={13} className="spin-icon" /> : <Globe size={13} />}
-              <span>Consultar PUG-REST</span>
+              {pubchemLoading ? <RefreshCw size={13} className="spin" /> : <Globe size={13} />}
+              <span className="hide-xs">Consultar PUG-REST</span>
             </button>
           </div>
 
@@ -606,8 +614,9 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
               borderRadius: 'var(--radius-md)',
               padding: '10px 14px',
               fontSize: '0.8rem',
-              color: 'var(--accent-red)',
+              color: 'var(--bad-ink)',
               display: 'flex',
+              flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '8px'
@@ -616,13 +625,23 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
                 <AlertCircle size={16} />
                 <span>{pubchemError}</span>
               </div>
-              <button
-                onClick={() => openPubChemWeb(searchTerm)}
-                className="btn btn-sm btn-outline"
-                style={{ fontSize: '0.72rem', borderColor: 'var(--accent-red)', color: 'var(--accent-red)' }}
-              >
-                Buscar «{searchTerm}» en PubChem Web <ExternalLink size={11} />
-              </button>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => executePubChemQuery(searchTerm)}
+                  className="btn btn-sm btn-outline"
+                  style={{ fontSize: '0.72rem' }}
+                >
+                  Reintentar
+                </button>
+                <button
+                  onClick={() => openPubChemWeb(searchTerm)}
+                  className="btn btn-sm btn-outline"
+                  style={{ fontSize: '0.72rem', borderColor: 'var(--bad-ink)', color: 'var(--bad-ink)' }}
+                >
+                  Buscar «{searchTerm}» en PubChem Web <ExternalLink size={11} />
+                </button>
+              </div>
             </div>
           )}
 
@@ -646,7 +665,7 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
 
           {/* Grid of Course Drugs */}
           {filteredDrugs.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(380px, 100%), 1fr))', gap: '1.25rem' }}>
               {filteredDrugs.map(({ drug, topic }, idx) => (
                 <div
                   key={`${drug.name}-${idx}`}
@@ -677,7 +696,12 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
                             onClose();
                             onSelectTopic(topic);
                           }
-                        }}
+                        }} {...pulsable(() => {
+                          if (onSelectTopic) {
+                            onClose();
+                            onSelectTopic(topic);
+                          }
+                        })}
                         className="qfdos-badge badge-navy"
                         style={{ fontSize: '0.68rem', cursor: onSelectTopic ? 'pointer' : 'default' }}
                         title="Ver tema completo"
@@ -747,7 +771,7 @@ export const DrugSearchModal: React.FC<DrugSearchModalProps> = ({
 
                   {/* Action Buttons: PubChem & DrugBank Direct Links */}
                   <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, max(150px, calc(50% - 1rem))), 1fr))', gap: '6px' }}>
                       <button
                         onClick={() => openPubChemWeb(drug.name)}
                         className="btn btn-sm"
