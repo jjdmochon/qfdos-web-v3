@@ -7,10 +7,8 @@ import {
   Search,
   Copy,
   Check,
-  ExternalLink,
   Sparkles,
   Layers,
-  Activity,
   ShieldCheck,
   Info,
   Sun,
@@ -53,27 +51,7 @@ export interface CartasDeckViewProps {
 
 const ORDEN_INDICES = ['AFI', 'SEL', 'EST', 'ORA', 'SNC', 'DUR'] as const;
 
-/** Mapeo a denominación INN / IUPAC en inglés para búsqueda directa y carga en 3D en MolView (PubChem) */
-const FARMACOS_MOLVIEW_MAP: Record<string, string> = {
-  acetilcolina: 'acetylcholine',
-  metacolina: 'methacholine',
-  carbacol: 'carbachol',
-  betanecol: 'bethanechol',
-  pilocarpina: 'pilocarpine',
-  muscarina: 'muscarine',
-  nicotina: 'nicotine',
-  neostigmina: 'neostigmine',
-  donepezilo: 'donepezil',
-  organofosforados: 'parathion',
-  pralidoxima: 'pralidoxime',
-  atropina: 'atropine',
-  butilescopolamina: 'butylscopolamine',
-  trihexifenidilo: 'trihexyphenidyl',
-  atracurio: 'atracurium'
-};
-
 export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
-  onOpenAdmet,
   showDocenteBanner = true
 }) => {
   const [activeGroup, setActiveGroup] = useState<string>('todos');
@@ -157,29 +135,6 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
     navigator.clipboard.writeText(smiles);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1800);
-  };
-
-  // Abrir en MolView 3D (búsqueda automática en PubChem 3D)
-  const handleOpen3D = (f: FarmacoCarta, e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const query = FARMACOS_MOLVIEW_MAP[f.id] || f.nombre;
-    window.open(`https://molview.org/?q=${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer');
-  };
-
-  // Abrir en ADMET
-  const handleAdmetClick = (f: FarmacoCarta, e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (onOpenAdmet) {
-      onOpenAdmet({
-        name: f.nombre,
-        smiles: f.smiles,
-        formula: f.formula,
-        mw: f.masa,
-        role: f.rol
-      });
-    }
   };
 
   const isAnyFlipped = Object.values(flippedCards).some(Boolean);
@@ -501,38 +456,16 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Botones de acción fijos en dorso */}
+                    {/* Botón de voltear en dorso */}
                     <div className="qf-dorso-actions" onClick={(e) => e.stopPropagation()}>
-                      <a
-                        href={`https://molview.org/?q=${encodeURIComponent(FARMACOS_MOLVIEW_MAP[f.id] || f.nombre)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="qf-dorso-btn qf-dorso-btn--secondary"
-                        title="Ver conformación tridimensional en MolView"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink size={11} /> 3D MolView
-                      </a>
-
-                      {onOpenAdmet && (
-                        <button
-                          type="button"
-                          className="qf-dorso-btn qf-dorso-btn--mint"
-                          onClick={(e) => handleAdmetClick(f, e)}
-                          title="Cargar molécula en la Calculadora ADMET de QFDOS"
-                        >
-                          <Activity size={11} /> ADMET
-                        </button>
-                      )}
-
                       <button
                         type="button"
                         className="qf-dorso-btn qf-dorso-btn--secondary"
                         onClick={(e) => toggleFlip(f.id, e)}
                         title="Voltear carta al anverso"
-                        style={{ flex: 'none', padding: '5px 7px' }}
+                        style={{ width: '100%', padding: '7px 12px', fontSize: '11px', gap: '6px' }}
                       >
-                        <RotateCw size={11} />
+                        <RotateCw size={12} /> Voltear al anverso
                       </button>
                     </div>
                   </div>

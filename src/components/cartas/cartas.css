@@ -246,6 +246,14 @@
   transform: rotateY(180deg);
 }
 
+/* Prevenir que la cara trasera o delantera oculta intercepte clics */
+.qf-carta-item:not(.is-flipped) .qf-cara--dorso {
+  pointer-events: none;
+}
+.qf-carta-item.is-flipped .qf-cara--frente {
+  pointer-events: none;
+}
+
 /* ==========================================================================
    CARAS DE LA CARTA (MODO LIMPIO POR DEFECTO)
    ========================================================================== */
