@@ -363,11 +363,10 @@ export interface StudentQuestion {
  *          losartán tenían el esqueleto equivocado; morfina, captopril,
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
- * v3.21.0 — Módulo Varios (Material General del Curso y Documentación Complementaria)
- *           y soporte multimedia integral en Avisos (audio MP3, PDF, imágenes HD, vídeo).
+ * v3.22.0 — Carga directa de imágenes y audios locales en Noticias y Píldoras de Audio en Módulos.
  */
-export const COURSE_DATA_VERSION = '3.21.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-28T22:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.22.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-28T22:41:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

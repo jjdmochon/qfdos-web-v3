@@ -84,7 +84,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   const [apiKey, setApiKey] = useState(getStoredGeminiApiKey());
   const [apiKeySaved, setApiKeySaved] = useState(false);
 
-  // New Announcement Form
+  // Announcement Form State
+  const [editingAnnId, setEditingAnnId] = useState<string | null>(null);
   const [newAnnTitle, setNewAnnTitle] = useState('');
   const [newAnnContent, setNewAnnContent] = useState('');
   const [newAnnPriority, setNewAnnPriority] = useState<'alta' | 'normal'>('normal');
@@ -97,7 +98,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   const [newAnnVideoUrl, setNewAnnVideoUrl] = useState('');
   const [newAnnLinkUrl, setNewAnnLinkUrl] = useState('');
   const [newAnnLinkLabel, setNewAnnLinkLabel] = useState('');
-  const [showAnnMedia, setShowAnnMedia] = useState(false);
+  const [showAnnMedia, setShowAnnMedia] = useState(true);
 
   // New Drug Form
   const [selectedTopicForDrug, setSelectedTopicForDrug] = useState(topics[0]?.id || 'tema-00');
@@ -364,32 +365,9 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     if (editingModuleId === id) resetModuleForm();
   };
 
-  // Handle Add Announcement
-  const handleAddAnnouncement = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAnnTitle.trim() || !newAnnContent.trim()) return;
-
-    const newAnn: QfdosAnnouncement = {
-      id: `ann_${Date.now()}`,
-      title: newAnnTitle.trim(),
-      content: newAnnContent.trim(),
-      date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }),
-      priority: newAnnPriority,
-      imageUrl: newAnnImageUrl.trim() || undefined,
-      imageCaption: newAnnImageCaption.trim() || undefined,
-      pdfUrl: newAnnPdfUrl.trim() || undefined,
-      pdfName: newAnnPdfName.trim() || undefined,
-      audioUrl: newAnnAudioUrl.trim() || undefined,
-      audioName: newAnnAudioName.trim() || undefined,
-      videoUrl: newAnnVideoUrl.trim() || undefined,
-      linkUrl: newAnnLinkUrl.trim() || undefined,
-      linkLabel: newAnnLinkLabel.trim() || undefined
-    };
-
-    const updated = [newAnn, ...announcements];
-    onUpdateAnnouncements(updated);
-    localStorage.setItem('qfdos_v2_announcements', JSON.stringify(updated));
-
+  // Reset Announcement Form
+  const resetAnnouncementForm = () => {
+    setEditingAnnId(null);
     setNewAnnTitle('');
     setNewAnnContent('');
     setNewAnnImageUrl('');
@@ -401,14 +379,147 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     setNewAnnVideoUrl('');
     setNewAnnLinkUrl('');
     setNewAnnLinkLabel('');
-    setShowAnnMedia(false);
+    setNewAnnPriority('normal');
+  };
+
+  // Start Edit Announcement
+  const handleStartEditAnnouncement = (ann: QfdosAnnouncement) => {
+    setEditingAnnId(ann.id);
+    setNewAnnTitle(ann.title);
+    setNewAnnContent(ann.content);
+    setNewAnnPriority(ann.priority);
+    setNewAnnImageUrl(ann.imageUrl || '');
+    setNewAnnImageCaption(ann.imageCaption || '');
+    setNewAnnPdfUrl(ann.pdfUrl || '');
+    setNewAnnPdfName(ann.pdfName || '');
+    setNewAnnAudioUrl(ann.audioUrl || '');
+    setNewAnnAudioName(ann.audioName || '');
+    setNewAnnVideoUrl(ann.videoUrl || '');
+    setNewAnnLinkUrl(ann.linkUrl || '');
+    setNewAnnLinkLabel(ann.linkLabel || '');
+    setShowAnnMedia(true);
+  };
+
+  // Upload Local Image for Announcement (DataURL)
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen seleccionada supera los 5 MB. Por favor, elija una de menor resolución.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setNewAnnImageUrl(reader.result);
+        if (!newAnnImageCaption) {
+          setNewAnnImageCaption(file.name.replace(/\.[^/.]+$/, ''));
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Upload Local Audio for Announcement (DataURL)
+  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      alert('El archivo de audio supera los 15 MB. Se recomienda utilizar un archivo MP3 en public/audio/ o enlace externo.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setNewAnnAudioUrl(reader.result);
+        if (!newAnnAudioName) {
+          setNewAnnAudioName(file.name.replace(/\.[^/.]+$/, ''));
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Upload Local Audio for Module (DataURL)
+  const handleModuleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      alert('El audio supera los 15 MB. Se recomienda utilizar un archivo MP3 en public/audio/ o alojarlo en Google Drive.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setModAudioPodcastUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle Add / Update Announcement
+  const handleAddAnnouncement = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAnnTitle.trim() || !newAnnContent.trim()) return;
+
+    if (editingAnnId) {
+      // Update existing
+      const updated = announcements.map(a => {
+        if (a.id === editingAnnId) {
+          return {
+            ...a,
+            title: newAnnTitle.trim(),
+            content: newAnnContent.trim(),
+            priority: newAnnPriority,
+            imageUrl: newAnnImageUrl.trim() || undefined,
+            imageCaption: newAnnImageCaption.trim() || undefined,
+            pdfUrl: newAnnPdfUrl.trim() || undefined,
+            pdfName: newAnnPdfName.trim() || undefined,
+            audioUrl: newAnnAudioUrl.trim() || undefined,
+            audioName: newAnnAudioName.trim() || undefined,
+            videoUrl: newAnnVideoUrl.trim() || undefined,
+            linkUrl: newAnnLinkUrl.trim() || undefined,
+            linkLabel: newAnnLinkLabel.trim() || undefined
+          };
+        }
+        return a;
+      });
+      onUpdateAnnouncements(updated);
+      localStorage.setItem('qfdos_v2_announcements', JSON.stringify(updated));
+    } else {
+      // Create new
+      const newAnn: QfdosAnnouncement = {
+        id: `ann_${Date.now()}`,
+        title: newAnnTitle.trim(),
+        content: newAnnContent.trim(),
+        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }),
+        priority: newAnnPriority,
+        imageUrl: newAnnImageUrl.trim() || undefined,
+        imageCaption: newAnnImageCaption.trim() || undefined,
+        pdfUrl: newAnnPdfUrl.trim() || undefined,
+        pdfName: newAnnPdfName.trim() || undefined,
+        audioUrl: newAnnAudioUrl.trim() || undefined,
+        audioName: newAnnAudioName.trim() || undefined,
+        videoUrl: newAnnVideoUrl.trim() || undefined,
+        linkUrl: newAnnLinkUrl.trim() || undefined,
+        linkLabel: newAnnLinkLabel.trim() || undefined
+      };
+
+      const updated = [newAnn, ...announcements];
+      onUpdateAnnouncements(updated);
+      localStorage.setItem('qfdos_v2_announcements', JSON.stringify(updated));
+    }
+
+    resetAnnouncementForm();
   };
 
   // Handle Delete Announcement
   const handleDeleteAnnouncement = (id: string) => {
+    if (!window.confirm('¿Desea eliminar este aviso del portal?')) return;
     const updated = announcements.filter(a => a.id !== id);
     onUpdateAnnouncements(updated);
     localStorage.setItem('qfdos_v2_announcements', JSON.stringify(updated));
+    if (editingAnnId === id) resetAnnouncementForm();
   };
 
   // Handle Add Drug to Topic
@@ -540,13 +651,13 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
               onClick={() => setActiveTab('announcements')}
               className={`tab-btn ${activeTab === 'announcements' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'announcements'}
             >
-              <Bell size={14} /> Tablón de Avisos ({announcements.length})
+              <Bell size={14} /> Noticias y Tablón de Avisos ({announcements.length})
             </button>
             <button
               onClick={() => setActiveTab('links')}
               className={`tab-btn ${activeTab === 'links' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'links'}
             >
-              <Compass size={14} /> Enlaces de Interés ({resourceLinks.length})
+              <Compass size={14} /> Enlaces Web & Artículos ({resourceLinks.length})
             </button>
             <button
               onClick={() => setActiveTab('drugs')}
@@ -792,17 +903,20 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       />
                     </div>
 
-                    {/* SECTION: 4 RECURSOS OBLIGATORIOS DEL PROFESOR */}
-                    <div style={{ background: 'var(--surface-alt)', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-                      <h5 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--teal-ink)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Upload size={16} /> Recursos y Enlaces Obligatorios por Módulo
-                      </h5>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '10px' }}>
+                    {/* SECTION: RECURSOS Y ENLACES OBLIGATORIOS DEL MÓDULO */}
+                    <div style={{ background: 'var(--surface-alt)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                        <h5 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--teal-ink)', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                          <Upload size={16} /> Recursos Didácticos del Módulo (PDFs, Cuaderno IA, Píldoras de Audio y Spotify)
+                        </h5>
+                      </div>
+                      
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '12px' }}>
                         
                         {/* 1. Diapositivas PDF */}
                         <div>
                           <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <FileText size={13} color="var(--navy-ink)" /> PDF de Diapositivas
+                            <FileText size={13} color="var(--navy-ink)" /> 1. Diapositivas (PDF)
                           </label>
                           <input
                             type="text"
@@ -817,7 +931,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                         {/* 2. Apuntes PDF */}
                         <div>
                           <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <FileText size={13} color="var(--teal-ink)" /> PDF de Apuntes Oficiales
+                            <FileText size={13} color="var(--teal-ink)" /> 2. Apuntes Oficiales (PDF)
                           </label>
                           <input
                             type="text"
@@ -832,7 +946,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                         {/* 3. Gemini Notebook */}
                         <div>
                           <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <BookOpen size={13} color="var(--mint)" /> Gemini Notebook (NotebookLM)
+                            <BookOpen size={13} color="var(--mint)" /> 3. Gemini Notebook (NotebookLM)
                           </label>
                           <input
                             type="text"
@@ -847,7 +961,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                         {/* 4. Spotify Video Podcast */}
                         <div>
                           <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <Radio size={13} color="#1db954" /> Video Podcast Spotify (Episodio)
+                            <Radio size={13} color="#1db954" /> 4. Video Podcast Spotify (Episodio)
                           </label>
                           <input
                             type="text"
@@ -859,21 +973,73 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                           />
                         </div>
 
-                        {/* 5. Direct Audio Podcast */}
-                        <div>
-                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <Radio size={13} color="#2563eb" /> Píldora de Audio Web (MP3 / WAV)
+                      </div>
+
+                      {/* 5. BLOQUE DESTACADO: PÍLDORA DE AUDIO / PODCAST NATIVO */}
+                      <div style={{
+                        marginTop: '12px',
+                        padding: '10px 12px',
+                        borderRadius: 'var(--radius-md)',
+                        background: 'rgba(37, 99, 235, 0.05)',
+                        border: '1px solid rgba(37, 99, 235, 0.25)'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                          <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '5px', margin: 0 }}>
+                            <Headphones size={15} color="#2563eb" /> 5. Píldora de Audio Web (Podcast MP3 / WAV integrable)
                           </label>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              onClick={() => setModAudioPodcastUrl('audio/podcast_colinergicos.mp3')}
+                              className="btn btn-sm btn-ghost"
+                              style={{ fontSize: '0.68rem', padding: '2px 7px', color: '#2563eb', border: '1px solid rgba(37,99,235,0.3)' }}
+                              title="Asignar el audio del podcast de colinérgicos"
+                            >
+                              + Usar podcast_colinergicos.mp3
+                            </button>
+                            {modAudioPodcastUrl && (
+                              <button
+                                type="button"
+                                onClick={() => setModAudioPodcastUrl('')}
+                                className="btn btn-sm btn-ghost"
+                                style={{ fontSize: '0.68rem', padding: '2px 7px', color: 'var(--bad-ink)' }}
+                              >
+                                ✕ Quitar
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) auto', gap: '8px', alignItems: 'center' }}>
                           <input
                             type="text"
-                            placeholder="audio/podcast_colinergicos.mp3"
+                            placeholder="Ruta en public/ (ej: audio/podcast_colinergicos.mp3) o URL externa"
                             value={modAudioPodcastUrl}
                             onChange={e => setModAudioPodcastUrl(e.target.value)}
                             className="form-input"
                             style={{ width: '100%', fontSize: '0.8rem' }}
                           />
+                          <label className="btn btn-sm btn-outline" style={{ fontSize: '0.74rem', gap: '5px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                            <Upload size={13} /> Subir Audio PC
+                            <input
+                              type="file"
+                              accept="audio/*"
+                              onChange={handleModuleAudioUpload}
+                              style={{ display: 'none' }}
+                            />
+                          </label>
                         </div>
 
+                        {modAudioPodcastUrl && (
+                          <div style={{ marginTop: '8px' }}>
+                            <audio 
+                              controls 
+                              src={modAudioPodcastUrl.startsWith('data:') || modAudioPodcastUrl.startsWith('http') ? modAudioPodcastUrl : `${import.meta.env.BASE_URL}${modAudioPodcastUrl}`} 
+                              style={{ width: '100%', height: '30px' }} 
+                              preload="none" 
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1022,6 +1188,9 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                             <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                               📓 Gemini Notebook {topic.geminiNotebookUrl ? '✓' : '✗'}
                             </span>
+                            <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.audioPodcastUrl ? 'rgba(37,99,235,0.15)' : 'var(--surface-alt)', color: topic.audioPodcastUrl ? '#2563eb' : 'var(--text-muted)', fontWeight: topic.audioPodcastUrl ? 700 : 400 }}>
+                              🎧 Píldora de Audio {topic.audioPodcastUrl ? '✓' : '✗'}
+                            </span>
                             <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? '#1db954' : 'var(--text-muted)' }}>
                               🎙️ Video Podcast {topic.spotifyPodcastUrl ? '✓' : '✗'}
                             </span>
@@ -1059,193 +1228,346 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
           {activeTab === 'announcements' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
-              {/* Add Announcement Form */}
+              {/* Add / Edit Announcement Form */}
               <div className="qfdos-card card-navy" style={{ padding: '1.25rem' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '10px' }}>
-                  Publicar Nuevo Aviso en el Portal
-                </h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Bell size={18} color="var(--navy-ink)" />
+                    {editingAnnId ? 'Editar Noticia / Aviso del Portal' : 'Publicar Nueva Noticia o Aviso en el Portal'}
+                  </h4>
+                  {editingAnnId && (
+                    <button type="button" onClick={resetAnnouncementForm} className="btn btn-sm btn-outline">
+                      Cancelar Edición
+                    </button>
+                  )}
+                </div>
 
-                <form onSubmit={handleAddAnnouncement} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <form onSubmit={handleAddAnnouncement} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '10px' }}>
-                    <input
-                      type="text"
-                      placeholder="Título del aviso..."
-                      value={newAnnTitle}
-                      onChange={e => setNewAnnTitle(e.target.value)}
+                    <div>
+                      <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '3px' }}>
+                        Titular de la Noticia / Aviso
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ej: Nuevo mapa interactivo de dianas terapéuticas disponible"
+                        value={newAnnTitle}
+                        onChange={e => setNewAnnTitle(e.target.value)}
+                        className="form-input"
+                        required
+                        style={{ width: '100%' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '3px' }}>
+                        Nivel de Prioridad
+                      </label>
+                      <select
+                        value={newAnnPriority}
+                        onChange={e => setNewAnnPriority(e.target.value as 'alta' | 'normal')}
+                        className="form-input"
+                        style={{ width: '100%' }}
+                      >
+                        <option value="normal">Normal (Informativo)</option>
+                        <option value="alta">Alta (Urgente / Examen)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)', display: 'block', marginBottom: '3px' }}>
+                      Cuerpo del Mensaje / Explicación para los Estudiantes
+                    </label>
+                    <textarea
+                      placeholder="Redacta la noticia, indicando a los alumnos qué materiales se han actualizado, fechas clave o tareas..."
+                      value={newAnnContent}
+                      onChange={e => setNewAnnContent(e.target.value)}
                       className="form-input"
+                      rows={3}
                       required
+                      style={{ width: '100%', resize: 'vertical' }}
                     />
-                    <select
-                      value={newAnnPriority}
-                      onChange={e => setNewAnnPriority(e.target.value as 'alta' | 'normal')}
-                      className="form-input"
-                    >
-                      <option value="normal">Prioridad Normal</option>
-                      <option value="alta">Prioridad Alta</option>
-                    </select>
                   </div>
 
-                  <textarea
-                    placeholder="Contenido detallado del aviso oficial para los estudiantes..."
-                    value={newAnnContent}
-                    onChange={e => setNewAnnContent(e.target.value)}
-                    className="form-input"
-                    rows={3}
-                    required
-                  />
+                  {/* PANEL MULTIMEDIA PERMANENTE: IMAGEN, PDF, AUDIO, VÍDEO */}
+                  <div style={{
+                    background: 'var(--surface-alt)',
+                    padding: '14px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
+                      <span style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--teal-ink)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Upload size={16} /> Adjuntar Contenido Multimedia a la Noticia
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        Opcional: puedes adjuntar imágenes, PDFs, audios o vídeos
+                      </span>
+                    </div>
 
-                  {/* Toggle Multimedia Fields */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setShowAnnMedia(prev => !prev)}
-                      className="btn btn-sm btn-outline"
-                      style={{
-                        gap: '6px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        borderColor: showAnnMedia ? 'var(--teal)' : 'var(--border-color)',
-                        background: showAnnMedia ? 'rgba(13, 148, 136, 0.08)' : 'transparent',
-                        color: showAnnMedia ? 'var(--teal-ink)' : 'var(--text-main)'
-                      }}
-                    >
-                      <Upload size={14} />
-                      {showAnnMedia ? 'Ocultar multimedia adjunta' : 'Adjuntar Multimedia (Imágenes, PDF, Audio MP3, Vídeo, Enlace)'}
-                    </button>
-
-                    <button type="submit" className="btn btn-primary">
-                      <Plus size={16} /> Publicar Aviso
-                    </button>
-                  </div>
-
-                  {/* Multimedia Fields Panel */}
-                  {showAnnMedia && (
-                    <div style={{
-                      background: 'var(--surface-alt)',
-                      padding: '12px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border-color)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px'
-                    }}>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--teal-ink)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Upload size={14} /> Recursos Multimedia para la Noticia
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '10px' }}>
-                        {/* 1. Imagen */}
-                        <div>
-                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <Image size={13} color="var(--teal-ink)" /> Imagen Destacada (URL o ruta en public/)
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '12px' }}>
+                      
+                      {/* 1. IMAGEN DESTACADA */}
+                      <div style={{ background: 'var(--surface-raised)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                          <label style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', margin: 0 }}>
+                            <Image size={14} color="var(--teal-ink)" /> 1. Imagen Destacada
                           </label>
-                          <input
-                            type="text"
-                            placeholder="Ej: varios/Mapa_de_las_dianas_terapeuticas.png"
-                            value={newAnnImageUrl}
-                            onChange={e => setNewAnnImageUrl(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Pie de foto descriptivo..."
-                            value={newAnnImageCaption}
-                            onChange={e => setNewAnnImageCaption(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.76rem' }}
-                          />
-                        </div>
-
-                        {/* 2. PDF */}
-                        <div>
-                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <FileText size={13} color="var(--navy-ink)" /> Documento PDF (URL o ruta en public/)
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="Ej: varios/FDA_drug_approved_Q3_2026.pdf"
-                            value={newAnnPdfUrl}
-                            onChange={e => setNewAnnPdfUrl(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Nombre visible del PDF (ej: Informe FDA Q3 2026)"
-                            value={newAnnPdfName}
-                            onChange={e => setNewAnnPdfName(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.76rem' }}
-                          />
-                        </div>
-
-                        {/* 3. Audio */}
-                        <div>
-                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <Headphones size={13} color="#2563eb" /> Píldora de Audio MP3 / WAV
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="Ej: audio/podcast_colinergicos.mp3"
-                            value={newAnnAudioUrl}
-                            onChange={e => setNewAnnAudioUrl(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Título de la pista (ej: Píldora Docente 01 - 6 min)"
-                            value={newAnnAudioName}
-                            onChange={e => setNewAnnAudioName(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.76rem' }}
-                          />
-                        </div>
-
-                        {/* 4. Vídeo y Enlace */}
-                        <div>
-                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
-                            <Film size={13} color="#8b5cf6" /> Vídeo / Enlace Externo
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="URL Vídeo (YouTube, Vimeo, etc.)"
-                            value={newAnnVideoUrl}
-                            onChange={e => setNewAnnVideoUrl(e.target.value)}
-                            className="form-input"
-                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
-                          />
-                          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '4px' }}>
-                            <input
-                              type="text"
-                              placeholder="URL del enlace web"
-                              value={newAnnLinkUrl}
-                              onChange={e => setNewAnnLinkUrl(e.target.value)}
-                              className="form-input"
-                              style={{ width: '100%', fontSize: '0.76rem' }}
-                            />
-                            <input
-                              type="text"
-                              placeholder="Texto botón"
-                              value={newAnnLinkLabel}
-                              onChange={e => setNewAnnLinkLabel(e.target.value)}
-                              className="form-input"
-                              style={{ width: '100%', fontSize: '0.76rem' }}
-                            />
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewAnnImageUrl('varios/Mapa_de_las_dianas_terapeuticas.png');
+                                if (!newAnnImageCaption) setNewAnnImageCaption('Mapa de Dianas Terapéuticas QFDOS');
+                              }}
+                              className="btn btn-sm btn-ghost"
+                              style={{ fontSize: '0.66rem', padding: '1px 6px', color: 'var(--teal-ink)' }}
+                              title="Usar imagen del Mapa de Dianas"
+                            >
+                              + Mapa Dianas
+                            </button>
+                            {newAnnImageUrl && (
+                              <button
+                                type="button"
+                                onClick={() => setNewAnnImageUrl('')}
+                                className="btn btn-sm btn-ghost"
+                                style={{ fontSize: '0.66rem', padding: '1px 6px', color: 'var(--bad-ink)' }}
+                              >
+                                ✕ Quitar
+                              </button>
+                            )}
                           </div>
                         </div>
 
+                        <div style={{ display: 'flex', gap: '6px', marginBottom: '5px' }}>
+                          <input
+                            type="text"
+                            placeholder="URL externa o ruta en public/ (ej: varios/...png)"
+                            value={newAnnImageUrl}
+                            onChange={e => setNewAnnImageUrl(e.target.value)}
+                            className="form-input"
+                            style={{ flex: 1, fontSize: '0.78rem' }}
+                          />
+                          <label className="btn btn-sm btn-outline" style={{ fontSize: '0.72rem', gap: '4px', cursor: 'pointer', whiteSpace: 'nowrap' }} title="Subir foto desde tu ordenador">
+                            <Upload size={12} /> Subir PC
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+
+                        <input
+                          type="text"
+                          placeholder="Pie de foto descriptivo..."
+                          value={newAnnImageCaption}
+                          onChange={e => setNewAnnImageCaption(e.target.value)}
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.74rem' }}
+                        />
+
+                        {newAnnImageUrl && (
+                          <div style={{ marginTop: '6px', textAlign: 'center' }}>
+                            <img
+                              src={newAnnImageUrl.startsWith('data:') || newAnnImageUrl.startsWith('http') ? newAnnImageUrl : `${import.meta.env.BASE_URL}${newAnnImageUrl}`}
+                              alt="Vista previa"
+                              style={{ maxHeight: '70px', borderRadius: '4px', objectFit: 'contain', border: '1px solid var(--border-color)' }}
+                            />
+                          </div>
+                        )}
                       </div>
+
+                      {/* 2. DOCUMENTO PDF */}
+                      <div style={{ background: 'var(--surface-raised)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                          <label style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', margin: 0 }}>
+                            <FileText size={14} color="var(--navy-ink)" /> 2. Documento PDF Adjunto
+                          </label>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewAnnPdfUrl('varios/FDA_drug_approved_Q3_2026.pdf');
+                                setNewAnnPdfName('Informe Oficial FDA Q3 2026');
+                              }}
+                              className="btn btn-sm btn-ghost"
+                              style={{ fontSize: '0.66rem', padding: '1px 6px', color: 'var(--navy-ink)' }}
+                            >
+                              + FDA Q3
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewAnnPdfUrl('varios/The_evolving_landscape_of_drug_targets.pdf');
+                                setNewAnnPdfName('The Evolving Landscape of Drug Targets');
+                              }}
+                              className="btn btn-sm btn-ghost"
+                              style={{ fontSize: '0.66rem', padding: '1px 6px', color: 'var(--navy-ink)' }}
+                            >
+                              + Landscape
+                            </button>
+                            {newAnnPdfUrl && (
+                              <button
+                                type="button"
+                                onClick={() => { setNewAnnPdfUrl(''); setNewAnnPdfName(''); }}
+                                className="btn btn-sm btn-ghost"
+                                style={{ fontSize: '0.66rem', padding: '1px 6px', color: 'var(--bad-ink)' }}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <input
+                          type="text"
+                          placeholder="URL externa o ruta (ej: varios/FDA_drug_approved_Q3_2026.pdf)"
+                          value={newAnnPdfUrl}
+                          onChange={e => setNewAnnPdfUrl(e.target.value)}
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.78rem', marginBottom: '5px' }}
+                        />
+                        <input
+                          type="text"
+                          placeholder="Nombre con el que verán el botón (ej: Informe FDA Q3 2026)"
+                          value={newAnnPdfName}
+                          onChange={e => setNewAnnPdfName(e.target.value)}
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.74rem' }}
+                        />
+                      </div>
+
+                      {/* 3. PÍLDORA DE AUDIO */}
+                      <div style={{ background: 'var(--surface-raised)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                          <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '4px', margin: 0 }}>
+                            <Headphones size={14} color="#2563eb" /> 3. Píldora de Audio (MP3 / Podcast)
+                          </label>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewAnnAudioUrl('audio/podcast_colinergicos.mp3');
+                                setNewAnnAudioName('Píldora Docente: Colinérgicos (6 min)');
+                              }}
+                              className="btn btn-sm btn-ghost"
+                              style={{ fontSize: '0.66rem', padding: '1px 6px', color: '#2563eb' }}
+                            >
+                              + Podcast T01
+                            </button>
+                            {newAnnAudioUrl && (
+                              <button
+                                type="button"
+                                onClick={() => { setNewAnnAudioUrl(''); setNewAnnAudioName(''); }}
+                                className="btn btn-sm btn-ghost"
+                                style={{ fontSize: '0.66rem', padding: '1px 6px', color: 'var(--bad-ink)' }}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '6px', marginBottom: '5px' }}>
+                          <input
+                            type="text"
+                            placeholder="Ruta en public/ (ej: audio/podcast_colinergicos.mp3) o URL"
+                            value={newAnnAudioUrl}
+                            onChange={e => setNewAnnAudioUrl(e.target.value)}
+                            className="form-input"
+                            style={{ flex: 1, fontSize: '0.78rem' }}
+                          />
+                          <label className="btn btn-sm btn-outline" style={{ fontSize: '0.72rem', gap: '4px', cursor: 'pointer', whiteSpace: 'nowrap' }} title="Subir audio desde tu ordenador">
+                            <Upload size={12} /> Subir PC
+                            <input
+                              type="file"
+                              accept="audio/*"
+                              onChange={handleAudioUpload}
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+
+                        <input
+                          type="text"
+                          placeholder="Título del audio (ej: Píldora Docente: Colinérgicos)"
+                          value={newAnnAudioName}
+                          onChange={e => setNewAnnAudioName(e.target.value)}
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.74rem' }}
+                        />
+
+                        {newAnnAudioUrl && (
+                          <div style={{ marginTop: '6px' }}>
+                            <audio
+                              controls
+                              src={newAnnAudioUrl.startsWith('data:') || newAnnAudioUrl.startsWith('http') ? newAnnAudioUrl : `${import.meta.env.BASE_URL}${newAnnAudioUrl}`}
+                              style={{ width: '100%', height: '28px' }}
+                              preload="none"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 4. VÍDEO Y ENLACE WEB */}
+                      <div style={{ background: 'var(--surface-raised)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                        <label style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '5px' }}>
+                          <Film size={14} color="#8b5cf6" /> 4. Vídeo o Enlace Web Externo
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="URL Vídeo (YouTube, Vimeo, etc.)"
+                          value={newAnnVideoUrl}
+                          onChange={e => setNewAnnVideoUrl(e.target.value)}
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.78rem', marginBottom: '5px' }}
+                        />
+                        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '4px' }}>
+                          <input
+                            type="text"
+                            placeholder="URL enlace web"
+                            value={newAnnLinkUrl}
+                            onChange={e => setNewAnnLinkUrl(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.74rem' }}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Texto botón"
+                            value={newAnnLinkLabel}
+                            onChange={e => setNewAnnLinkLabel(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.74rem' }}
+                          />
+                        </div>
+                      </div>
+
                     </div>
-                  )}
+                  </div>
+
+                  {/* SUBMIT BUTTON */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
+                    {editingAnnId && (
+                      <button type="button" onClick={resetAnnouncementForm} className="btn btn-outline">
+                        Cancelar
+                      </button>
+                    )}
+                    <button type="submit" className="btn btn-primary" style={{ padding: '0.6rem 1.4rem', fontWeight: 700 }}>
+                      <Save size={16} /> {editingAnnId ? 'Guardar Cambios de la Noticia' : 'Publicar Noticia en el Portal'}
+                    </button>
+                  </div>
                 </form>
               </div>
 
               {/* List of Announcements */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <h5 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-title)' }}>
-                  Avisos Activos ({announcements.length})
+                <h5 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-title)' }}>
+                  Noticias y Avisos Publicados ({announcements.length})
                 </h5>
 
                 {announcements.map(ann => (
@@ -1256,48 +1578,48 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       flexDirection: 'row', 
                       justifyContent: 'space-between', 
                       alignItems: 'center', 
-                      padding: '0.9rem 1.2rem',
+                      padding: '1rem 1.25rem',
                       borderLeft: ann.priority === 'alta' ? '4px solid #ef4444' : '4px solid var(--navy)'
                     }}
                   >
-                    <div style={{ flex: 1, minWidth: 0, marginRight: '12px' }}>
+                    <div style={{ flex: 1, minWidth: 0, marginRight: '14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                        <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-title)' }}>
+                        <h4 style={{ fontSize: '0.94rem', fontWeight: 700, color: 'var(--text-title)' }}>
                           {ann.title}
                         </h4>
                         <span className={`qfdos-badge ${ann.priority === 'alta' ? 'badge-amber' : 'badge-navy'}`} style={{ fontSize: '0.65rem' }}>
                           {ann.priority.toUpperCase()}
                         </span>
                       </div>
-                      <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', marginBottom: '4px' }}>
+                      <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', marginBottom: '6px' }}>
                         {ann.content}
                       </p>
                       
                       {/* Attached media indicators */}
                       {(ann.imageUrl || ann.pdfUrl || ann.audioUrl || ann.videoUrl || ann.linkUrl) && (
-                        <div style={{ display: 'flex', gap: '5px', marginTop: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '6px', marginTop: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
                           {ann.imageUrl && (
-                            <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                              📷 Imagen
+                            <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                              📷 Imagen adjunta
                             </span>
                           )}
                           {ann.pdfUrl && (
-                            <span className="qfdos-badge badge-navy" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                            <span className="qfdos-badge badge-navy" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
                               📄 PDF: {ann.pdfName || 'Documento'}
                             </span>
                           )}
                           {ann.audioUrl && (
-                            <span className="qfdos-badge" style={{ fontSize: '0.65rem', padding: '1px 6px', background: '#2563eb', color: '#fff' }}>
+                            <span className="qfdos-badge" style={{ fontSize: '0.68rem', padding: '2px 8px', background: '#2563eb', color: '#fff' }}>
                               🎙️ Audio: {ann.audioName || 'Pista MP3'}
                             </span>
                           )}
                           {ann.videoUrl && (
-                            <span className="qfdos-badge badge-purple" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                              🎥 Vídeo
+                            <span className="qfdos-badge badge-purple" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                              🎥 Vídeo adjunto
                             </span>
                           )}
                           {ann.linkUrl && (
-                            <span className="qfdos-badge badge-emerald" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                            <span className="qfdos-badge badge-emerald" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
                               🔗 {ann.linkLabel || 'Enlace'}
                             </span>
                           )}
@@ -1305,17 +1627,27 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       )}
 
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                        {ann.date}
+                        Publicado: {ann.date}
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteAnnouncement(ann.id)}
-                      className="btn btn-sm btn-outline"
-                      style={{ color: 'var(--bad-ink)', borderColor: 'rgba(239,68,68,0.3)', flexShrink: 0 }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button
+                        onClick={() => handleStartEditAnnouncement(ann)}
+                        className="btn btn-sm btn-outline"
+                        title="Editar esta noticia o cambiar multimedia"
+                      >
+                        <Edit3 size={14} /> Editar
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAnnouncement(ann.id)}
+                        className="btn btn-sm btn-outline"
+                        style={{ color: 'var(--bad-ink)', borderColor: 'rgba(239,68,68,0.3)' }}
+                        title="Eliminar aviso"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
