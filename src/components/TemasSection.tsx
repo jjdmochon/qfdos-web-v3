@@ -37,12 +37,14 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
 }) => {
   const { isProfesor } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'teoria' | 'examen' | 'trabajo' | 'seminario'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'teoria' | 'examen' | 'trabajo' | 'seminario' | 'general'>('all');
 
   const filteredTopics = topics.filter(t => {
+    const isGeneral = t.category === 'general' || t.id === 'tema-varios';
     const matchesCategory = 
       selectedCategory === 'all' ? true :
       selectedCategory === 'teoria' ? (!t.category || t.category === 'teoria') :
+      selectedCategory === 'general' ? isGeneral :
       t.category === selectedCategory;
 
     const matchesSearch = 
@@ -58,6 +60,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
   const theoryCount = topics.filter(t => !t.category || t.category === 'teoria').length;
   const examCount = topics.filter(t => t.category === 'examen').length;
   const projectCount = topics.filter(t => t.category === 'trabajo').length;
+  const generalCount = topics.filter(t => t.category === 'general' || t.id === 'tema-varios').length;
 
   return (
     <div className="container" style={{ padding: '2rem 1rem' }}>
@@ -74,6 +77,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
             {[
               `${theoryCount} temas de teoría`,
+              generalCount > 0 && `${generalCount} módulo general`,
               examCount > 0 && `${examCount} convocatorias de examen`,
               projectCount > 0 && `${projectCount} trabajos`
             ].filter(Boolean).join(' · ')} · Curso 2026/2027 · UGR
@@ -96,7 +100,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
       </div>
 
       {/* Category chips: solo si hay más de una categoría con contenido */}
-      {[theoryCount, examCount, projectCount].filter(n => n > 0).length > 1 && (
+      {[theoryCount, examCount, projectCount, generalCount].filter(n => n > 0).length > 1 && (
         <div role="group" aria-label="Filtrar por tipo" style={{ marginBottom: '1.75rem', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
             <Filter size={14} /> Filtrar por:
@@ -107,6 +111,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
           {theoryCount > 0 && (
             <button onClick={() => setSelectedCategory('teoria')} className="chip" aria-pressed={selectedCategory === 'teoria'}>
               🔬 Teoría ({theoryCount})
+            </button>
+          )}
+          {generalCount > 0 && (
+            <button onClick={() => setSelectedCategory('general')} className="chip" aria-pressed={selectedCategory === 'general'}>
+              📦 Material General ({generalCount})
             </button>
           )}
           {examCount > 0 && (
@@ -137,7 +146,8 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
         {filteredTopics.map((topic, idx) => {
           const isExam = topic.category === 'examen';
           const isProject = topic.category === 'trabajo';
-          const accentClass = isExam ? 'card-amber' : isProject ? 'card-emerald' : idx % 3 === 0 ? 'card-navy' : idx % 3 === 1 ? 'card-teal' : 'card-mint';
+          const isGeneral = topic.category === 'general' || topic.id === 'tema-varios';
+          const accentClass = isExam ? 'card-amber' : isProject ? 'card-emerald' : isGeneral ? 'card-teal' : idx % 3 === 0 ? 'card-navy' : idx % 3 === 1 ? 'card-teal' : 'card-mint';
 
           // Un tema sin publicar se muestra, para que se vea que existe y esta
           // por venir, pero sin acceso: el profesorado si entra, para prepararlo.
@@ -156,15 +166,19 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {topic.id !== 'tema-00' && topic.number && (
-                      <span className={`qfdos-badge ${isExam ? 'badge-amber' : isProject ? 'badge-emerald' : 'badge-navy'}`} style={{ fontSize: '0.72rem' }}>
+                      <span className={`qfdos-badge ${isExam ? 'badge-amber' : isProject ? 'badge-emerald' : isGeneral ? 'badge-teal' : 'badge-navy'}`} style={{ fontSize: '0.72rem' }}>
                         {topic.number}
                       </span>
                     )}
-                    {topic.category && topic.category !== 'teoria' && (
+                    {isGeneral ? (
+                      <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>
+                        MATERIAL GENERAL
+                      </span>
+                    ) : topic.category && topic.category !== 'teoria' ? (
                       <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem' }}>
                         {topic.category.toUpperCase()}
                       </span>
-                    )}
+                    ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: '5px' }}>
                     {topic.pdbTargetId && (
@@ -235,8 +249,8 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
                     📓 Notebook {topic.geminiNotebookUrl ? '✓' : ''}
                   </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
-                    🎙️ Video Podcast {topic.spotifyPodcastUrl ? '✓' : ''}
+                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
+                    🎙️ Podcast {(topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? '✓' : ''}
                   </span>
                   {topic.id === 'tema-01' && (
                     <>
@@ -347,11 +361,35 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   )}
                 </div>
 
-                {topic.id !== 'tema-00' && !bloqueado && !testHabilitado(topic) && !flashcardsHabilitadas(topic) &&
+                {topic.id !== 'tema-00' && !isGeneral && !bloqueado && !testHabilitado(topic) && !flashcardsHabilitadas(topic) &&
                   (topic.testDisponible === false || topic.flashcardsDisponibles === false) && (
                   <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0 }}>
                     Test y flashcards: disponibles próximamente.
                   </p>
+                )}
+
+                {/* Si es módulo general y tiene adjuntos, botón prominente de ver documentos */}
+                {isGeneral && (topic.attachments?.length ?? 0) > 0 && (
+                  <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                    <button
+                      onClick={() => onSelectTopic(topic)}
+                      className="btn btn-sm btn-primary"
+                      style={{ 
+                        flex: 1, 
+                        minWidth: 0,
+                        fontSize: '0.76rem', 
+                        padding: '7px 8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        whiteSpace: 'nowrap'
+                      }}
+                      title="Ver y descargar documentación complementaria"
+                    >
+                      <FileText size={13} /> Ver Documentos ({topic.attachments?.length})
+                    </button>
+                  </div>
                 )}
                 {/* Fila 2: Herramientas de Estudio (Test y Flashcards) */}
                 {topic.id !== 'tema-00' && !bloqueado && (testHabilitado(topic) || flashcardsHabilitadas(topic)) && (

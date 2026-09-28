@@ -51,7 +51,7 @@ export function limpiarCacheRemota(): void {
  */
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
-  return topics.map(t => {
+  const mapped = topics.map(t => {
     const base = INITIAL_TOPICS.find(item => item.id === t.id);
     if (!base) return t;
 
@@ -80,6 +80,9 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
       spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
       videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
+      audioPodcastUrl: t.audioPodcastUrl || base.audioPodcastUrl || '',
+      audioPodcastName: t.audioPodcastName || base.audioPodcastName || '',
+      attachments: (t.attachments && t.attachments.length > 0) ? t.attachments : (base.attachments || []),
       testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
       flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
       drugs: (Array.isArray(t.drugs) && t.drugs.length >= (base.drugs?.length || 0)) ? t.drugs : (base.drugs || []),
@@ -88,6 +91,11 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       flashcardsDisponibles: base.flashcardsDisponibles,
     };
   });
+
+  // Asegurar que temas introducidos en INITIAL_TOPICS (ej: tema-varios) no queden fuera si la caché es anterior
+  const mappedIds = new Set(mapped.map(t => t.id));
+  const missingBaseTopics = INITIAL_TOPICS.filter(bt => !mappedIds.has(bt.id));
+  return [...mapped, ...missingBaseTopics];
 }
 
 /**

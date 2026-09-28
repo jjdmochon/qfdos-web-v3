@@ -38,7 +38,10 @@ import {
   AlertCircle,
   Compass,
   Star,
-  Link2
+  Link2,
+  Image,
+  Film,
+  Headphones
 } from 'lucide-react';
 
 interface AdminCmsModalProps {
@@ -85,6 +88,16 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   const [newAnnTitle, setNewAnnTitle] = useState('');
   const [newAnnContent, setNewAnnContent] = useState('');
   const [newAnnPriority, setNewAnnPriority] = useState<'alta' | 'normal'>('normal');
+  const [newAnnImageUrl, setNewAnnImageUrl] = useState('');
+  const [newAnnImageCaption, setNewAnnImageCaption] = useState('');
+  const [newAnnPdfUrl, setNewAnnPdfUrl] = useState('');
+  const [newAnnPdfName, setNewAnnPdfName] = useState('');
+  const [newAnnAudioUrl, setNewAnnAudioUrl] = useState('');
+  const [newAnnAudioName, setNewAnnAudioName] = useState('');
+  const [newAnnVideoUrl, setNewAnnVideoUrl] = useState('');
+  const [newAnnLinkUrl, setNewAnnLinkUrl] = useState('');
+  const [newAnnLinkLabel, setNewAnnLinkLabel] = useState('');
+  const [showAnnMedia, setShowAnnMedia] = useState(false);
 
   // New Drug Form
   const [selectedTopicForDrug, setSelectedTopicForDrug] = useState(topics[0]?.id || 'tema-00');
@@ -115,7 +128,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
 
   // Form State for New / Editing Module
-  const [modCategory, setModCategory] = useState<'teoria' | 'examen' | 'trabajo' | 'seminario'>('teoria');
+  const [modCategory, setModCategory] = useState<'teoria' | 'examen' | 'trabajo' | 'seminario' | 'general'>('teoria');
   const [modNumber, setModNumber] = useState('');
   const [modTitle, setModTitle] = useState('');
   const [modSubtitle, setModSubtitle] = useState('');
@@ -127,6 +140,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   const [modNotesPdfUrl, setModNotesPdfUrl] = useState('');
   const [modGeminiNotebookUrl, setModGeminiNotebookUrl] = useState('');
   const [modSpotifyPodcastUrl, setModSpotifyPodcastUrl] = useState('');
+  const [modAudioPodcastUrl, setModAudioPodcastUrl] = useState('');
   const [modDueDate, setModDueDate] = useState('');
   const [modWeightPercentage, setModWeightPercentage] = useState<number>(15);
   const [modSubmissionInstructions, setModSubmissionInstructions] = useState('');
@@ -227,6 +241,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     setModNotesPdfUrl('');
     setModGeminiNotebookUrl('');
     setModSpotifyPodcastUrl('');
+    setModAudioPodcastUrl('');
     setModDueDate('');
     setModWeightPercentage(15);
     setModSubmissionInstructions('');
@@ -251,6 +266,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     setModNotesPdfUrl(topic.notesPdfUrl || '');
     setModGeminiNotebookUrl(topic.geminiNotebookUrl || '');
     setModSpotifyPodcastUrl(topic.spotifyPodcastUrl || '');
+    setModAudioPodcastUrl(topic.audioPodcastUrl || '');
     setModDueDate(topic.dueDate || '');
     setModWeightPercentage(topic.weightPercentage || 15);
     setModSubmissionInstructions(topic.submissionInstructions || '');
@@ -288,6 +304,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
             geminiNotebookUrl: modGeminiNotebookUrl.trim() || undefined,
             spotifyPodcastUrl: modSpotifyPodcastUrl.trim() || undefined,
             videoPodcastUrl: modSpotifyPodcastUrl.trim() || undefined,
+            audioPodcastUrl: modAudioPodcastUrl.trim() || undefined,
             dueDate: modDueDate.trim() || undefined,
             weightPercentage: Number(modWeightPercentage) || undefined,
             submissionInstructions: modSubmissionInstructions.trim() || undefined,
@@ -322,6 +339,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
         geminiNotebookUrl: modGeminiNotebookUrl.trim() || undefined,
         spotifyPodcastUrl: modSpotifyPodcastUrl.trim() || undefined,
         videoPodcastUrl: modSpotifyPodcastUrl.trim() || undefined,
+        audioPodcastUrl: modAudioPodcastUrl.trim() || undefined,
         dueDate: modDueDate.trim() || undefined,
         weightPercentage: Number(modWeightPercentage) || undefined,
         submissionInstructions: modSubmissionInstructions.trim() || undefined,
@@ -356,7 +374,16 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
       title: newAnnTitle.trim(),
       content: newAnnContent.trim(),
       date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }),
-      priority: newAnnPriority
+      priority: newAnnPriority,
+      imageUrl: newAnnImageUrl.trim() || undefined,
+      imageCaption: newAnnImageCaption.trim() || undefined,
+      pdfUrl: newAnnPdfUrl.trim() || undefined,
+      pdfName: newAnnPdfName.trim() || undefined,
+      audioUrl: newAnnAudioUrl.trim() || undefined,
+      audioName: newAnnAudioName.trim() || undefined,
+      videoUrl: newAnnVideoUrl.trim() || undefined,
+      linkUrl: newAnnLinkUrl.trim() || undefined,
+      linkLabel: newAnnLinkLabel.trim() || undefined
     };
 
     const updated = [newAnn, ...announcements];
@@ -365,6 +392,16 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
     setNewAnnTitle('');
     setNewAnnContent('');
+    setNewAnnImageUrl('');
+    setNewAnnImageCaption('');
+    setNewAnnPdfUrl('');
+    setNewAnnPdfName('');
+    setNewAnnAudioUrl('');
+    setNewAnnAudioName('');
+    setNewAnnVideoUrl('');
+    setNewAnnLinkUrl('');
+    setNewAnnLinkLabel('');
+    setShowAnnMedia(false);
   };
 
   // Handle Delete Announcement
@@ -655,6 +692,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                           style={{ width: '100%' }}
                         >
                           <option value="teoria">Teoría (Unidad Temática)</option>
+                          <option value="general">Módulo General / Varios</option>
                           <option value="examen">Examen Oficial / Parcial</option>
                           <option value="trabajo">Trabajo Dirigido / Proyecto</option>
                           <option value="seminario">Seminario / Caso Práctico</option>
@@ -816,6 +854,21 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                             placeholder="https://open.spotify.com/episode/..."
                             value={modSpotifyPodcastUrl}
                             onChange={e => setModSpotifyPodcastUrl(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.8rem' }}
+                          />
+                        </div>
+
+                        {/* 5. Direct Audio Podcast */}
+                        <div>
+                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                            <Radio size={13} color="#2563eb" /> Píldora de Audio Web (MP3 / WAV)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="audio/podcast_colinergicos.mp3"
+                            value={modAudioPodcastUrl}
+                            onChange={e => setModAudioPodcastUrl(e.target.value)}
                             className="form-input"
                             style={{ width: '100%', fontSize: '0.8rem' }}
                           />
@@ -1041,11 +1094,151 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     required
                   />
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  {/* Toggle Multimedia Fields */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowAnnMedia(prev => !prev)}
+                      className="btn btn-sm btn-outline"
+                      style={{
+                        gap: '6px',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        borderColor: showAnnMedia ? 'var(--teal)' : 'var(--border-color)',
+                        background: showAnnMedia ? 'rgba(13, 148, 136, 0.08)' : 'transparent',
+                        color: showAnnMedia ? 'var(--teal-ink)' : 'var(--text-main)'
+                      }}
+                    >
+                      <Upload size={14} />
+                      {showAnnMedia ? 'Ocultar multimedia adjunta' : 'Adjuntar Multimedia (Imágenes, PDF, Audio MP3, Vídeo, Enlace)'}
+                    </button>
+
                     <button type="submit" className="btn btn-primary">
                       <Plus size={16} /> Publicar Aviso
                     </button>
                   </div>
+
+                  {/* Multimedia Fields Panel */}
+                  {showAnnMedia && (
+                    <div style={{
+                      background: 'var(--surface-alt)',
+                      padding: '12px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--border-color)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px'
+                    }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--teal-ink)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Upload size={14} /> Recursos Multimedia para la Noticia
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '10px' }}>
+                        {/* 1. Imagen */}
+                        <div>
+                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                            <Image size={13} color="var(--teal-ink)" /> Imagen Destacada (URL o ruta en public/)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ej: varios/Mapa_de_las_dianas_terapeuticas.png"
+                            value={newAnnImageUrl}
+                            onChange={e => setNewAnnImageUrl(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Pie de foto descriptivo..."
+                            value={newAnnImageCaption}
+                            onChange={e => setNewAnnImageCaption(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.76rem' }}
+                          />
+                        </div>
+
+                        {/* 2. PDF */}
+                        <div>
+                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                            <FileText size={13} color="var(--navy-ink)" /> Documento PDF (URL o ruta en public/)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ej: varios/FDA_drug_approved_Q3_2026.pdf"
+                            value={newAnnPdfUrl}
+                            onChange={e => setNewAnnPdfUrl(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Nombre visible del PDF (ej: Informe FDA Q3 2026)"
+                            value={newAnnPdfName}
+                            onChange={e => setNewAnnPdfName(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.76rem' }}
+                          />
+                        </div>
+
+                        {/* 3. Audio */}
+                        <div>
+                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                            <Headphones size={13} color="#2563eb" /> Píldora de Audio MP3 / WAV
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ej: audio/podcast_colinergicos.mp3"
+                            value={newAnnAudioUrl}
+                            onChange={e => setNewAnnAudioUrl(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Título de la pista (ej: Píldora Docente 01 - 6 min)"
+                            value={newAnnAudioName}
+                            onChange={e => setNewAnnAudioName(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.76rem' }}
+                          />
+                        </div>
+
+                        {/* 4. Vídeo y Enlace */}
+                        <div>
+                          <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-title)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                            <Film size={13} color="#8b5cf6" /> Vídeo / Enlace Externo
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="URL Vídeo (YouTube, Vimeo, etc.)"
+                            value={newAnnVideoUrl}
+                            onChange={e => setNewAnnVideoUrl(e.target.value)}
+                            className="form-input"
+                            style={{ width: '100%', fontSize: '0.8rem', marginBottom: '4px' }}
+                          />
+                          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '4px' }}>
+                            <input
+                              type="text"
+                              placeholder="URL del enlace web"
+                              value={newAnnLinkUrl}
+                              onChange={e => setNewAnnLinkUrl(e.target.value)}
+                              className="form-input"
+                              style={{ width: '100%', fontSize: '0.76rem' }}
+                            />
+                            <input
+                              type="text"
+                              placeholder="Texto botón"
+                              value={newAnnLinkLabel}
+                              onChange={e => setNewAnnLinkLabel(e.target.value)}
+                              className="form-input"
+                              style={{ width: '100%', fontSize: '0.76rem' }}
+                            />
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  )}
                 </form>
               </div>
 
@@ -1067,8 +1260,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       borderLeft: ann.priority === 'alta' ? '4px solid #ef4444' : '4px solid var(--navy)'
                     }}
                   >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <div style={{ flex: 1, minWidth: 0, marginRight: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
                         <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-title)' }}>
                           {ann.title}
                         </h4>
@@ -1079,6 +1272,38 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', marginBottom: '4px' }}>
                         {ann.content}
                       </p>
+                      
+                      {/* Attached media indicators */}
+                      {(ann.imageUrl || ann.pdfUrl || ann.audioUrl || ann.videoUrl || ann.linkUrl) && (
+                        <div style={{ display: 'flex', gap: '5px', marginTop: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                          {ann.imageUrl && (
+                            <span className="qfdos-badge badge-teal" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                              📷 Imagen
+                            </span>
+                          )}
+                          {ann.pdfUrl && (
+                            <span className="qfdos-badge badge-navy" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                              📄 PDF: {ann.pdfName || 'Documento'}
+                            </span>
+                          )}
+                          {ann.audioUrl && (
+                            <span className="qfdos-badge" style={{ fontSize: '0.65rem', padding: '1px 6px', background: '#2563eb', color: '#fff' }}>
+                              🎙️ Audio: {ann.audioName || 'Pista MP3'}
+                            </span>
+                          )}
+                          {ann.videoUrl && (
+                            <span className="qfdos-badge badge-purple" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                              🎥 Vídeo
+                            </span>
+                          )}
+                          {ann.linkUrl && (
+                            <span className="qfdos-badge badge-emerald" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                              🔗 {ann.linkLabel || 'Enlace'}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
                       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                         {ann.date}
                       </span>
@@ -1087,7 +1312,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     <button
                       onClick={() => handleDeleteAnnouncement(ann.id)}
                       className="btn btn-sm btn-outline"
-                      style={{ color: 'var(--bad-ink)', borderColor: 'rgba(239,68,68,0.3)' }}
+                      style={{ color: 'var(--bad-ink)', borderColor: 'rgba(239,68,68,0.3)', flexShrink: 0 }}
                     >
                       <Trash2 size={14} />
                     </button>

@@ -87,7 +87,9 @@ function purgeStaleCourseCache(): void {
             slidesPdfName: t.slidesPdfName,
             geminiNotebookUrl: t.geminiNotebookUrl,
             spotifyPodcastUrl: t.spotifyPodcastUrl,
-            videoPodcastUrl: t.videoPodcastUrl
+            videoPodcastUrl: t.videoPodcastUrl,
+            audioPodcastUrl: t.audioPodcastUrl,
+            audioPodcastName: t.audioPodcastName
           };
         }
       });

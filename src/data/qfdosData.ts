@@ -9,6 +9,7 @@ export interface CourseAttachment {
   title: string;
   type: 'pdf' | 'audio' | 'video' | 'spotify' | 'notebook' | 'drive' | 'model3d' | 'data';
   url: string;
+  audioUrl?: string;
   driveId?: string;
   size?: string;
   date: string;
@@ -133,7 +134,7 @@ export interface QfdosTopic {
   title: string;
   subtitle: string;
   description: string;
-  category?: 'teoria' | 'examen' | 'trabajo' | 'seminario';
+  category?: 'teoria' | 'examen' | 'trabajo' | 'seminario' | 'general';
   keyConcepts: string[];
   slideCount: number;
   pdbTargetId?: string;
@@ -148,6 +149,8 @@ export interface QfdosTopic {
   geminiNotebookUrl?: string;
   spotifyPodcastUrl?: string;
   videoPodcastUrl?: string;
+  audioPodcastUrl?: string;
+  audioPodcastName?: string;
   // Metadatos para Exámenes y Trabajos/Proyectos
   dueDate?: string;
   maxScore?: number;
@@ -320,6 +323,15 @@ export interface QfdosAnnouncement {
   content: string;
   date: string;
   priority: 'alta' | 'normal';
+  imageUrl?: string;
+  imageCaption?: string;
+  pdfUrl?: string;
+  pdfName?: string;
+  audioUrl?: string;
+  audioName?: string;
+  videoUrl?: string;
+  linkUrl?: string;
+  linkLabel?: string;
 }
 
 export interface StudentQuestion {
@@ -351,9 +363,11 @@ export interface StudentQuestion {
  *          losartán tenían el esqueleto equivocado; morfina, captopril,
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
+ * v3.21.0 — Módulo Varios (Material General del Curso y Documentación Complementaria)
+ *           y soporte multimedia integral en Avisos (audio MP3, PDF, imágenes HD, vídeo).
  */
-export const COURSE_DATA_VERSION = '3.20.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-23T20:40:00.000Z';
+export const COURSE_DATA_VERSION = '3.21.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-09-28T22:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -381,6 +395,28 @@ export const QFDOS_INFO = {
 };
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-podcast-t01',
+    title: '🎙️ Nueva Píldora de Audio del Tema 1: Sistema Colinérgico (MP3 & Spotify)',
+    content: 'Publicado el episodio de audio docente para el repaso autónomo de la transmisión colinérgica, inhibidores de AChE (Donepezilo, Rivastigmina) y rescate enzimático frente a organofosforados con Pralidoxima (2-PAM). Puedes escucharlo directamente aquí o descargarlo en MP3.',
+    date: '28 Septiembre 2026',
+    priority: 'alta',
+    audioUrl: 'audio/podcast_colinergicos.mp3',
+    audioName: 'Píldora Docente 01: Acetilcolina y Fármacos Colinérgicos (6 min)',
+    linkUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2',
+    linkLabel: 'Escuchar en Spotify'
+  },
+  {
+    id: 'ann-fda-targets-2026',
+    title: '📄 Novedades Regulatorias: Fármacos Aprobados FDA (Q3 2026) y Landscape de Dianas',
+    content: 'Disponibles en el nuevo módulo de Material General los informes con las últimas moléculas aprobadas por la FDA en 2026 y la revisión sobre el panorama evolutivo de dianas terapéuticas.',
+    date: '28 Septiembre 2026',
+    priority: 'alta',
+    pdfUrl: 'varios/FDA_drug_approved_Q3_2026.pdf',
+    pdfName: 'FDA Drug Approved Q3 2026 (PDF · 1.2 MB)',
+    imageUrl: 'varios/Mapa_de_las_dianas_terapeuticas.png',
+    imageCaption: 'Mapa de Dianas Terapéuticas y Familias Farmacológicas'
+  },
   {
     id: 'ann-examen-tema1-modelo-a',
     title: '📝 Abierto el Examen Tipo Test del Tema 1 · Modelo A (15 preguntas) en modo examen',
@@ -1952,6 +1988,8 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     geminiNotebookUrl: 'https://notebook.google.com/notebook/bb462eb7-e40b-42be-9356-f785b120b782',
     spotifyPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
     videoPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
+    audioPodcastUrl: 'audio/podcast_colinergicos.mp3',
+    audioPodcastName: 'Píldora Docente 01: Acetilcolina y Fármacos Colinérgicos (Audio MP3 · 6 min)',
     drugs: [
       {
         name: 'Acetilcolina',
@@ -2436,6 +2474,14 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
       }
     ],
     attachments: [
+      {
+        id: 'att-t01-podcast-audio',
+        title: 'Píldora Docente de Audio 01: Transmisión y Fármacos Colinérgicos (Audio MP3 · 6 min)',
+        type: 'audio',
+        url: 'audio/podcast_colinergicos.mp3',
+        size: '4.3 MB',
+        date: '28/09/2026'
+      },
       {
         id: 'att-t01-nachr-3d',
         title: 'Modelo 3D: "Nicotinic Acetylcholine Receptor" (British Pharmacological Society · CC BY 4.0)',
@@ -4017,6 +4063,54 @@ flashcards: [
         category: 'ADMET & Profiling'
       }
     ]
+  },
+  {
+    id: 'tema-varios',
+    number: 'Varios',
+    title: 'Material General del Curso y Documentación Complementaria',
+    subtitle: 'Informes regulatorios FDA, panorama de dianas terapéuticas y recursos transversales',
+    description: 'Espacio de recursos generales y lecturas complementarias de Química Farmacéutica II. Contiene los informes oficiales de aprobación de nuevos fármacos por la FDA (Q3 2026), revisiones especializadas sobre el panorama evolutivo de dianas farmacológicas e infografías de referencia.',
+    category: 'general',
+    keyConcepts: [
+      'Aprobaciones de Fármacos FDA (Q3 2026)',
+      'Panorama Evolutivo de Dianas Farmacológicas',
+      'Química Médica Traslacional',
+      'Documentación y Recursos Transversales'
+    ],
+    slideCount: 0,
+    status: 'Publicado',
+    slidesPdfUrl: '',
+    notesPdfUrl: '',
+    geminiNotebookUrl: 'https://notebook.google.com/notebook/4ec999d2-6985-4cd1-8172-5ab07a892986',
+    attachments: [
+      {
+        id: 'att-var-fda-2026',
+        title: 'FDA Drug Approvals Q3 2026 (Informe Oficial de Nuevas Moléculas y Biológicos)',
+        type: 'pdf',
+        url: 'varios/FDA_drug_approved_Q3_2026.pdf',
+        size: '1.2 MB',
+        date: '28/09/2026'
+      },
+      {
+        id: 'att-var-targets-paper',
+        title: 'The Evolving Landscape of Drug Targets (Nature Reviews Drug Discovery)',
+        type: 'pdf',
+        url: 'varios/The_evolving_landscape_of_drug_targets.pdf',
+        size: '1.7 MB',
+        date: '28/09/2026'
+      },
+      {
+        id: 'att-var-mapa-dianas',
+        title: 'Mapa Infográfico de Dianas Terapéuticas y Familias Farmacológicas (PNG HD)',
+        type: 'data',
+        url: 'varios/Mapa_de_las_dianas_terapeuticas.png',
+        size: '5.1 MB',
+        date: '28/09/2026'
+      }
+    ],
+    drugs: [],
+    testQuestions: [],
+    flashcards: []
   }
 ];
 

@@ -73,6 +73,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   const [editNotesUrl, setEditNotesUrl] = useState(topic.notesPdfUrl || '');
   const [editNotebookUrl, setEditNotebookUrl] = useState(topic.geminiNotebookUrl || '');
   const [editSpotifyUrl, setEditSpotifyUrl] = useState(topic.spotifyPodcastUrl || '');
+  const [editAudioUrl, setEditAudioUrl] = useState(topic.audioPodcastUrl || '');
   const [drugSearchTerm, setDrugSearchTerm] = useState('');
 
   useEffect(() => {
@@ -80,6 +81,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     setEditNotesUrl(topic.notesPdfUrl || '');
     setEditNotebookUrl(topic.geminiNotebookUrl || '');
     setEditSpotifyUrl(topic.spotifyPodcastUrl || '');
+    setEditAudioUrl(topic.audioPodcastUrl || '');
     setIsEditingDriveLinks(false);
     setDrugSearchTerm('');
   }, [topic]);
@@ -115,7 +117,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
       notesPdfUrl: editNotesUrl.trim() || undefined,
       geminiNotebookUrl: editNotebookUrl.trim() || undefined,
       spotifyPodcastUrl: editSpotifyUrl.trim() || undefined,
-      videoPodcastUrl: editSpotifyUrl.trim() || undefined
+      videoPodcastUrl: editSpotifyUrl.trim() || undefined,
+      audioPodcastUrl: editAudioUrl.trim() || undefined
     };
     onUpdateTopic(updated);
     setIsEditingDriveLinks(false);
@@ -230,14 +233,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   }
 
   const handlePlayPodcast = () => {
-    if (topic.spotifyPodcastUrl) {
+    if (topic.audioPodcastUrl || topic.spotifyPodcastUrl) {
       onOpenSpotifyPlayer({
         id: `sp_${topic.id}`,
-        title: `Podcast Oficial: ${topic.number} — ${topic.title}`,
-        type: 'spotify',
-        url: topic.spotifyPodcastUrl,
+        title: topic.audioPodcastName || `Podcast Oficial: ${topic.number} — ${topic.title}`,
+        type: topic.audioPodcastUrl ? 'audio' : 'spotify',
+        url: topic.audioPodcastUrl || topic.spotifyPodcastUrl || '',
+        audioUrl: topic.audioPodcastUrl,
+        spotifyUri: topic.spotifyPodcastUrl,
         date: 'Curso 2026/2027',
-        isPodcastVideo: true
+        isPodcastVideo: !!topic.videoPodcastUrl
       });
     }
   };
@@ -447,6 +452,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           style={{ width: '100%', fontSize: '0.8rem' }}
                         />
                       </div>
+                      <div>
+                        <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
+                          🎧 Audio Podcast Directo (MP3 / WAV / Web)
+                        </label>
+                        <input
+                          type="text"
+                          value={editAudioUrl}
+                          onChange={e => setEditAudioUrl(e.target.value)}
+                          placeholder="audio/podcast_colinergicos.mp3"
+                          className="form-input"
+                          style={{ width: '100%', fontSize: '0.8rem' }}
+                        />
+                      </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                       <button
@@ -471,7 +489,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   const hasNotes = !!(topic.notesPdfUrl && topic.notesPdfUrl.startsWith('http'));
                   const hasSlides = !!(topic.slidesPdfUrl && topic.slidesPdfUrl.startsWith('http'));
                   const hasNotebook = !!(topic.geminiNotebookUrl && topic.geminiNotebookUrl.startsWith('http'));
+                  const hasAudio = !!(topic.audioPodcastUrl && topic.audioPodcastUrl.trim().length > 0);
                   const hasSpotify = !!(topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http'));
+                  const hasPodcast = hasAudio || hasSpotify;
 
                   return (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '14px' }}>
@@ -629,9 +649,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         )}
                       </div>
 
-                      {/* 4. Spotify Podcast (Omitido en Presentación del Curso) */}
+                      {/* 4. Podcast & Píldora de Audio (Omitido en Presentación del Curso) */}
                       {topic.id !== 'tema-00' && (
-                        <div className={`qfdos-card card-spotify resource-card ${hasSpotify ? 'is-active' : 'is-inactive'}`}>
+                        <div className={`qfdos-card card-spotify resource-card ${hasPodcast ? 'is-active' : 'is-inactive'}`}>
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -639,29 +659,36 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                   width: 32,
                                   height: 32,
                                   borderRadius: '8px',
-                                  background: hasSpotify ? 'rgba(29, 185, 84, 0.14)' : 'var(--surface-alt)',
+                                  background: hasPodcast ? 'rgba(29, 185, 84, 0.14)' : 'var(--surface-alt)',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   flexShrink: 0
                                 }}>
-                                  <Radio size={17} color={hasSpotify ? '#1db954' : 'var(--text-muted)'} />
+                                  <Radio size={17} color={hasPodcast ? '#1db954' : 'var(--text-muted)'} />
                                 </div>
-                                <strong style={{ fontSize: '0.88rem', color: hasSpotify ? 'var(--text-title)' : 'var(--text-muted)' }}>
-                                  4. Podcast en Spotify
+                                <strong style={{ fontSize: '0.88rem', color: hasPodcast ? 'var(--text-title)' : 'var(--text-muted)' }}>
+                                  4. Podcast & Píldora de Audio
                                 </strong>
                               </div>
-                              {hasSpotify && (
-                                <span className="qfdos-badge" style={{ background: 'rgba(29,185,84,0.15)', color: '#1db954', fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
-                                  🎙️ Audio
-                                </span>
-                              )}
+                              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                                {hasAudio && (
+                                  <span className="qfdos-badge" style={{ background: '#2563eb', color: '#fff', fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                    🎙️ MP3 Web
+                                  </span>
+                                )}
+                                {hasSpotify && (
+                                  <span className="qfdos-badge" style={{ background: 'rgba(29,185,84,0.15)', color: '#1db954', fontSize: '0.66rem', fontWeight: 700, padding: '2px 8px' }}>
+                                    🟢 Spotify
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <p style={{ fontSize: '0.78rem', color: hasSpotify ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              Episodio de audio/vídeo oficial con explicaciones del profesor.
+                            <p style={{ fontSize: '0.78rem', color: hasPodcast ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              {hasAudio ? 'Píldora sonora oficial (6 min) con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
                             </p>
                           </div>
-                          {hasSpotify ? (
+                          {hasPodcast ? (
                             <button 
                               onClick={handlePlayPodcast}
                               className="btn btn-sm" 
@@ -670,13 +697,13 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 justifyContent: 'center',
                                 fontSize: '0.78rem',
                                 fontWeight: 700,
-                                background: '#1db954',
+                                background: hasAudio ? 'linear-gradient(135deg, #10b981, #059669)' : '#1db954',
                                 color: '#ffffff',
                                 border: 'none',
-                                boxShadow: '0 2px 8px rgba(29, 185, 84, 0.25)'
+                                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
                               }}
                             >
-                              <Play size={13} /> Reproducir Episodio
+                              <Play size={13} /> {hasAudio ? 'Escuchar Píldora de Audio' : 'Reproducir Episodio'}
                             </button>
                           ) : (
                             <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
@@ -1131,6 +1158,128 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 })()}
               </div>
               </div>
+
+              {/* ATTACHMENTS & MODULE MATERIALS */}
+              {topic.attachments && topic.attachments.length > 0 && (
+                <div className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FileText size={17} color="var(--teal-ink)" /> Materiales y Documentos Complementarios ({topic.attachments.length})
+                    </h4>
+                    <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem', fontWeight: 700 }}>
+                      Descargas Oficiales
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '12px' }}>
+                    {topic.attachments.map(att => {
+                      const isPdf = att.type === 'pdf' || att.url.toLowerCase().endsWith('.pdf');
+                      const isAudio = att.type === 'audio' || att.url.toLowerCase().endsWith('.mp3') || att.url.toLowerCase().endsWith('.wav');
+                      const isModel = att.type === 'model3d' || att.url.toLowerCase().endsWith('.glb');
+                      const isImage = att.url.toLowerCase().endsWith('.png') || att.url.toLowerCase().endsWith('.jpg') || att.url.toLowerCase().endsWith('.jpeg') || att.url.toLowerCase().endsWith('.webp');
+
+                      const resolvedUrl = att.url.startsWith('http') || att.url.startsWith('data:')
+                        ? att.url
+                        : `${import.meta.env.BASE_URL}${att.url.replace(/^\//, '')}`;
+
+                      return (
+                        <div
+                          key={att.id}
+                          className="qfdos-card"
+                          style={{
+                            padding: '1rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            background: 'var(--surface-raised)',
+                            border: '1px solid var(--border-color)',
+                            gap: '10px'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '6px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 34,
+                                  height: 34,
+                                  borderRadius: '8px',
+                                  background: isPdf ? 'rgba(30, 58, 138, 0.12)' : isAudio ? 'rgba(37, 99, 235, 0.12)' : isModel ? 'rgba(13, 148, 136, 0.14)' : 'rgba(16, 185, 129, 0.14)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  {isPdf ? (
+                                    <FileText size={18} color="var(--navy-ink)" />
+                                  ) : isAudio ? (
+                                    <Radio size={18} color="#2563eb" />
+                                  ) : isModel ? (
+                                    <Box size={18} color="var(--teal)" />
+                                  ) : (
+                                    <FileText size={18} color="var(--teal-ink)" />
+                                  )}
+                                </div>
+                                <div>
+                                  <span className={`qfdos-badge ${isPdf ? 'badge-navy' : isAudio ? 'badge-teal' : 'badge-mint'}`} style={{ fontSize: '0.62rem', fontWeight: 800 }}>
+                                    {isPdf ? 'DOCUMENTO PDF' : isAudio ? 'AUDIO MP3' : isModel ? 'MODELO 3D' : isImage ? 'INFOGRAFÍA HD' : 'DATOS / RECURSO'}
+                                  </span>
+                                  {att.size && (
+                                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginLeft: '6px' }}>
+                                      {att.size}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {att.date && (
+                                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                  {att.date}
+                                </span>
+                              )}
+                            </div>
+
+                            <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.4, margin: '4px 0 6px' }}>
+                              {att.title}
+                            </h5>
+                          </div>
+
+                          {/* Actions */}
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <a
+                              href={resolvedUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-sm btn-primary"
+                              style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                fontSize: '0.76rem',
+                                fontWeight: 700,
+                                textDecoration: 'none'
+                              }}
+                            >
+                              <ExternalLink size={12} /> {isPdf ? 'Abrir PDF' : isImage ? 'Ver Imagen HD' : isAudio ? 'Escuchar Audio' : 'Ver Recurso'}
+                            </a>
+                            <a
+                              href={resolvedUrl}
+                              download
+                              className="btn btn-sm btn-outline"
+                              style={{
+                                flexShrink: 0,
+                                fontSize: '0.74rem',
+                                padding: '6px 10px',
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar archivo en tu dispositivo"
+                            >
+                              <Download size={13} />
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Key Concepts List */}
               <div className="qfdos-card" style={{ padding: '1.25rem' }}>

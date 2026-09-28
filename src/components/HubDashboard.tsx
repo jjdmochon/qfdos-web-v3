@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   Award, Activity, Bell, ArrowRight, ChevronRight, FileText,
   ShieldCheck, UploadCloud, FlaskConical, Shuffle, Lock, Calendar,
-  Globe, Database, ExternalLink
+  Globe, Database, ExternalLink, Headphones, Download, Video
 } from 'lucide-react';
 
 interface HubDashboardProps {
@@ -192,13 +192,108 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {announcements.map(ann => (
                 <div key={ann.id} className={`ann-card ${ann.priority === 'alta' ? 'ann-alta' : 'ann-normal'}`}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 3, gap: 8 }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.84rem', color: 'var(--text-title)' }}>{ann.title}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 4, gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.86rem', color: 'var(--text-title)' }}>{ann.title}</span>
+                      {ann.priority === 'alta' && (
+                        <span className="qfdos-badge badge-amber" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>URGENTE</span>
+                      )}
+                    </div>
                     <span className="tabular" style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                       {ann.date}
                     </span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5 }}>{ann.content}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5, margin: '4px 0 8px' }}>{ann.content}</p>
+
+                  {/* Multimedia: Imagen */}
+                  {ann.imageUrl && (
+                    <div style={{ marginTop: 8, marginBottom: 8 }}>
+                      <a href={ann.imageUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
+                        <img
+                          src={ann.imageUrl}
+                          alt={ann.imageCaption || ann.title}
+                          style={{
+                            width: '100%',
+                            maxHeight: 220,
+                            objectFit: 'cover',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border-color)',
+                            boxShadow: 'var(--shadow-sm)'
+                          }}
+                          loading="lazy"
+                        />
+                      </a>
+                      {ann.imageCaption && (
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4, fontStyle: 'italic' }}>
+                          📷 {ann.imageCaption}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Multimedia: Audio Player */}
+                  {ann.audioUrl && (
+                    <div style={{
+                      marginTop: 8,
+                      marginBottom: 8,
+                      padding: '8px 12px',
+                      background: 'var(--surface-alt)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border-color)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 6
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-title)' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <Headphones size={13} color="#2563eb" /> {ann.audioName || 'Píldora Sonora / Audio'}
+                        </span>
+                        <a href={ann.audioUrl} download className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', fontSize: '0.68rem', gap: 4 }} title="Descargar audio">
+                          <Download size={11} /> MP3
+                        </a>
+                      </div>
+                      <audio controls src={ann.audioUrl} style={{ width: '100%', height: 32 }} preload="none" />
+                    </div>
+                  )}
+
+                  {/* Action Badges / Downloads (PDF, Video, Link) */}
+                  {(ann.pdfUrl || ann.videoUrl || ann.linkUrl) && (
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8, paddingTop: 6, borderTop: '1px dashed var(--border-color)' }}>
+                      {ann.pdfUrl && (
+                        <a
+                          href={ann.pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-sm btn-outline"
+                          style={{ fontSize: '0.72rem', padding: '4px 9px', gap: 5, color: 'var(--navy-ink)', borderColor: 'rgba(30,58,138,0.3)', background: 'rgba(30,58,138,0.04)' }}
+                        >
+                          <FileText size={13} color="var(--navy-ink)" /> {ann.pdfName || 'Documento PDF Adjunto'}
+                        </a>
+                      )}
+                      {ann.videoUrl && (
+                        <a
+                          href={ann.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-sm btn-outline"
+                          style={{ fontSize: '0.72rem', padding: '4px 9px', gap: 5, color: '#1db954', borderColor: 'rgba(29,185,84,0.3)', background: 'rgba(29,185,84,0.04)' }}
+                        >
+                          <Video size={13} color="#1db954" /> Ver Vídeo
+                        </a>
+                      )}
+                      {ann.linkUrl && (
+                        <a
+                          href={ann.linkUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-sm btn-ghost"
+                          style={{ fontSize: '0.72rem', padding: '4px 9px', gap: 5, color: 'var(--teal-ink)' }}
+                        >
+                          <ExternalLink size={12} /> {ann.linkLabel || 'Más información'}
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
