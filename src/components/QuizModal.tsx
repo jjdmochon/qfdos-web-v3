@@ -25,6 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { pulsable } from '../utils/a11y';
+import { useProtegerSalida } from '../utils/proteccionSalida';
 import { OpinionDificultad } from './OpinionDificultad';
 import { 
   X, 
@@ -359,6 +360,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       lastDate
     };
   };
+
+  // Un examen empezado y sin entregar se pierde al cerrar: se pregunta por
+  // el fondo, la X y Escape (que llega como clic en el fondo), Atrás,
+  // recargar y cerrar la pestaña
+  const enCurso = isStarted && !isCompleted;
+  const cerrarConGuarda = () => {
+    if (enCurso && !window.confirm('¿Salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) return;
+    onClose();
+  };
+  useProtegerSalida(enCurso);
 
   if (questions.length === 0) {
     return (
@@ -712,13 +723,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const statsRetro = getModelStats('retrosintesis');
   const currentStats = getModelStats(selectedModel);
 
-  // Fondo o Escape en mitad de un examen: se pregunta antes de perder las respuestas
-  const cerrarConGuarda = () => {
-    if (isStarted && !isCompleted &&
-        !window.confirm('¿Salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) return;
-    onClose();
-  };
-
   return (
     <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) cerrarConGuarda(); }}>
       <div 
@@ -766,7 +770,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-outline" style={{ flexShrink: 0, marginLeft: '8px' }} title="Cerrar ventana"><X size={18} /></button>
+          <button onClick={cerrarConGuarda} className="btn btn-sm btn-outline" style={{ flexShrink: 0, marginLeft: '8px' }} title="Cerrar ventana (Esc)" aria-label="Cerrar ventana"><X size={18} /></button>
         </div>
 
         {/* Tab Switcher */}

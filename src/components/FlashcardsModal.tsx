@@ -51,10 +51,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const [filterHardOnly, setFilterHardOnly] = useState(false);
 
   // Almacenamiento local persistente por tema
-  const STORAGE_KEY = `qfdos_v3_flashcards_${topic.id}`;
+  // Por cuenta: dos personas que comparten equipo no mezclan sus valoraciones.
+  // Si la cuenta aún no tiene nada, se aprovecha lo guardado antes sin cuenta.
+  const STORAGE_KEY = `qfdos_v3_flashcards_${topic.id}_${(user?.email || 'anonimo').toLowerCase()}`;
+  const STORAGE_KEY_ANTIGUA = `qfdos_v3_flashcards_${topic.id}`;
   const [cardStats, setCardStats] = useState<{ [id: string]: 'easy' | 'medium' | 'hard' }>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY_ANTIGUA);
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
