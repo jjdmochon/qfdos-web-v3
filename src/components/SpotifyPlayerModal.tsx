@@ -41,8 +41,9 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
   );
 
   const hasBoth = !!(audioSource && spotifySource);
+  // Se abre en la pestaña que se pidió desde la tarjeta del tema
   const [activeMediaTab, setActiveMediaTab] = useState<'audio' | 'spotify'>(
-    audioSource ? 'audio' : 'spotify'
+    attachment.type === 'spotify' && spotifySource ? 'spotify' : audioSource ? 'audio' : 'spotify'
   );
 
   // Audio player state
