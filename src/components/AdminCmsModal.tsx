@@ -9,6 +9,7 @@ import {
   MoleculeDrug
 } from '../data/qfdosData';
 import { PanelDudasProfesor } from './PanelDudasProfesor';
+import { PanelClavesCorreccion } from './PanelClavesCorreccion';
 import { PanelSeguimiento } from './PanelSeguimiento';
 import { 
   getStoredGeminiApiKey, 
@@ -2110,7 +2111,10 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
           )}
 
           {activeTab === 'seguimiento' && (
-            <PanelSeguimiento topics={topics} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <PanelClavesCorreccion topics={topics} />
+              <PanelSeguimiento topics={topics} />
+            </div>
           )}
 
           {/* TAB 5: Clave API Gemini */}

@@ -57,7 +57,9 @@ export interface GoogleSheetsSubmissionResult {
    * podido releer: es el estado honesto mientras el despliegue no exponga la
    * lectura.
    */
-  status: 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida';
+  status: 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida' | 'rechazado';
+  /** Lo que el servidor anotó tras corregir; puede diferir de lo que calculó el navegador */
+  correccionServidor?: { score: number; correctCount: number; totalQuestions: number };
 }
 
 /**
@@ -106,6 +108,12 @@ export async function submitAttemptToGoogleSheets(
     totalQuestions: attempt.totalQuestions,
     evaluator: attempt.evaluator,
     evaluationMode: attempt.evaluationMode,
+    // Qué opción marcó en cada pregunta: con esto el servidor corrige por su
+    // cuenta y anota SU nota (score/correctCount/totalQuestions de arriba se
+    // usan solo si el servidor no tiene todavía las claves)
+    respuestas: attempt.evaluationMode === 'flashcards_autoevaluacion'
+      ? undefined
+      : (attempt.answersDetail ?? []).map(a => ({ id: a.questionId, opcion: a.selectedOptionIndex })),
     answersDetail: (attempt.answersDetail ?? []).map(a => ({
       num: a.questionNumber,
       question: a.questionText,
@@ -134,10 +142,21 @@ export async function submitAttemptToGoogleSheets(
     }
 
     if (cuerpo?.ok) {
+      const corregido = typeof cuerpo.score === 'number' && typeof cuerpo.correctCount === 'number' && typeof cuerpo.totalQuestions === 'number'
+        ? { score: cuerpo.score, correctCount: cuerpo.correctCount, totalQuestions: cuerpo.totalQuestions }
+        : undefined;
       return {
         success: true,
         status: 'sent',
-        message: `Calificación registrada en la hoja oficial${cuerpo.fila ? ` (fila ${cuerpo.fila})` : ''}.`
+        message: `Calificación registrada en la hoja oficial${cuerpo.fila ? ` (fila ${cuerpo.fila})` : ''}.`,
+        correccionServidor: corregido
+      };
+    }
+    if (cuerpo?.codigo === 'claves_no_publicadas' || cuerpo?.codigo === 'correccion_no_verificable') {
+      return {
+        success: false,
+        status: 'rechazado',
+        message: `${cuerpo.error} El intento queda guardado en este navegador.`
       };
     }
     if (esSesionInvalida(cuerpo)) {
