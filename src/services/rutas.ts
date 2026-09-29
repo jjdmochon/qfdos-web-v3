@@ -4,7 +4,7 @@
  * Vite reescribe la ruta base de los recursos que IMPORTA, pero no toca las
  * cadenas de texto escritas a mano en los ficheros de datos. En local eso da
  * igual, porque la aplicación se sirve desde la raíz; en GitHub Pages cuelga
- * de /qfods-web-v3/ y esas rutas absolutas apuntan fuera del sitio: la imagen
+ * de /qfdos-web-v3/ y esas rutas absolutas apuntan fuera del sitio: la imagen
  * existe, pero el navegador la pide donde no está y recibe un 404.
  *
  * Esta función antepone la base correcta en cada caso.
