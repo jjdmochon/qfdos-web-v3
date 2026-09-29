@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, Circle, Loader2, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { NotaCuaderno } from './NotaCuaderno';
 import { misEntregas, EntregaPropia, publicacionDisponible, getCachedEntregas } from '../../services/contenidoRemoto';
 import { MisEntregas } from '../MisEntregas';
 import { MiSemanaPracticas } from '../MiSemanaPracticas';
@@ -136,6 +137,8 @@ export const PracticasProgreso: React.FC<PracticasProgresoProps> = ({ onIr, onSa
           </button>
         </div>
       )}
+
+      <NotaCuaderno entregas={entregas} />
 
       {/* Lista de tareas: mientras carga no se marcan como pendientes */}
       <div className="progreso-lista" aria-busy={cargando && !entregas}>

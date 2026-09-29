@@ -28,7 +28,7 @@ export type Resultado<T> = { ok: true; datos: T } | { ok: false; error: string }
 
 const SESION_CADUCADA = 'Tu sesión ha caducado. Cierra sesión y vuelve a entrar.';
 const SCRIPT_ANTIGUO =
-  'El script de Apps Script todavía es una versión anterior (falta publicar Codigo.gs v5). No se ha guardado ni leído nada.';
+  'El script de Apps Script todavía es una versión anterior (falta publicar la última versión de Codigo.gs). No se ha guardado ni leído nada.';
 
 async function llamar<T>(accion: string, extraer: (c: Record<string, unknown>) => T, cuerpo?: unknown): Promise<Resultado<T>> {
   if (!WEBAPP_URL) return { ok: false, error: 'Falta configurar VITE_PRACTICAS_WEBAPP_URL.' };
@@ -147,7 +147,7 @@ export function filaAInforme(f: Fila): InformeCuaderno {
  * Las entregas de la hoja, una por pareja: si una pareja ha entregado varias
  * veces (puesto, turno y fecha de sesión iguales) se queda la más reciente.
  */
-export function cargarCuaderno(): Promise<Resultado<InformeCuaderno[]>> {
+export function cargarCuaderno(): Promise<Resultado<{ informes: InformeCuaderno[]; notasPublicadas: boolean }>> {
   return llamar('cuaderno', c => {
     if (!Array.isArray(c.filas)) throw new Error(SCRIPT_ANTIGUO);
     const filas = c.filas as Fila[];
@@ -161,7 +161,10 @@ export function cargarCuaderno(): Promise<Resultado<InformeCuaderno[]>> {
       if (previo && previo.recibidoEn > informe.recibidoEn) previo.entregas = entregas;
       else porPareja.set(clave, { ...informe, entregas });
     }
-    return Array.from(porPareja.values()).sort((a, b) => b.recibidoEn.localeCompare(a.recibidoEn));
+    return {
+      informes: Array.from(porPareja.values()).sort((a, b) => b.recibidoEn.localeCompare(a.recibidoEn)),
+      notasPublicadas: c.notasPublicadas === true
+    };
   });
 }
 
@@ -177,5 +180,18 @@ export function calificarInforme(
       return { calificadoEn: String(c.calificadoEn) };
     },
     { fila: informe.fila, recibidoEn: informe.recibidoEn, nota, comentario }
+  );
+}
+
+/** Publica u oculta las notas del cuaderno para el alumnado. Solo profesorado. */
+export function publicarNotas(publicadas: boolean): Promise<Resultado<boolean>> {
+  return llamar(
+    'publicarNotasCuaderno',
+    c => {
+      // Un script anterior a la v9 contesta ok sin confirmar el estado
+      if (typeof c.notasPublicadas !== 'boolean') throw new Error(SCRIPT_ANTIGUO);
+      return c.notasPublicadas;
+    },
+    { publicadas }
   );
 }

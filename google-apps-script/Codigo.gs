@@ -80,6 +80,7 @@ function manejar(e) {
     if (accion === 'borrarDuda')       return borrarDuda(p, e);
     if (accion === 'cuaderno')         return cuaderno(p);
     if (accion === 'calificarCuaderno') return calificarCuaderno(p, e);
+    if (accion === 'publicarNotasCuaderno') return publicarNotasCuaderno(p, e);
     if (accion === 'seguimiento')      return seguimiento(p);
     if (accion === 'iniciarSubida')    return iniciarSubida(p, e);
     if (accion === 'subirFragmento')   return subirFragmento(p, e);
@@ -93,8 +94,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 8,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
+        version: 9,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -436,6 +437,7 @@ function misEntregas(p) {
 
   var libro = SpreadsheetApp.openById(HOJA_ID);
   var resultado = [];
+  var notasPublicas = notasCuadernoPublicadas_();
 
   libro.getSheets().forEach(function (hoja) {
     var nombre = hoja.getName();
@@ -461,7 +463,10 @@ function misEntregas(p) {
       var fila = {};
       cabeceras.forEach(function (c, i) {
         if (c === '') return;
-        if (s.r !== 'profesor' && CAMPOS_NOTA.indexOf(String(c)) !== -1) return;
+        if (s.r !== 'profesor' && CAMPOS_NOTA.indexOf(String(c)) !== -1) {
+          // La nota del cuaderno solo se muestra al alumnado si el profesor la ha publicado
+          if (!(notasPublicas && nombre === HOJA_CUADERNO)) return;
+        }
         var v = datos[f][i];
         fila[String(c)] = (v instanceof Date) ? v.toISOString() : String(v);
       });
@@ -473,7 +478,7 @@ function misEntregas(p) {
     return String(b.datos.recibidoEn || '').localeCompare(String(a.datos.recibidoEn || ''));
   });
 
-  return json({ ok: true, email: correo, total: resultado.length, entregas: resultado });
+  return json({ ok: true, email: correo, total: resultado.length, entregas: resultado, notasPublicadas: notasPublicas });
 }
 
 /* ------------------------------------------------------------------ */
@@ -780,7 +785,7 @@ function cuaderno(p) {
   if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede ver el cuaderno de todas las parejas.' });
 
   var hoja = SpreadsheetApp.openById(HOJA_ID).getSheetByName(HOJA_CUADERNO);
-  if (!hoja || hoja.getLastRow() < 2) return json({ ok: true, filas: [] });
+  if (!hoja || hoja.getLastRow() < 2) return json({ ok: true, filas: [], notasPublicadas: notasCuadernoPublicadas_() });
 
   var datos = hoja.getDataRange().getValues();
   var cabeceras = datos[0].map(String);
@@ -794,7 +799,28 @@ function cuaderno(p) {
     }
     filas.push(obj);
   }
-  return json({ ok: true, filas: filas });
+  return json({ ok: true, filas: filas, notasPublicadas: notasCuadernoPublicadas_() });
+}
+
+/**
+ * Las notas del cuaderno no se enseñan al alumnado hasta que el profesor las
+ * publica. El interruptor vive en la propiedad NOTAS_CUADERNO_PUBLICAS ('1').
+ * Al publicar, cada pareja ve su nota y su comentario en «Mis entregas»; las
+ * filas sin calificar siguen sin nada que mostrar.
+ */
+function notasCuadernoPublicadas_() {
+  return propiedad_('NOTAS_CUADERNO_PUBLICAS') === '1';
+}
+
+function publicarNotasCuaderno(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede publicar las notas.' });
+
+  var d = cuerpoJson_(e);
+  if (typeof d.publicadas !== 'boolean') return json({ ok: false, error: 'Falta indicar si se publican o se ocultan.' });
+  PropertiesService.getScriptProperties().setProperty('NOTAS_CUADERNO_PUBLICAS', d.publicadas ? '1' : '0');
+  return json({ ok: true, notasPublicadas: d.publicadas });
 }
 
 /** Devuelve el índice (base 1) de una columna, creándola al final si no existe. */
