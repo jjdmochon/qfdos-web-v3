@@ -6,17 +6,16 @@ import {
   INITIAL_ANNOUNCEMENTS,
   INITIAL_GLOSSARY,
   INITIAL_RESOURCE_LINKS,
-  INITIAL_STUDENT_QUESTIONS,
   QfdosTopic,
   QfdosAnnouncement,
   QfdosGlossaryTerm,
   QfdosResourceLink,
-  StudentQuestion,
   CourseAttachment,
   TestQuestion,
   MoleculeDrug, testHabilitado, flashcardsHabilitadas } from './data/qfdosData';
 import { useAuth } from './context/AuthContext';
 import { descargarContenido, contenidoEnCache, normalizarTemas } from './services/contenidoRemoto';
+import { limpiarDudasLocales } from './services/dudas';
 import { ExternalLink } from 'lucide-react';
 
 import { LoginPage } from './components/LoginPage';
@@ -98,18 +97,8 @@ function purgeStaleCourseCache(): void {
 
   SHIPPED_KEYS.forEach(k => localStorage.removeItem(k));
   
-  // Purgar también claves heredadas y dudas semilla inventadas de versiones anteriores
-  localStorage.removeItem('qfdos_v2_student_questions');
-  try {
-    const rawSq = localStorage.getItem('qfdos_v3_student_questions');
-    if (rawSq) {
-      const parsedSq = JSON.parse(rawSq) as StudentQuestion[];
-      const cleanedSq = parsedSq.filter(q => q.id !== 'sq-1' && q.id !== 'sq-2' && !q.studentEmail.includes('alumno.demo') && !q.studentEmail.includes('martinez.m@correo.ugr.es'));
-      localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(cleanedSq));
-    }
-  } catch {
-    localStorage.removeItem('qfdos_v3_student_questions');
-  }
+  // El buzón de dudas vive ahora en el servidor: fuera las copias locales
+  limpiarDudasLocales();
 
   localStorage.setItem(VERSION_KEY, COURSE_DATA_VERSION);
 
@@ -299,12 +288,6 @@ export const App: React.FC = () => {
     contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS)
   );
 
-  const [studentQuestions, setStudentQuestions] = useState<StudentQuestion[]>(() => {
-    localStorage.removeItem('qfdos_v2_student_questions');
-    return loadUserOwned<StudentQuestion[]>('qfdos_v3_student_questions', INITIAL_STUDENT_QUESTIONS)
-      .filter(q => q.id !== 'sq-1' && q.id !== 'sq-2' && !q.studentEmail?.includes('alumno.demo') && !q.studentEmail?.includes('martinez.m@correo.ugr.es'));
-  });
-
   // Modal states
   const [selectedTopicDetail, setSelectedTopicDetail] = useState<QfdosTopic | null>(null);
   const [topicInitialTab, setTopicInitialTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas' | undefined>();
@@ -344,7 +327,6 @@ export const App: React.FC = () => {
       localStorage.setItem('qfdos_v3_links', JSON.stringify(resourceLinks));
     }
   }, [resourceLinks, isProfesor]);
-  useEffect(() => { localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(studentQuestions)); }, [studentQuestions]);
 
   /**
    * Trae el contenido que el profesor haya publicado.
@@ -662,7 +644,6 @@ export const App: React.FC = () => {
           announcements={announcements}
           glossary={glossary}
           resourceLinks={resourceLinks}
-          studentQuestions={studentQuestions}
           onClose={() => setIsAdminCmsOpen(false)}
           onUpdateTopics={setTopics}
           onUpdateAnnouncements={setAnnouncements}
@@ -670,7 +651,6 @@ export const App: React.FC = () => {
           onUpdateResourceLinks={setResourceLinks}
           publicadoEn={publicadoEn}
           onPublicado={(cuando: string) => setPublicadoEn(cuando)}
-          onUpdateStudentQuestions={setStudentQuestions}
           onOpenCartas={() => setIsCartasModalOpen(true)}
           initialTab={cmsInitialTab}
           initialEditingTopicId={cmsInitialEditingTopicId}

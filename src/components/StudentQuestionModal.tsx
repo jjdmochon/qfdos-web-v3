@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { QfdosTopic, StudentQuestion, INITIAL_STUDENT_QUESTIONS } from '../data/qfdosData';
+import React, { useEffect, useState } from 'react';
+import { QfdosTopic } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
+import { Duda, cargarDudas, enviarDuda, fechaDuda, limpiarDudasLocales } from '../services/dudas';
 import { 
   X, 
   HelpCircle, 
@@ -9,7 +10,8 @@ import {
   MessageSquare, 
   Clock, 
   UserCheck,
-  Trash2
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 
 interface StudentQuestionModalProps {
@@ -17,76 +19,77 @@ interface StudentQuestionModalProps {
   onClose: () => void;
 }
 
+const PROFESOR_EMAIL = 'juandiaz@ugr.es';
+
 export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
   topics,
   onClose
 }) => {
   const { user } = useAuth();
 
-  const [questionsList, setQuestionsList] = useState<StudentQuestion[]>(() => {
-    localStorage.removeItem('qfdos_v2_student_questions');
-    const saved = localStorage.getItem('qfdos_v3_student_questions');
-    if (saved) {
-      try {
-        const parsed = (JSON.parse(saved) as StudentQuestion[]).filter(
-          q => q.id !== 'sq-1' && q.id !== 'sq-2' && !q.studentEmail?.includes('alumno.demo') && !q.studentEmail?.includes('martinez.m@correo.ugr.es')
-        );
-        localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(parsed));
-        return parsed;
-      } catch (e) {
-        console.error('Error parsing saved questions', e);
-      }
+  // Las dudas se leen del servidor: cada alumno ve las suyas, con la
+  // respuesta del profesor cuando la haya, desde cualquier dispositivo.
+  const [questionsList, setQuestionsList] = useState<Duda[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+
+  const recargar = async () => {
+    setCargando(true);
+    const r = await cargarDudas();
+    if (r.ok) {
+      setQuestionsList(r.datos);
+      setErrorCarga(null);
+    } else {
+      setErrorCarga(r.error);
     }
-    return INITIAL_STUDENT_QUESTIONS;
-  });
-
-  const handleDeleteQuestion = (id: string) => {
-    const updated = questionsList.filter(q => q.id !== id);
-    setQuestionsList(updated);
-    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updated));
+    setCargando(false);
   };
 
-  const handleClearAllQuestions = () => {
-    if (!window.confirm('¿Deseas vaciar el historial de dudas en este navegador?')) return;
-    setQuestionsList([]);
-    localStorage.removeItem('qfdos_v3_student_questions');
-    localStorage.removeItem('qfdos_v2_student_questions');
-  };
+  useEffect(() => {
+    limpiarDudasLocales();
+    recargar();
+  }, []);
 
   const [selectedTopicId, setSelectedTopicId] = useState(topics[0]?.id || 'tema-00');
   const [studentName, setStudentName] = useState(user?.name ?? '');
-  const [studentEmail, setStudentEmail] = useState(user?.email ?? '');
   const [questionText, setQuestionText] = useState('');
+  const [enviando, setEnviando] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const topic = topics.find(t => t.id === selectedTopicId);
+  const topicTitle = topic ? `${topic.number}: ${topic.title}` : 'Tema General';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!questionText.trim()) return;
+    if (!questionText.trim() || enviando) return;
 
-    const topic = topics.find(t => t.id === selectedTopicId);
-    const newQuestion: StudentQuestion = {
-      id: `sq_${Date.now()}`,
-      topicId: selectedTopicId,
-      topicTitle: topic ? `${topic.number}: ${topic.title}` : 'Tema General',
-      studentName: studentName.trim() || 'Estudiante UGR',
-      studentEmail: studentEmail.trim() || 'estudiante@correo.ugr.es',
-      question: questionText.trim(),
-      timestamp: new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      status: 'pendiente'
-    };
+    setEnviando(true);
+    setErrorEnvio(null);
+    const r = await enviarDuda({
+      nombre: studentName.trim(),
+      temaId: selectedTopicId,
+      temaTitulo: topicTitle,
+      pregunta: questionText.trim()
+    });
+    setEnviando(false);
 
-    const updated = [newQuestion, ...questionsList];
-    setQuestionsList(updated);
-    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updated));
+    if (r.ok) {
+      setQuestionsList(prev => [r.datos, ...prev]);
+      setQuestionText('');
+      setIsSubmitted(true);
+      setTimeout(() => setIsSubmitted(false), 5000);
+    } else {
+      // El texto se conserva en el formulario para no perderlo
+      setErrorEnvio(r.error);
+    }
+  };
 
-    // El buzón no tiene backend: la duda se envía al profesor por correo para que llegue de verdad.
-    const subject = encodeURIComponent(`[QFDOS E] Duda - ${newQuestion.topicTitle}`);
-    const body = encodeURIComponent(`${newQuestion.question}\n\n${newQuestion.studentName} <${newQuestion.studentEmail}>`);
-    window.location.href = `mailto:juandiaz@ugr.es?subject=${subject}&body=${body}`;
-
-    setQuestionText('');
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 4000);
+  /** Alternativa si el servidor falla: la duda, ya redactada, por correo. */
+  const enviarPorCorreo = () => {
+    const subject = encodeURIComponent(`[QFDOS E] Duda - ${topicTitle}`);
+    const body = encodeURIComponent(`${questionText.trim()}\n\n${studentName.trim()} <${user?.email ?? ''}>`);
+    window.location.href = `mailto:${PROFESOR_EMAIL}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -118,7 +121,16 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
 
             {isSubmitted && (
               <div style={{ padding: '8px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-md)', color: 'var(--ok-ink)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                <CheckCircle2 size={16} /> Se ha abierto tu correo con la duda preparada: pulsa Enviar para que llegue al profesor.
+                <CheckCircle2 size={16} /> Duda enviada. El profesor la verá en su panel y la respuesta aparecerá aquí abajo.
+              </div>
+            )}
+
+            {errorEnvio && (
+              <div style={{ padding: '8px 12px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-md)', color: 'var(--accent-red)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                <AlertTriangle size={16} /> No se ha podido enviar: {errorEnvio}
+                <button type="button" onClick={enviarPorCorreo} className="btn btn-sm btn-outline" style={{ fontSize: '0.75rem' }}>
+                  Enviar por correo
+                </button>
               </div>
             )}
 
@@ -165,14 +177,17 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
                   onChange={e => setQuestionText(e.target.value)}
                   className="form-textarea"
                   rows={3}
+                  maxLength={4000}
                   placeholder="Escribe aquí tu duda de forma concisa..."
                   required
                 />
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button type="submit" className="btn btn-secondary">
-                  <Send size={14} /> Enviar Pregunta
+                <button type="submit" className="btn btn-secondary" disabled={enviando}>
+                  {enviando
+                    ? <><RefreshCw size={14} className="spin" /> Enviando…</>
+                    : <><Send size={14} /> Enviar Pregunta</>}
                 </button>
               </div>
             </form>
@@ -182,30 +197,47 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
           <div>
             <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <MessageSquare size={16} color="var(--navy-ink)" />
-              Historial de Consultas Respondidas ({questionsList.length})
+              Mis consultas ({questionsList.length})
             </h4>
+
+            {cargando && (
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <RefreshCw size={14} className="spin" /> Cargando tus consultas…
+              </div>
+            )}
+            {!cargando && errorCarga && (
+              <div style={{ fontSize: '0.82rem', color: 'var(--warn-ink)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <AlertTriangle size={14} /> No se han podido cargar tus consultas: {errorCarga}
+                <button type="button" onClick={recargar} className="btn btn-sm btn-outline" style={{ fontSize: '0.72rem' }}>Reintentar</button>
+              </div>
+            )}
+            {!cargando && !errorCarga && questionsList.length === 0 && (
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                Todavía no has enviado ninguna consulta.
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {questionsList.map(q => (
                 <div key={q.id} className="qfdos-card" style={{ padding: '1rem', background: 'var(--surface-alt)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <span className="qfdos-badge badge-navy" style={{ fontSize: '0.7rem' }}>
-                      {q.topicTitle}
+                      {q.temaTitulo || 'Tema General'}
                     </span>
                     <span className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                      {q.timestamp}
+                      {fechaDuda(q.recibidaEn)}
                     </span>
                   </div>
 
                   <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
-                    «{q.question}»
+                    «{q.pregunta}»
                   </div>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-                    Planteada por: {q.studentName}
+                    Planteada por: {q.nombre || q.correo}
                   </span>
 
                   {/* Professor Response */}
-                  {q.response ? (
+                  {q.respuesta ? (
                     <div style={{
                       padding: '8px 12px',
                       borderRadius: 'var(--radius-sm)',
@@ -218,7 +250,7 @@ export const StudentQuestionModal: React.FC<StudentQuestionModalProps> = ({
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--navy-ink)', fontWeight: 700, marginBottom: '2px', fontSize: '0.78rem' }}>
                         <UserCheck size={14} /> Respuesta del Profesor (Dr. Juan José Díaz-Mochón):
                       </div>
-                      {q.response}
+                      <span style={{ whiteSpace: 'pre-wrap' }}>{q.respuesta}</span>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--warn-ink)', fontSize: '0.75rem' }}>
