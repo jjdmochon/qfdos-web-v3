@@ -78,6 +78,8 @@ function manejar(e) {
     if (accion === 'misDudas')         return misDudas(p);
     if (accion === 'responderDuda')    return responderDuda(p, e);
     if (accion === 'borrarDuda')       return borrarDuda(p, e);
+    if (accion === 'cuaderno')         return cuaderno(p);
+    if (accion === 'calificarCuaderno') return calificarCuaderno(p, e);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -85,8 +87,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 4,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'anotarFila'],
+        version: 5,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -259,8 +261,16 @@ var HOJAS_ENTREGA = ['Cuaderno de parejas', 'normas de seguridad', 'Material', '
 /** Pestañas que reciben filas pero no son entregas: no salen en «Mis entregas». */
 var HOJAS_NO_ENTREGA = ['Opiniones'];
 
+/**
+ * Columnas con la nota del profesorado en «Cuaderno de parejas». Se descartan
+ * del formulario (un alumno no puede escribirlas mandando el campo a mano) y
+ * no se devuelven a los estudiantes en `misEntregas`.
+ */
+var CAMPOS_NOTA = ['notaProfesor', 'comentarioProfesor', 'calificadoEn'];
+
 /** Campos que se descartan del formulario; `cuentaVerificada` la pone el servidor. */
-var CAMPOS_RESERVADOS = ['sheetId', 'sheetName', 'callback', 'accion', 'sesion', 'cuentaVerificada', 'recibidoEn'];
+var CAMPOS_RESERVADOS = ['sheetId', 'sheetName', 'callback', 'accion', 'sesion', 'cuentaVerificada', 'recibidoEn']
+  .concat(CAMPOS_NOTA);
 
 var MAX_CAMPOS = 80;
 var MAX_LONGITUD = 20000;
@@ -445,6 +455,7 @@ function misEntregas(p) {
       var fila = {};
       cabeceras.forEach(function (c, i) {
         if (c === '') return;
+        if (s.r !== 'profesor' && CAMPOS_NOTA.indexOf(String(c)) !== -1) return;
         var v = datos[f][i];
         fila[String(c)] = (v instanceof Date) ? v.toISOString() : String(v);
       });
@@ -741,6 +752,93 @@ function borrarDuda(p, e) {
     var fila = filaDeDuda_(hoja, String(d.id || ''));
     if (fila !== -1) hoja.deleteRow(fila);
     return json({ ok: true });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. Cuaderno de parejas: lectura y calificación (profesorado)        */
+/* ------------------------------------------------------------------ */
+
+var HOJA_CUADERNO = 'Cuaderno de parejas';
+
+/**
+ * Todas las entregas del cuaderno, con el número de fila de la hoja. Sólo
+ * profesorado. Antes el panel del profesor leía el localStorage de su
+ * navegador y no veía lo que enviaba el alumnado.
+ */
+function cuaderno(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede ver el cuaderno de todas las parejas.' });
+
+  var hoja = SpreadsheetApp.openById(HOJA_ID).getSheetByName(HOJA_CUADERNO);
+  if (!hoja || hoja.getLastRow() < 2) return json({ ok: true, filas: [] });
+
+  var datos = hoja.getDataRange().getValues();
+  var cabeceras = datos[0].map(String);
+  var filas = [];
+  for (var f = 1; f < datos.length; f++) {
+    var obj = { _fila: f + 1 };
+    for (var c = 0; c < cabeceras.length; c++) {
+      if (cabeceras[c] === '') continue;
+      var v = datos[f][c];
+      obj[cabeceras[c]] = (v instanceof Date) ? v.toISOString() : String(v);
+    }
+    filas.push(obj);
+  }
+  return json({ ok: true, filas: filas });
+}
+
+/** Devuelve el índice (base 1) de una columna, creándola al final si no existe. */
+function columnaOCrear_(hoja, nombre) {
+  var ancho = hoja.getLastColumn();
+  var cab = ancho > 0 ? hoja.getRange(1, 1, 1, ancho).getValues()[0].map(String) : [];
+  var i = cab.indexOf(nombre);
+  if (i !== -1) return i + 1;
+  hoja.getRange(1, ancho + 1, 1, 1).setValues([[nombre]]).setFontWeight('bold');
+  return ancho + 1;
+}
+
+/**
+ * Guarda la nota y el comentario del profesor en la fila de esa entrega.
+ * Recibe por POST { fila, recibidoEn, nota, comentario }. `recibidoEn` sirve
+ * de guarda: si alguien ha borrado o insertado filas y ya no coincide, se
+ * rechaza en vez de calificar a otra pareja.
+ */
+function calificarCuaderno(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede calificar.' });
+
+  var d = cuerpoJson_(e);
+  var fila = Number(d.fila);
+  var nota = Number(d.nota);
+  var comentario = String(d.comentario || '').slice(0, 4000);
+  if (!(fila >= 2) || fila !== Math.floor(fila)) return json({ ok: false, error: 'Fila no válida.' });
+  if (d.nota === '' || d.nota === null || d.nota === undefined || isNaN(nota) || nota < 0 || nota > 10) {
+    return json({ ok: false, error: 'La nota tiene que estar entre 0 y 10.' });
+  }
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = SpreadsheetApp.openById(HOJA_ID).getSheetByName(HOJA_CUADERNO);
+    if (!hoja || fila > hoja.getLastRow()) return json({ ok: false, codigo: 'fila_cambiada', error: 'Esa entrega ya no existe. Recarga el panel.' });
+
+    var colRecibido = columnaOCrear_(hoja, 'recibidoEn');
+    var actual = hoja.getRange(fila, colRecibido, 1, 1).getValues()[0][0];
+    var actualIso = (actual instanceof Date) ? actual.toISOString() : String(actual);
+    if (String(d.recibidoEn || '') !== actualIso) {
+      return json({ ok: false, codigo: 'fila_cambiada', error: 'La hoja ha cambiado desde que cargaste el panel. Recárgalo y vuelve a calificar.' });
+    }
+
+    var ahora = new Date();
+    hoja.getRange(fila, columnaOCrear_(hoja, 'notaProfesor'), 1, 1).setValues([[Math.round(nota * 100) / 100]]);
+    hoja.getRange(fila, columnaOCrear_(hoja, 'comentarioProfesor'), 1, 1).setValues([[textoSeguro_(comentario)]]);
+    hoja.getRange(fila, columnaOCrear_(hoja, 'calificadoEn'), 1, 1).setValues([[ahora]]);
+    return json({ ok: true, fila: fila, calificadoEn: ahora.toISOString() });
   } finally {
     lock.releaseLock();
   }

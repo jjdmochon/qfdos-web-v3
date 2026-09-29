@@ -12,6 +12,7 @@ import { EncabezadoReaccion } from './EncabezadoReaccion';
 import { DesgloseRendimiento } from './DesgloseRendimiento';
 import { EntregaProfesor } from './EntregaProfesor';
 import { useAuth } from '../../context/AuthContext';
+import { cargarCuaderno, calificarInforme, InformeCuaderno } from '../../services/cuaderno';
 
 const STORAGE_KEY = 'qfdos_pair_reports';
 
@@ -202,6 +203,29 @@ export const PracticasPairReport: React.FC = () => {
   const [profesorSearchTerm, setProfesorSearchTerm] = useState<string>('');
   const [tempGrade, setTempGrade] = useState<number>(9.0);
   const [tempFeedback, setTempFeedback] = useState<string>('');
+
+  // Panel del profesor: las entregas y las notas viven en la hoja de cálculo
+  // (Codigo.gs), no en este navegador. El profesorado lee la de todas las parejas.
+  const [informes, setInformes] = useState<InformeCuaderno[]>([]);
+  const [cargandoInformes, setCargandoInformes] = useState(false);
+  const [avisoInformes, setAvisoInformes] = useState<string | null>(null);
+  const [guardandoNota, setGuardandoNota] = useState(false);
+
+  const recargarInformes = async () => {
+    setCargandoInformes(true);
+    const r = await cargarCuaderno();
+    if (r.ok) {
+      setInformes(r.datos);
+      setAvisoInformes(null);
+    } else {
+      setAvisoInformes(`No se han podido cargar las entregas: ${r.error}`);
+    }
+    setCargandoInformes(false);
+  };
+
+  useEffect(() => {
+    if (isProfesor && viewMode === 'profesor') recargarInformes();
+  }, [isProfesor, viewMode]);
 
   // Auto-calculate yields when masses change in student form
   const handleCalculateStep1Yield = (massCrude: number) => {
@@ -439,28 +463,34 @@ export const PracticasPairReport: React.FC = () => {
     });
   };
 
-  // Grade submission in professor mode
-  const handleSaveGrade = (reportId: string) => {
-    const gradingTime = new Date().toLocaleString('es-ES', {
+  // Grade submission in professor mode: se guarda en la hoja, en la fila de la entrega
+  const handleSaveGrade = async (reportId: string) => {
+    const informe = informes.find(r => r.id === reportId);
+    if (!informe || guardandoNota) return;
+    if (!(tempGrade >= 0 && tempGrade <= 10)) {
+      setAvisoInformes('La nota tiene que estar entre 0 y 10. No se ha guardado nada.');
+      return;
+    }
+
+    setGuardandoNota(true);
+    const r = await calificarInforme(informe, tempGrade, tempFeedback);
+    setGuardandoNota(false);
+
+    if (!r.ok) {
+      // La nota y el comentario siguen en el formulario para no perderlos
+      setAvisoInformes(`No se ha podido guardar la calificación: ${r.error}`);
+      return;
+    }
+
+    const cuando = new Date(r.datos.calificadoEn || Date.now()).toLocaleString('es-ES', {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit'
     });
-
-    setReports(prev => prev.map(r => {
-      if (r.id === reportId) {
-        return {
-          ...r,
-          status: 'Calificado',
-          profesorGrade: tempGrade,
-          profesorFeedback: tempFeedback,
-          gradedAt: gradingTime
-        };
-      }
-      return r;
-    }));
-
+    setInformes(prev => prev.map(i => (i.id === reportId
+      ? { ...i, status: 'Calificado', profesorGrade: tempGrade, profesorFeedback: tempFeedback, gradedAt: cuando }
+      : i)));
+    setAvisoInformes(null);
     setSelectedReportIdForGrading(null);
-    alert(`Calificación de ${tempGrade.toFixed(1)}/10 guardada con éxito para la pareja ${reportId}.`);
   };
 
   // Export all grades to CSV for Professor Juanjo
@@ -474,7 +504,7 @@ export const PracticasPairReport: React.FC = () => {
       'Estado', 'Nota_Final_10', 'Feedback_Profesor', 'Fecha_Calificacion'
     ];
 
-    const rows = reports.map(r => [
+    const rows = informes.map(r => [
       `"${r.id}"`,
       `"${r.puesto}"`,
       `"${r.turno}"`,
@@ -505,16 +535,8 @@ export const PracticasPairReport: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // Reset to demo data
-  const handleResetToDemoData = () => {
-    if (window.confirm('¿Vaciar todos los informes guardados en este navegador? Esta acción no se puede deshacer.')) {
-      setReports(LAB_PAIR_REPORTS_DEFAULT);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(LAB_PAIR_REPORTS_DEFAULT));
-    }
-  };
-
   // Filtered reports for Professor table
-  const filteredProfessorReports = reports.filter(r => {
+  const filteredProfessorReports = informes.filter(r => {
     const matchesTurno = profesorFilterTurno === 'all' || r.turno === profesorFilterTurno;
     const matchesSearch = profesorSearchTerm === '' ||
       r.id.toLowerCase().includes(profesorSearchTerm.toLowerCase()) ||
@@ -525,7 +547,7 @@ export const PracticasPairReport: React.FC = () => {
     return matchesTurno && matchesSearch;
   });
 
-  const activeGradingReport = reports.find(r => r.id === selectedReportIdForGrading);
+  const activeGradingReport = informes.find(r => r.id === selectedReportIdForGrading);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
@@ -562,7 +584,7 @@ export const PracticasPairReport: React.FC = () => {
               className={`btn btn-sm ${viewMode === 'profesor' ? 'btn-navy' : 'btn-ghost'}`}
               style={{ fontWeight: viewMode === 'profesor' ? 700 : 500, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              <UserCheck size={14} /> Panel del Profesor ({reports.length} Entregas)
+              <UserCheck size={14} /> Panel del Profesor ({informes.length} Entregas)
             </button>
           </div>
           )}
@@ -611,7 +633,7 @@ export const PracticasPairReport: React.FC = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', color: 'var(--navy-ink)' }}>
               <UserCheck size={16} />
-              <span><strong>Modo Profesor (Dr. Juanjo):</strong> Visualiza las entregas en tiempo real, filtra por Grupo/Puesto, revisa los datos experimentales, asigna calificaciones (/10) y exporta las actas a CSV.</span>
+              <span><strong>Modo Profesor (Dr. Juanjo):</strong> Las entregas se leen de la hoja de cálculo (botón Recargar para ver las nuevas), filtra por Grupo/Puesto, revisa los datos experimentales, asigna calificaciones (/10) y exporta las actas a CSV.</span>
             </div>
             <div style={{ display: 'flex', gap: '6px' }}>
               <button
@@ -624,11 +646,13 @@ export const PracticasPairReport: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={handleResetToDemoData}
+                onClick={recargarInformes}
+                disabled={cargandoInformes}
                 className="btn btn-xs btn-ghost"
-                style={{ fontSize: '0.72rem' }}
+                style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                title="Volver a leer las entregas de la hoja"
               >
-                Vaciar informes
+                <RefreshCw size={12} className={cargandoInformes ? 'spin' : undefined} /> Recargar
               </button>
             </div>
           </div>
@@ -1259,26 +1283,32 @@ export const PracticasPairReport: React.FC = () => {
       {viewMode === 'profesor' && isProfesor && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
+          {avisoInformes && (
+            <div style={{ padding: '0.75rem 1rem', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', color: 'var(--accent-red)', fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={15} /> {avisoInformes}
+            </div>
+          )}
+
           {/* Summary Metrics Bar */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '1rem' }}>
             <div className="qfdos-card" style={{ padding: '1rem', borderLeft: '4px solid var(--navy)' }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>TOTAL ENTREGAS</span>
               <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: 'var(--navy-ink)' }}>
-                {reports.length} Parejas
+                {informes.length} Parejas
               </h3>
             </div>
 
             <div className="qfdos-card" style={{ padding: '1rem', borderLeft: '4px solid #10b981' }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>INFORMES CALIFICADOS</span>
               <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: 'var(--ok-ink)' }}>
-                {reports.filter(r => r.status === 'Calificado').length}
+                {informes.filter(r => r.status === 'Calificado').length}
               </h3>
             </div>
 
             <div className="qfdos-card" style={{ padding: '1rem', borderLeft: '4px solid #f59e0b' }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>PENDIENTES DE REVISAR</span>
               <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: '#f59e0b' }}>
-                {reports.filter(r => r.status === 'Entregado').length}
+                {informes.filter(r => r.status === 'Entregado').length}
               </h3>
             </div>
 
@@ -1286,7 +1316,7 @@ export const PracticasPairReport: React.FC = () => {
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>CALIFICACIÓN MEDIA</span>
               <h3 style={{ margin: '0.2rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: 'var(--teal-ink)' }}>
                 {(() => {
-                  const graded = reports.filter(r => r.profesorGrade !== undefined);
+                  const graded = informes.filter(r => r.profesorGrade !== undefined);
                   if (!graded.length) return '-- / 10';
                   const avg = graded.reduce((acc, curr) => acc + (curr.profesorGrade || 0), 0) / graded.length;
                   return `${avg.toFixed(2)} / 10`;
@@ -1396,7 +1426,7 @@ export const PracticasPairReport: React.FC = () => {
                 {!filteredProfessorReports.length && (
                   <tr>
                     <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                      No se han encontrado entregas para los filtros seleccionados.
+                      {cargandoInformes ? 'Cargando entregas de la hoja…' : avisoInformes ? 'Sin datos: revisa el aviso de arriba.' : informes.length === 0 ? 'Todavía no hay entregas en la hoja.' : 'No se han encontrado entregas para los filtros seleccionados.'}
                     </td>
                   </tr>
                 )}
@@ -1488,6 +1518,19 @@ export const PracticasPairReport: React.FC = () => {
                 </ol>
               </div>
 
+              {activeGradingReport.observaciones && (
+                <div style={{ background: 'var(--surface-muted)', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
+                  <h4 style={{ margin: '0 0 0.4rem 0', fontSize: '0.84rem', fontWeight: 800 }}>Observaciones de la pareja:</h4>
+                  <p style={{ margin: 0, fontSize: '0.78rem', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{activeGradingReport.observaciones}</p>
+                </div>
+              )}
+
+              {activeGradingReport.entregas > 1 && (
+                <p style={{ margin: '0 0 1rem', fontSize: '0.76rem', color: 'var(--warn-ink)' }}>
+                  Esta pareja ha entregado {activeGradingReport.entregas} veces; se muestra la más reciente ({activeGradingReport.submittedAt}).
+                </p>
+              )}
+
               {/* Grading Input Form */}
               <div style={{ display: 'grid', gridTemplateColumns: '160px minmax(0, 1fr)', gap: '1.25rem', alignItems: 'flex-start', background: 'rgba(30,58,138,0.04)', padding: '1.25rem', borderRadius: '8px' }}>
                 <div>
@@ -1534,10 +1577,11 @@ export const PracticasPairReport: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleSaveGrade(activeGradingReport.id)}
+                  disabled={guardandoNota}
                   className="btn btn-navy"
                   style={{ fontSize: '0.84rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
-                  <Award size={15} /> Guardar Calificación y Enviar Feedback
+                  <Award size={15} /> {guardandoNota ? 'Guardando en la hoja…' : 'Guardar calificación en la hoja'}
                 </button>
               </div>
             </div>
