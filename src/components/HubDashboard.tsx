@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { QfdosTopic, QfdosAnnouncement, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
+import { HistoriasQfdos } from './HistoriasQfdos';
 import { useAuth } from '../context/AuthContext';
 import {
   Award, Activity, Bell, ArrowRight, ChevronRight, FileText,
@@ -96,6 +97,9 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
           </div>
         </div>
       )}
+
+      {/* Historias: banda rotatoria + visor tipo Instagram (v1: solo profesorado) */}
+      {isProfesor && <HistoriasQfdos announcements={announcements} topics={topics} />}
 
       {/*
         Examen del Tema 1.
