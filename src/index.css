@@ -4098,3 +4098,13 @@ body:has(.mobile-tabbar) .aviso-cookies { bottom: calc(76px + env(safe-area-inse
 .opinion-escala { display: flex; flex-wrap: wrap; gap: 6px; }
 .opinion-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 .opinion-contador { font-size: var(--fs-2xs); color: var(--text-muted); font-family: var(--font-mono); }
+
+/* Ficha de tema en móvil: las acciones ocupan poco y «Cerrar» ya está en la
+   cabecera (✕), así que no se repite abajo. Antes la botonera se comía media
+   pantalla y dejaba unas pocas líneas de contenido. */
+@media (max-width: 640px) {
+  .ficha-footer { padding: 0.6rem 0.9rem !important; }
+  .ficha-footer-acciones { gap: 6px !important; flex: 1 1 100%; }
+  .ficha-footer-acciones .btn { flex: 1 1 auto; justify-content: center; font-size: 0.78rem; }
+  .ficha-footer-cerrar { display: none; }
+}

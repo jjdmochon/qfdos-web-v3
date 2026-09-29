@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { QfdosTopic, Flashcard, INITIAL_TOPICS } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { recurso } from '../services/rutas';
 import { useAuth } from '../context/AuthContext';
 import { pulsable } from '../utils/a11y';
-import { getSesion } from '../services/sesion';
-import {
-  aProgreso, fusionar, leerProgresoTarjetas, guardarProgresoTarjetas,
-  type Valoraciones, type Marcas
-} from '../services/progreso';
+import { claveFlashcards } from '../services/progreso';
+import { useProgresoSincronizado } from '../utils/useProgresoSincronizado';
 import { OpinionDificultad } from './OpinionDificultad';
 import { 
   X, 
@@ -78,74 +75,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
     }
   }, [cardStats, STORAGE_KEY]);
 
-  // Sincronización con la cuenta: cada valoración lleva su marca de tiempo y,
-  // al abrir, se fusiona con lo guardado en el servidor (gana la más reciente).
-  const TIEMPOS_KEY = `${STORAGE_KEY}_t`;
-  const marcas = useRef<Marcas>((() => {
-    try { return JSON.parse(localStorage.getItem(TIEMPOS_KEY) || '{}'); } catch { return {}; }
-  })());
-  const previas = useRef<Valoraciones>(cardStats);
-  const statsActual = useRef<Valoraciones>(cardStats);
-  statsActual.current = cardStats;
-  const sincronizado = useRef(false);
-  const temporizador = useRef<number | undefined>(undefined);
-  const [estadoSync, setEstadoSync] = useState<'local' | 'sincronizando' | 'ok' | 'error'>('local');
-
-  const guardarMarcas = () => {
-    try { localStorage.setItem(TIEMPOS_KEY, JSON.stringify(marcas.current)); } catch { /* sin almacenamiento */ }
-  };
-
-  const enviar = () => {
-    temporizador.current = undefined;
-    guardarProgresoTarjetas(topic.id, aProgreso(statsActual.current, marcas.current))
-      .then(ok => setEstadoSync(ok ? 'ok' : 'error'));
-  };
-
-  // Marca de tiempo de lo que cambia y envío diferido (una ráfaga = un envío)
-  useEffect(() => {
-    let hayCambios = false;
-    for (const id of Object.keys(cardStats)) {
-      if (cardStats[id] !== previas.current[id]) { marcas.current[id] = Date.now(); hayCambios = true; }
-    }
-    previas.current = cardStats;
-    if (!hayCambios) return;
-    guardarMarcas();
-    if (sincronizado.current) {
-      setEstadoSync('sincronizando');
-      window.clearTimeout(temporizador.current);
-      temporizador.current = window.setTimeout(enviar, 1200);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardStats]);
-
-  // Al abrir: traer lo del servidor y fusionar
-  useEffect(() => {
-    sincronizado.current = false;
-    if (!getSesion()) return;
-    let cancelado = false;
-    setEstadoSync('sincronizando');
-    leerProgresoTarjetas(topic.id).then(remoto => {
-      if (cancelado) return;
-      if (!remoto) { setEstadoSync('error'); return; }
-      const { fusion, cambiaLocal, cambiaRemoto } = fusionar(aProgreso(statsActual.current, marcas.current), remoto);
-      if (cambiaLocal) {
-        const nuevas: Valoraciones = {};
-        for (const id of Object.keys(fusion)) { nuevas[id] = fusion[id][0]; marcas.current[id] = fusion[id][1]; }
-        previas.current = nuevas;
-        guardarMarcas();
-        setCardStats(nuevas);
-      }
-      sincronizado.current = true;
-      if (cambiaRemoto) enviar();
-      else setEstadoSync('ok');
-    });
-    return () => {
-      cancelado = true;
-      // Al cerrar no se pierde lo pendiente
-      if (temporizador.current !== undefined) { window.clearTimeout(temporizador.current); enviar(); }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topic.id, STORAGE_KEY]);
+  // Sincronización con la cuenta (gana la valoración más reciente por tarjeta)
+  const estadoSync = useProgresoSincronizado(claveFlashcards(topic.id), `${STORAGE_KEY}_t`, cardStats, setCardStats);
 
   // Tarjetas a mostrar según filtro
   const displayCards = useMemo(() => {

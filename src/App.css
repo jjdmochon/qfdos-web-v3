@@ -190,6 +190,8 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  /* sin esto las pestañas se comprimen en móvil y el texto se solapa */
+  flex-shrink: 0;
 }
 
 .tab-btn:hover {

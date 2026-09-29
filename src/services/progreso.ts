@@ -12,13 +12,10 @@ import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 
-export type Nivel = 'easy' | 'medium' | 'hard';
-export type Valoraciones = Record<string, Nivel>;
-export type Marcas = Record<string, number>;
-/** Lo que viaja al servidor: id de tarjeta → [nivel, marca de tiempo en ms] */
-export type ProgresoTarjetas = Record<string, [Nivel, number]>;
-
-const NIVELES: Nivel[] = ['easy', 'medium', 'hard'];
+/** Valor de una celda de progreso; null = borrada (la marca evita que resucite). */
+export type Valor = string | number;
+/** Lo que viaja al servidor: id → [valor o null, marca de tiempo en ms] */
+export type ProgresoMapa = Record<string, [Valor | null, number]>;
 
 export function claveFlashcards(temaId: string): string {
   return `flashcards_${temaId.toLowerCase().replace(/[^a-z0-9_-]/g, '_').slice(0, 40)}`;
@@ -51,39 +48,34 @@ async function llamar(accion: string, cuerpo?: unknown): Promise<Record<string, 
   }
 }
 
-/** Progreso remoto de un tema, o null si no hay sesión, red o Codigo.gs v8. */
-export async function leerProgresoTarjetas(temaId: string): Promise<ProgresoTarjetas | null> {
+/** Progreso remoto de una clave, o null si no hay sesión, red o Codigo.gs v8. */
+export async function leerProgresoClave(clave: string): Promise<ProgresoMapa | null> {
   const c = await llamar('leerProgreso');
   // Un script anterior a la v8 contesta ok a cualquier acción, sin `progreso`
   if (!c || typeof c.progreso !== 'object' || c.progreso === null) return null;
-  const crudo = (c.progreso as Record<string, unknown>)[claveFlashcards(temaId)];
-  const limpio: ProgresoTarjetas = {};
+  const crudo = (c.progreso as Record<string, unknown>)[clave];
+  const limpio: ProgresoMapa = {};
   if (crudo && typeof crudo === 'object') {
     for (const [id, v] of Object.entries(crudo as Record<string, unknown>)) {
-      if (Array.isArray(v) && NIVELES.includes(v[0] as Nivel) && Number.isFinite(v[1])) {
-        limpio[id] = [v[0] as Nivel, Number(v[1])];
+      if (!Array.isArray(v) || !Number.isFinite(v[1])) continue;
+      if (v[0] === null || typeof v[0] === 'string' || typeof v[0] === 'number') {
+        limpio[id] = [v[0] as Valor | null, Number(v[1])];
       }
     }
   }
   return limpio;
 }
 
-export async function guardarProgresoTarjetas(temaId: string, valor: ProgresoTarjetas): Promise<boolean> {
-  return !!(await llamar('guardarProgreso', { clave: claveFlashcards(temaId), valor }));
+export async function guardarProgresoClave(clave: string, valor: ProgresoMapa): Promise<boolean> {
+  return !!(await llamar('guardarProgreso', { clave, valor }));
 }
 
-export function aProgreso(v: Valoraciones, m: Marcas): ProgresoTarjetas {
-  const r: ProgresoTarjetas = {};
-  for (const id of Object.keys(v)) r[id] = [v[id], m[id] ?? 0];
-  return r;
-}
-
-/** Por tarjeta gana la marca más reciente; a igualdad, la local. */
+/** Por celda gana la marca más reciente; a igualdad, la local. */
 export function fusionar(
-  local: ProgresoTarjetas,
-  remoto: ProgresoTarjetas
-): { fusion: ProgresoTarjetas; cambiaLocal: boolean; cambiaRemoto: boolean } {
-  const fusion: ProgresoTarjetas = { ...local };
+  local: ProgresoMapa,
+  remoto: ProgresoMapa
+): { fusion: ProgresoMapa; cambiaLocal: boolean; cambiaRemoto: boolean } {
+  const fusion: ProgresoMapa = {};
   let cambiaLocal = false;
   let cambiaRemoto = false;
   for (const id of new Set([...Object.keys(local), ...Object.keys(remoto)])) {
@@ -94,7 +86,7 @@ export function fusionar(
       if (!r || r[0] !== l[0] || r[1] !== l[1]) cambiaRemoto = true;
     } else if (r) {
       fusion[id] = r;
-      cambiaLocal = true;
+      if (!l || l[0] !== r[0]) cambiaLocal = true;
     }
   }
   return { fusion, cambiaLocal, cambiaRemoto };

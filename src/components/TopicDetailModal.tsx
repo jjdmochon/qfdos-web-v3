@@ -1793,8 +1793,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.75rem' }}>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div className="modal-footer ficha-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.75rem' }}>
+          <div className="ficha-footer-acciones" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {topic.id !== 'tema-00' && (
               <>
                 {isProfesor && testHabilitado(topic) && (
@@ -1826,7 +1826,6 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       style={{ 
                         fontWeight: 800,
                         border: '1.5px solid var(--tertiary, #2dd4bf)',
-                        color: activeTab === 'cartas' ? '#ffffff' : 'var(--teal-ink)',
                         boxShadow: '0 2px 8px rgba(30, 58, 138, 0.15)'
                       }}
                       title="Ver baraja de 15 cartas coleccionables de fármacos"
@@ -1854,7 +1853,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             )}
           </div>
 
-          <button onClick={onClose} className="btn btn-outline">
+          <button onClick={onClose} className="btn btn-outline ficha-footer-cerrar">
             Cerrar Ficha
           </button>
         </div>
