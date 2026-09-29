@@ -862,158 +862,6 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
-                      {/* Modelo 3D Tema 02: Complejo LAT1 (SLC7A5) con L-DOPA (PDB 8J8L) */}
-                      {topic.id === 'tema-02' && (
-                        <div 
-                          className="qfdos-card card-teal resource-card is-active"
-                          style={{
-                            border: '1.5px solid var(--teal)',
-                            boxShadow: '0 4px 16px rgba(13,148,136,0.18)',
-                            position: 'relative'
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '8px',
-                                  background: 'linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(30,58,138,0.3) 100%)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  <Atom size={17} color="var(--teal-ink)" />
-                                </div>
-                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
-                                  Estructura 3D Crio-EM: Complejo LAT1 - L-DOPA (PDB 8J8L)
-                                </strong>
-                              </div>
-                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
-                                Cryo-EM · 3.56 Å
-                              </span>
-                            </div>
-                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '8px', lineHeight: 1.45 }}>
-                              Estructura tridimensional del transportador humano LAT1 (SLC7A5) en complejo con 4F2hc (SLC3A2) y L-DOPA ocluida. Demuestra el reconocimiento molecular del esqueleto de alfa-aminoácido para el transporte activo a través de la BHE (Pregunta oficial FIR 2025 · P15).
-                            </p>
-                            <p style={{ fontSize: '0.69rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.35 }}>
-                              RCSB PDB ID: <strong style={{ color: 'var(--text-title)' }}>8J8L</strong> · Yang et al. (2025) <em>J. Biol. Chem.</em>
-                            </p>
-                          </div>
-                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                            <a
-                              href="https://www.rcsb.org/3d-view/8J8L/1"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-primary" 
-                              style={{ 
-                                flex: 1.2, 
-                                justifyContent: 'center', 
-                                fontSize: '0.78rem', 
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
-                                border: 'none',
-                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
-                                padding: '7px 8px',
-                                textDecoration: 'none',
-                                color: '#ffffff'
-                              }}
-                            >
-                              <Atom size={13} /> Ver en 3D interactivo (RCSB) <ExternalLink size={12} style={{ marginLeft: 4 }} />
-                            </a>
-                            <a
-                              href="https://www.rcsb.org/structure/8J8L"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-sm btn-outline"
-                              style={{ 
-                                flex: 0.8,
-                                justifyContent: 'center', 
-                                fontSize: '0.74rem', 
-                                padding: '7px 8px',
-                                textDecoration: 'none'
-                              }}
-                              title="Ver ficha completa en RCSB PDB"
-                            >
-                              <Database size={12} /> Ficha RCSB
-                            </a>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Base de Datos Oficial de Estructuras QFDOS Tema 2 */}
-                      {topic.id === 'tema-02' && (
-                        <div 
-                          className="qfdos-card card-teal resource-card is-active"
-                          style={{
-                            border: '1.5px solid var(--border-color)',
-                            position: 'relative'
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '8px',
-                                  background: 'rgba(13, 148, 136, 0.16)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  <Database size={17} color="var(--teal-ink)" />
-                                </div>
-                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
-                                  Base de Datos de Estructuras QFDOS (Tema 2)
-                                </strong>
-                              </div>
-                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
-                                49 Fármacos · RDKit
-                              </span>
-                            </div>
-                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              Colección molecular completa del Sistema Adrenérgico (QFDOS-046 a QFDOS-094, Bloques 1-6). Incluye libro Excel con depicciones 2D, descriptores físico-químicos (Lipinski, TPSA, logP Crippen, estereocentros CIP) y tabla CSV exportable.
-                            </p>
-                          </div>
-                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                            <a
-                              href={`${import.meta.env.BASE_URL}estructuras/tema2/estructuras_qfdos.xlsx`}
-                              download="estructuras_qfdos_tema2.xlsx"
-                              className="btn btn-sm btn-primary"
-                              style={{
-                                flex: 1.2,
-                                justifyContent: 'center',
-                                fontSize: '0.76rem',
-                                fontWeight: 700,
-                                textDecoration: 'none'
-                              }}
-                              title="Descargar Excel con hojas de propiedades y estructuras del Tema 2 integradas (841 KB)"
-                            >
-                              <Download size={12} /> Descargar .XLSX
-                            </a>
-                            <a
-                              href={`${import.meta.env.BASE_URL}estructuras/tema2/propiedades_qfdos.csv`}
-                              download="propiedades_qfdos_tema2.csv"
-                              className="btn btn-sm btn-outline"
-                              style={{
-                                flex: 0.8,
-                                justifyContent: 'center',
-                                fontSize: '0.74rem',
-                                padding: '7px 8px',
-                                textDecoration: 'none'
-                              }}
-                              title="Descargar tabla de descriptores CSV del Tema 2 (40 KB)"
-                            >
-                              <Download size={12} /> .CSV
-                            </a>
-                          </div>
-                        </div>
-                      )}
-
                     </div>
                   );
                 })()}
@@ -1022,12 +870,15 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
 
               {/* ATTACHMENTS & MODULE MATERIALS */}
               {(() => {
-                // Tema 1: el taller de retrosíntesis, el visor 3D y la base de datos
-                // viven aquí. Los adjuntos que son el mismo fichero (GLB, XLSX, CSV)
-                // se omiten para no mostrarlos dos veces.
-                const interactivos = topic.id === 'tema-01' ? 3 : 0;
+                // Temas 1 y 2: el visor 3D, la base de datos de estructuras (y, en el
+                // tema 1, el taller de retrosíntesis) viven aquí. Los adjuntos que son
+                // el mismo recurso (GLB/enlace 3D, XLSX, CSV) se omiten para no
+                // mostrarlos dos veces.
+                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : 0;
                 const yaIncluidos = topic.id === 'tema-01'
                   ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
+                  : topic.id === 'tema-02'
+                  ? ['rcsb.org/3d-view/8J8L/1', 'estructuras/tema2/estructuras_qfdos.xlsx', 'estructuras/tema2/propiedades_qfdos.csv']
                   : [];
                 const adjuntos = (topic.attachments ?? []).filter(
                   att => !yaIncluidos.some(u => att.url.endsWith(u))
@@ -1253,6 +1104,158 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
+
+                      {/* Modelo 3D Tema 02: Complejo LAT1 (SLC7A5) con L-DOPA (PDB 8J8L) */}
+                      {topic.id === 'tema-02' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--teal)',
+                            boxShadow: '0 4px 16px rgba(13,148,136,0.18)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(30,58,138,0.3) 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Atom size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  Estructura 3D Crio-EM: Complejo LAT1 - L-DOPA (PDB 8J8L)
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                Cryo-EM · 3.56 Å
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '8px', lineHeight: 1.45 }}>
+                              Estructura tridimensional del transportador humano LAT1 (SLC7A5) en complejo con 4F2hc (SLC3A2) y L-DOPA ocluida. Demuestra el reconocimiento molecular del esqueleto de alfa-aminoácido para el transporte activo a través de la BHE (Pregunta oficial FIR 2025 · P15).
+                            </p>
+                            <p style={{ fontSize: '0.69rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.35 }}>
+                              RCSB PDB ID: <strong style={{ color: 'var(--text-title)' }}>8J8L</strong> · Yang et al. (2025) <em>J. Biol. Chem.</em>
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <a
+                              href="https://www.rcsb.org/3d-view/8J8L/1"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-sm btn-primary" 
+                              style={{ 
+                                flex: 1.2, 
+                                justifyContent: 'center', 
+                                fontSize: '0.78rem', 
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
+                                padding: '7px 8px',
+                                textDecoration: 'none',
+                                color: '#ffffff'
+                              }}
+                            >
+                              <Atom size={13} /> Ver en 3D interactivo (RCSB) <ExternalLink size={12} style={{ marginLeft: 4 }} />
+                            </a>
+                            <a
+                              href="https://www.rcsb.org/structure/8J8L"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-sm btn-outline"
+                              style={{ 
+                                flex: 0.8,
+                                justifyContent: 'center', 
+                                fontSize: '0.74rem', 
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Ver ficha completa en RCSB PDB"
+                            >
+                              <Database size={12} /> Ficha RCSB
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Base de Datos Oficial de Estructuras QFDOS Tema 2 */}
+                      {topic.id === 'tema-02' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--border-color)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(13, 148, 136, 0.16)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Database size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  Base de Datos de Estructuras QFDOS (Tema 2)
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                49 Fármacos · RDKit
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              Colección molecular completa del Sistema Adrenérgico (QFDOS-046 a QFDOS-094, Bloques 1-6). Incluye libro Excel con depicciones 2D, descriptores físico-químicos (Lipinski, TPSA, logP Crippen, estereocentros CIP) y tabla CSV exportable.
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <a
+                              href={`${import.meta.env.BASE_URL}estructuras/tema2/estructuras_qfdos.xlsx`}
+                              download="estructuras_qfdos_tema2.xlsx"
+                              className="btn btn-sm btn-primary"
+                              style={{
+                                flex: 1.2,
+                                justifyContent: 'center',
+                                fontSize: '0.76rem',
+                                fontWeight: 700,
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar Excel con hojas de propiedades y estructuras del Tema 2 integradas (841 KB)"
+                            >
+                              <Download size={12} /> Descargar .XLSX
+                            </a>
+                            <a
+                              href={`${import.meta.env.BASE_URL}estructuras/tema2/propiedades_qfdos.csv`}
+                              download="propiedades_qfdos_tema2.csv"
+                              className="btn btn-sm btn-outline"
+                              style={{
+                                flex: 0.8,
+                                justifyContent: 'center',
+                                fontSize: '0.74rem',
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar tabla de descriptores CSV del Tema 2 (40 KB)"
+                            >
+                              <Download size={12} /> .CSV
+                            </a>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
