@@ -133,7 +133,9 @@ Quién es cada cual lo decide Apps Script:
      de tiempo y el cliente fusiona por tarjeta: gana la más reciente, así que
      se puede estudiar en el móvil y seguir en el ordenador. Sin sesión o sin
      red, el progreso queda en el navegador y se sincroniza en la siguiente
-     apertura. Claves admitidas: `flashcards_<tema>` y `fir`.
+     apertura. Claves admitidas: `flashcards_<tema>` y `fir` (respuestas del simulador
+     FIR; un borrado también lleva su marca, para que no reaparezca desde otro
+     dispositivo).
    - **Cuaderno de parejas**: `cuaderno` (sólo profesor) devuelve todas las
      entregas de la pestaña «Cuaderno de parejas» con su número de fila, y
      `calificarCuaderno` (sólo profesor) escribe en esa fila las columnas

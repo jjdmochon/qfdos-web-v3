@@ -31,6 +31,7 @@ import { Chem2DDrawer } from './Chem2DDrawer';
 
 import { pulsable } from '../utils/a11y';
 import { useAuth } from '../context/AuthContext';
+import { useProgresoSincronizado } from '../utils/useProgresoSincronizado';
 interface FirSimulatorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,7 +39,7 @@ interface FirSimulatorModalProps {
   initialTopicId?: string;
 }
 
-export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
+const FirSimulatorContenido: React.FC<FirSimulatorModalProps> = ({
   isOpen,
   onClose,
   initialTab = 'trainer',
@@ -73,6 +74,8 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
       // sin espacio o almacenamiento bloqueado: el simulador sigue funcionando
     }
   }, [answers, claveRespuestas]);
+  // Sincronización con la cuenta: las respuestas siguen en el móvil y en el ordenador
+  const estadoSync = useProgresoSincronizado('fir', `${claveRespuestas}_t`, answers, setAnswers, isOpen);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   // Base URL for image assets
@@ -264,6 +267,16 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
                 <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)' }}>
                   Simulador Oficial FIR (2020-2025)
                 </h3>
+                {estadoSync !== 'local' && (
+                  <span
+                    style={{ color: estadoSync === 'error' ? 'var(--accent-amber)' : 'var(--text-muted)', fontSize: '0.75rem' }}
+                    title={estadoSync === 'error'
+                      ? 'No se ha podido sincronizar; tus respuestas están guardadas en este dispositivo.'
+                      : 'Tus respuestas se guardan en tu cuenta y aparecen en tus otros dispositivos.'}
+                  >
+                    {estadoSync === 'sincronizando' ? '↻ Sincronizando…' : estadoSync === 'ok' ? '☁ Sincronizado' : '⚠ Solo en este dispositivo'}
+                  </span>
+                )}
                 <span
                   style={{
                     fontSize: '0.68rem',
@@ -1027,4 +1040,14 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
       </div>
     </div>
   );
+};
+
+/**
+ * El simulador está siempre montado y sus respuestas se leen al montar: la
+ * clave por cuenta hace que, si alguien inicia sesión sin recargar, se
+ * remonte y cargue las suyas en lugar de heredar las del usuario anterior.
+ */
+export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = props => {
+  const { user } = useAuth();
+  return <FirSimulatorContenido key={(user?.email || 'anonimo').toLowerCase()} {...props} />;
 };
