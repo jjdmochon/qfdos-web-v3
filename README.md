@@ -127,6 +127,13 @@ Quién es cada cual lo decide Apps Script:
      hoja de entregas. El alumno ve sólo las suyas, con la respuesta cuando la
      haya; el profesor las ve todas en *Gestionar curso → Dudas de Alumnos*.
      Máximo 4000 caracteres por duda y 20 pendientes por alumno.
+   - **Progreso sincronizado** (v8): `leerProgreso` y `guardarProgreso` guardan
+     las valoraciones de flashcards de cada alumno en la pestaña oculta
+     `_Progreso` (una fila por correo y clave). Cada valoración lleva su marca
+     de tiempo y el cliente fusiona por tarjeta: gana la más reciente, así que
+     se puede estudiar en el móvil y seguir en el ordenador. Sin sesión o sin
+     red, el progreso queda en el navegador y se sincroniza en la siguiente
+     apertura. Claves admitidas: `flashcards_<tema>` y `fir`.
    - **Cuaderno de parejas**: `cuaderno` (sólo profesor) devuelve todas las
      entregas de la pestaña «Cuaderno de parejas» con su número de fila, y
      `calificarCuaderno` (sólo profesor) escribe en esa fila las columnas
