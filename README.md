@@ -67,12 +67,31 @@ cuentas institucionales administradas. En Google Cloud Console hay que añadir
 Como profesor, hay dos accesos: el botón **Gestionar curso** de la cabecera y
 **Subir materiales** en el panel azul del inicio. Ambos abren el CMS en la
 pestaña *Materiales*, con arrastrar y soltar para PDF, PPTX, DOCX, imágenes y
-audio (hasta 40 MB por fichero).
+audio (hasta 50 MB por fichero).
 
-**Los ficheros se guardan en IndexedDB, es decir, en tu navegador.** No hay
-servidor: el alumnado no los ve desde sus equipos. Para distribuirlos, sube la
-misma copia a Google Drive y pega el enlace en el módulo correspondiente,
-dentro de la pestaña *Módulos*.
+**Los ficheros se suben a Drive.** Van a la carpeta «QFDOS · Materiales del
+curso» de tu Drive (se crea la primera vez), se comparten con «cualquier
+persona con el enlace» y con un clic quedan asignados al módulo elegido como
+*Apuntes*, *Diapositivas* o *Material complementario*. Después hay que pulsar
+**Publicar** para que el alumnado lo vea. La subida se hace en fragmentos de
+3 MiB a una sesión de subida reanudable de Drive (`iniciarSubida`,
+`subirFragmento`, `materiales` en `Codigo.gs`), así que el script nunca tiene
+el fichero entero en memoria.
+
+Configuración única en el proyecto de Apps Script de `Codigo.gs`:
+
+1. Sustituir el manifiesto por `google-apps-script/appsscript.json`, que añade
+   el permiso `drive.file` (el script solo puede tocar los ficheros y la
+   carpeta que crea él mismo, no el resto del Drive) y el servicio avanzado
+   de Drive.
+2. Ejecutar una vez `autorizarDrive` desde el editor y aceptar el permiso. Crea
+   la carpeta y deja su enlace en el Registro de ejecución.
+3. Publicar una versión nueva de la implementación.
+
+Las audios de las píldoras del curso siguen viviendo en `public/audio/` (el
+reproductor de la web necesita un fichero directo, no un enlace de Drive). Hay
+un apartado plegado, «Guardar solo en este navegador», con el almacenamiento
+local de antes (IndexedDB), que el alumnado no ve.
 
 ---
 
@@ -132,6 +151,7 @@ Quién es cada cual lo decide Apps Script:
 | `GOOGLE_CLIENT_ID` | Opcional (por defecto, el de la plataforma) | — |
 | `PROFESORES` | Opcional (correos separados por comas) | — |
 | `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
+| `MATERIALES_CARPETA_ID` | Se rellena sola al crear la carpeta de materiales; se puede fijar a mano | — |
 | `CALIFICACIONES_HOJA_ID` | Opcional (por defecto, la hoja de calificaciones actual; la lee el seguimiento) | — |
 
 El manifiesto del proyecto de Codigo.gs está en `google-apps-script/appsscript.json`:

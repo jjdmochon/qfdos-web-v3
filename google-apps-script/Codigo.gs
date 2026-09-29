@@ -81,6 +81,9 @@ function manejar(e) {
     if (accion === 'cuaderno')         return cuaderno(p);
     if (accion === 'calificarCuaderno') return calificarCuaderno(p, e);
     if (accion === 'seguimiento')      return seguimiento(p);
+    if (accion === 'iniciarSubida')    return iniciarSubida(p, e);
+    if (accion === 'subirFragmento')   return subirFragmento(p, e);
+    if (accion === 'materiales')       return materiales(p);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -88,8 +91,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 6,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'seguimiento', 'anotarFila'],
+        version: 7,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -1008,6 +1011,229 @@ function seguimiento(p) {
     return (x.nombre || x.email).toLowerCase().localeCompare((y.nombre || y.email).toLowerCase());
   });
   return json({ ok: true, generado: new Date().toISOString(), hayLista: hayLista, hayTests: hayTests, alumnos: lista });
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. Materiales en Drive (profesorado)                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Antes los ficheros que subía el profesor se quedaban en el IndexedDB de su
+ * navegador y había que subirlos otra vez a Drive y pegar el enlace. Ahora el
+ * fichero va directamente a una carpeta de Drive y se devuelve el enlace.
+ *
+ * Cómo se sube: el navegador manda el fichero en fragmentos de 3 MiB
+ * (`subirFragmento`) y este script los reenvía a una sesión de subida
+ * reanudable de la API de Drive (`iniciarSubida`), de modo que nunca se carga
+ * el fichero entero en memoria. Solo se necesita el permiso `drive.file`: el
+ * script solo puede tocar los ficheros y la carpeta que ha creado él mismo, no
+ * el resto del Drive.
+ *
+ * Requiere, en appsscript.json, el permiso `drive.file` y el servicio
+ * avanzado de Drive (ver google-apps-script/appsscript.json), y haber
+ * ejecutado una vez `autorizarDrive` desde el editor.
+ */
+var CARPETA_MATERIALES = 'QFDOS · Materiales del curso';
+var FRAGMENTO_BYTES = 3 * 1024 * 1024;        // múltiplo de 256 KiB, como exige Drive
+var MAX_SUBIDA_BYTES = 50 * 1024 * 1024;
+var EXTENSIONES_PERMITIDAS = ['pdf', 'ppt', 'pptx', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'png', 'jpg', 'jpeg', 'webp', 'svg', 'zip', 'mp3', 'm4a', 'wav'];
+var DRIVE_API = 'https://www.googleapis.com/drive/v3';
+var DRIVE_SUBIDA = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true';
+
+function cabeceraDrive_(extra) {
+  var h = { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() };
+  if (extra) Object.keys(extra).forEach(function (k) { h[k] = extra[k]; });
+  return h;
+}
+
+/** Devuelve una cabecera de respuesta sin importar las mayúsculas. */
+function cabeceraRespuesta_(resp, nombre) {
+  var todas = resp.getAllHeaders ? resp.getAllHeaders() : resp.getHeaders();
+  var buscada = nombre.toLowerCase();
+  var claves = Object.keys(todas || {});
+  for (var i = 0; i < claves.length; i++) if (claves[i].toLowerCase() === buscada) return String(todas[claves[i]]);
+  return '';
+}
+
+function jsonDrive_(resp) {
+  try { return JSON.parse(resp.getContentText()); } catch (err) { return {}; }
+}
+
+/** Mensaje legible de un error de la API de Drive. */
+function errorDrive_(resp, contexto) {
+  var cuerpo = jsonDrive_(resp);
+  var msg = (cuerpo.error && (cuerpo.error.message || cuerpo.error)) || resp.getContentText().slice(0, 200);
+  return contexto + ' (Drive ' + resp.getResponseCode() + '): ' + msg;
+}
+
+/** Carpeta donde caen los materiales; se crea la primera vez y se recuerda su id. */
+function carpetaMateriales_() {
+  var id = propiedad_('MATERIALES_CARPETA_ID');
+  if (id) {
+    var r = UrlFetchApp.fetch(DRIVE_API + '/files/' + id + '?fields=id,trashed&supportsAllDrives=true', {
+      headers: cabeceraDrive_(), muteHttpExceptions: true
+    });
+    if (r.getResponseCode() === 200 && !jsonDrive_(r).trashed) return id;
+  }
+  var c = UrlFetchApp.fetch(DRIVE_API + '/files?fields=id&supportsAllDrives=true', {
+    method: 'post',
+    headers: cabeceraDrive_(),
+    contentType: 'application/json; charset=UTF-8',
+    payload: JSON.stringify({ name: CARPETA_MATERIALES, mimeType: 'application/vnd.google-apps.folder' }),
+    muteHttpExceptions: true
+  });
+  if (c.getResponseCode() !== 200) throw new Error(errorDrive_(c, 'No se pudo crear la carpeta de materiales'));
+  var nuevo = jsonDrive_(c).id;
+  PropertiesService.getScriptProperties().setProperty('MATERIALES_CARPETA_ID', nuevo);
+  return nuevo;
+}
+
+function extension_(nombre) {
+  var m = String(nombre || '').toLowerCase().match(/\.([a-z0-9]{1,5})$/);
+  return m ? m[1] : '';
+}
+
+function enlaceArchivo_(id) {
+  return 'https://drive.google.com/file/d/' + id + '/view';
+}
+
+/**
+ * Ejecutar UNA vez desde el editor (Ejecutar → autorizarDrive): pide el
+ * permiso de Drive y comprueba que todo está bien creando la carpeta de
+ * materiales. El resultado sale en el Registro de ejecución.
+ */
+function autorizarDrive() {
+  var id = carpetaMateriales_();
+  Logger.log('Drive listo. Carpeta de materiales: https://drive.google.com/drive/folders/' + id);
+}
+
+/**
+ * Empieza una subida. Recibe por POST { nombre, mime, tamano } y devuelve el
+ * id de subida y el tamaño de fragmento que debe usar el navegador.
+ */
+function iniciarSubida(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede subir materiales.' });
+
+  var d = cuerpoJson_(e);
+  var nombre = String(d.nombre || '').replace(/[\\/\r\n]+/g, ' ').trim().slice(0, 180);
+  var tamano = Number(d.tamano);
+  if (!nombre) return json({ ok: false, error: 'Falta el nombre del fichero.' });
+  if (EXTENSIONES_PERMITIDAS.indexOf(extension_(nombre)) === -1) {
+    return json({ ok: false, error: 'Tipo de fichero no admitido (.' + extension_(nombre) + '). Admitidos: ' + EXTENSIONES_PERMITIDAS.join(', ') + '.' });
+  }
+  if (!(tamano > 0) || tamano !== Math.floor(tamano)) return json({ ok: false, error: 'Tamaño no válido.' });
+  if (tamano > MAX_SUBIDA_BYTES) return json({ ok: false, error: 'El fichero pesa ' + Math.round(tamano / 1048576) + ' MB; el máximo es ' + Math.round(MAX_SUBIDA_BYTES / 1048576) + ' MB.' });
+  var mime = String(d.mime || 'application/octet-stream').slice(0, 120);
+
+  var carpeta = carpetaMateriales_();
+  var resp = UrlFetchApp.fetch(DRIVE_SUBIDA, {
+    method: 'post',
+    headers: cabeceraDrive_({ 'X-Upload-Content-Type': mime, 'X-Upload-Content-Length': String(tamano) }),
+    contentType: 'application/json; charset=UTF-8',
+    payload: JSON.stringify({ name: nombre, parents: [carpeta] }),
+    muteHttpExceptions: true
+  });
+  if (resp.getResponseCode() !== 200) return json({ ok: false, error: errorDrive_(resp, 'Drive no ha aceptado la subida') });
+  var sesionSubida = cabeceraRespuesta_(resp, 'Location');
+  if (!sesionSubida) return json({ ok: false, error: 'Drive no ha devuelto la sesión de subida.' });
+
+  var id = 'sub_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+  CacheService.getScriptCache().put(id, JSON.stringify({
+    url: sesionSubida, tamano: tamano, mime: mime, nombre: nombre, offset: 0, dueno: s.e
+  }), 21600);
+  return json({ ok: true, subida: id, fragmento: FRAGMENTO_BYTES });
+}
+
+/**
+ * Recibe un fragmento (base64 en el cuerpo) de una subida empezada. `inicio`
+ * es el byte en el que empieza y tiene que coincidir con lo ya recibido: si no
+ * coincide se devuelve el punto real para que el navegador retome desde ahí.
+ * Con el último fragmento, Drive devuelve el fichero y se comparte con enlace.
+ */
+function subirFragmento(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede subir materiales.' });
+
+  var cache = CacheService.getScriptCache();
+  var estado = null;
+  try { estado = JSON.parse(cache.get(String(p.subida || '')) || 'null'); } catch (err) { estado = null; }
+  if (!estado || estado.dueno !== s.e) return json({ ok: false, codigo: 'subida_desconocida', error: 'La subida ha caducado. Empieza de nuevo.' });
+
+  var inicio = Number(p.inicio);
+  if (inicio !== estado.offset) return json({ ok: false, codigo: 'fuera_de_orden', offset: estado.offset, error: 'Fragmento fuera de orden.' });
+
+  var bytes;
+  try { bytes = Utilities.base64Decode(String((e && e.postData && e.postData.contents) || '')); } catch (err) { bytes = []; }
+  if (!bytes.length) return json({ ok: false, error: 'Fragmento vacío.' });
+
+  var fin = inicio + bytes.length - 1;
+  var ultimo = fin + 1 === estado.tamano;
+  if (fin + 1 > estado.tamano) return json({ ok: false, error: 'El fragmento se sale del tamaño anunciado.' });
+  // Drive exige múltiplos de 256 KiB salvo en el último
+  if (!ultimo && bytes.length % 262144 !== 0) return json({ ok: false, error: 'Tamaño de fragmento no válido.' });
+
+  var resp = UrlFetchApp.fetch(estado.url, {
+    method: 'put',
+    headers: { 'Content-Range': 'bytes ' + inicio + '-' + fin + '/' + estado.tamano },
+    contentType: 'application/octet-stream',
+    payload: bytes,
+    followRedirects: false,
+    muteHttpExceptions: true
+  });
+  var codigo = resp.getResponseCode();
+
+  if (codigo === 308) {
+    // Drive indica hasta dónde ha recibido en la cabecera Range: bytes=0-N
+    var rango = cabeceraRespuesta_(resp, 'Range').match(/-(\d+)$/);
+    estado.offset = rango ? Number(rango[1]) + 1 : fin + 1;
+    cache.put(String(p.subida), JSON.stringify(estado), 21600);
+    return json({ ok: true, completo: false, offset: estado.offset });
+  }
+  if (codigo === 200 || codigo === 201) {
+    cache.remove(String(p.subida));
+    var f = jsonDrive_(resp);
+    if (!f.id) return json({ ok: false, error: 'Drive no ha devuelto el fichero subido.' });
+
+    var compartido = true;
+    var perm = UrlFetchApp.fetch(DRIVE_API + '/files/' + f.id + '/permissions?supportsAllDrives=true', {
+      method: 'post',
+      headers: cabeceraDrive_(),
+      contentType: 'application/json; charset=UTF-8',
+      payload: JSON.stringify({ type: 'anyone', role: 'reader' }),
+      muteHttpExceptions: true
+    });
+    if (perm.getResponseCode() !== 200) compartido = false;
+
+    return json({
+      ok: true, completo: true,
+      archivo: { id: f.id, nombre: f.name || estado.nombre, mime: f.mimeType || estado.mime, tamano: estado.tamano, url: enlaceArchivo_(f.id), compartido: compartido }
+    });
+  }
+  return json({ ok: false, error: errorDrive_(resp, 'Drive ha rechazado el fragmento') });
+}
+
+/** Ficheros de la carpeta de materiales, los más recientes primero. */
+function materiales(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede ver los materiales.' });
+
+  var id = propiedad_('MATERIALES_CARPETA_ID');
+  if (!id) return json({ ok: true, carpeta: '', archivos: [] });
+  var q = "'" + id + "' in parents and trashed = false";
+  var r = UrlFetchApp.fetch(
+    DRIVE_API + '/files?q=' + encodeURIComponent(q) + '&orderBy=createdTime%20desc&pageSize=100' +
+    '&fields=' + encodeURIComponent('files(id,name,mimeType,size,createdTime)') + '&supportsAllDrives=true&includeItemsFromAllDrives=true',
+    { headers: cabeceraDrive_(), muteHttpExceptions: true }
+  );
+  if (r.getResponseCode() !== 200) return json({ ok: false, error: errorDrive_(r, 'No se han podido listar los materiales') });
+  var archivos = (jsonDrive_(r).files || []).map(function (f) {
+    return { id: f.id, nombre: f.name, mime: f.mimeType, tamano: Number(f.size) || 0, creado: f.createdTime, url: enlaceArchivo_(f.id) };
+  });
+  return json({ ok: true, carpeta: 'https://drive.google.com/drive/folders/' + id, archivos: archivos });
 }
 
 /* ------------------------------------------------------------------ */
