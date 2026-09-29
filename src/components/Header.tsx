@@ -24,6 +24,8 @@ interface HeaderProps {
   onOpenStudentQuestion: () => void;
   onOpenAdminCms: () => void;
   onOpenCartas?: () => void;
+  /** Profesorado: dudas sin responder. */
+  dudasPendientes?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,7 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenFirSimulator,
   onOpenStudentQuestion,
   onOpenAdminCms,
-  onOpenCartas
+  onOpenCartas,
+  dudasPendientes = 0
 }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, isProfesor, isInstitucional, logout } = useAuth();
@@ -207,11 +210,14 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenStudentQuestion}
               className="btn btn-sm btn-ghost-clean btn-header-buzon"
-              title="Buzón de dudas: pregunta al profesor y consulta sus respuestas"
-              aria-label="Buzón de dudas"
+              title={isProfesor ? 'Buzón de dudas: responde a tu alumnado' : 'Buzón de dudas: pregunta al profesor y consulta sus respuestas'}
+              aria-label={isProfesor && dudasPendientes > 0 ? `Buzón de dudas, ${dudasPendientes} sin responder` : 'Buzón de dudas'}
             >
               <HelpCircle size={16} />
               <span className="tool-label">Buzón de dudas</span>
+              {isProfesor && dudasPendientes > 0 && (
+                <span className="buzon-aviso" aria-hidden="true">{dudasPendientes}</span>
+              )}
             </button>
 
             {/* Admin (sólo profesorado) */}
@@ -398,7 +404,7 @@ export const Header: React.FC<HeaderProps> = ({
               <ul className="mobile-drawer-list">
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenSearch)}><Search size={18} /> Buscar</button></li>
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenFirSimulator)}><Award size={18} /> Simulador FIR</button></li>
-                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenStudentQuestion)}><HelpCircle size={18} /> Buzón de dudas</button></li>
+                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenStudentQuestion)}><HelpCircle size={18} /> Buzón de dudas{isProfesor && dudasPendientes > 0 ? ` (${dudasPendientes})` : ''}</button></li>
                 <li>
                   <button className="menu-item" onClick={toggleTheme}>
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}

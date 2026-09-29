@@ -1305,6 +1305,18 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   transition: all var(--transition-smooth);
 }
 .btn-ghost-clean:hover { background: var(--hdr-tab-hover-bg); color: var(--hdr-tab-hover-ink); }
+.buzon-aviso {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #d97706;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
 .btn-header-buzon {
   gap: 6px;
   padding: 7px 11px;

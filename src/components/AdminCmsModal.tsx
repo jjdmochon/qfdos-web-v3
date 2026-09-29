@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   QfdosTopic, 
   QfdosAnnouncement, 
@@ -8,7 +8,7 @@ import {
   ResourceCategory,
   MoleculeDrug
 } from '../data/qfdosData';
-import { Duda, cargarDudas, responderDuda, borrarDuda, fechaDuda } from '../services/dudas';
+import { PanelDudasProfesor } from './PanelDudasProfesor';
 import { 
   getStoredGeminiApiKey, 
   setStoredGeminiApiKey 
@@ -57,6 +57,9 @@ interface AdminCmsModalProps {
   publicadoEn?: string;
   onPublicado?: (cuando: string) => void;
   onOpenCartas?: () => void;
+  /** Dudas del alumnado sin responder (lo calcula App y se actualiza desde el panel). */
+  dudasPendientes?: number;
+  onDudasPendientes?: (n: number) => void;
   initialTab?: 'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey';
   initialEditingTopicId?: string;
 }
@@ -74,6 +77,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   publicadoEn,
   onPublicado,
   onOpenCartas,
+  dudasPendientes = 0,
+  onDudasPendientes,
   initialTab = 'modules',
   initialEditingTopicId
 }) => {
@@ -122,8 +127,6 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   const [lnkError, setLnkError] = useState<string | null>(null);
 
   // Question Response State
-  const [respondingQId, setRespondingQId] = useState<string | null>(null);
-  const [responseText, setResponseText] = useState('');
 
   // Module Management State
   const [isCreatingModule, setIsCreatingModule] = useState(false);
@@ -593,54 +596,6 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
     onUpdateTopics(updatedTopics);
     localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
-  };
-
-  // Buzón de dudas: se lee y se modifica en el servidor (pestaña _Dudas)
-  const [studentQuestions, setStudentQuestions] = useState<Duda[]>([]);
-  const [dudasCargando, setDudasCargando] = useState(true);
-  const [dudasAviso, setDudasAviso] = useState<string | null>(null);
-  const [enviandoRespuesta, setEnviandoRespuesta] = useState(false);
-
-  const recargarDudas = async () => {
-    setDudasCargando(true);
-    const r = await cargarDudas();
-    if (r.ok) {
-      setStudentQuestions(r.datos);
-      setDudasAviso(null);
-    } else {
-      setDudasAviso(`No se han podido cargar las dudas: ${r.error}`);
-    }
-    setDudasCargando(false);
-  };
-
-  useEffect(() => { recargarDudas(); }, []);
-
-  const dudasPendientes = studentQuestions.filter(q => q.estado === 'pendiente').length;
-
-  const handleSendResponse = async (qId: string) => {
-    if (!responseText.trim() || enviandoRespuesta) return;
-    setEnviandoRespuesta(true);
-    const r = await responderDuda(qId, responseText.trim());
-    setEnviandoRespuesta(false);
-    if (!r.ok) {
-      // La respuesta sigue en el cuadro de texto para no perderla
-      setDudasAviso(`No se ha podido guardar la respuesta: ${r.error}`);
-      return;
-    }
-    setStudentQuestions(prev => prev.map(q => (q.id === qId ? r.datos : q)));
-    setDudasAviso(null);
-    setRespondingQId(null);
-    setResponseText('');
-  };
-
-  const handleDeleteStudentQuestion = async (qId: string) => {
-    if (!window.confirm('¿Eliminar esta consulta? El alumno dejará de verla.')) return;
-    const r = await borrarDuda(qId);
-    if (!r.ok) {
-      setDudasAviso(`No se ha podido eliminar: ${r.error}`);
-      return;
-    }
-    setStudentQuestions(prev => prev.filter(q => q.id !== qId));
   };
 
   return (
@@ -2126,139 +2081,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
           {/* TAB 4: Dudas de Alumnos */}
           {activeTab === 'questions' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', marginBottom: '4px' }}>
-                    Buzón de Preguntas y Tutorías Virtuales
-                  </h4>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-                    Preguntas enviadas por los estudiantes desde el portal. Cada alumno ve sólo las suyas y, cuando responda, la respuesta aparecerá en su buzón.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={recargarDudas}
-                  disabled={dudasCargando}
-                  className="btn btn-sm btn-outline"
-                  style={{ fontSize: '0.74rem' }}
-                  title="Volver a leer las dudas del servidor"
-                >
-                  {dudasCargando ? 'Cargando…' : 'Recargar dudas'}
-                </button>
-              </div>
-
-              {dudasAviso && (
-                <div style={{ padding: '8px 12px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-md)', color: 'var(--accent-red)', fontSize: '0.82rem' }}>
-                  {dudasAviso}
-                </div>
-              )}
-
-              {dudasCargando && studentQuestions.length === 0 ? (
-                <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.86rem' }}>
-                  Cargando dudas…
-                </div>
-              ) : studentQuestions.length === 0 ? (
-                <div style={{
-                  padding: '30px',
-                  textAlign: 'center',
-                  background: 'var(--surface-alt)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px dashed var(--border-color)',
-                  color: 'var(--text-muted)',
-                  fontSize: '0.86rem'
-                }}>
-                  No hay preguntas de alumnos en el buzón actualmente.
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {studentQuestions.map(q => (
-                    <div
-                      key={q.id}
-                      className="qfdos-card"
-                      style={{
-                        padding: '1.25rem',
-                        borderLeft: q.estado === 'pendiente' ? '4px solid #f59e0b' : '4px solid #10b981'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.7rem' }}>
-                          {q.temaTitulo || 'Tema General'}
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className={`qfdos-badge ${q.estado === 'pendiente' ? 'badge-amber' : 'badge-emerald'}`} style={{ fontSize: '0.68rem' }}>
-                            {q.estado.toUpperCase()}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteStudentQuestion(q.id)}
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              color: 'var(--text-muted)',
-                              cursor: 'pointer',
-                              padding: '2px',
-                              display: 'flex',
-                              alignItems: 'center'
-                            }}
-                            title="Eliminar esta consulta"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <p style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-title)', marginBottom: '6px' }}>
-                        "{q.pregunta}"
-                      </p>
-
-                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        Por: <strong>{q.nombre || q.correo}</strong> ({q.correo}) · {fechaDuda(q.recibidaEn)}
-                      </div>
-
-                      {/* Response display or response form */}
-                      {q.respuesta ? (
-                        <div style={{ background: 'var(--surface-alt)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                          <strong style={{ fontSize: '0.78rem', color: 'var(--navy-ink)', display: 'block', marginBottom: '3px' }}>
-                            Respuesta del Profesor:
-                          </strong>
-                          <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5, margin: 0 }}>
-                            <span style={{ whiteSpace: 'pre-wrap' }}>{q.respuesta}</span>
-                          </p>
-                        </div>
-                      ) : respondingQId === q.id ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '6px' }}>
-                          <textarea
-                            placeholder="Escriba la respuesta oficial para el estudiante..."
-                            value={responseText}
-                            onChange={e => setResponseText(e.target.value)}
-                            className="form-input"
-                            rows={3}
-                          />
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                            <button onClick={() => setRespondingQId(null)} className="btn btn-sm btn-outline">
-                              Cancelar
-                            </button>
-                            <button onClick={() => handleSendResponse(q.id)} disabled={enviandoRespuesta} className="btn btn-sm btn-primary">
-                              <Send size={13} /> {enviandoRespuesta ? 'Guardando…' : 'Enviar Respuesta Oficial'}
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => { setRespondingQId(q.id); setResponseText(''); }}
-                          className="btn btn-sm btn-outline"
-                          style={{ alignSelf: 'flex-start' }}
-                        >
-                          <MessageSquare size={13} /> Responder Duda
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-            </div>
+            <PanelDudasProfesor onPendientes={onDudasPendientes} />
           )}
 
           {/* TAB 5: Clave API Gemini */}

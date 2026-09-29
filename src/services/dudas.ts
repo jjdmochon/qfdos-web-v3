@@ -95,3 +95,11 @@ export function limpiarDudasLocales(): void {
   localStorage.removeItem('qfdos_v2_student_questions');
   localStorage.removeItem('qfdos_v3_student_questions');
 }
+
+/**
+ * Título del tema sin el «: » que quedaba delante cuando el tema no tiene
+ * número (por ejemplo, la presentación del curso).
+ */
+export function tituloTema(t: string | undefined | null): string {
+  return (t ?? '').replace(/^\s*:\s*/, '').trim() || 'Tema General';
+}

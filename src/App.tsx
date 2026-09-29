@@ -15,7 +15,7 @@ import {
   MoleculeDrug, testHabilitado, flashcardsHabilitadas } from './data/qfdosData';
 import { useAuth } from './context/AuthContext';
 import { descargarContenido, contenidoEnCache, normalizarTemas } from './services/contenidoRemoto';
-import { limpiarDudasLocales } from './services/dudas';
+import { limpiarDudasLocales, cargarDudas } from './services/dudas';
 import { ExternalLink } from 'lucide-react';
 
 import { LoginPage } from './components/LoginPage';
@@ -300,6 +300,20 @@ export const App: React.FC = () => {
   const [isExamGeneratorOpen, setIsExamGeneratorOpen] = useState(false);
   const [isFirModalOpen, setIsFirModalOpen] = useState(false);
   const [isStudentQuestionOpen, setIsStudentQuestionOpen] = useState(false);
+
+  // Profesorado: dudas sin responder, para el aviso del botón «Buzón de dudas»
+  const [dudasPendientes, setDudasPendientes] = useState(0);
+  const refrescarDudas = useCallback(async () => {
+    if (!isProfesor) { setDudasPendientes(0); return; }
+    const r = await cargarDudas();
+    if (r.ok) setDudasPendientes(r.datos.filter(d => d.estado === 'pendiente').length);
+  }, [isProfesor]);
+  useEffect(() => {
+    refrescarDudas();
+    if (!isProfesor) return;
+    const id = window.setInterval(refrescarDudas, 5 * 60 * 1000);
+    return () => window.clearInterval(id);
+  }, [refrescarDudas, isProfesor]);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
   const [cmsInitialTab, setCmsInitialTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>('modules');
   const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
@@ -477,6 +491,7 @@ export const App: React.FC = () => {
         onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
         onOpenFirSimulator={() => setIsFirModalOpen(true)}
         onOpenStudentQuestion={() => setIsStudentQuestionOpen(true)}
+        dudasPendientes={dudasPendientes}
         onOpenAdminCms={() => setIsAdminCmsOpen(true)}
         onOpenCartas={() => setIsCartasModalOpen(true)}
       />
@@ -635,7 +650,7 @@ export const App: React.FC = () => {
         }}
       />
       {isStudentQuestionOpen && (
-        <StudentQuestionModal topics={topics} onClose={() => setIsStudentQuestionOpen(false)} />
+        <StudentQuestionModal topics={topics} onClose={() => setIsStudentQuestionOpen(false)} onPendientes={setDudasPendientes} />
       )}
       {/* Admin CMS: only accessible to professor */}
       {isAdminCmsOpen && isProfesor && (
@@ -652,6 +667,8 @@ export const App: React.FC = () => {
           publicadoEn={publicadoEn}
           onPublicado={(cuando: string) => setPublicadoEn(cuando)}
           onOpenCartas={() => setIsCartasModalOpen(true)}
+          dudasPendientes={dudasPendientes}
+          onDudasPendientes={setDudasPendientes}
           initialTab={cmsInitialTab}
           initialEditingTopicId={cmsInitialEditingTopicId}
         />
