@@ -104,6 +104,14 @@ Quién es cada cual lo decide Apps Script:
      hoja de entregas. El alumno ve sólo las suyas, con la respuesta cuando la
      haya; el profesor las ve todas en *Gestionar curso → Dudas de Alumnos*.
      Máximo 4000 caracteres por duda y 20 pendientes por alumno.
+   - **Cuaderno de parejas**: `cuaderno` (sólo profesor) devuelve todas las
+     entregas de la pestaña «Cuaderno de parejas» con su número de fila, y
+     `calificarCuaderno` (sólo profesor) escribe en esa fila las columnas
+     `notaProfesor`, `comentarioProfesor` y `calificadoEn` (las crea si no
+     existen). Comprueba `recibidoEn` antes de escribir, para no calificar a
+     otra pareja si se han borrado o insertado filas. Esas tres columnas no
+     las puede escribir el alumnado ni las ve en «Mis entregas». Si una pareja
+     entrega varias veces, el panel muestra la última.
    - Un estudiante sólo registra notas a su nombre y solo con los modos `alumno_evaluado` o `flashcards_autoevaluacion` (`docente_sesion` es exclusivo del profesor); publicar exige sesión de
      profesor **y** la clave.
 
