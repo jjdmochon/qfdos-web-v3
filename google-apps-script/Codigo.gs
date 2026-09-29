@@ -84,6 +84,8 @@ function manejar(e) {
     if (accion === 'iniciarSubida')    return iniciarSubida(p, e);
     if (accion === 'subirFragmento')   return subirFragmento(p, e);
     if (accion === 'materiales')       return materiales(p);
+    if (accion === 'leerProgreso')     return leerProgreso(p);
+    if (accion === 'guardarProgreso')  return guardarProgreso(p, e);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -91,8 +93,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 7,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'anotarFila'],
+        version: 8,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -1241,6 +1243,83 @@ function materiales(p) {
 function leerCabeceras(hoja) {
   if (hoja.getLastRow() === 0 || hoja.getLastColumn() === 0) return [];
   return hoja.getRange(1, 1, 1, hoja.getLastColumn()).getValues()[0].filter(String);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Progreso personal (sincronización entre dispositivos)              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Valoraciones de flashcards y otros datos de estudio que el alumno quiere
+ * ver igual en el móvil y en el ordenador. Viven en la pestaña oculta
+ * `_Progreso` de la hoja de entregas, una fila por (correo, clave):
+ *   · leerProgreso   — devuelve todas las claves de la sesión
+ *   · guardarProgreso — escribe una clave; el correo sale de la sesión, así
+ *                      que nadie puede leer ni escribir el progreso de otro
+ * La fusión (qué valoración gana) la hace el cliente, que guarda una marca de
+ * tiempo por tarjeta; el servidor solo almacena.
+ */
+var HOJA_PROGRESO = '_Progreso';
+var CABECERAS_PROGRESO = ['correo', 'clave', 'valor', 'actualizadoEn'];
+var CLAVE_PROGRESO_VALIDA = /^(flashcards_[a-z0-9_-]{1,40}|fir)$/;
+var MAX_PROGRESO = 20000;
+
+function hojaProgreso_() {
+  var libro = SpreadsheetApp.openById(HOJA_ID);
+  var hoja = libro.getSheetByName(HOJA_PROGRESO);
+  if (!hoja) {
+    hoja = libro.insertSheet(HOJA_PROGRESO);
+    hoja.getRange(1, 1, 1, CABECERAS_PROGRESO.length).setValues([CABECERAS_PROGRESO]).setFontWeight('bold');
+    hoja.setFrozenRows(1);
+    hoja.hideSheet();
+  }
+  return hoja;
+}
+
+function leerProgreso(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+
+  var hoja = hojaProgreso_();
+  var datos = hoja.getLastRow() < 2 ? [] : hoja.getRange(2, 1, hoja.getLastRow() - 1, 4).getValues();
+  var progreso = {};
+  datos.forEach(function (f) {
+    if (String(f[0]) !== s.e) return;
+    try { progreso[String(f[1])] = JSON.parse(String(f[2])); } catch (err) { /* fila corrupta: se ignora */ }
+  });
+  return json({ ok: true, progreso: progreso });
+}
+
+function guardarProgreso(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+
+  var d = cuerpoJson_(e);
+  var clave = String(d.clave || '');
+  if (!CLAVE_PROGRESO_VALIDA.test(clave)) return json({ ok: false, error: 'Clave de progreso no admitida.' });
+  if (!d.valor || typeof d.valor !== 'object' || Array.isArray(d.valor)) {
+    return json({ ok: false, error: 'El progreso debe ser un objeto.' });
+  }
+  var valor = JSON.stringify(d.valor);
+  if (valor.length > MAX_PROGRESO) return json({ ok: false, error: 'El progreso es demasiado grande.' });
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = hojaProgreso_();
+    var n = hoja.getLastRow() < 2 ? 0 : hoja.getLastRow() - 1;
+    var claves = n ? hoja.getRange(2, 1, n, 2).getValues() : [];
+    var fila = -1;
+    for (var i = 0; i < claves.length; i++) {
+      if (String(claves[i][0]) === s.e && String(claves[i][1]) === clave) { fila = i + 2; break; }
+    }
+    var ahora = new Date();
+    if (fila === -1) hoja.appendRow([s.e, clave, valor, ahora]);
+    else hoja.getRange(fila, 3, 1, 2).setValues([[valor, ahora]]);
+    return json({ ok: true });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function json(obj) {
