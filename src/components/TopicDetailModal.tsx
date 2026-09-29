@@ -862,213 +862,6 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
-                      {/* 7. Taller de Retrosíntesis & Desconexiones (Card Destacada para Tema 01) */}
-                      {topic.id === 'tema-01' && (
-                        <div 
-                          className="qfdos-card card-teal resource-card is-active"
-                          style={{
-                            border: '2px solid var(--teal)',
-                            boxShadow: '0 6px 20px -3px rgba(13, 148, 136, 0.28)',
-                            background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(30, 58, 138, 0.08) 100%)',
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)', color: '#ffffff', fontSize: '0.6rem', fontWeight: 800, padding: '3px 10px', borderBottomLeftRadius: '8px', letterSpacing: '0.5px' }}>
-                            ✨ DESTACADO
-                          </div>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', marginTop: '4px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '8px',
-                                  background: 'rgba(13, 148, 136, 0.22)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  <GitBranch size={17} color="var(--teal-ink)" />
-                                </div>
-                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
-                                  7. Taller de Retrosíntesis
-                                </strong>
-                              </div>
-                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
-                                Slides 28-35
-                              </span>
-                            </div>
-                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              4 casos prácticos guiados de desconexión (⇒) y 8 diapositivas vectoriales RDKit con visor a pantalla completa.
-                            </p>
-                          </div>
-                          <button 
-                            onClick={() => setActiveTab('retrosintesis')}
-                            className="btn btn-sm btn-primary" 
-                            style={{ 
-                              width: '100%', 
-                              justifyContent: 'center', 
-                              fontSize: '0.8rem', 
-                              fontWeight: 800,
-                              background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
-                              border: 'none',
-                              boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)'
-                            }}
-                          >
-                            <GitBranch size={14} /> Abrir Taller de Retrosíntesis <ArrowRight size={13} />
-                          </button>
-                        </div>
-                      )}
-
-                      {/* 8. Modelo 3D: Receptor Nicotínico de Acetilcolina (nAChR) */}
-                      {topic.id === 'tema-01' && (
-                        <div 
-                          className="qfdos-card card-teal resource-card is-active"
-                          style={{
-                            border: '1.5px solid var(--teal)',
-                            boxShadow: '0 4px 16px rgba(13,148,136,0.18)',
-                            position: 'relative'
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '8px',
-                                  background: 'linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(30,58,138,0.3) 100%)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  <Box size={17} color="var(--teal-ink)" />
-                                </div>
-                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
-                                  8. Estructura 3D: Receptor Nicotínico (nAChR)
-                                </strong>
-                              </div>
-                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
-                                3D GLB · 7.0 MB
-                              </span>
-                            </div>
-                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '8px', lineHeight: 1.45 }}>
-                              Canal iónico pentamérico interactivo. Rotación orbital 360°, zoom y detalle de sitios de unión de acetilcolina y bloqueantes.
-                            </p>
-                            <p style={{ fontSize: '0.69rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.35 }}>
-                              <a href="https://skfb.ly/6zvJE" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', textDecoration: 'underline' }}>"Nicotinic Acetylcholine Receptor"</a> by <strong style={{ color: 'var(--text-title)' }}>British Pharmacological Society</strong> (licencia <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', textDecoration: 'underline' }}>CC BY 4.0</a>).
-                            </p>
-                          </div>
-                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                            <button 
-                              onClick={() => setIs3DViewerOpen(true)}
-                              className="btn btn-sm btn-primary" 
-                              style={{ 
-                                flex: 1.2, 
-                                justifyContent: 'center', 
-                                fontSize: '0.78rem', 
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
-                                border: 'none',
-                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
-                                padding: '7px 8px'
-                              }}
-                            >
-                              <Box size={13} /> Explorar en 3D
-                            </button>
-                            <a
-                              href={`${import.meta.env.BASE_URL}models/nicotinic_acetylcholine_receptor.glb`}
-                              download="receptor_nicotinico_nachr.glb"
-                              className="btn btn-sm btn-outline"
-                              style={{ 
-                                flex: 0.8,
-                                justifyContent: 'center', 
-                                fontSize: '0.74rem',
-                                padding: '7px 8px',
-                                textDecoration: 'none'
-                              }}
-                              title="Descargar archivo GLB nativo (7 MB)"
-                            >
-                              <Download size={12} /> .GLB
-                            </a>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 9. Base de Datos Oficial de Estructuras QFDOS */}
-                      {topic.id === 'tema-01' && (
-                        <div 
-                          className="qfdos-card card-teal resource-card is-active"
-                          style={{
-                            border: '1.5px solid var(--border-color)',
-                            position: 'relative'
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '8px',
-                                  background: 'rgba(13, 148, 136, 0.16)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
-                                }}>
-                                  <Database size={17} color="var(--teal-ink)" />
-                                </div>
-                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
-                                  9. Base de Datos de Estructuras QFDOS
-                                </strong>
-                              </div>
-                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
-                                40 Fármacos · RDKit
-                              </span>
-                            </div>
-                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              Fichero maestro con 40 estructuras del curso (Bloques 1-8). Incluye imágenes 2D, descriptores fisicoquímicos, Lipinski, estereocentros CIP y notas docentes.
-                            </p>
-                          </div>
-                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                            <a
-                              href={`${import.meta.env.BASE_URL}estructuras/estructuras_qfdos.xlsx`}
-                              download="estructuras_qfdos.xlsx"
-                              className="btn btn-sm btn-primary"
-                              style={{
-                                flex: 1.2,
-                                justifyContent: 'center',
-                                fontSize: '0.76rem',
-                                fontWeight: 700,
-                                textDecoration: 'none'
-                              }}
-                              title="Descargar Excel con hojas de propiedades y estructuras integradas (722 KB)"
-                            >
-                              <Download size={12} /> Descargar .XLSX
-                            </a>
-                            <a
-                              href={`${import.meta.env.BASE_URL}estructuras/propiedades_qfdos.csv`}
-                              download="propiedades_qfdos.csv"
-                              className="btn btn-sm btn-outline"
-                              style={{
-                                flex: 0.8,
-                                justifyContent: 'center',
-                                fontSize: '0.74rem',
-                                padding: '7px 8px',
-                                textDecoration: 'none'
-                              }}
-                              title="Descargar tabla de descriptores CSV (42 KB)"
-                            >
-                              <Download size={12} /> .CSV
-                            </a>
-                          </div>
-                        </div>
-                      )}
-
                       {/* Modelo 3D Tema 02: Complejo LAT1 (SLC7A5) con L-DOPA (PDB 8J8L) */}
                       {topic.id === 'tema-02' && (
                         <div 
@@ -1228,19 +1021,244 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               </div>
 
               {/* ATTACHMENTS & MODULE MATERIALS */}
-              {topic.attachments && topic.attachments.length > 0 && (
+              {(() => {
+                // Tema 1: el taller de retrosíntesis, el visor 3D y la base de datos
+                // viven aquí. Los adjuntos que son el mismo fichero (GLB, XLSX, CSV)
+                // se omiten para no mostrarlos dos veces.
+                const interactivos = topic.id === 'tema-01' ? 3 : 0;
+                const yaIncluidos = topic.id === 'tema-01'
+                  ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
+                  : [];
+                const adjuntos = (topic.attachments ?? []).filter(
+                  att => !yaIncluidos.some(u => att.url.endsWith(u))
+                );
+                if (adjuntos.length + interactivos === 0) return null;
+                return (
                 <div className="qfdos-card card-teal" style={{ padding: '1.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                     <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <FileText size={17} color="var(--teal-ink)" /> Materiales y Documentos Complementarios ({topic.attachments.length})
+                      <FileText size={17} color="var(--teal-ink)" /> Materiales y Documentos Complementarios ({adjuntos.length + interactivos})
                     </h4>
                     <span className="qfdos-badge badge-teal" style={{ fontSize: '0.68rem', fontWeight: 700 }}>
                       Descargas Oficiales
                     </span>
                   </div>
 
+                  {interactivos > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '12px', marginBottom: adjuntos.length > 0 ? '12px' : 0 }}>
+                      {/* Taller de Retrosíntesis & Desconexiones (Card Destacada para Tema 01) */}
+                      {topic.id === 'tema-01' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '2px solid var(--teal)',
+                            boxShadow: '0 6px 20px -3px rgba(13, 148, 136, 0.28)',
+                            background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(30, 58, 138, 0.08) 100%)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)', color: '#ffffff', fontSize: '0.6rem', fontWeight: 800, padding: '3px 10px', borderBottomLeftRadius: '8px', letterSpacing: '0.5px' }}>
+                            ✨ DESTACADO
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', marginTop: '4px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(13, 148, 136, 0.22)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <GitBranch size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  Taller de Retrosíntesis
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                Slides 28-35
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              4 casos prácticos guiados de desconexión (⇒) y 8 diapositivas vectoriales RDKit con visor a pantalla completa.
+                            </p>
+                          </div>
+                          <button 
+                            onClick={() => setActiveTab('retrosintesis')}
+                            className="btn btn-sm btn-primary" 
+                            style={{ 
+                              width: '100%', 
+                              justifyContent: 'center', 
+                              fontSize: '0.8rem', 
+                              fontWeight: 800,
+                              background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                              border: 'none',
+                              boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)'
+                            }}
+                          >
+                            <GitBranch size={14} /> Abrir Taller de Retrosíntesis <ArrowRight size={13} />
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Modelo 3D: Receptor Nicotínico de Acetilcolina (nAChR) */}
+                      {topic.id === 'tema-01' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--teal)',
+                            boxShadow: '0 4px 16px rgba(13,148,136,0.18)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'linear-gradient(135deg, rgba(13,148,136,0.25) 0%, rgba(30,58,138,0.3) 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Box size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  Estructura 3D: Receptor Nicotínico (nAChR)
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                3D GLB · 7.0 MB
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '8px', lineHeight: 1.45 }}>
+                              Canal iónico pentamérico interactivo. Rotación orbital 360°, zoom y detalle de sitios de unión de acetilcolina y bloqueantes.
+                            </p>
+                            <p style={{ fontSize: '0.69rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.35 }}>
+                              <a href="https://skfb.ly/6zvJE" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', textDecoration: 'underline' }}>"Nicotinic Acetylcholine Receptor"</a> by <strong style={{ color: 'var(--text-title)' }}>British Pharmacological Society</strong> (licencia <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--teal-ink)', textDecoration: 'underline' }}>CC BY 4.0</a>).
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <button 
+                              onClick={() => setIs3DViewerOpen(true)}
+                              className="btn btn-sm btn-primary" 
+                              style={{ 
+                                flex: 1.2, 
+                                justifyContent: 'center', 
+                                fontSize: '0.78rem', 
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
+                                padding: '7px 8px'
+                              }}
+                            >
+                              <Box size={13} /> Explorar en 3D
+                            </button>
+                            <a
+                              href={`${import.meta.env.BASE_URL}models/nicotinic_acetylcholine_receptor.glb`}
+                              download="receptor_nicotinico_nachr.glb"
+                              className="btn btn-sm btn-outline"
+                              style={{ 
+                                flex: 0.8,
+                                justifyContent: 'center', 
+                                fontSize: '0.74rem',
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar archivo GLB nativo (7 MB)"
+                            >
+                              <Download size={12} /> .GLB
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Base de Datos Oficial de Estructuras QFDOS */}
+                      {topic.id === 'tema-01' && (
+                        <div 
+                          className="qfdos-card card-teal resource-card is-active"
+                          style={{
+                            border: '1.5px solid var(--border-color)',
+                            position: 'relative'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '8px',
+                                  background: 'rgba(13, 148, 136, 0.16)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0
+                                }}>
+                                  <Database size={17} color="var(--teal-ink)" />
+                                </div>
+                                <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                  Base de Datos de Estructuras QFDOS
+                                </strong>
+                              </div>
+                              <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                40 Fármacos · RDKit
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                              Fichero maestro con 40 estructuras del curso (Bloques 1-8). Incluye imágenes 2D, descriptores fisicoquímicos, Lipinski, estereocentros CIP y notas docentes.
+                            </p>
+                          </div>
+                          <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                            <a
+                              href={`${import.meta.env.BASE_URL}estructuras/estructuras_qfdos.xlsx`}
+                              download="estructuras_qfdos.xlsx"
+                              className="btn btn-sm btn-primary"
+                              style={{
+                                flex: 1.2,
+                                justifyContent: 'center',
+                                fontSize: '0.76rem',
+                                fontWeight: 700,
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar Excel con hojas de propiedades y estructuras integradas (722 KB)"
+                            >
+                              <Download size={12} /> Descargar .XLSX
+                            </a>
+                            <a
+                              href={`${import.meta.env.BASE_URL}estructuras/propiedades_qfdos.csv`}
+                              download="propiedades_qfdos.csv"
+                              className="btn btn-sm btn-outline"
+                              style={{
+                                flex: 0.8,
+                                justifyContent: 'center',
+                                fontSize: '0.74rem',
+                                padding: '7px 8px',
+                                textDecoration: 'none'
+                              }}
+                              title="Descargar tabla de descriptores CSV (42 KB)"
+                            >
+                              <Download size={12} /> .CSV
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                    </div>
+                  )}
+
+                  {adjuntos.length > 0 && (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '12px' }}>
-                    {topic.attachments.map(att => {
+                    {adjuntos.map(att => {
                       const isPdf = att.type === 'pdf' || att.url.toLowerCase().endsWith('.pdf');
                       const isAudio = att.type === 'audio' || att.url.toLowerCase().endsWith('.mp3') || att.url.toLowerCase().endsWith('.wav');
                       const isModel = att.type === 'model3d' || att.url.toLowerCase().endsWith('.glb');
@@ -1346,8 +1364,10 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       );
                     })}
                   </div>
+                  )}
                 </div>
-              )}
+                );
+              })()}
 
               {/* Key Concepts List */}
               <div className="qfdos-card" style={{ padding: '1.25rem' }}>

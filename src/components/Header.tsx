@@ -203,14 +203,15 @@ export const Header: React.FC<HeaderProps> = ({
               <Award size={14} /><span className="tool-label">Simulador FIR</span>
             </button>
 
-            {/* Buzón de Consultas */}
+            {/* Buzón de dudas: con etiqueta, porque el icono «?» solo no se reconocía */}
             <button
               onClick={onOpenStudentQuestion}
-              className="btn btn-sm btn-ghost-clean"
-              title="Buzón de Consultas y Tutorías"
-              aria-label="Buzón de consultas y tutorías"
+              className="btn btn-sm btn-ghost-clean btn-header-buzon"
+              title="Buzón de dudas: pregunta al profesor y consulta sus respuestas"
+              aria-label="Buzón de dudas"
             >
               <HelpCircle size={16} />
+              <span className="tool-label">Buzón de dudas</span>
             </button>
 
             {/* Admin (sólo profesorado) */}
@@ -397,7 +398,7 @@ export const Header: React.FC<HeaderProps> = ({
               <ul className="mobile-drawer-list">
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenSearch)}><Search size={18} /> Buscar</button></li>
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenFirSimulator)}><Award size={18} /> Simulador FIR</button></li>
-                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenStudentQuestion)}><HelpCircle size={18} /> Buzón de consultas</button></li>
+                <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenStudentQuestion)}><HelpCircle size={18} /> Buzón de dudas</button></li>
                 <li>
                   <button className="menu-item" onClick={toggleTheme}>
                     {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}

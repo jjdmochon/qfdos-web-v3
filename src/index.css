@@ -1305,6 +1305,13 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   transition: all var(--transition-smooth);
 }
 .btn-ghost-clean:hover { background: var(--hdr-tab-hover-bg); color: var(--hdr-tab-hover-ink); }
+.btn-header-buzon {
+  gap: 6px;
+  padding: 7px 11px;
+  font-size: 0.79rem;
+  font-weight: 600;
+  border-color: var(--border-color);
+}
 
 /* ==========================================================================
    Canal de secciones y regla de ocupación
