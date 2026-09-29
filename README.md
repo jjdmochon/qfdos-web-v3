@@ -104,7 +104,7 @@ Quién es cada cual lo decide Apps Script:
      hoja de entregas. El alumno ve sólo las suyas, con la respuesta cuando la
      haya; el profesor las ve todas en *Gestionar curso → Dudas de Alumnos*.
      Máximo 4000 caracteres por duda y 20 pendientes por alumno.
-   - Un estudiante sólo registra notas a su nombre; publicar exige sesión de
+   - Un estudiante sólo registra notas a su nombre y solo con los modos `alumno_evaluado` o `flashcards_autoevaluacion` (`docente_sesion` es exclusivo del profesor); publicar exige sesión de
      profesor **y** la clave.
 
 **Propiedades de Apps Script** (⚙️ → Propiedades de la secuencia de comandos):

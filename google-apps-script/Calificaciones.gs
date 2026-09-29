@@ -173,6 +173,22 @@ function doGet(e) {
   return json_({ ok: true, servicio: 'QFDOS · Calificaciones', acciones: ['misCalificaciones'] });
 }
 
+/**
+ * Modos de evaluación que puede registrar cada rol. «docente_sesion» es una
+ * sesión dirigida por el profesor y solo lo puede escribir el profesorado:
+ * antes cualquier alumno podía enviarlo y su intento aparecía como sesión
+ * docente en la hoja. Cualquier valor desconocido se trata como intento de
+ * alumno (o queda vacío si lo envía el profesorado).
+ */
+var MODOS_ALUMNO = ['alumno_evaluado', 'flashcards_autoevaluacion'];
+var MODOS_PROFESOR = ['docente_sesion', 'alumno_evaluado', 'flashcards_autoevaluacion'];
+
+function modoPermitido_(pedido, esProfesor) {
+  var m = String(pedido || '');
+  if (esProfesor) return MODOS_PROFESOR.indexOf(m) !== -1 ? m : '';
+  return MODOS_ALUMNO.indexOf(m) !== -1 ? m : 'alumno_evaluado';
+}
+
 function doPost(e) {
   var data;
   try {
@@ -190,7 +206,7 @@ function doPost(e) {
   // anotar el de otra persona (modo «Sesión docente»).
   var esProfesor = s.r === 'profesor';
   var correo = esProfesor && data.studentEmail ? String(data.studentEmail).toLowerCase().trim() : s.e;
-  var modo = data.evaluationMode || (esProfesor ? '' : 'alumno_evaluado');
+  var modo = modoPermitido_(data.evaluationMode, esProfesor);
 
   var score = Number(data.score);
   var aciertos = Number(data.correctCount);
