@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   QfdosTopic, 
   QfdosAnnouncement, 
@@ -6,9 +6,9 @@ import {
   QfdosResourceLink,
   RESOURCE_CATEGORIES,
   ResourceCategory,
-  MoleculeDrug, 
-  StudentQuestion 
+  MoleculeDrug
 } from '../data/qfdosData';
+import { Duda, cargarDudas, responderDuda, borrarDuda, fechaDuda } from '../services/dudas';
 import { 
   getStoredGeminiApiKey, 
   setStoredGeminiApiKey 
@@ -49,7 +49,6 @@ interface AdminCmsModalProps {
   announcements: QfdosAnnouncement[];
   glossary: QfdosGlossaryTerm[];
   resourceLinks: QfdosResourceLink[];
-  studentQuestions: StudentQuestion[];
   onClose: () => void;
   onUpdateTopics: (updated: QfdosTopic[]) => void;
   onUpdateAnnouncements: (updated: QfdosAnnouncement[]) => void;
@@ -57,7 +56,6 @@ interface AdminCmsModalProps {
   onUpdateResourceLinks: (updated: QfdosResourceLink[]) => void;
   publicadoEn?: string;
   onPublicado?: (cuando: string) => void;
-  onUpdateStudentQuestions: (updated: StudentQuestion[]) => void;
   onOpenCartas?: () => void;
   initialTab?: 'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey';
   initialEditingTopicId?: string;
@@ -68,7 +66,6 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   announcements,
   glossary,
   resourceLinks,
-  studentQuestions,
   onClose,
   onUpdateTopics,
   onUpdateAnnouncements,
@@ -76,7 +73,6 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   onUpdateResourceLinks,
   publicadoEn,
   onPublicado,
-  onUpdateStudentQuestions,
   onOpenCartas,
   initialTab = 'modules',
   initialEditingTopicId
@@ -599,40 +595,52 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
     localStorage.setItem('qfdos_v3_topics', JSON.stringify(updatedTopics));
   };
 
-  // Handle Respond to Student Question
-  const handleSendResponse = (qId: string) => {
-    if (!responseText.trim()) return;
+  // Buzón de dudas: se lee y se modifica en el servidor (pestaña _Dudas)
+  const [studentQuestions, setStudentQuestions] = useState<Duda[]>([]);
+  const [dudasCargando, setDudasCargando] = useState(true);
+  const [dudasAviso, setDudasAviso] = useState<string | null>(null);
+  const [enviandoRespuesta, setEnviandoRespuesta] = useState(false);
 
-    const updatedQuestions = studentQuestions.map(q => {
-      if (q.id === qId) {
-        return {
-          ...q,
-          response: responseText.trim(),
-          status: 'respondida' as const
-        };
-      }
-      return q;
-    });
+  const recargarDudas = async () => {
+    setDudasCargando(true);
+    const r = await cargarDudas();
+    if (r.ok) {
+      setStudentQuestions(r.datos);
+      setDudasAviso(null);
+    } else {
+      setDudasAviso(`No se han podido cargar las dudas: ${r.error}`);
+    }
+    setDudasCargando(false);
+  };
 
-    onUpdateStudentQuestions(updatedQuestions);
-    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updatedQuestions));
-    localStorage.removeItem('qfdos_v2_student_questions');
+  useEffect(() => { recargarDudas(); }, []);
 
+  const dudasPendientes = studentQuestions.filter(q => q.estado === 'pendiente').length;
+
+  const handleSendResponse = async (qId: string) => {
+    if (!responseText.trim() || enviandoRespuesta) return;
+    setEnviandoRespuesta(true);
+    const r = await responderDuda(qId, responseText.trim());
+    setEnviandoRespuesta(false);
+    if (!r.ok) {
+      // La respuesta sigue en el cuadro de texto para no perderla
+      setDudasAviso(`No se ha podido guardar la respuesta: ${r.error}`);
+      return;
+    }
+    setStudentQuestions(prev => prev.map(q => (q.id === qId ? r.datos : q)));
+    setDudasAviso(null);
     setRespondingQId(null);
     setResponseText('');
   };
 
-  const handleDeleteStudentQuestion = (qId: string) => {
-    const updated = studentQuestions.filter(q => q.id !== qId);
-    onUpdateStudentQuestions(updated);
-    localStorage.setItem('qfdos_v3_student_questions', JSON.stringify(updated));
-  };
-
-  const handleClearAllStudentQuestions = () => {
-    if (!window.confirm('¿Está seguro de que desea vaciar todas las dudas del buzón?')) return;
-    onUpdateStudentQuestions([]);
-    localStorage.removeItem('qfdos_v3_student_questions');
-    localStorage.removeItem('qfdos_v2_student_questions');
+  const handleDeleteStudentQuestion = async (qId: string) => {
+    if (!window.confirm('¿Eliminar esta consulta? El alumno dejará de verla.')) return;
+    const r = await borrarDuda(qId);
+    if (!r.ok) {
+      setDudasAviso(`No se ha podido eliminar: ${r.error}`);
+      return;
+    }
+    setStudentQuestions(prev => prev.filter(q => q.id !== qId));
   };
 
   return (
@@ -695,7 +703,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
               onClick={() => setActiveTab('questions')}
               className={`tab-btn ${activeTab === 'questions' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'questions'}
             >
-              <MessageSquare size={14} /> Dudas de Alumnos ({studentQuestions.length})
+              <MessageSquare size={14} /> Dudas de Alumnos ({dudasPendientes} pendientes)
             </button>
             <button
               onClick={() => setActiveTab('apikey')}
@@ -2125,23 +2133,32 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     Buzón de Preguntas y Tutorías Virtuales
                   </h4>
                   <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
-                    Preguntas enviadas por los estudiantes a través del portal. Responda para publicarlas en la sección docente.
+                    Preguntas enviadas por los estudiantes desde el portal. Cada alumno ve sólo las suyas y, cuando responda, la respuesta aparecerá en su buzón.
                   </p>
                 </div>
-                {studentQuestions.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleClearAllStudentQuestions}
-                    className="btn btn-sm btn-outline"
-                    style={{ fontSize: '0.74rem', color: 'var(--accent-red)', borderColor: 'var(--accent-red)' }}
-                    title="Vaciar todas las dudas del buzón"
-                  >
-                    <Trash2 size={13} /> Vaciar Buzón de Dudas
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={recargarDudas}
+                  disabled={dudasCargando}
+                  className="btn btn-sm btn-outline"
+                  style={{ fontSize: '0.74rem' }}
+                  title="Volver a leer las dudas del servidor"
+                >
+                  {dudasCargando ? 'Cargando…' : 'Recargar dudas'}
+                </button>
               </div>
 
-              {studentQuestions.length === 0 ? (
+              {dudasAviso && (
+                <div style={{ padding: '8px 12px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-md)', color: 'var(--accent-red)', fontSize: '0.82rem' }}>
+                  {dudasAviso}
+                </div>
+              )}
+
+              {dudasCargando && studentQuestions.length === 0 ? (
+                <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.86rem' }}>
+                  Cargando dudas…
+                </div>
+              ) : studentQuestions.length === 0 ? (
                 <div style={{
                   padding: '30px',
                   textAlign: 'center',
@@ -2161,16 +2178,16 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       className="qfdos-card"
                       style={{
                         padding: '1.25rem',
-                        borderLeft: q.status === 'pendiente' ? '4px solid #f59e0b' : '4px solid #10b981'
+                        borderLeft: q.estado === 'pendiente' ? '4px solid #f59e0b' : '4px solid #10b981'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                         <span className="qfdos-badge badge-teal" style={{ fontSize: '0.7rem' }}>
-                          {q.topicTitle}
+                          {q.temaTitulo || 'Tema General'}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className={`qfdos-badge ${q.status === 'pendiente' ? 'badge-amber' : 'badge-emerald'}`} style={{ fontSize: '0.68rem' }}>
-                            {q.status.toUpperCase()}
+                          <span className={`qfdos-badge ${q.estado === 'pendiente' ? 'badge-amber' : 'badge-emerald'}`} style={{ fontSize: '0.68rem' }}>
+                            {q.estado.toUpperCase()}
                           </span>
                           <button
                             type="button"
@@ -2192,21 +2209,21 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       </div>
 
                       <p style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-title)', marginBottom: '6px' }}>
-                        "{q.question}"
+                        "{q.pregunta}"
                       </p>
 
                       <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        Por: <strong>{q.studentName}</strong> ({q.studentEmail}) · {q.timestamp}
+                        Por: <strong>{q.nombre || q.correo}</strong> ({q.correo}) · {fechaDuda(q.recibidaEn)}
                       </div>
 
                       {/* Response display or response form */}
-                      {q.response ? (
+                      {q.respuesta ? (
                         <div style={{ background: 'var(--surface-alt)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
                           <strong style={{ fontSize: '0.78rem', color: 'var(--navy-ink)', display: 'block', marginBottom: '3px' }}>
                             Respuesta del Profesor:
                           </strong>
                           <p style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.5, margin: 0 }}>
-                            {q.response}
+                            <span style={{ whiteSpace: 'pre-wrap' }}>{q.respuesta}</span>
                           </p>
                         </div>
                       ) : respondingQId === q.id ? (
@@ -2222,8 +2239,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                             <button onClick={() => setRespondingQId(null)} className="btn btn-sm btn-outline">
                               Cancelar
                             </button>
-                            <button onClick={() => handleSendResponse(q.id)} className="btn btn-sm btn-primary">
-                              <Send size={13} /> Enviar Respuesta Oficial
+                            <button onClick={() => handleSendResponse(q.id)} disabled={enviandoRespuesta} className="btn btn-sm btn-primary">
+                              <Send size={13} /> {enviandoRespuesta ? 'Guardando…' : 'Enviar Respuesta Oficial'}
                             </button>
                           </div>
                         </div>

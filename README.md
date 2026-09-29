@@ -99,6 +99,11 @@ Quién es cada cual lo decide Apps Script:
      editan en la matriz: actualiza la fila del correo o añade una nueva. La
      hoja necesita columnas de correo, examen final, parcial, prácticas y
      trabajos.
+   - **Buzón de dudas**: `enviarDuda`, `misDudas`, `responderDuda` y
+     `borrarDuda` guardan las consultas en la pestaña oculta `_Dudas` de la
+     hoja de entregas. El alumno ve sólo las suyas, con la respuesta cuando la
+     haya; el profesor las ve todas en *Gestionar curso → Dudas de Alumnos*.
+     Máximo 4000 caracteres por duda y 20 pendientes por alumno.
    - Un estudiante sólo registra notas a su nombre; publicar exige sesión de
      profesor **y** la clave.
 
@@ -111,6 +116,10 @@ Quién es cada cual lo decide Apps Script:
 | `GOOGLE_CLIENT_ID` | Opcional (por defecto, el de la plataforma) | — |
 | `PROFESORES` | Opcional (correos separados por comas) | — |
 | `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
+
+El manifiesto del proyecto de Codigo.gs está en `google-apps-script/appsscript.json`:
+sin el permiso `script.external_request`, `iniciarSesion` no puede verificar el
+token con Google.
 
 **Orden de despliegue** tras cambiar los scripts: nueva implementación de los
 dos scripts y, justo después, compilar y publicar `docs/`. Cada mitad sola deja

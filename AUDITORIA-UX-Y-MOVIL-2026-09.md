@@ -31,7 +31,7 @@ Esta verificación del token en servidor es además **prerrequisito de la app m�
 | Punto | Estado | Nota |
 |---|---|---|
 | P1 Caché remota pegajosa | **Parcial** | Ya se purga `qfdos_v3_contenido_remoto` (`App.tsx:59`) y se descartan publicaciones más antiguas que el build (`contenidoRemoto.ts:101,128`). Pero los topics remotos se siguen copiando en `qfdos_v3_topics` (`App.tsx:272`), no hay botón «Restablecer», y `COURSE_BUILD_TIMESTAMP` (`qfdosData.ts:334`) se edita a mano: tras cada build, lo publicado antes se descarta sin avisar al profesor. |
-| P2 Buzón de dudas | **Abierto** | El alumno escribe en `qfdos_v2_student_questions` de su propio navegador (`StudentQuestionModal.tsx:26,61`), el profesor lee `qfdos_v3_*` (`App.tsx:247`) y ve dudas de ejemplo. Nada viaja por red. |
+| P2 Buzón de dudas | **Resuelto (PR del buzón)**: las dudas viven en `_Dudas` vía Apps Script. Era: | El alumno escribe en `qfdos_v2_student_questions` de su propio navegador (`StudentQuestionModal.tsx:26,61`), el profesor lee `qfdos_v3_*` (`App.tsx:247`) y ve dudas de ejemplo. Nada viaja por red. |
 | P3 Endpoints abiertos | **Abierto y peor** | Ver S1–S4. |
 | P4 Scripts duplicados | **Abierto** | Siguen `google-apps-script-receiver.gs` y un tercer despliegue, `Calificaciones.gs`, cuya URL puede sobrescribirse desde localStorage (`googleSheetsService.ts:31`). |
 | P5 Sin CI | **Abierto** | No existe `.github/`; `docs/` se compila y sube a mano. |

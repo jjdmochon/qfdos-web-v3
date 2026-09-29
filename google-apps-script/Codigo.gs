@@ -74,6 +74,10 @@ function manejar(e) {
     if (accion === 'misEntregas')      return misEntregas(p);
     if (accion === 'evaluacion')       return evaluacion(p);
     if (accion === 'guardarEvaluacion') return guardarEvaluacion(p, e);
+    if (accion === 'enviarDuda')       return enviarDuda(p, e);
+    if (accion === 'misDudas')         return misDudas(p);
+    if (accion === 'responderDuda')    return responderDuda(p, e);
+    if (accion === 'borrarDuda')       return borrarDuda(p, e);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -81,8 +85,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 3,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'anotarFila'],
+        version: 4,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -586,6 +590,157 @@ function guardarEvaluacion(p, e) {
       hoja.getRange(fila, 1, 1, ancho).setValues([valores]);
     }
     return json({ ok: true, fila: fila, nueva: nueva });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Buzón de dudas                                                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Antes la duda se guardaba sólo en el navegador del alumno y el profesor
+ * nunca la veía. Ahora vive en la pestaña oculta `_Dudas` de la hoja de
+ * entregas (fuera de la lista blanca de anotarFila y del barrido de
+ * misEntregas, que ignora las pestañas que empiezan por `_`):
+ *   · enviarDuda    — cualquier sesión; el correo sale de la sesión
+ *   · misDudas      — estudiante: las suyas; profesor: todas
+ *   · responderDuda — sólo profesor
+ *   · borrarDuda    — sólo profesor
+ */
+var HOJA_DUDAS = '_Dudas';
+var CABECERAS_DUDAS = ['id', 'recibidaEn', 'correo', 'nombre', 'temaId', 'temaTitulo', 'pregunta', 'estado', 'respuesta', 'respondidaEn'];
+var MAX_PREGUNTA = 4000;
+var MAX_PENDIENTES_POR_ALUMNO = 20;
+
+function hojaDudas_() {
+  var libro = SpreadsheetApp.openById(HOJA_ID);
+  var hoja = libro.getSheetByName(HOJA_DUDAS);
+  if (!hoja) {
+    hoja = libro.insertSheet(HOJA_DUDAS);
+    hoja.getRange(1, 1, 1, CABECERAS_DUDAS.length).setValues([CABECERAS_DUDAS]).setFontWeight('bold');
+    hoja.setFrozenRows(1);
+    hoja.hideSheet();
+  }
+  return hoja;
+}
+
+function filasDudas_(hoja) {
+  if (hoja.getLastRow() < 2) return [];
+  return hoja.getRange(2, 1, hoja.getLastRow() - 1, CABECERAS_DUDAS.length).getValues();
+}
+
+function dudaAObjeto_(f) {
+  var fecha = function (v) { return (v instanceof Date) ? v.toISOString() : String(v || ''); };
+  return {
+    id: String(f[0]),
+    recibidaEn: fecha(f[1]),
+    correo: String(f[2]),
+    nombre: String(f[3]),
+    temaId: String(f[4]),
+    temaTitulo: String(f[5]),
+    pregunta: String(f[6]),
+    estado: String(f[7]) === 'respondida' ? 'respondida' : 'pendiente',
+    respuesta: String(f[8] || ''),
+    respondidaEn: fecha(f[9])
+  };
+}
+
+function cuerpoJson_(e) {
+  try { return JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (err) { return {}; }
+}
+
+function enviarDuda(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+
+  var d = cuerpoJson_(e);
+  var pregunta = String(d.pregunta || '').trim();
+  if (!pregunta) return json({ ok: false, error: 'La duda está vacía.' });
+  if (pregunta.length > MAX_PREGUNTA) return json({ ok: false, error: 'La duda es demasiado larga (máximo ' + MAX_PREGUNTA + ' caracteres).' });
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = hojaDudas_();
+    var pendientes = filasDudas_(hoja).filter(function (f) {
+      return String(f[2]) === s.e && String(f[7]) !== 'respondida';
+    }).length;
+    if (pendientes >= MAX_PENDIENTES_POR_ALUMNO) {
+      return json({ ok: false, error: 'Tienes ' + pendientes + ' dudas sin responder. Espera a que se respondan antes de enviar más.' });
+    }
+
+    var id = 'd_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+    var ahora = new Date();
+    hoja.appendRow([
+      id, ahora, s.e,
+      textoSeguro_(String(d.nombre || '').slice(0, 120)),
+      textoSeguro_(String(d.temaId || '').slice(0, 60)),
+      textoSeguro_(String(d.temaTitulo || '').slice(0, 200)),
+      textoSeguro_(pregunta),
+      'pendiente', '', ''
+    ]);
+    return json({ ok: true, duda: dudaAObjeto_([id, ahora, s.e, d.nombre || '', d.temaId || '', d.temaTitulo || '', pregunta, 'pendiente', '', '']) });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function misDudas(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+
+  var dudas = filasDudas_(hojaDudas_())
+    .filter(function (f) { return f[0] !== '' && (s.r === 'profesor' || String(f[2]) === s.e); })
+    .map(dudaAObjeto_);
+  dudas.reverse(); // la más reciente primero
+  return json({ ok: true, dudas: dudas });
+}
+
+/** Localiza la fila (base 1) de una duda por su id, o -1. */
+function filaDeDuda_(hoja, id) {
+  var ids = hoja.getLastRow() < 2 ? [] : hoja.getRange(2, 1, hoja.getLastRow() - 1, 1).getValues();
+  for (var i = 0; i < ids.length; i++) if (String(ids[i][0]) === id) return i + 2;
+  return -1;
+}
+
+function responderDuda(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede responder dudas.' });
+
+  var d = cuerpoJson_(e);
+  var respuesta = String(d.respuesta || '').trim();
+  if (!respuesta) return json({ ok: false, error: 'La respuesta está vacía.' });
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = hojaDudas_();
+    var fila = filaDeDuda_(hoja, String(d.id || ''));
+    if (fila === -1) return json({ ok: false, error: 'Esa duda ya no existe.' });
+    // Columnas 8–10: estado, respuesta, respondidaEn
+    hoja.getRange(fila, 8, 1, 3).setValues([['respondida', textoSeguro_(respuesta.slice(0, MAX_LONGITUD)), new Date()]]);
+    return json({ ok: true, duda: dudaAObjeto_(hoja.getRange(fila, 1, 1, CABECERAS_DUDAS.length).getValues()[0]) });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function borrarDuda(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede borrar dudas.' });
+
+  var d = cuerpoJson_(e);
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = hojaDudas_();
+    var fila = filaDeDuda_(hoja, String(d.id || ''));
+    if (fila !== -1) hoja.deleteRow(fila);
+    return json({ ok: true });
   } finally {
     lock.releaseLock();
   }
