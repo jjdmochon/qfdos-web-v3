@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { QfdosTopic, testHabilitado } from '../data/qfdosData';
 import { AlumnoSeguimiento, Seguimiento, cargarSeguimiento } from '../services/seguimiento';
-import { AlertTriangle, Check, Clock, Copy, Download, Mail, RefreshCw, Search } from 'lucide-react';
+import { enviarRecordatorio } from '../services/correo';
+import { AlertTriangle, Check, Clock, Copy, Download, Mail, RefreshCw, Search, Send } from 'lucide-react';
 
 interface PanelSeguimientoProps {
   topics: QfdosTopic[];
@@ -42,6 +43,8 @@ export const PanelSeguimiento: React.FC<PanelSeguimientoProps> = ({ topics }) =>
   const [grupo, setGrupo] = useState('todos');
   const [filtro, setFiltro] = useState<Filtro>('todos');
   const [copiado, setCopiado] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [resultadoEnvio, setResultadoEnvio] = useState<{ ok: boolean; texto: string } | null>(null);
 
   // Columnas de test: los temas publicados con test habilitado. Los que están
   // «Próximamente» no se pueden hacer todavía, así que no cuentan como pendientes.
@@ -123,6 +126,36 @@ export const PanelSeguimiento: React.FC<PanelSeguimientoProps> = ({ topics }) =>
   };
   // Muchos clientes de correo recortan los enlaces mailto muy largos
   const correoAbrible = correos.length > 0 && enlaceCorreo().length < 1900;
+
+  /** Envía el recordatorio desde la plataforma (un correo por persona, con vuestra dirección como respuesta). */
+  const enviarAhora = async () => {
+    const { asunto, cuerpo } = textoRecordatorio();
+    const n = correos.length;
+    if (!n || enviando) return;
+    if (!window.confirm(`Se enviará ahora «${asunto}» a ${plural(n, 'estudiante', 'estudiantes')} desde tu cuenta. Cada persona recibe su propio correo y podrá responderte. ¿Enviar?`)) return;
+    setEnviando(true);
+    setResultadoEnvio(null);
+    const r = await enviarRecordatorio({
+      destinatarios: correos,
+      asunto,
+      cuerpo,
+      tipo: filtro === 'todos' ? 'cualquiera' : filtro.startsWith('test:') ? 'test' : filtro
+    });
+    setEnviando(false);
+    if (!r.ok) {
+      setResultadoEnvio({ ok: false, texto: r.error });
+      return;
+    }
+    const { enviados, fallidos, descartados, cuotaRestante } = r.datos;
+    const extra = [
+      fallidos.length ? `no se pudo enviar a ${fallidos.join(', ')}` : '',
+      descartados.length ? `${plural(descartados.length, 'correo descartado', 'correos descartados')} por no ser válidos` : ''
+    ].filter(Boolean).join('; ');
+    setResultadoEnvio({
+      ok: fallidos.length === 0,
+      texto: `Enviados ${enviados} de ${n}${extra ? ` (${extra})` : ''}. Hoy te quedan ${cuotaRestante} correos.`
+    });
+  };
 
   const copiarCorreos = async () => {
     try {
@@ -307,25 +340,34 @@ export const PanelSeguimiento: React.FC<PanelSeguimientoProps> = ({ topics }) =>
       <div className="qfdos-card" style={{ padding: '0.85rem 1rem', ...fila, justifyContent: 'space-between' }}>
         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: '520px', lineHeight: 1.45 }}>
           <strong style={{ color: 'var(--text-title)' }}>Recordatorio:</strong> {correos.length
-            ? `${plural(correos.length, 'estudiante en pantalla tiene', 'estudiantes en pantalla tienen')} algo pendiente${filtro === 'todos' ? '' : ' según el filtro'}. El correo se prepara con copia oculta y lo enviáis vosotros desde vuestra cuenta.`
+            ? `${plural(correos.length, 'estudiante en pantalla tiene', 'estudiantes en pantalla tienen')} algo pendiente${filtro === 'todos' ? '' : ' según el filtro'}. «Enviar ahora» manda un correo a cada persona desde tu cuenta; «Preparar en mi correo» lo deja listo con copia oculta para que lo envíes tú.`
             : 'No hay estudiantes con pendientes en pantalla.'}
         </div>
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           <button type="button" onClick={copiarCorreos} disabled={!correos.length} className="btn btn-sm btn-outline" style={{ fontSize: '0.76rem' }}>
             <Copy size={13} /> {copiado ? 'Copiados ✓' : `Copiar correos (${correos.length})`}
           </button>
+          <button type="button" onClick={enviarAhora} disabled={!correos.length || enviando} className="btn btn-sm btn-primary" style={{ fontSize: '0.76rem' }}
+            title="Envía el recordatorio ahora desde la plataforma, un correo por persona">
+            <Send size={13} /> {enviando ? 'Enviando…' : `Enviar ahora (${correos.length})`}
+          </button>
           {correoAbrible ? (
             <a href={enlaceCorreo()} className="btn btn-sm btn-primary" style={{ fontSize: '0.76rem', textDecoration: 'none' }}>
-              <Mail size={13} /> Preparar correo
+              <Mail size={13} /> Preparar en mi correo
             </a>
           ) : (
             <button type="button" disabled className="btn btn-sm btn-primary" style={{ fontSize: '0.76rem' }}
               title={correos.length ? 'Demasiados destinatarios para un enlace de correo: copia los correos y pégalos en tu cliente' : undefined}>
-              <Mail size={13} /> Preparar correo
+              <Mail size={13} /> Preparar en mi correo
             </button>
           )}
         </div>
       </div>
+      {resultadoEnvio && (
+        <div className={resultadoEnvio.ok ? 'status-msg status-msg--ok' : 'status-msg status-msg--bad'} role={resultadoEnvio.ok ? 'status' : 'alert'}>
+          <span>{resultadoEnvio.texto}</span>
+        </div>
+      )}
     </div>
   );
 };

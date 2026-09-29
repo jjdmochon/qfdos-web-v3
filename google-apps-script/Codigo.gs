@@ -81,6 +81,7 @@ function manejar(e) {
     if (accion === 'cuaderno')         return cuaderno(p);
     if (accion === 'calificarCuaderno') return calificarCuaderno(p, e);
     if (accion === 'publicarNotasCuaderno') return publicarNotasCuaderno(p, e);
+    if (accion === 'enviarRecordatorio') return enviarRecordatorio(p, e);
     if (accion === 'seguimiento')      return seguimiento(p);
     if (accion === 'iniciarSubida')    return iniciarSubida(p, e);
     if (accion === 'subirFragmento')   return subirFragmento(p, e);
@@ -94,8 +95,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 9,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
+        version: 10,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -744,7 +745,19 @@ function responderDuda(p, e) {
     if (fila === -1) return json({ ok: false, error: 'Esa duda ya no existe.' });
     // Columnas 8–10: estado, respuesta, respondidaEn
     hoja.getRange(fila, 8, 1, 3).setValues([['respondida', textoSeguro_(respuesta.slice(0, MAX_LONGITUD)), new Date()]]);
-    return json({ ok: true, duda: dudaAObjeto_(hoja.getRange(fila, 1, 1, CABECERAS_DUDAS.length).getValues()[0]) });
+    var duda = dudaAObjeto_(hoja.getRange(fila, 1, 1, CABECERAS_DUDAS.length).getValues()[0]);
+    // El aviso por correo es opcional y nunca impide guardar la respuesta
+    var avisado = false;
+    var errorAviso = '';
+    if (d.avisar === true) {
+      try {
+        avisarRespuestaDuda_(duda, respuesta, s.e);
+        avisado = true;
+      } catch (err) {
+        errorAviso = String(err && err.message ? err.message : err);
+      }
+    }
+    return json({ ok: true, duda: duda, avisado: avisado, errorAviso: errorAviso });
   } finally {
     lock.releaseLock();
   }
@@ -821,6 +834,124 @@ function publicarNotasCuaderno(p, e) {
   if (typeof d.publicadas !== 'boolean') return json({ ok: false, error: 'Falta indicar si se publican o se ocultan.' });
   PropertiesService.getScriptProperties().setProperty('NOTAS_CUADERNO_PUBLICAS', d.publicadas ? '1' : '0');
   return json({ ok: true, notasPublicadas: d.publicadas });
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Correo: recordatorios y aviso de respuesta a una duda               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Envía correos desde la cuenta del profesor (MailApp, permiso
+ * script.send_mail). Solo profesorado. Cada persona recibe su propio mensaje
+ * (no hay copia oculta con la lista de la clase) y las respuestas van al
+ * correo del profesor que lo envió.
+ *
+ * Límites: destinatarios con correo válido de la UGR o personal, sin
+ * repetidos, máximo 300 por envío y sin superar la cuota diaria de la cuenta
+ * (unos 100 en cuentas personales, 1500 en Workspace). Cada envío queda
+ * anotado en la pestaña oculta `_Correos`.
+ */
+var HOJA_CORREOS = '_Correos';
+var MAX_DESTINATARIOS = 300;
+var MAX_CUERPO_CORREO = 3000;
+var NOMBRE_REMITENTE = 'QFDOS · Química Farmacéutica II';
+var URL_PLATAFORMA = 'https://jjdmochon.github.io/qfdos-web-v3/';
+
+/** Ejecutar UNA vez desde el editor (Ejecutar → autorizarCorreo) para conceder el permiso de correo. */
+function autorizarCorreo() {
+  Logger.log('Correo listo. Cuota diaria restante: ' + MailApp.getRemainingDailyQuota());
+}
+
+function destinatarioValido_(c) {
+  return /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(c) &&
+    (terminaEn_(c, DOMINIOS_UGR) || terminaEn_(c, DOMINIOS_PERSONALES));
+}
+
+function anotarCorreo_(quien, asunto, tipo, enviados, fallidos) {
+  var libro = SpreadsheetApp.openById(HOJA_ID);
+  var hoja = libro.getSheetByName(HOJA_CORREOS);
+  if (!hoja) {
+    hoja = libro.insertSheet(HOJA_CORREOS);
+    hoja.getRange(1, 1, 1, 6).setValues([['fecha', 'profesor', 'tipo', 'asunto', 'enviados', 'fallidos']]).setFontWeight('bold');
+    hoja.setFrozenRows(1);
+    hoja.hideSheet();
+  }
+  hoja.appendRow([new Date(), quien, tipo, textoSeguro_(asunto), enviados, fallidos]);
+}
+
+function enviarRecordatorio(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede enviar recordatorios.' });
+
+  var d = cuerpoJson_(e);
+  var asunto = String(d.asunto || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 150);
+  var cuerpo = String(d.cuerpo || '').trim().slice(0, MAX_CUERPO_CORREO);
+  if (!asunto || !cuerpo) return json({ ok: false, error: 'Faltan el asunto o el mensaje.' });
+  if (!Array.isArray(d.destinatarios) || !d.destinatarios.length) return json({ ok: false, error: 'No hay destinatarios.' });
+
+  var vistos = {};
+  var destinatarios = [];
+  var descartados = [];
+  d.destinatarios.forEach(function (c) {
+    var correo = String(c || '').trim().toLowerCase();
+    if (vistos.hasOwnProperty(correo)) return;
+    vistos[correo] = true;
+    if (destinatarioValido_(correo)) destinatarios.push(correo);
+    else descartados.push(correo.slice(0, 60));
+  });
+  if (!destinatarios.length) return json({ ok: false, error: 'Ningún destinatario tiene un correo válido.' });
+  if (destinatarios.length > MAX_DESTINATARIOS) {
+    return json({ ok: false, error: 'Demasiados destinatarios (máximo ' + MAX_DESTINATARIOS + ' por envío).' });
+  }
+
+  var cuota = MailApp.getRemainingDailyQuota();
+  if (cuota < destinatarios.length) {
+    return json({ ok: false, codigo: 'cuota_correo', error: 'Hoy solo quedan ' + cuota + ' correos por enviar en esta cuenta y vas a enviar ' + destinatarios.length + '.' });
+  }
+
+  var pie = '\n\n—\nMensaje enviado desde la plataforma QFDOS (' + URL_PLATAFORMA + '). Puedes responder a este correo.';
+  var enviados = 0;
+  var fallidos = [];
+  destinatarios.forEach(function (correo) {
+    try {
+      MailApp.sendEmail({
+        to: correo,
+        subject: '[QFDOS] ' + asunto.replace(/^\[QFDOS\]\s*/i, ''),
+        body: cuerpo + pie,
+        replyTo: s.e,
+        name: NOMBRE_REMITENTE
+      });
+      enviados++;
+    } catch (err) {
+      fallidos.push(correo);
+    }
+  });
+  anotarCorreo_(s.e, asunto, String(d.tipo || 'recordatorio').slice(0, 30), enviados, fallidos.length);
+  return json({
+    ok: true, enviados: enviados, fallidos: fallidos, descartados: descartados,
+    cuotaRestante: MailApp.getRemainingDailyQuota()
+  });
+}
+
+/** Correo al alumno cuando el profesor responde su duda. Lanza si falla. */
+function avisarRespuestaDuda_(duda, respuesta, profesor) {
+  if (!destinatarioValido_(String(duda.correo || '').toLowerCase())) throw new Error('El correo de la duda no es válido.');
+  var cuerpo =
+    'Hola' + (duda.nombre ? ' ' + duda.nombre : '') + ',\n\n' +
+    'Han respondido tu duda' + (duda.temaTitulo ? ' sobre «' + duda.temaTitulo + '»' : '') + ':\n\n' +
+    'Tu pregunta:\n' + duda.pregunta.slice(0, 1500) + '\n\n' +
+    'Respuesta:\n' + respuesta.slice(0, 2500) + '\n\n' +
+    'También la tienes en la plataforma, en el buzón de dudas: ' + URL_PLATAFORMA +
+    '\n\n—\nMensaje enviado desde la plataforma QFDOS. Puedes responder a este correo.';
+  MailApp.sendEmail({
+    to: duda.correo,
+    subject: '[QFDOS] Respuesta a tu duda',
+    body: cuerpo,
+    replyTo: profesor,
+    name: NOMBRE_REMITENTE
+  });
 }
 
 /** Devuelve el índice (base 1) de una columna, creándola al final si no existe. */

@@ -127,6 +127,16 @@ Quién es cada cual lo decide Apps Script:
      hoja de entregas. El alumno ve sólo las suyas, con la respuesta cuando la
      haya; el profesor las ve todas en *Gestionar curso → Dudas de Alumnos*.
      Máximo 4000 caracteres por duda y 20 pendientes por alumno.
+   - **Correo desde la plataforma** (v10): `enviarRecordatorio` (sólo profesor)
+     manda un correo a cada persona desde la cuenta del profesor (MailApp, con
+     su dirección como respuesta): sólo a correos de la UGR o personales, sin
+     repetidos, máximo 300 por envío y dentro de la cuota diaria (unos 100 en
+     cuentas personales, 1500 en Workspace). Cada envío queda en la pestaña
+     oculta `_Correos`. Se usa desde *Seguimiento → Enviar ahora*, y
+     `responderDuda` puede avisar al alumno (casilla «Avisar al alumno por
+     correo»; si el correo falla, la respuesta se guarda igualmente). Exige el
+     permiso `script.send_mail` del manifiesto y ejecutar una vez
+     `autorizarCorreo` desde el editor.
    - **Notas del cuaderno al alumnado** (v9): `publicarNotasCuaderno` (sólo
      profesor) activa o desactiva la propiedad `NOTAS_CUADERNO_PUBLICAS`.
      Mientras esté desactivada (por defecto) `misEntregas` oculta al alumnado
