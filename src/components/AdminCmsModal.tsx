@@ -9,6 +9,7 @@ import {
   MoleculeDrug
 } from '../data/qfdosData';
 import { PanelDudasProfesor } from './PanelDudasProfesor';
+import { PanelSeguimiento } from './PanelSeguimiento';
 import { 
   getStoredGeminiApiKey, 
   setStoredGeminiApiKey 
@@ -41,7 +42,8 @@ import {
   Link2,
   Image,
   Film,
-  Headphones
+  Headphones,
+  Users
 } from 'lucide-react';
 
 interface AdminCmsModalProps {
@@ -60,7 +62,7 @@ interface AdminCmsModalProps {
   /** Dudas del alumnado sin responder (lo calcula App y se actualiza desde el panel). */
   dudasPendientes?: number;
   onDudasPendientes?: (n: number) => void;
-  initialTab?: 'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey';
+  initialTab?: 'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'seguimiento' | 'apikey';
   initialEditingTopicId?: string;
 }
 
@@ -82,7 +84,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   initialTab = 'modules',
   initialEditingTopicId
 }) => {
-  const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'seguimiento' | 'apikey'>(initialTab);
   const [materialsTopicId, setMaterialsTopicId] = useState<string>('');
   const [moduleSaveSuccess, setModuleSaveSuccess] = useState<string | null>(null);
 
@@ -659,6 +661,12 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
               className={`tab-btn ${activeTab === 'questions' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'questions'}
             >
               <MessageSquare size={14} /> Dudas de Alumnos ({dudasPendientes} pendientes)
+            </button>
+            <button
+              onClick={() => setActiveTab('seguimiento')}
+              className={`tab-btn ${activeTab === 'seguimiento' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'seguimiento'}
+            >
+              <Users size={14} /> Seguimiento
             </button>
             <button
               onClick={() => setActiveTab('apikey')}
@@ -2082,6 +2090,10 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
           {/* TAB 4: Dudas de Alumnos */}
           {activeTab === 'questions' && (
             <PanelDudasProfesor onPendientes={onDudasPendientes} />
+          )}
+
+          {activeTab === 'seguimiento' && (
+            <PanelSeguimiento topics={topics} />
           )}
 
           {/* TAB 5: Clave API Gemini */}

@@ -80,6 +80,7 @@ function manejar(e) {
     if (accion === 'borrarDuda')       return borrarDuda(p, e);
     if (accion === 'cuaderno')         return cuaderno(p);
     if (accion === 'calificarCuaderno') return calificarCuaderno(p, e);
+    if (accion === 'seguimiento')      return seguimiento(p);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -87,8 +88,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 5,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'anotarFila'],
+        version: 6,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'seguimiento', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -842,6 +843,171 @@ function calificarCuaderno(p, e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. Seguimiento del alumnado (profesorado)                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Hoja de calificaciones de los tests (la escribe Calificaciones.gs). Se abre
+ * por id porque es otro libro; este script corre con la cuenta del profesor,
+ * que es la propietaria de los dos. Se puede cambiar con la propiedad
+ * CALIFICACIONES_HOJA_ID.
+ */
+var CALIFICACIONES_HOJA_ID = '1ha8QIAHQqK7PFm0wQJfeSsG3Y24_vovAlphvVfR7gME';
+var HOJA_TESTS = 'Respuestas_QFDOS';
+
+function iso_(v) {
+  return (v instanceof Date) ? v.toISOString() : String(v === undefined || v === null ? '' : v);
+}
+
+/**
+ * «Marca Temporal» de la hoja de tests: la escribe el navegador como texto
+ * («29/09/2026 11:38») y Sheets puede dejarla como texto o convertirla en
+ * fecha. Se pasa a ISO para poder comparar; vacío si no se entiende.
+ */
+function marcaAIso_(v) {
+  if (v instanceof Date) return v.toISOString();
+  var m = String(v || '').match(/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})[\s,]*(?:(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (!m) return '';
+  var d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0));
+  return isNaN(d.getTime()) ? '' : d.toISOString();
+}
+
+function correoValido_(v) {
+  var c = String(v || '').trim().toLowerCase();
+  return c.indexOf('@') > 0 ? c : '';
+}
+
+/** Filas de una pestaña como objetos {cabecera: valor}; [] si no existe. */
+function filasComoObjetos_(libro, nombre) {
+  var hoja = libro.getSheetByName(nombre);
+  if (!hoja || hoja.getLastRow() < 2) return [];
+  var datos = hoja.getDataRange().getValues();
+  var cab = datos[0].map(String);
+  var filas = [];
+  for (var f = 1; f < datos.length; f++) {
+    var o = {};
+    for (var c = 0; c < cab.length; c++) if (cab[c] !== '') o[cab[c]] = datos[f][c];
+    filas.push(o);
+  }
+  return filas;
+}
+
+/**
+ * Una fila por estudiante con lo que ha hecho: normas firmadas, cuaderno,
+ * tests por tema y flashcards. La lista de matriculados es la hoja de
+ * evaluación (correo, nombre y, si existe, una columna «Grupo»); quien aparece
+ * en otras hojas y no está en ella se marca `enLista: false`. Sin esa lista no
+ * se puede saber quién NO ha entregado nada.
+ */
+function seguimiento(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede ver el seguimiento.' });
+
+  var alumnos = {};
+  var alumno_ = function (correo, nombre) {
+    var a = alumnos[correo];
+    if (!a) {
+      a = alumnos[correo] = {
+        email: correo, nombre: '', grupo: '', enLista: false,
+        normas: null, cuaderno: null, tests: {}, flashcards: 0, ultima: ''
+      };
+    }
+    if (!a.nombre && nombre) a.nombre = String(nombre).trim();
+    return a;
+  };
+  var actividad_ = function (a, cuando) {
+    if (cuando && cuando > a.ultima) a.ultima = cuando;
+  };
+
+  var libro = SpreadsheetApp.openById(HOJA_ID);
+
+  // 1. Lista de matriculados (hoja de evaluación)
+  var hayLista = false;
+  var libroEval = SpreadsheetApp.openById(propiedad_('EVALUACION_HOJA_ID') || EVALUACION_HOJA_ID);
+  var hojaEval = libroEval.getSheets()[0];
+  if (hojaEval && hojaEval.getLastRow() >= 2) {
+    var de = hojaEval.getDataRange().getValues();
+    var col = columnasEvaluacion_(de[0]);
+    var colGrupo = -1;
+    for (var g = 0; g < de[0].length; g++) if (/grupo/i.test(String(de[0][g]))) { colGrupo = g; break; }
+    if (col.correo !== -1) {
+      for (var i = 1; i < de.length; i++) {
+        var ce = correoValido_(de[i][col.correo]);
+        if (!ce) continue;
+        var ae = alumno_(ce, col.nombre !== -1 ? de[i][col.nombre] : '');
+        ae.enLista = true;
+        if (colGrupo !== -1) ae.grupo = String(de[i][colGrupo] || '').trim();
+        hayLista = true;
+      }
+    }
+  }
+
+  // 2. Normas de seguridad firmadas
+  filasComoObjetos_(libro, 'normas de seguridad').forEach(function (r) {
+    var c = correoValido_(r.cuentaVerificada || r.email);
+    if (!c) return;
+    var a = alumno_(c, r.nombre);
+    var cuando = iso_(r.recibidoEn);
+    if (!a.normas || cuando > a.normas) a.normas = cuando || 'firmada';
+    actividad_(a, cuando);
+  });
+
+  // 3. Cuaderno de parejas: la entrega cuenta para los dos miembros y para quien la envió
+  var porCuaderno = {};
+  filasComoObjetos_(libro, HOJA_CUADERNO).forEach(function (r) {
+    var cuando = iso_(r.recibidoEn);
+    var miembros = {};
+    [[r.email1, r.alumno1], [r.email2, r.alumno2], [r.cuentaVerificada, '']].forEach(function (par) {
+      var c = correoValido_(par[0]);
+      if (c) miembros[c] = par[1];
+    });
+    Object.keys(miembros).forEach(function (c) {
+      var a = alumno_(c, miembros[c]);
+      var previo = a.cuaderno;
+      var nota = (r.notaProfesor === '' || r.notaProfesor === undefined) ? null : Number(r.notaProfesor);
+      a.cuaderno = {
+        entregas: (previo ? previo.entregas : 0) + 1,
+        ultima: previo && previo.ultima > cuando ? previo.ultima : cuando,
+        // La nota es la de la entrega más reciente
+        nota: (previo && previo.ultima > cuando) ? previo.nota : (isNaN(nota) ? null : nota)
+      };
+      actividad_(a, cuando);
+    });
+  });
+
+  // 4. Tests y flashcards (otro libro)
+  var hayTests = true;
+  try {
+    var libroTests = SpreadsheetApp.openById(propiedad_('CALIFICACIONES_HOJA_ID') || CALIFICACIONES_HOJA_ID);
+    filasComoObjetos_(libroTests, HOJA_TESTS).forEach(function (r) {
+      var c = correoValido_(r['Correo UGR']);
+      if (!c) return;
+      var a = alumno_(c, r['Apellidos y Nombre']);
+      var cuando = marcaAIso_(r['Marca Temporal']);
+      var modo = String(r['Modo Evaluación'] || '');
+      actividad_(a, cuando);
+      if (modo === 'flashcards_autoevaluacion') { a.flashcards++; return; }
+      var tema = String(r['Tema'] || '');
+      if (!tema) return;
+      var t = a.tests[tema] || (a.tests[tema] = { intentos: 0, mejor: null, ultima: '' });
+      var nota = Number(r['Nota Final (/10)']);
+      t.intentos++;
+      if (!isNaN(nota) && (t.mejor === null || nota > t.mejor)) t.mejor = nota;
+      if (cuando > t.ultima) t.ultima = cuando;
+    });
+  } catch (err) {
+    hayTests = false;  // sin acceso a la hoja de tests: se sigue con el resto
+  }
+
+  var lista = Object.keys(alumnos).map(function (c) { return alumnos[c]; });
+  lista.sort(function (x, y) {
+    return (x.nombre || x.email).toLowerCase().localeCompare((y.nombre || y.email).toLowerCase());
+  });
+  return json({ ok: true, generado: new Date().toISOString(), hayLista: hayLista, hayTests: hayTests, alumnos: lista });
 }
 
 /* ------------------------------------------------------------------ */

@@ -112,6 +112,14 @@ Quién es cada cual lo decide Apps Script:
      otra pareja si se han borrado o insertado filas. Esas tres columnas no
      las puede escribir el alumnado ni las ve en «Mis entregas». Si una pareja
      entrega varias veces, el panel muestra la última.
+   - **Seguimiento** (`seguimiento`, sólo profesor): una fila por estudiante
+     con normas firmadas, cuaderno (y su nota), mejor nota e intentos de cada
+     test, sesiones de flashcards y última actividad. Cruza la pestaña
+     `normas de seguridad` y `Cuaderno de parejas` de la hoja de entregas, la
+     hoja de calificaciones de los tests (`CALIFICACIONES_HOJA_ID`, por defecto
+     la actual) y la hoja de evaluación, que hace de **lista de matriculados**:
+     sin correos ahí no se puede saber quién no ha hecho nada. Si esa hoja
+     tiene una columna «Grupo», el panel permite filtrar por grupo.
    - Un estudiante sólo registra notas a su nombre y solo con los modos `alumno_evaluado` o `flashcards_autoevaluacion` (`docente_sesion` es exclusivo del profesor); publicar exige sesión de
      profesor **y** la clave.
 
@@ -124,6 +132,7 @@ Quién es cada cual lo decide Apps Script:
 | `GOOGLE_CLIENT_ID` | Opcional (por defecto, el de la plataforma) | — |
 | `PROFESORES` | Opcional (correos separados por comas) | — |
 | `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
+| `CALIFICACIONES_HOJA_ID` | Opcional (por defecto, la hoja de calificaciones actual; la lee el seguimiento) | — |
 
 El manifiesto del proyecto de Codigo.gs está en `google-apps-script/appsscript.json`:
 sin el permiso `script.external_request`, `iniciarSesion` no puede verificar el

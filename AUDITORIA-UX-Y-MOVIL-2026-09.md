@@ -47,7 +47,7 @@ Esta verificación del token en servidor es además **prerrequisito de la app m�
 - **Las dudas del alumnado no llegan** (P2). Hace falta una acción `guardarDuda` y otra `listarDudas` (solo profesor, con token verificado), más un contador de dudas pendientes en la cabecera del profesor.
 
 ### Media
-- **No hay un panel de seguimiento.** Nada cruza lista de matriculados × entregas × tests. **Propuesta:** una pestaña «Seguimiento» con:
+- **Panel de seguimiento: resuelto** (Gestionar curso → Seguimiento; matriz alumno × normas / cuaderno / tests, filtros, CSV y recordatorio por correo preparado). Faltaba: **no había un panel de seguimiento.** Nada cruza lista de matriculados × entregas × tests. **Propuesta:** una pestaña «Seguimiento» con:
   - matriz alumno × práctica/test, con estados entregado / pendiente / tarde;
   - filtros por grupo (C/E) y pareja;
   - exportación CSV;

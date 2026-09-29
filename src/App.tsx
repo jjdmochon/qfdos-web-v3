@@ -315,7 +315,7 @@ export const App: React.FC = () => {
     return () => window.clearInterval(id);
   }, [refrescarDudas, isProfesor]);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
-  const [cmsInitialTab, setCmsInitialTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'apikey'>('modules');
+  const [cmsInitialTab, setCmsInitialTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'seguimiento' | 'apikey'>('modules');
   const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
   const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
   const [isCartasModalOpen, setIsCartasModalOpen] = useState(false);
