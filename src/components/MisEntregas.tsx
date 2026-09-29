@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Inbox, RefreshCw, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { NotaCuaderno } from './practicas/NotaCuaderno';
 import { misEntregas, EntregaPropia, publicacionDisponible, getCachedEntregas } from '../services/contenidoRemoto';
 
 /** Etiquetas legibles para las claves que llegan de la hoja. */
@@ -15,7 +16,7 @@ const ETIQUETAS: Record<string, string> = {
   recibidoEn: 'Recibido'
 };
 
-const OCULTAR = ['email1', 'email2', 'cuentaDeEnvio', 'email', 'iniciales'];
+const OCULTAR = ['email1', 'email2', 'cuentaDeEnvio', 'email', 'iniciales', 'notaProfesor', 'comentarioProfesor', 'calificadoEn'];
 
 interface MisEntregasProps {
   entregasProp?: EntregaPropia[] | null;
@@ -112,6 +113,8 @@ export const MisEntregas: React.FC<MisEntregasProps> = ({
           algo, pulsa «Actualizar»: la hoja tarda unos segundos en reflejarlo.
         </div>
       )}
+
+      {!error && <NotaCuaderno entregas={entregas} />}
 
       {!error && !!entregas?.length && (
         <ul className="mis-entregas-lista">

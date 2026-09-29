@@ -12,7 +12,7 @@ import { EncabezadoReaccion } from './EncabezadoReaccion';
 import { DesgloseRendimiento } from './DesgloseRendimiento';
 import { EntregaProfesor } from './EntregaProfesor';
 import { useAuth } from '../../context/AuthContext';
-import { cargarCuaderno, calificarInforme, InformeCuaderno } from '../../services/cuaderno';
+import { cargarCuaderno, calificarInforme, publicarNotas, InformeCuaderno } from '../../services/cuaderno';
 
 const STORAGE_KEY = 'qfdos_pair_reports';
 
@@ -210,12 +210,34 @@ export const PracticasPairReport: React.FC = () => {
   const [cargandoInformes, setCargandoInformes] = useState(false);
   const [avisoInformes, setAvisoInformes] = useState<string | null>(null);
   const [guardandoNota, setGuardandoNota] = useState(false);
+  // Mientras no se publiquen, el alumnado no ve ni la nota ni el comentario
+  const [notasPublicadas, setNotasPublicadas] = useState(false);
+  const [cambiandoPublicacion, setCambiandoPublicacion] = useState(false);
+
+  const alternarPublicacion = async () => {
+    const publicar = !notasPublicadas;
+    const calificadas = informes.filter(i => i.profesorGrade !== undefined).length;
+    const aviso = publicar
+      ? `Se publicarán las notas y comentarios de ${calificadas} cuaderno${calificadas === 1 ? '' : 's'} calificado${calificadas === 1 ? '' : 's'}. Cada pareja verá solo el suyo. ¿Continuar?`
+      : 'Las parejas dejarán de ver su nota y su comentario. ¿Continuar?';
+    if (!window.confirm(aviso)) return;
+    setCambiandoPublicacion(true);
+    const r = await publicarNotas(publicar);
+    if (r.ok) {
+      setNotasPublicadas(r.datos);
+      setAvisoInformes(null);
+    } else {
+      setAvisoInformes(`No se ha podido cambiar la publicación: ${r.error}`);
+    }
+    setCambiandoPublicacion(false);
+  };
 
   const recargarInformes = async () => {
     setCargandoInformes(true);
     const r = await cargarCuaderno();
     if (r.ok) {
-      setInformes(r.datos);
+      setInformes(r.datos.informes);
+      setNotasPublicadas(r.datos.notasPublicadas);
       setAvisoInformes(null);
     } else {
       setAvisoInformes(`No se han podido cargar las entregas: ${r.error}`);
@@ -635,7 +657,19 @@ export const PracticasPairReport: React.FC = () => {
               <UserCheck size={16} />
               <span><strong>Modo Profesor (Dr. Juanjo):</strong> Las entregas se leen de la hoja de cálculo (botón Recargar para ver las nuevas), filtra por Grupo/Puesto, revisa los datos experimentales, asigna calificaciones (/10) y exporta las actas a CSV.</span>
             </div>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={alternarPublicacion}
+                disabled={cambiandoPublicacion}
+                className={`btn btn-xs ${notasPublicadas ? 'btn-outline' : 'btn-navy'}`}
+                style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                title={notasPublicadas
+                  ? 'Las parejas ven ahora su nota y su comentario en «Mis entregas». Pulsa para ocultarlas.'
+                  : 'Las parejas no ven todavía su nota. Pulsa para publicarlas.'}
+              >
+                <Eye size={12} /> {notasPublicadas ? 'Notas publicadas · Ocultar' : 'Publicar notas al alumnado'}
+              </button>
               <button
                 type="button"
                 onClick={handleExportCSV}

@@ -127,6 +127,12 @@ Quién es cada cual lo decide Apps Script:
      hoja de entregas. El alumno ve sólo las suyas, con la respuesta cuando la
      haya; el profesor las ve todas en *Gestionar curso → Dudas de Alumnos*.
      Máximo 4000 caracteres por duda y 20 pendientes por alumno.
+   - **Notas del cuaderno al alumnado** (v9): `publicarNotasCuaderno` (sólo
+     profesor) activa o desactiva la propiedad `NOTAS_CUADERNO_PUBLICAS`.
+     Mientras esté desactivada (por defecto) `misEntregas` oculta al alumnado
+     `notaProfesor`, `comentarioProfesor` y `calificadoEn`; al publicarlas, cada
+     pareja ve su nota y su comentario en *Prácticas → Mi progreso* y en *Mis
+     entregas*. El interruptor está en el panel del profesor del cuaderno.
    - **Progreso sincronizado** (v8): `leerProgreso` y `guardarProgreso` guardan
      las valoraciones de flashcards de cada alumno en la pestaña oculta
      `_Progreso` (una fila por correo y clave). Cada valoración lleva su marca
