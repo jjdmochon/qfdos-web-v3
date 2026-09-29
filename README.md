@@ -88,6 +88,10 @@ Configuración única en el proyecto de Apps Script de `Codigo.gs`:
    la carpeta y deja su enlace en el Registro de ejecución.
 3. Publicar una versión nueva de la implementación.
 
+Los campos de enlace de **Diapositivas** y **Apuntes** del formulario de cada
+módulo (Módulos → Añadir/Editar, y el editor rápido de la ficha del tema) tienen
+un botón **Subir a Drive** que sube el fichero y escribe su enlace en el campo.
+
 Las audios de las píldoras del curso siguen viviendo en `public/audio/` (el
 reproductor de la web necesita un fichero directo, no un enlace de Drive). Hay
 un apartado plegado, «Guardar solo en este navegador», con el almacenamiento

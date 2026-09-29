@@ -4,6 +4,7 @@ import { Chem2DDrawer } from './Chem2DDrawer';
 import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
 import { RetrosintesisWorkshop } from './RetrosintesisWorkshop';
+import { BotonSubirDrive } from './BotonSubirDrive';
 import { Model3DViewerModal } from './Model3DViewerModal';
 import { CartasDeckView } from './cartas';
 import { 
@@ -440,6 +441,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           className="form-input"
                           style={{ width: '100%', fontSize: '0.8rem' }}
                         />
+                        <BotonSubirDrive onSubido={a => setEditNotesUrl(a.url)} />
                       </div>
                       <div>
                         <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
@@ -453,6 +455,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           className="form-input"
                           style={{ width: '100%', fontSize: '0.8rem' }}
                         />
+                        <BotonSubirDrive onSubido={a => setEditSlidesUrl(a.url)} />
                       </div>
                       <div>
                         <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-title)', display: 'block', marginBottom: '4px' }}>
