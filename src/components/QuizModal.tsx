@@ -133,14 +133,43 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Records / Grading Dashboard State
   // Google Sheets Integration State
-  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida'>('idle');
+  const [sheetSubmitStatus, setSheetSubmitStatus] = useState<'idle' | 'sending' | 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida' | 'rechazado'>('idle');
   const ultimoIntentoRef = React.useRef<QuizRegistrationRecord | null>(null);
+  const [mensajeRechazo, setMensajeRechazo] = useState('');
+  const [avisoCorreccion, setAvisoCorreccion] = useState('');
+
+  /**
+   * Tras el envío: el servidor corrige por su cuenta y anota SU nota. Si
+   * difiere de la que calculó el navegador (claves distintas, por ejemplo tras
+   * editar una pregunta), la nota válida es la del servidor y el historial
+   * local se ajusta a ella.
+   */
+  const alTerminarEnvio = (res: GoogleSheetsSubmissionResult) => {
+    setSheetSubmitStatus(res.status);
+    setMensajeRechazo(res.status === 'rechazado' ? res.message : '');
+    const c = res.correccionServidor;
+    const intento = ultimoIntentoRef.current;
+    if (!c || !intento || (c.score === intento.score && c.correctCount === intento.correctCount)) return;
+    const corregido = { ...intento, score: c.score, correctCount: c.correctCount, totalQuestions: c.totalQuestions };
+    ultimoIntentoRef.current = corregido;
+    try {
+      const guardados: QuizRegistrationRecord[] = JSON.parse(localStorage.getItem(REGISTRATION_STORAGE_KEY) || '[]');
+      const ajustados = guardados.map(r => (r.id === intento.id ? corregido : r));
+      localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(ajustados));
+      localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(ajustados));
+    } catch {
+      // sin almacenamiento: el aviso de abajo sigue valiendo
+    }
+    setRecords(prev => prev.map(r => (r.id === intento.id ? corregido : r)));
+    setAvisoCorreccion(`El servidor ha corregido tu intento: ${c.correctCount} de ${c.totalQuestions} aciertos (${c.score} / 10). Esa es la nota que consta.`);
+  };
+
   const reenviarAHoja = () => {
     const intento = ultimoIntentoRef.current;
     if (!intento) return;
     setSheetSubmitStatus('sending');
     submitAttemptToGoogleSheets(intento)
-      .then((res: GoogleSheetsSubmissionResult) => setSheetSubmitStatus(res.status))
+      .then(alTerminarEnvio)
       .catch(() => setSheetSubmitStatus('network_error'));
   };
   const [showSheetsConfig, setShowSheetsConfig] = useState<boolean>(false);
@@ -524,10 +553,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       // Enviar de forma asíncrona a Google Sheets
       ultimoIntentoRef.current = finalAttempt;
       setSheetSubmitStatus('sending');
+      setAvisoCorreccion('');
       submitAttemptToGoogleSheets(finalAttempt)
-        .then((res: GoogleSheetsSubmissionResult) => {
-          setSheetSubmitStatus(res.status);
-        })
+        .then(alTerminarEnvio)
         .catch((err: any) => {
           console.error('Error enviando a Google Sheets:', err);
           setSheetSubmitStatus('network_error');
@@ -1941,6 +1969,17 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             <div className="status-msg status-msg--bad" role="alert" style={{ justifyContent: 'center' }}>
                               <AlertCircle size={15} /> <span>Tu sesión ha caducado: el intento está guardado en este navegador. Cierra sesión, vuelve a entrar y pulsa Reintentar.</span>
                               <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar envío</button>
+                            </div>
+                          )}
+                          {sheetSubmitStatus === 'rechazado' && (
+                            <div className="status-msg status-msg--bad" role="alert" style={{ justifyContent: 'center' }}>
+                              <AlertCircle size={15} /> <span>{mensajeRechazo}</span>
+                              <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar envío</button>
+                            </div>
+                          )}
+                          {avisoCorreccion && (
+                            <div role="status" style={{ marginTop: '8px', padding: '8px 12px', borderRadius: '6px', background: 'var(--semantic-warn-bg)', border: '1px solid var(--accent-amber)', color: 'var(--text-main)', fontSize: '0.78rem', textAlign: 'center' }}>
+                              {avisoCorreccion}
                             </div>
                           )}
                           {sheetSubmitStatus === 'network_error' && (

@@ -45,7 +45,8 @@ var CABECERAS = [
   'Modo Evaluación',
   'Evaluador',
   'Detalle de Respuestas',
-  'Cuenta verificada'
+  'Cuenta verificada',
+  'Corrección'
 ];
 
 /* ------------------------------------------------------------------ */
@@ -170,7 +171,13 @@ function doGet(e) {
     var correo = (s.r === 'profesor' && p.email) ? p.email : s.e;
     return json_(misCalificaciones_(correo));
   }
-  return json_({ ok: true, servicio: 'QFDOS · Calificaciones', acciones: ['misCalificaciones'] });
+  if (p.accion === 'estadoClaves') {
+    var sp = verificarSesion_(p.sesion);
+    if (!sp) return json_(SESION_INVALIDA);
+    if (sp.r !== 'profesor') return json_({ ok: false, error: 'Sólo el profesorado.' });
+    return json_(estadoClaves_());
+  }
+  return json_({ ok: true, servicio: 'QFDOS · Calificaciones', version: 2, acciones: ['misCalificaciones', 'estadoClaves', 'publicar_claves', 'record_quiz_attempt'] });
 }
 
 /**
@@ -189,6 +196,139 @@ function modoPermitido_(pedido, esProfesor) {
   return MODOS_ALUMNO.indexOf(m) !== -1 ? m : 'alumno_evaluado';
 }
 
+
+/* ------------------------------------------------------------------ */
+/* Corrección en el servidor                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Hasta ahora la nota la calculaba el navegador y el servidor se limitaba a
+ * anotarla: cualquiera con la consola abierta podía enviar un 10. Ahora el
+ * navegador manda además qué opción marcó en cada pregunta (`respuestas`:
+ * [{ id, opcion }], con opcion = -1 si la dejó en blanco) y el servidor
+ * corrige contra las claves que el profesor publica desde el panel
+ * (pestaña oculta `_Claves`). La nota, los aciertos y el total que se anotan
+ * son los del servidor; los del navegador se ignoran.
+ *
+ * Límite conocido: las preguntas se sirven con sus soluciones (el alumnado ve
+ * la explicación al responder), así que un alumno decidido podría leer la
+ * clave del código y enviar todas las respuestas correctas. Esto impide
+ * falsificar la nota sin haber respondido, no sabérsela de antemano.
+ *
+ * Despliegue gradual con la propiedad EXIGIR_CORRECCION_SERVIDOR:
+ *   ausente / distinta de '1' → si el intento no se puede corregir (clave
+ *     sin publicar, navegador antiguo) se acepta como antes y la columna
+ *     «Corrección» dice «cliente (sin verificar)».
+ *   '1' → el alumnado solo puede registrar intentos corregidos aquí.
+ */
+var HOJA_CLAVES = '_Claves';
+var MAX_CLAVES = 5000;
+var MAX_PREGUNTAS_INTENTO = 200;
+
+function hojaClaves_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = ss.getSheetByName(HOJA_CLAVES);
+  if (!hoja) {
+    hoja = ss.insertSheet(HOJA_CLAVES);
+    hoja.getRange(1, 1, 1, 3).setValues([['id', 'correcta', 'actualizadoEn']]).setFontWeight('bold');
+    hoja.setFrozenRows(1);
+    hoja.hideSheet();
+  }
+  return hoja;
+}
+
+/** { id: índice de la opción correcta } */
+function leerClaves_() {
+  var hoja = hojaClaves_();
+  var claves = {};
+  if (hoja.getLastRow() < 2) return claves;
+  hoja.getRange(2, 1, hoja.getLastRow() - 1, 2).getValues().forEach(function (f) {
+    if (f[0] !== '') claves[String(f[0])] = Number(f[1]);
+  });
+  return claves;
+}
+
+function exigirCorreccion_() {
+  return (PropertiesService.getScriptProperties().getProperty('EXIGIR_CORRECCION_SERVIDOR') || '').trim() === '1';
+}
+
+function estadoClaves_() {
+  var hoja = hojaClaves_();
+  var n = Math.max(0, hoja.getLastRow() - 1);
+  var cuando = '';
+  if (n > 0) {
+    var v = hoja.getRange(2, 3).getValue();
+    cuando = (v instanceof Date) ? v.toISOString() : String(v || '');
+  }
+  return { ok: true, claves: n, actualizadoEn: cuando, exigir: exigirCorreccion_() };
+}
+
+/** Sustituye todas las claves. Solo profesorado. */
+function publicarClaves_(s, data) {
+  if (s.r !== 'profesor') return json_({ ok: false, error: 'Sólo el profesorado puede publicar las claves.' });
+  var claves = data.claves;
+  if (!claves || typeof claves !== 'object' || Array.isArray(claves)) {
+    return json_({ ok: false, error: 'Faltan las claves.' });
+  }
+  var ids = Object.keys(claves);
+  if (!ids.length || ids.length > MAX_CLAVES) {
+    return json_({ ok: false, error: 'Número de claves no válido (entre 1 y ' + MAX_CLAVES + ').' });
+  }
+  var ahora = new Date();
+  var filas = [];
+  for (var i = 0; i < ids.length; i++) {
+    var idx = Number(claves[ids[i]]);
+    if (!/^[\w.:\-]{1,80}$/.test(ids[i]) || idx !== Math.floor(idx) || idx < 0 || idx > 9) {
+      return json_({ ok: false, error: 'Clave no válida en la pregunta «' + String(ids[i]).slice(0, 40) + '».' });
+    }
+    filas.push([ids[i], idx, ahora]);
+  }
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var hoja = hojaClaves_();
+    if (hoja.getLastRow() > 1) hoja.getRange(2, 1, hoja.getLastRow() - 1, 3).clearContent();
+    hoja.getRange(2, 1, filas.length, 3).setValues(filas);
+    return json_({ ok: true, claves: filas.length, actualizadoEn: ahora.toISOString() });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Corrige `respuestas` contra las claves. Devuelve
+ *   { ok: true, aciertos, total, aciertosPorPregunta: [bool] }
+ * o { ok: false, motivo: 'sin_respuestas' | 'respuestas_no_validas' | 'clave_desconocida' }.
+ */
+function corregir_(respuestas) {
+  if (!Array.isArray(respuestas) || !respuestas.length) return { ok: false, motivo: 'sin_respuestas' };
+  if (respuestas.length > MAX_PREGUNTAS_INTENTO) return { ok: false, motivo: 'respuestas_no_validas' };
+  var claves = leerClaves_();
+  var vistos = {};
+  var aciertos = 0;
+  var porPregunta = [];
+  for (var i = 0; i < respuestas.length; i++) {
+    var r = respuestas[i] || {};
+    var id = String(r.id === undefined || r.id === null ? '' : r.id);
+    var op = Number(r.opcion);
+    if (!id || vistos.hasOwnProperty(id) || isNaN(op) || op !== Math.floor(op) || op < -1 || op > 9) {
+      return { ok: false, motivo: 'respuestas_no_validas' };
+    }
+    vistos[id] = true;
+    if (!claves.hasOwnProperty(id)) return { ok: false, motivo: 'clave_desconocida' };
+    var acierto = op === claves[id];
+    if (acierto) aciertos++;
+    porPregunta.push(acierto);
+  }
+  return { ok: true, aciertos: aciertos, total: respuestas.length, aciertosPorPregunta: porPregunta };
+}
+
+var MENSAJES_CORRECCION = {
+  sin_respuestas: 'Este intento no se puede corregir en el servidor. Recarga la página (Ctrl+F5) e inténtalo de nuevo.',
+  respuestas_no_validas: 'Las respuestas enviadas no son válidas. Recarga la página (Ctrl+F5) e inténtalo de nuevo.',
+  clave_desconocida: 'El profesorado todavía no ha publicado las claves de corrección de este test.'
+};
+
 function doPost(e) {
   var data;
   try {
@@ -201,6 +341,7 @@ function doPost(e) {
   // del cuerpo, y cualquiera podía anotar notas a nombre de otra persona.
   var s = verificarSesion_(data.sesion);
   if (!s) return json_(SESION_INVALIDA);
+  if (data.action === 'publicar_claves') return publicarClaves_(s, data);
 
   // Un estudiante sólo registra intentos a su nombre. El profesorado puede
   // anotar el de otra persona (modo «Sesión docente»).
@@ -211,6 +352,39 @@ function doPost(e) {
   var score = Number(data.score);
   var aciertos = Number(data.correctCount);
   var total = Number(data.totalQuestions);
+  var detalle = data.answersDetail || [];
+  var correccion = '';
+
+  // Test (no autoevaluación de flashcards): la nota es la que sale de corregir aquí
+  if (modo !== 'flashcards_autoevaluacion') {
+    var c = corregir_(data.respuestas);
+    if (c.ok) {
+      var notaServidor = Number((c.aciertos / c.total * 10).toFixed(1));
+      correccion = 'servidor';
+      if (!isNaN(score) && Math.abs(score - notaServidor) > 0.05) correccion += ' (el navegador decía ' + score + ')';
+      score = notaServidor;
+      aciertos = c.aciertos;
+      total = c.total;
+      // El detalle también se ajusta a lo corregido, no a lo que afirme el navegador
+      if (Array.isArray(detalle) && detalle.length === c.aciertosPorPregunta.length) {
+        detalle = detalle.map(function (d, i) {
+          var copia = (d && typeof d === 'object') ? d : {};
+          copia.isCorrect = c.aciertosPorPregunta[i];
+          return copia;
+        });
+      }
+    } else if (!esProfesor && exigirCorreccion_()) {
+      return json_({
+        ok: false,
+        status: 'error',
+        codigo: c.motivo === 'clave_desconocida' ? 'claves_no_publicadas' : 'correccion_no_verificable',
+        error: MENSAJES_CORRECCION[c.motivo]
+      });
+    } else {
+      correccion = 'cliente (sin verificar)';
+    }
+  }
+
   if (isNaN(score) || score < 0 || score > 10 || isNaN(aciertos) || isNaN(total) || aciertos < 0 || aciertos > total) {
     return json_({ ok: false, status: 'error', error: 'Calificación fuera de rango.' });
   }
@@ -233,11 +407,15 @@ function doPost(e) {
       total,
       modo,
       textoSeguro_(esProfesor ? (data.evaluator || '') : ''),
-      textoSeguro_(JSON.stringify(data.answersDetail || [])),
-      s.e
+      textoSeguro_(JSON.stringify(detalle)),
+      s.e,
+      correccion
     ]);
 
-    return json_({ ok: true, status: 'success', fila: sheet.getLastRow() });
+    return json_({
+      ok: true, status: 'success', fila: sheet.getLastRow(),
+      correccion: correccion, score: score, correctCount: aciertos, totalQuestions: total
+    });
   } catch (err) {
     return json_({ ok: false, status: 'error', error: String(err) });
   } finally {

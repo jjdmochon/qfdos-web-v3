@@ -160,6 +160,16 @@ Quién es cada cual lo decide Apps Script:
      tiene una columna «Grupo», el panel permite filtrar por grupo.
    - Un estudiante sólo registra notas a su nombre y solo con los modos `alumno_evaluado` o `flashcards_autoevaluacion` (`docente_sesion` es exclusivo del profesor); publicar exige sesión de
      profesor **y** la clave.
+   - **Corrección en el servidor**: el navegador envía qué opción marcó en cada
+     pregunta (`respuestas: [{ id, opcion }]`) y Calificaciones.gs corrige contra
+     las claves de la pestaña oculta `_Claves`, que el profesor publica desde
+     *Gestión docente → Seguimiento → Publicar claves de corrección* (hay que
+     repetirlo al añadir o cambiar preguntas). La nota, los aciertos y el total
+     que se anotan son los del servidor; la columna «Corrección» indica
+     `servidor` o `cliente (sin verificar)`. Con `EXIGIR_CORRECCION_SERVIDOR = 1`
+     el alumnado solo puede registrar tests corregidos en el servidor. Límite:
+     las preguntas viajan con su solución (se enseña la explicación al
+     responder), así que esto impide falsificar la nota, no conocerla de antemano.
 
 **Propiedades de Apps Script** (⚙️ → Propiedades de la secuencia de comandos):
 
@@ -172,6 +182,8 @@ Quién es cada cual lo decide Apps Script:
 | `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
 | `MATERIALES_CARPETA_ID` | Se rellena sola al crear la carpeta de materiales; se puede fijar a mano | — |
 | `CALIFICACIONES_HOJA_ID` | Opcional (por defecto, la hoja de calificaciones actual; la lee el seguimiento) | — |
+| `EXIGIR_CORRECCION_SERVIDOR` (`1`) | — | Opcional: rechaza los tests del alumnado que el servidor no pueda corregir |
+| `NOTAS_CUADERNO_PUBLICAS` | La gestiona el botón del panel del cuaderno | — |
 
 El manifiesto del proyecto de Codigo.gs está en `google-apps-script/appsscript.json`:
 sin el permiso `script.external_request`, `iniciarSesion` no puede verificar el
