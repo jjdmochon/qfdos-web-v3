@@ -42,20 +42,28 @@ export const PanelDudasProfesor: React.FC<PanelDudasProfesorProps> = ({ onPendie
   const pendientes = dudas.filter(d => d.estado === 'pendiente').length;
   const visibles = filtro === 'pendientes' ? dudas.filter(d => d.estado === 'pendiente') : dudas;
 
+  const [avisarPorCorreo, setAvisarPorCorreo] = useState(true);
+  const [confirmacion, setConfirmacion] = useState<string | null>(null);
+
   const enviarRespuesta = async (id: string) => {
     if (!texto.trim() || guardando) return;
+    setConfirmacion(null);
     setGuardando(true);
-    const r = await responderDuda(id, texto.trim());
+    const r = await responderDuda(id, texto.trim(), avisarPorCorreo);
     setGuardando(false);
     if (!r.ok) {
       // El texto se queda en el cuadro para no perderlo
       setAviso(`No se ha podido guardar la respuesta: ${r.error}`);
       return;
     }
-    const nueva = dudas.map(d => (d.id === id ? r.datos : d));
+    const nueva = dudas.map(d => (d.id === id ? r.datos.duda : d));
     setDudas(nueva);
     avisarPendientes(nueva);
-    setAviso(null);
+    // La respuesta ya está guardada; el correo es aparte y puede fallar
+    setAviso(avisarPorCorreo && !r.datos.avisado
+      ? `Respuesta guardada, pero no se ha podido avisar al alumno por correo (${r.datos.errorAviso || 'falta publicar la última versión de Codigo.gs'}). Podrá verla igualmente en su buzón.`
+      : null);
+    setConfirmacion(r.datos.avisado ? `Respuesta guardada y aviso enviado por correo a ${dudas.find(d => d.id === id)?.correo ?? 'el alumno'}.` : null);
     setRespondiendoId(null);
     setTexto('');
   };
@@ -105,6 +113,11 @@ export const PanelDudasProfesor: React.FC<PanelDudasProfesorProps> = ({ onPendie
         </div>
       </div>
 
+      {confirmacion && !aviso && (
+        <div role="status" style={{ padding: '8px 12px', background: 'var(--ok-bg)', border: '1px solid var(--ok-border)', borderRadius: 'var(--radius-md)', color: 'var(--ok-ink)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <CheckCircle2 size={14} /> {confirmacion}
+        </div>
+      )}
       {aviso && (
         <div style={{ padding: '8px 12px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-md)', color: 'var(--accent-red)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <AlertTriangle size={14} /> {aviso}
@@ -169,6 +182,10 @@ export const PanelDudasProfesor: React.FC<PanelDudasProfesorProps> = ({ onPendie
                   rows={4}
                   autoFocus
                 />
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-main)' }}>
+                  <input type="checkbox" checked={avisarPorCorreo} onChange={e => setAvisarPorCorreo(e.target.checked)} />
+                  Avisar al alumno por correo ({q.correo})
+                </label>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                   <button type="button" onClick={() => { setRespondiendoId(null); setTexto(''); }} className="btn btn-sm btn-outline">
                     Cancelar

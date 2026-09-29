@@ -75,8 +75,21 @@ export function enviarDuda(d: {
   return llamar('enviarDuda', c => c.duda as Duda, d);
 }
 
-export function responderDuda(id: string, respuesta: string): Promise<Resultado<Duda>> {
-  return llamar('responderDuda', c => c.duda as Duda, { id, respuesta });
+export interface RespuestaGuardada {
+  duda: Duda;
+  /** Se envió el aviso por correo al alumno */
+  avisado: boolean;
+  /** Por qué no se pudo enviar el aviso, si se pidió y falló (la respuesta se guarda igualmente) */
+  errorAviso: string;
+}
+
+/** `avisar`: además de guardarla, escribe al alumno por correo (necesita Codigo.gs v10). */
+export function responderDuda(id: string, respuesta: string, avisar = false): Promise<Resultado<RespuestaGuardada>> {
+  return llamar(
+    'responderDuda',
+    c => ({ duda: c.duda as Duda, avisado: c.avisado === true, errorAviso: String(c.errorAviso ?? '') }),
+    { id, respuesta, avisar }
+  );
 }
 
 export function borrarDuda(id: string): Promise<Resultado<null>> {
