@@ -128,6 +128,24 @@ export interface MoleculeDrug {
   pdbId?: string;
 }
 
+/**
+ * Molécula que se dibuja en la tarjeta del tema. Por defecto, el primer
+ * fármaco de la lista; aquí se fija otra cuando la primera no es la más
+ * representativa (el Tema 2 abre con la L-tirosina por la biosíntesis de
+ * catecolaminas, pero su tarjeta muestra el salbutamol). Va por id y nombre,
+ * no por posición, para que siga valiendo con el contenido publicado desde el
+ * panel, que puede traer los fármacos en otro orden.
+ */
+const MOLECULA_DE_TARJETA: Record<string, RegExp> = {
+  'tema-02': /salbutamol/i
+};
+
+export function moleculaDeTarjeta(topic: { id: string; drugs?: MoleculeDrug[] }): MoleculeDrug | undefined {
+  const drugs = topic.drugs ?? [];
+  const patron = MOLECULA_DE_TARJETA[topic.id];
+  return (patron && drugs.find(d => patron.test(d.name))) || drugs[0];
+}
+
 export interface QfdosTopic {
   id: string;
   number: string;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { QfdosTopic, testHabilitado, flashcardsHabilitadas } from '../data/qfdosData';
+import { QfdosTopic, testHabilitado, flashcardsHabilitadas, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -335,10 +335,10 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   ))}
                 </div>
 
-                {/* 2D Structure of First Drug */}
-                {topic.drugs && topic.drugs.length > 0 && (
+                {/* Estructura 2D del fármaco destacado (por defecto, el primero) */}
+                {moleculaDeTarjeta(topic) && (
                   <div style={{ margin: '8px 0 12px', display: 'flex', justifyContent: 'center' }}>
-                    <Chem2DDrawer smiles={topic.drugs[0].smiles} name={topic.drugs[0].name} width={260} height={110} />
+                    <Chem2DDrawer smiles={moleculaDeTarjeta(topic)!.smiles} name={moleculaDeTarjeta(topic)!.name} width={260} height={110} />
                   </div>
                 )}
               </div>
