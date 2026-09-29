@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { QfdosTopic, QfdosAnnouncement } from '../data/qfdosData';
+import { QfdosTopic, QfdosAnnouncement, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
 import { useAuth } from '../context/AuthContext';
@@ -562,9 +562,9 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                 {t.subtitle}
               </p>
 
-              {t.drugs?.length > 0 && (
+              {moleculaDeTarjeta(t) && (
                 <div style={{ display: 'flex', justifyContent: 'center', margin: '6px 0' }}>
-                  <Chem2DDrawer smiles={t.drugs[0].smiles} name={t.drugs[0].name} width={215} height={105} />
+                  <Chem2DDrawer smiles={moleculaDeTarjeta(t)!.smiles} name={moleculaDeTarjeta(t)!.name} width={215} height={105} />
                 </div>
               )}
             </div>
