@@ -16,6 +16,7 @@ import {
 } from '../services/geminiService';
 import { MaterialUploader } from './MaterialUploader';
 import { SubidaDrive } from './SubidaDrive';
+import { BotonSubirDrive } from './BotonSubirDrive';
 import { PublicarContenido } from './PublicarContenido';
 import {
   X, 
@@ -970,6 +971,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                             className="form-input"
                             style={{ width: '100%', fontSize: '0.8rem' }}
                           />
+                          <BotonSubirDrive onSubido={a => setModSlidesPdfUrl(a.url)} />
                         </div>
 
                         {/* 2. Apuntes PDF */}
@@ -985,6 +987,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                             className="form-input"
                             style={{ width: '100%', fontSize: '0.8rem' }}
                           />
+                          <BotonSubirDrive onSubido={a => setModNotesPdfUrl(a.url)} />
                         </div>
 
                         {/* 3. Gemini Notebook */}
