@@ -25,6 +25,7 @@ import {
   Calendar, 
   AlertCircle,
   Play,
+  Headphones,
   Share2,
   Atom,
   Lock,
@@ -240,13 +241,17 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     );
   }
 
-  const handlePlayPodcast = () => {
+  /**
+   * Abre el reproductor en la pestaña pedida. La píldora de audio y el vídeo
+   * podcast de Spotify son materiales distintos: cada uno tiene su botón.
+   */
+  const handlePlayPodcast = (pestana: 'audio' | 'spotify') => {
     if (topic.audioPodcastUrl || topic.spotifyPodcastUrl) {
       onOpenSpotifyPlayer({
         id: `sp_${topic.id}`,
         title: topic.audioPodcastName || `Podcast Oficial: ${topic.number} — ${topic.title}`,
-        type: topic.audioPodcastUrl ? 'audio' : 'spotify',
-        url: topic.audioPodcastUrl || topic.spotifyPodcastUrl || '',
+        type: pestana,
+        url: (pestana === 'audio' ? topic.audioPodcastUrl : topic.spotifyPodcastUrl) || '',
         audioUrl: topic.audioPodcastUrl,
         spotifyUri: topic.spotifyPodcastUrl,
         date: 'Curso 2026/2027',
@@ -714,26 +719,60 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               </div>
                             </div>
                             <p style={{ fontSize: '0.78rem', color: hasPodcast ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              {hasAudio ? 'Píldora sonora oficial (6 min) con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
+                              {hasAudio && hasSpotify ? 'Píldora sonora (6 min) para escuchar en la web y vídeo podcast del episodio en Spotify.' : hasAudio ? 'Píldora sonora oficial (6 min) con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
                             </p>
                           </div>
                           {hasPodcast ? (
-                            <button 
-                              onClick={handlePlayPodcast}
-                              className="btn btn-sm" 
-                              style={{
-                                width: '100%',
-                                justifyContent: 'center',
-                                fontSize: '0.78rem',
-                                fontWeight: 700,
-                                background: hasAudio ? 'linear-gradient(135deg, #10b981, #059669)' : '#1db954',
-                                color: '#ffffff',
-                                border: 'none',
-                                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
-                              }}
-                            >
-                              <Play size={13} /> {hasAudio ? 'Escuchar Píldora de Audio' : 'Reproducir Episodio'}
-                            </button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {hasAudio && (
+                                <button 
+                                  onClick={() => handlePlayPodcast('audio')}
+                                  className="btn btn-sm" 
+                                  style={{
+                                    width: '100%',
+                                    justifyContent: 'center',
+                                    fontSize: '0.78rem',
+                                    fontWeight: 700,
+                                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
+                                  }}
+                                >
+                                  <Headphones size={13} /> Escuchar Píldora de Audio
+                                </button>
+                              )}
+                              {hasSpotify && (
+                                <div style={{ display: 'flex', gap: '6px' }}>
+                                  <button 
+                                    onClick={() => handlePlayPodcast('spotify')}
+                                    className="btn btn-sm" 
+                                    style={{
+                                      flex: 1,
+                                      justifyContent: 'center',
+                                      fontSize: '0.78rem',
+                                      fontWeight: 700,
+                                      background: '#1db954',
+                                      color: '#ffffff',
+                                      border: 'none',
+                                      boxShadow: '0 2px 8px rgba(29, 185, 84, 0.25)'
+                                    }}
+                                  >
+                                    <Play size={13} /> Vídeo Podcast
+                                  </button>
+                                  <a
+                                    href={topic.spotifyPodcastUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-sm btn-outline"
+                                    style={{ fontSize: '0.74rem', fontWeight: 700, color: '#1db954', borderColor: '#1db954', whiteSpace: 'nowrap' }}
+                                    title="Abrir el episodio en Spotify (vídeo en HD)"
+                                  >
+                                    <ExternalLink size={13} /> Spotify
+                                  </a>
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
                               Próximamente disponible
