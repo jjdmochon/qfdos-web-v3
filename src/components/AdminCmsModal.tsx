@@ -15,6 +15,7 @@ import {
   setStoredGeminiApiKey 
 } from '../services/geminiService';
 import { MaterialUploader } from './MaterialUploader';
+import { SubidaDrive } from './SubidaDrive';
 import { PublicarContenido } from './PublicarContenido';
 import {
   X, 
@@ -694,8 +695,9 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                   Materiales del curso
                 </h4>
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.55, maxWidth: '68ch' }}>
-                  Arrastra aquí apuntes, diapositivas, imágenes o audio. Los ficheros se guardan en
-                  este navegador, listos para consultarlos y descargarlos desde la propia plataforma.
+                  Arrastra aquí apuntes, diapositivas, imágenes o audio: se suben a la carpeta de Drive del
+                  curso, se comparten con enlace y, con un clic, quedan asignados a un módulo. Después,
+                  pulsad «Publicar» para que los vea el alumnado.
                 </p>
               </div>
 
@@ -721,7 +723,18 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                 </select>
               </div>
 
-              <MaterialUploader
+              <SubidaDrive
+                topics={topics}
+                topicId={materialsTopicId || undefined}
+                onUpdateTopics={onUpdateTopics}
+              />
+
+              <details>
+                <summary style={{ cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                  Guardar solo en este navegador (el alumnado no lo verá)
+                </summary>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 10 }}>
+                  <MaterialUploader
                 topicId={materialsTopicId || undefined}
                 topicLabel={topics.find(t => t.id === materialsTopicId)?.number}
               />
@@ -733,10 +746,9 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
               }}>
                 <AlertCircle size={16} color="var(--accent-amber)" style={{ flexShrink: 0, marginTop: 1 }} />
                 <div style={{ fontSize: '0.79rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
-                  <strong style={{ color: 'var(--accent-amber)' }}>Distribución al alumnado.</strong>{' '}
-                  Estos ficheros viven en tu navegador, no en un servidor: el alumnado no los ve desde
-                  sus equipos. Para que les lleguen, sube la misma copia a Google Drive y pega el
-                  enlace en el campo correspondiente de cada módulo, en la pestaña{' '}
+                  <strong style={{ color: 'var(--accent-amber)' }}>Solo en este navegador.</strong>{' '}
+                  Estos ficheros viven en tu navegador: el alumnado no los ve. Para distribuirlos, súbelos
+                  a Drive con la zona de arriba o pega el enlace en el módulo, en la pestaña{' '}
                   <button
                     onClick={() => setActiveTab('modules')}
                     style={{
@@ -748,6 +760,8 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                   </button>.
                 </div>
               </div>
+                </div>
+              </details>
             </div>
           )}
 
