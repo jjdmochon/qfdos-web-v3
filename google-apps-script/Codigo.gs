@@ -86,7 +86,7 @@ function manejar(e) {
         ok: true,
         servicio: 'QFDOS',
         version: 4,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'anotarFila'],
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
