@@ -30,6 +30,7 @@ import {
 import { Chem2DDrawer } from './Chem2DDrawer';
 
 import { pulsable } from '../utils/a11y';
+import { useAuth } from '../context/AuthContext';
 interface FirSimulatorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,7 +54,25 @@ export const FirSimulatorModal: React.FC<FirSimulatorModalProps> = ({
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  // Las respuestas se guardan por cuenta en este navegador: al volver a abrir
+  // el simulador, el progreso y la puntuación siguen donde se dejaron
+  const { user } = useAuth();
+  const claveRespuestas = `qfdos_v3_fir_respuestas_${(user?.email || 'anonimo').toLowerCase()}`;
+  const [answers, setAnswers] = useState<Record<string, number>>(() => {
+    try {
+      const guardado = JSON.parse(localStorage.getItem(claveRespuestas) || '{}');
+      return guardado && typeof guardado === 'object' ? guardado : {};
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(claveRespuestas, JSON.stringify(answers));
+    } catch {
+      // sin espacio o almacenamiento bloqueado: el simulador sigue funcionando
+    }
+  }, [answers, claveRespuestas]);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   // Base URL for image assets

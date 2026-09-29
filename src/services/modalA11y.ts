@@ -15,6 +15,7 @@
 //     así respeta las guardas que tenga cada modal, p. ej. un examen en curso)
 //   · al cerrarse, el foco vuelve al control que lo abrió
 //   · animación de salida: una copia congelada se desvanece 160 ms
+//   · el fondo de la página no se desplaza mientras haya un modal abierto
 // ==========================================================================
 
 const FOCUSABLE =
@@ -31,6 +32,22 @@ let contador = 0;
 // Último control enfocado fuera de cualquier modal: cuando el modal monta su
 // propio autoFocus, activeElement ya está dentro y no sirve como disparador.
 let ultimoFocoFuera: HTMLElement | null = null;
+// Desplazamiento del fondo: se bloquea con el primer modal y se restaura al cerrar el último
+let overflowPrevio: string | null = null;
+
+function bloquearFondo() {
+  if (overflowPrevio === null) {
+    overflowPrevio = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function liberarFondo() {
+  if (overflowPrevio !== null && !abiertos.some(a => a.overlay.isConnected)) {
+    document.body.style.overflow = overflowPrevio;
+    overflowPrevio = null;
+  }
+}
 
 const reduceMotion = () =>
   typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -70,6 +87,7 @@ function abrir(overlay: HTMLElement) {
   const activo = document.activeElement as HTMLElement | null;
   const fuera = activo && activo !== document.body && !activo.closest('.modal-overlay') ? activo : ultimoFocoFuera;
   abiertos.push({ overlay, trigger: fuera });
+  bloquearFondo();
   etiquetar(overlay);
   // Tras el primer render: si el propio modal no ha colocado el foco (autoFocus), se coloca aquí
   requestAnimationFrame(() => {
@@ -91,6 +109,7 @@ function cerrar(overlay: HTMLElement) {
   const i = abiertos.findIndex(a => a.overlay === overlay);
   if (i === -1) return;
   const [{ trigger }] = abiertos.splice(i, 1);
+  liberarFondo();
   if (!reduceMotion()) animarSalida(overlay);
   requestAnimationFrame(() => {
     // Solo si nadie más ha movido el foco (p. ej. otro modal que se abre)
