@@ -107,7 +107,7 @@ Esta verificación del token en servidor es además **prerrequisito de la app m�
 - **PWA a medias.**
   - No hay service worker, así que no hay modo offline.
   - Los iconos del manifest son una URL externa de i.ibb.co repetida para 192 y 512 y marcada `maskable`.
-  - `start_url: "/"` no funciona bajo `/qfods-web-v3/`.
+  - `start_url: "/"` no funcionaba bajo la subcarpeta de Pages (resuelto: `manifest.webmanifest` usa `/qfdos-web-v3/` como `start_url`, `scope` e `id`, con iconos locales).
 
 ### Baja
 - El texto del login anuncia «@go.ugr.es o @gmail.com», pero se aceptan también `@correo.ugr.es` y `@ugr.es` (`LoginPage.tsx:103,169`; `AuthContext.tsx:39`). El alumnado real usa `@correo.ugr.es`.
