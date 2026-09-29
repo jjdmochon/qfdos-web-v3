@@ -349,3 +349,12 @@ src/
 Respecto a v2 se eliminaron el generador de apuntes por transcripción de audio
 y el visor cristalográfico 3D. Los códigos PDB se conservan como enlaces al
 RCSB.
+
+
+## Instalar como app
+
+La plataforma es una PWA. En el menú (☰ → Herramientas) aparece **Instalar la app**:
+en Android y escritorio (Chrome, Edge) lanza el aviso de instalación del navegador;
+en iPhone y iPad muestra los tres pasos de Safari (Compartir → Añadir a pantalla
+de inicio). Una vez instalada, la opción desaparece. Empaquetarla para las tiendas
+(Capacitor) no está hecho: requiere cuentas de desarrollador de Google y Apple.

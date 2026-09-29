@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { useInstalarApp } from '../utils/instalarApp';
 import {
   Sun, Moon, Search, FileText, HelpCircle, Settings,
   GraduationCap, BookOpen, Activity, Award, Layers,
   LogOut, ChevronDown, ShieldCheck, Compass, FlaskConical, Menu, X
-} from 'lucide-react';
+, Download } from 'lucide-react';
 
 /** Atajo de búsqueda con la tecla modificadora de cada plataforma */
 const ES_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
@@ -43,6 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
   const { user, isProfesor, isInstitucional, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { opcion: opcionInstalar, instalar } = useInstalarApp();
+  const [ayudaIOS, setAyudaIOS] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const chipRef = useRef<HTMLButtonElement>(null);
 
@@ -404,6 +407,13 @@ export const Header: React.FC<HeaderProps> = ({
               <ul className="mobile-drawer-list">
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenSearch)}><Search size={18} /> Buscar</button></li>
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenFirSimulator)}><Award size={18} /> Simulador FIR</button></li>
+                {opcionInstalar && (
+                  <li>
+                    <button className="menu-item" onClick={() => { setDrawerOpen(false); opcionInstalar === 'nativa' ? instalar() : setAyudaIOS(true); }}>
+                      <Download size={18} /> Instalar la app
+                    </button>
+                  </li>
+                )}
                 <li><button className="menu-item" onClick={abrirDesdeMenu(onOpenStudentQuestion)}><HelpCircle size={18} /> Buzón de dudas{isProfesor && dudasPendientes > 0 ? ` (${dudasPendientes})` : ''}</button></li>
                 <li>
                   <button className="menu-item" onClick={toggleTheme}>
@@ -429,6 +439,28 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       )}
       </>, document.body)}
+      {ayudaIOS && createPortal(
+        <div className="modal-overlay" onClick={() => setAyudaIOS(false)}>
+          <div className="modal-container" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 style={{ margin: 0 }}>Instalar en iPhone o iPad</h3>
+              <button onClick={() => setAyudaIOS(false)} className="btn btn-sm btn-outline" aria-label="Cerrar"><X size={18} /></button>
+            </div>
+            <div className="modal-body" style={{ lineHeight: 1.6, fontSize: '0.92rem' }}>
+              <ol style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <li>Abre esta página en <strong>Safari</strong> (desde otro navegador no aparece la opción).</li>
+                <li>Pulsa el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba).</li>
+                <li>Elige <strong>Añadir a pantalla de inicio</strong> y confirma.</li>
+              </ol>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: 0 }}>
+                Se abrirá a pantalla completa, como una app, y tendrás el temario disponible sin conexión.
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button onClick={() => setAyudaIOS(false)} className="btn btn-primary">Entendido</button>
+            </div>
+          </div>
+        </div>, document.body)}
     </header>
   );
 };
