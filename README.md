@@ -358,3 +358,14 @@ en Android y escritorio (Chrome, Edge) lanza el aviso de instalación del navega
 en iPhone y iPad muestra los tres pasos de Safari (Compartir → Añadir a pantalla
 de inicio). Una vez instalada, la opción desaparece. Empaquetarla para las tiendas
 (Capacitor) no está hecho: requiere cuentas de desarrollador de Google y Apple.
+
+## Historias QFDOS (vista previa del profesorado)
+
+Banda rotatoria y visor 9:16 en el Hub, visibles solo para el perfil docente.
+Grupos: **Tema 1** (clip y cartel), **Podcast** (píldora de audio y vídeo podcast,
+30 s cada uno; el botón abre el reproductor de la ficha del tema), **Enlaces**
+(los 2 enlaces de interés más recientes por `addedAt`) y **Materiales** (los
+adjuntos de «Materiales varios»). El cartel está en `public/historias`; los dos
+vídeos se preparan desde Drive con `scripts/preparar-historias.ps1` (recorta el
+vídeo podcast a 30 s y comprime el clip) y hasta que estén subidos esas dos
+historias no se muestran.

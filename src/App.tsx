@@ -512,6 +512,8 @@ export const App: React.FC = () => {
           <HubDashboard
             topics={topics}
             announcements={announcements}
+            resourceLinks={resourceLinks}
+            onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
             onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
             onNavigateToCourseInfo={() => navigateTo('info')}
             onNavigateToTemas={() => navigateTo('temas')}

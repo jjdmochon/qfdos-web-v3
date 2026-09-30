@@ -1,23 +1,31 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Bell, Headphones, X, Pause, Play, Volume2, VolumeX,
-  ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles
+  Headphones, X, Pause, Play, Volume2, VolumeX, Link2, FolderOpen, GraduationCap,
+  ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles, Image as ImagenIcono
 } from 'lucide-react';
-import { QfdosAnnouncement, QfdosTopic } from '../data/qfdosData';
-import { avisosRecientesPrimero } from '../utils/avisos';
+import { CourseAttachment, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
 
 // ==========================================================================
 // Historias QFDOS
 //
 // Banda rotatoria en la portada + fila de círculos + visor a pantalla completa
-// con el formato de las historias de Instagram. Se alimenta de los datos que ya
-// existen (avisos y podcast de los módulos): no añade nada al CMS.
+// con el formato de las historias de Instagram. Se alimenta de lo que ya
+// existe en la web (podcast del tema, enlaces de interés y materiales varios)
+// más los medios de portada del Tema 1 que se guardan en /historias.
 //
-// v1: avisos y podcast. Solo visible para el profesorado (lo decide HubDashboard).
+// v1: solo visible para el profesorado (lo decide HubDashboard).
 // ==========================================================================
 
-type GrupoId = 'avisos' | 'podcast';
+type GrupoId = 'tema1' | 'podcast' | 'enlaces' | 'materiales';
+
+interface Accion {
+  label: string;
+  icono: 'pdf' | 'enlace' | 'video' | 'spotify' | 'audio' | 'tema';
+  href?: string;
+  /** Sin href: se ejecuta al pulsar (el visor se cierra antes) */
+  alPulsar?: () => void;
+}
 
 interface Historia {
   id: string;
@@ -29,7 +37,13 @@ interface Historia {
   video?: string;
   imagen?: string;
   audio?: string;
-  acciones: { label: string; href: string; icono: 'pdf' | 'enlace' | 'video' | 'spotify' }[];
+  /** Cómo encaja el vídeo en el 9:16: vertical = cubrir, apaisado = contener */
+  ajuste?: 'cubrir' | 'contener';
+  /** Tope de reproducción del medio, en segundos (por defecto, entero) */
+  maxSegundos?: number;
+  /** Ruta local (bajo BASE_URL) que hay que comprobar antes de enseñar la historia */
+  requiere?: string;
+  acciones: Accion[];
   duracionMs: number;
 }
 
@@ -41,13 +55,20 @@ interface Grupo {
 
 const CLAVE_VISTAS = 'qfdos_v3_historias_vistas';
 const ROTACION_BANDA_S = 6;
+const SEGUNDOS_PODCAST = 30;
 
-const esVideoDirecto = (u: string) => /^data:video\//i.test(u) || /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(u);
-
-function miniaturaYoutube(u: string): string | undefined {
-  const m = u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
-  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : undefined;
-}
+/**
+ * Medios de portada por tema. Los vídeos se recortan y comprimen con
+ * `scripts/preparar-historias.ps1` desde las carpetas de Drive; hasta que
+ * estén en /historias la historia correspondiente no se muestra.
+ */
+const MEDIOS_TEMA: Record<string, { videoPodcast?: string; clip?: string; imagen?: string }> = {
+  'tema-01': {
+    videoPodcast: 'historias/tema-01-video-podcast.mp4',
+    clip: 'historias/tema-01-clip.mp4',
+    imagen: 'historias/tema-01-brag.jpg'
+  }
+};
 
 /** Las rutas relativas (audio/x.mp3) cuelgan de BASE_URL; las absolutas y data: se dejan tal cual. */
 const resolver = (u: string) => (/^(https?:|data:|blob:|\/)/i.test(u) ? u : `${import.meta.env.BASE_URL}${u}`);
@@ -73,58 +94,127 @@ function guardarVistas(v: Set<string>) {
 }
 
 const duracionPorTexto = (t?: string) => Math.max(7000, Math.min(15000, (t?.length ?? 0) * 55));
+const recortar = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t);
 
-function construirGrupos(announcements: QfdosAnnouncement[], topics: QfdosTopic[]): Grupo[] {
-  const avisos: Historia[] = avisosRecientesPrimero(announcements).map(a => {
-    const acciones: Historia['acciones'] = [];
-    if (a.pdfUrl) acciones.push({ label: a.pdfName || 'Ver PDF', href: resolver(a.pdfUrl), icono: 'pdf' });
-    if (a.videoUrl && !esVideoDirecto(a.videoUrl)) acciones.push({ label: 'Ver vídeo', href: a.videoUrl, icono: 'video' });
-    if (a.linkUrl) acciones.push({ label: a.linkLabel || 'Más información', href: a.linkUrl, icono: 'enlace' });
-    return {
-      id: `aviso-${a.id}`,
-      grupo: 'avisos',
-      etiqueta: 'Aviso',
-      titulo: a.title,
-      texto: a.content,
-      fecha: a.date,
-      video: a.videoUrl && esVideoDirecto(a.videoUrl) ? resolver(a.videoUrl) : undefined,
-      imagen: a.imageUrl ? resolver(a.imageUrl) : (a.videoUrl ? miniaturaYoutube(a.videoUrl) : undefined),
-      audio: a.audioUrl ? resolver(a.audioUrl) : undefined,
-      acciones: acciones.slice(0, 2),
-      duracionMs: duracionPorTexto(a.content)
-    };
-  });
+interface Callbacks {
+  onAbrirReproductor?: (att: CourseAttachment) => void;
+  onAbrirTema?: (topic: QfdosTopic) => void;
+}
 
-  const podcast: Historia[] = topics
-    .filter(t => t.audioPodcastUrl?.trim() || t.spotifyPodcastUrl?.startsWith('http'))
-    .map(t => {
-      const acciones: Historia['acciones'] = [];
-      if (t.spotifyPodcastUrl?.startsWith('http')) {
-        acciones.push({ label: 'Escuchar en Spotify', href: t.spotifyPodcastUrl, icono: 'spotify' });
-      }
-      return {
-        id: `podcast-${t.id}`,
-        grupo: 'podcast',
-        etiqueta: 'Podcast',
-        titulo: `${t.number} · ${t.title}`,
-        texto: t.audioPodcastName || t.subtitle,
-        imagen: resolver('assets/Podcast/qfdos-podcast-portada-vertical.png'),
-        audio: t.audioPodcastUrl?.trim() ? resolver(t.audioPodcastUrl.trim()) : undefined,
-        acciones,
-        duracionMs: 8000
-      };
-    });
+function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[], cb: Callbacks): Grupo[] {
+  const portadaPodcast = resolver('assets/Podcast/qfdos-podcast-portada-vertical.png');
+
+  // --- Tema 1: clip completo + imagen de portada -------------------------
+  const tema1: Historia[] = [];
+  for (const t of topics) {
+    const m = MEDIOS_TEMA[t.id];
+    if (!m) continue;
+    const abrirTema: Accion[] = cb.onAbrirTema
+      ? [{ label: `Abrir el ${t.number}`, icono: 'tema', alPulsar: () => cb.onAbrirTema?.(t) }]
+      : [];
+    if (m.clip) {
+      tema1.push({
+        id: `clip-${t.id}`, grupo: 'tema1', etiqueta: 'Clip',
+        titulo: `${t.number} · ${t.title}`, texto: 'El clip completo del tema.',
+        video: resolver(m.clip), imagen: m.imagen ? resolver(m.imagen) : undefined, ajuste: 'cubrir',
+        requiere: m.clip, acciones: abrirTema, duracionMs: 12000
+      });
+    }
+    if (m.imagen) {
+      tema1.push({
+        id: `imagen-${t.id}`, grupo: 'tema1', etiqueta: t.number,
+        titulo: `${t.number} · ${t.title}`, imagen: resolver(m.imagen),
+        acciones: abrirTema, duracionMs: 6000
+      });
+    }
+  }
+
+  // --- Podcast: píldora de audio + vídeo podcast (30 s cada uno) ----------
+  const podcast: Historia[] = [];
+  for (const t of topics) {
+    const spotify = t.spotifyPodcastUrl?.startsWith('http') ? t.spotifyPodcastUrl : undefined;
+    const audio = t.audioPodcastUrl?.trim();
+    const m = MEDIOS_TEMA[t.id];
+    if (audio) {
+      const reproductor = cb.onAbrirReproductor
+        ? [{
+            label: 'Escuchar la píldora completa',
+            icono: 'audio' as const,
+            alPulsar: () => cb.onAbrirReproductor?.({
+              id: `sp_${t.id}`,
+              title: t.audioPodcastName || `Podcast Oficial: ${t.number} — ${t.title}`,
+              type: 'audio',
+              url: audio,
+              audioUrl: audio,
+              spotifyUri: t.spotifyPodcastUrl,
+              date: 'Curso 2026/2027',
+              isPodcastVideo: !!t.videoPodcastUrl
+            })
+          }]
+        : [];
+      podcast.push({
+        id: `podcast-audio-${t.id}`, grupo: 'podcast', etiqueta: 'Píldora de audio',
+        titulo: `${t.number} · ${t.title}`, texto: t.audioPodcastName || t.subtitle,
+        imagen: portadaPodcast, audio: resolver(audio), maxSegundos: SEGUNDOS_PODCAST,
+        acciones: reproductor, duracionMs: SEGUNDOS_PODCAST * 1000
+      });
+    }
+    if (m?.videoPodcast) {
+      podcast.push({
+        id: `podcast-video-${t.id}`, grupo: 'podcast', etiqueta: 'Vídeo podcast',
+        titulo: `${t.number} · ${t.title}`, texto: 'Resumen en vídeo del tema.',
+        video: resolver(m.videoPodcast), imagen: portadaPodcast, ajuste: 'contener',
+        maxSegundos: SEGUNDOS_PODCAST, requiere: m.videoPodcast,
+        acciones: spotify ? [{ label: 'Ver el episodio en Spotify', icono: 'spotify', href: spotify }] : [],
+        duracionMs: SEGUNDOS_PODCAST * 1000
+      });
+    }
+  }
+
+  // --- Enlaces de interés: los 2 más recientes ---------------------------
+  const enlaces: Historia[] = resourceLinks
+    .map((l, i) => ({ l, i }))
+    .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
+    .slice(0, 2)
+    .map(({ l }) => ({
+      id: `enlace-${l.id}`, grupo: 'enlaces' as const, etiqueta: 'Enlace de interés',
+      titulo: l.title, texto: recortar(l.summary, 320),
+      fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
+      acciones: [{ label: 'Abrir el enlace', icono: 'enlace' as const, href: resolver(l.url) }],
+      duracionMs: duracionPorTexto(l.summary)
+    }));
+
+  // --- Materiales varios ------------------------------------------------
+  const varios = topics.find(t => t.id === 'tema-varios');
+  const materiales: Historia[] = (varios?.attachments ?? []).map(a => ({
+    id: `material-${a.id}`, grupo: 'materiales' as const,
+    etiqueta: a.type === 'pdf' ? 'PDF' : 'Material',
+    titulo: a.title, texto: [a.size, a.date].filter(Boolean).join(' · ') || undefined,
+    acciones: [{
+      label: a.type === 'pdf' ? 'Abrir el PDF' : 'Abrir el material',
+      icono: (a.type === 'pdf' ? 'pdf' : 'enlace') as Accion['icono'],
+      href: resolver(a.url)
+    }],
+    duracionMs: 7000
+  }));
 
   const grupos: Grupo[] = [
-    { id: 'avisos', nombre: 'Avisos', historias: avisos },
-    { id: 'podcast', nombre: 'Podcast', historias: podcast }
+    { id: 'tema1', nombre: 'Tema 1', historias: tema1 },
+    { id: 'podcast', nombre: 'Podcast', historias: podcast },
+    { id: 'enlaces', nombre: 'Enlaces', historias: enlaces },
+    { id: 'materiales', nombre: 'Materiales', historias: materiales }
   ];
   return grupos.filter(g => g.historias.length > 0);
 }
 
-const IconoAccion: React.FC<{ tipo: Historia['acciones'][number]['icono'] }> = ({ tipo }) =>
+const IconoAccion: React.FC<{ tipo: Accion['icono'] }> = ({ tipo }) =>
   tipo === 'pdf' ? <FileText size={15} /> : tipo === 'video' ? <Video size={15} /> :
-  tipo === 'spotify' ? <Headphones size={15} /> : <ExternalLink size={15} />;
+  tipo === 'spotify' || tipo === 'audio' ? <Headphones size={15} /> :
+  tipo === 'tema' ? <GraduationCap size={15} /> : <ExternalLink size={15} />;
+
+const IconoGrupo: React.FC<{ id: GrupoId; size: number }> = ({ id, size }) =>
+  id === 'podcast' ? <Headphones size={size} /> : id === 'enlaces' ? <Link2 size={size} /> :
+  id === 'materiales' ? <FolderOpen size={size} /> : <GraduationCap size={size} />;
 
 // --------------------------------------------------------------------------
 // Visor a pantalla completa
@@ -136,6 +226,8 @@ interface VisorProps {
   onClose: () => void;
   onVista: (id: string) => void;
 }
+
+const fondoDe = (h: Historia) => (h.grupo === 'podcast' ? 'hist-bg-podcast' : 'hist-bg-aviso');
 
 const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   const [g, setG] = useState(inicio.g);
@@ -214,7 +306,9 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
         let p: number;
         if (m && !mediaFailed) {
           if (Number.isFinite(m.duration) && m.duration > 0) {
-            p = m.ended ? 1 : m.currentTime / m.duration;
+            // Hay medios que solo se enseñan un rato (los podcasts, 30 s)
+            const tope = historia.maxSegundos ? Math.min(m.duration, historia.maxSegundos) : m.duration;
+            p = m.ended ? 1 : m.currentTime / tope;
           } else {
             waited += dt;
             p = 0;
@@ -231,7 +325,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [historia.id, historia.duracionMs, mediaFailed, autoplay, siguiente]);
+  }, [historia.id, historia.duracionMs, historia.maxSegundos, mediaFailed, autoplay, siguiente]);
 
   // Teclado (Escape lo gestiona modalA11y con un clic en el fondo)
   useEffect(() => {
@@ -281,7 +375,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
 
   const tieneMedio = !!(historia.video || historia.audio) && !mediaFailed;
   const hayAudio = !!historia.audio && !historia.video;
-  const fondoClase = historia.grupo === 'podcast' ? 'hist-bg-podcast' : 'hist-bg-aviso';
+  const fondoClase = fondoDe(historia);
 
   const visor = (
     <div
@@ -295,7 +389,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
             <video
               key={historia.id}
               ref={el => { mediaRef.current = el; }}
-              className="hist-media"
+              className={`hist-media${historia.ajuste === 'contener' ? ' contener' : ''}`}
               src={historia.video}
               playsInline
               preload="auto"
@@ -343,7 +437,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
           <div className="hist-bar">
             <span className="hist-quien">
               <span className={`hist-avatar ${historia.grupo}`} aria-hidden="true">
-                {historia.grupo === 'podcast' ? <Headphones size={14} /> : <Bell size={14} />}
+                <IconoGrupo id={historia.grupo} size={14} />
               </span>
               <strong>{grupo.nombre}</strong>
               {historia.fecha && <span className="hist-fecha">{historia.fecha}</span>}
@@ -372,16 +466,25 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
             </div>
           )}
           <span className="hist-chip">
-            {historia.grupo === 'podcast' ? <Headphones size={12} /> : <Sparkles size={12} />} {historia.etiqueta}
+            <Sparkles size={12} /> {historia.etiqueta}
           </span>
           <h2 className="hist-titulo">{historia.titulo}</h2>
           {historia.texto && <p className="hist-texto">{historia.texto}</p>}
           {historia.acciones.length > 0 && (
             <div className="hist-acciones">
-              {historia.acciones.map(a => (
-                <a key={a.href} href={a.href} target="_blank" rel="noopener noreferrer" className="hist-cta">
+              {historia.acciones.map(a => a.href ? (
+                <a key={a.label} href={a.href} target="_blank" rel="noopener noreferrer" className="hist-cta">
                   <IconoAccion tipo={a.icono} /> {a.label}
                 </a>
+              ) : (
+                <button
+                  key={a.label}
+                  type="button"
+                  className="hist-cta"
+                  onClick={() => { onClose(); a.alPulsar?.(); }}
+                >
+                  <IconoAccion tipo={a.icono} /> {a.label}
+                </button>
               ))}
             </div>
           )}
@@ -405,13 +508,36 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
 // Banda rotatoria + círculos
 // --------------------------------------------------------------------------
 
-interface HistoriasQfdosProps {
-  announcements: QfdosAnnouncement[];
+interface HistoriasQfdosProps extends Callbacks {
   topics: QfdosTopic[];
+  resourceLinks: QfdosResourceLink[];
 }
 
-export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, topics }) => {
-  const grupos = useMemo(() => construirGrupos(announcements, topics), [announcements, topics]);
+export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, onAbrirReproductor, onAbrirTema }) => {
+  // Los medios locales que aún no se han subido (vídeos de /historias) se comprueban una vez
+  const [ausentes, setAusentes] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const rutas = new Set<string>();
+    for (const m of Object.values(MEDIOS_TEMA)) [m.videoPodcast, m.clip].forEach(r => r && rutas.add(r));
+    let cancelado = false;
+    Promise.all([...rutas].map(async r => {
+      try {
+        const resp = await fetch(resolver(r), { method: 'HEAD' });
+        const tipo = resp.headers.get('content-type') || '';
+        return resp.ok && !/text\/html/i.test(tipo) ? null : r;
+      } catch {
+        return r;
+      }
+    })).then(res => { if (!cancelado) setAusentes(new Set(res.filter((x): x is string => !!x))); });
+    return () => { cancelado = true; };
+  }, []);
+
+  const grupos = useMemo(
+    () => construirGrupos(topics, resourceLinks, { onAbrirReproductor, onAbrirTema })
+      .map(g => ({ ...g, historias: g.historias.filter(h => !h.requiere || !ausentes.has(h.requiere)) }))
+      .filter(g => g.historias.length > 0),
+    [topics, resourceLinks, onAbrirReproductor, onAbrirTema, ausentes]
+  );
   const [vistas, setVistas] = useState<Set<string>>(leerVistas);
   const [abierto, setAbierto] = useState<{ g: number; i: number } | null>(null);
   const [banda, setBanda] = useState(0);
@@ -453,7 +579,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
           const todasVistas = gr.historias.every(h => vistas.has(h.id));
           const portada = gr.id === 'podcast'
             ? resolver('assets/Podcast/qfdos-podcast-portada-cuadrada.png')
-            : gr.historias.find(h => h.imagen)?.imagen;
+            : gr.id === 'tema1' ? gr.historias.find(h => h.imagen)?.imagen : undefined;
           const pendientes = gr.historias.filter(h => !vistas.has(h.id)).length;
           const primera = Math.max(0, gr.historias.findIndex(h => !vistas.has(h.id)));
           return (
@@ -467,7 +593,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
             >
               <span className="hist-anillo">
                 <span className={`hist-foto ${gr.id}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
-                  {!portada && (gr.id === 'podcast' ? <Headphones size={26} /> : <Bell size={26} />)}
+                  {!portada && <IconoGrupo id={gr.id} size={26} />}
                 </span>
               </span>
               <span className="hist-etiqueta">{gr.nombre}</span>
@@ -490,7 +616,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
         <button
           type="button"
           key={actual.h.id}
-          className={`hist-banda-slide ${actual.h.grupo === 'podcast' ? 'hist-bg-podcast' : 'hist-bg-aviso'}`}
+          className={`hist-banda-slide ${fondoDe(actual.h)}`}
           onClick={() => setAbierto({ g: actual.g, i: actual.i })}
           aria-label={`Abrir historia: ${actual.h.titulo}`}
         >
@@ -498,7 +624,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
           <span className="hist-banda-scrim" aria-hidden="true" />
           <span className="hist-banda-texto">
             <span className="hist-chip">
-              {actual.h.grupo === 'podcast' ? <Headphones size={12} /> : <Bell size={12} />} {actual.h.etiqueta}
+              <IconoGrupo id={actual.h.grupo} size={12} /> {actual.h.etiqueta}
             </span>
             <strong>{actual.h.titulo}</strong>
             {actual.h.texto && <span className="hist-banda-sub">{actual.h.texto}</span>}

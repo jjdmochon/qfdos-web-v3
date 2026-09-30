@@ -14,6 +14,8 @@ import {
 interface HubDashboardProps {
   topics: QfdosTopic[];
   announcements: QfdosAnnouncement[];
+  resourceLinks?: QfdosResourceLink[];
+  onOpenSpotifyPlayer?: (att: CourseAttachment) => void;
   onSelectTopic: (topic: QfdosTopic) => void;
   onNavigateToCourseInfo: () => void;
   onNavigateToTemas: () => void;
@@ -29,6 +31,8 @@ interface HubDashboardProps {
 export const HubDashboard: React.FC<HubDashboardProps> = ({
   topics,
   announcements,
+  resourceLinks = [],
+  onOpenSpotifyPlayer,
   onSelectTopic,
   onNavigateToCourseInfo,
   onNavigateToTemas,
@@ -107,7 +111,14 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
       )}
 
       {/* Historias: banda rotatoria + visor tipo Instagram (v1: solo profesorado) */}
-      {isProfesor && <HistoriasQfdos announcements={announcements} topics={topics} />}
+      {isProfesor && (
+        <HistoriasQfdos
+          topics={topics}
+          resourceLinks={resourceLinks}
+          onAbrirReproductor={onOpenSpotifyPlayer}
+          onAbrirTema={onSelectTopic}
+        />
+      )}
 
       {/*
         Examen del Tema 1.
