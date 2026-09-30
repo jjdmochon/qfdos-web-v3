@@ -157,7 +157,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
       historias.push({
         id: `podcast-video-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Vídeo podcast',
         titulo: `${t.number} · ${t.title}`, texto: 'Resumen en vídeo del tema.',
-        video: resolver(m.videoPodcast), imagen: portadaPodcast, ajuste: 'contener',
+        video: resolver(m.videoPodcast), imagen: resolver('assets/Podcast/qfdos-podcast-ep01-16x9.png'), ajuste: 'contener',
         maxSegundos: SEGUNDOS_PODCAST, requiere: m.videoPodcast,
         acciones: spotify ? [{ label: 'Ver el episodio en Spotify', icono: 'spotify', href: spotify }] : [],
         duracionMs: SEGUNDOS_PODCAST * 1000
@@ -389,9 +389,13 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
       <div className="hist-stage" aria-label="Historias QFDOS" aria-roledescription="carrusel">
         {/* Fondo: vídeo, imagen o degradado */}
         <div className={`hist-bg ${fondoClase}`} aria-hidden="true">
+          {historia.ajuste === 'contener' && historia.imagen && (
+            <div className="hist-difuminado" style={{ backgroundImage: `url("${historia.imagen}")` }} />
+          )}
           {historia.video && !mediaFailed ? (
             <video
               key={historia.id}
+              poster={historia.imagen}
               ref={el => { mediaRef.current = el; }}
               className={`hist-media${historia.ajuste === 'contener' ? ' contener' : ''}`}
               src={historia.video}
@@ -403,7 +407,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
           ) : historia.imagen ? (
             <img
               key={historia.id}
-              className="hist-media"
+              className={`hist-media${historia.ajuste === 'contener' ? ' contener' : ''}`}
               src={historia.imagen}
               alt=""
               onError={e => { e.currentTarget.style.display = 'none'; }}
@@ -621,7 +625,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
           onClick={() => setAbierto({ g: actual.g, i: actual.i })}
           aria-label={`Abrir historia: ${actual.h.titulo}`}
         >
-          {actual.h.imagen && <img src={actual.h.imagen} alt="" className="hist-banda-img" loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
+          {actual.h.imagen && <img src={actual.h.imagen} alt="" className={`hist-banda-img${actual.h.ajuste === 'contener' ? ' difuminada' : ''}`} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
           <span className="hist-banda-scrim" aria-hidden="true" />
           <span className="hist-banda-texto">
             <span className="hist-chip">
