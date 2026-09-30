@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles
 } from 'lucide-react';
 import { QfdosAnnouncement, QfdosTopic } from '../data/qfdosData';
+import { avisosRecientesPrimero } from '../utils/avisos';
 
 // ==========================================================================
 // Historias QFDOS
@@ -25,7 +26,6 @@ interface Historia {
   titulo: string;
   texto?: string;
   fecha?: string;
-  urgente?: boolean;
   video?: string;
   imagen?: string;
   audio?: string;
@@ -75,7 +75,7 @@ function guardarVistas(v: Set<string>) {
 const duracionPorTexto = (t?: string) => Math.max(7000, Math.min(15000, (t?.length ?? 0) * 55));
 
 function construirGrupos(announcements: QfdosAnnouncement[], topics: QfdosTopic[]): Grupo[] {
-  const avisos: Historia[] = announcements.map(a => {
+  const avisos: Historia[] = avisosRecientesPrimero(announcements).map(a => {
     const acciones: Historia['acciones'] = [];
     if (a.pdfUrl) acciones.push({ label: a.pdfName || 'Ver PDF', href: resolver(a.pdfUrl), icono: 'pdf' });
     if (a.videoUrl && !esVideoDirecto(a.videoUrl)) acciones.push({ label: 'Ver vídeo', href: a.videoUrl, icono: 'video' });
@@ -83,11 +83,10 @@ function construirGrupos(announcements: QfdosAnnouncement[], topics: QfdosTopic[
     return {
       id: `aviso-${a.id}`,
       grupo: 'avisos',
-      etiqueta: a.priority === 'alta' ? 'Urgente' : 'Aviso',
+      etiqueta: 'Aviso',
       titulo: a.title,
       texto: a.content,
       fecha: a.date,
-      urgente: a.priority === 'alta',
       video: a.videoUrl && esVideoDirecto(a.videoUrl) ? resolver(a.videoUrl) : undefined,
       imagen: a.imageUrl ? resolver(a.imageUrl) : (a.videoUrl ? miniaturaYoutube(a.videoUrl) : undefined),
       audio: a.audioUrl ? resolver(a.audioUrl) : undefined,
@@ -282,7 +281,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
 
   const tieneMedio = !!(historia.video || historia.audio) && !mediaFailed;
   const hayAudio = !!historia.audio && !historia.video;
-  const fondoClase = historia.grupo === 'podcast' ? 'hist-bg-podcast' : historia.urgente ? 'hist-bg-urgente' : 'hist-bg-aviso';
+  const fondoClase = historia.grupo === 'podcast' ? 'hist-bg-podcast' : 'hist-bg-aviso';
 
   const visor = (
     <div
@@ -372,7 +371,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
               {Array.from({ length: 28 }, (_, k) => <i key={k} style={{ animationDelay: `${(k * 97) % 700}ms` }} />)}
             </div>
           )}
-          <span className={`hist-chip ${historia.urgente ? 'urgente' : ''}`}>
+          <span className="hist-chip">
             {historia.grupo === 'podcast' ? <Headphones size={12} /> : <Sparkles size={12} />} {historia.etiqueta}
           </span>
           <h2 className="hist-titulo">{historia.titulo}</h2>
@@ -445,14 +444,13 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
         <h3 id="hist-titulo-seccion">
           <Sparkles size={16} aria-hidden="true" /> Historias
         </h3>
-        <span className="qfdos-badge badge-amber" style={{ fontSize: '0.62rem' }}>Vista previa · solo profesorado</span>
+        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem' }}>Vista previa · solo profesorado</span>
       </div>
 
       {/* Círculos */}
       <div className="hist-circulos" role="list">
         {grupos.map((gr, g) => {
           const todasVistas = gr.historias.every(h => vistas.has(h.id));
-          const urgente = gr.historias.some(h => h.urgente && !vistas.has(h.id));
           const portada = gr.id === 'podcast'
             ? resolver('assets/Podcast/qfdos-podcast-portada-cuadrada.png')
             : gr.historias.find(h => h.imagen)?.imagen;
@@ -463,7 +461,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
               key={gr.id}
               type="button"
               role="listitem"
-              className={`hist-circulo${todasVistas ? ' vista' : ''}${urgente ? ' urgente' : ''}`}
+              className={`hist-circulo${todasVistas ? ' vista' : ''}`}
               onClick={() => setAbierto({ g, i: todasVistas ? 0 : primera })}
               aria-label={`${gr.nombre}: ${gr.historias.length} historia${gr.historias.length === 1 ? '' : 's'}${pendientes ? `, ${pendientes} sin ver` : ''}`}
             >
@@ -492,14 +490,14 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ announcements, t
         <button
           type="button"
           key={actual.h.id}
-          className={`hist-banda-slide ${actual.h.grupo === 'podcast' ? 'hist-bg-podcast' : actual.h.urgente ? 'hist-bg-urgente' : 'hist-bg-aviso'}`}
+          className={`hist-banda-slide ${actual.h.grupo === 'podcast' ? 'hist-bg-podcast' : 'hist-bg-aviso'}`}
           onClick={() => setAbierto({ g: actual.g, i: actual.i })}
           aria-label={`Abrir historia: ${actual.h.titulo}`}
         >
           {actual.h.imagen && <img src={actual.h.imagen} alt="" className="hist-banda-img" loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
           <span className="hist-banda-scrim" aria-hidden="true" />
           <span className="hist-banda-texto">
-            <span className={`hist-chip ${actual.h.urgente ? 'urgente' : ''}`}>
+            <span className="hist-chip">
               {actual.h.grupo === 'podcast' ? <Headphones size={12} /> : <Bell size={12} />} {actual.h.etiqueta}
             </span>
             <strong>{actual.h.titulo}</strong>

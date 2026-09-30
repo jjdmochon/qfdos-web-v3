@@ -2329,8 +2329,13 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   border-left: 3.5px solid var(--border-color);
   transition: border-color var(--transition-fast);
 }
-.ann-card.ann-alta { border-left-color: var(--navy-ink); }
 .ann-card.ann-normal { border-left-color: var(--teal-ink); }
+.ann-ver-mas {
+  margin-top: 10px; padding: 0; background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--navy-ink); text-decoration: underline; text-underline-offset: 3px;
+}
+.ann-ver-mas:hover { color: var(--teal-ink); }
+.ann-ver-mas:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
 
 /* ========== Molecule Drawer ========== */
 .mol-drawer-wrap {
