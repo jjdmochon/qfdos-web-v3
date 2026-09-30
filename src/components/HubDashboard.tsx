@@ -3,6 +3,7 @@ import { QfdosTopic, QfdosAnnouncement, moleculaDeTarjeta } from '../data/qfdosD
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
 import { HistoriasQfdos } from './HistoriasQfdos';
+import { avisosRecientesPrimero } from '../utils/avisos';
 import { useAuth } from '../context/AuthContext';
 import {
   Award, Activity, Bell, ArrowRight, ChevronRight, FileText,
@@ -40,6 +41,13 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
   onOpenTema1Exam
 }) => {
   const { isProfesor } = useAuth();
+
+  // Tablón: los 3 avisos más recientes; el resto, detrás de un enlace
+  const AVISOS_A_LA_VISTA = 3;
+  const [verTodosAvisos, setVerTodosAvisos] = useState(false);
+  const avisosOrdenados = useMemo(() => avisosRecientesPrimero(announcements), [announcements]);
+  const avisosVisibles = verTodosAvisos ? avisosOrdenados : avisosOrdenados.slice(0, AVISOS_A_LA_VISTA);
+  const anteriores = Math.max(0, avisosOrdenados.length - AVISOS_A_LA_VISTA);
 
   // Catálogo plano de fármacos con estructura, para el foco estructural
   const catalogue = useMemo(
@@ -194,14 +202,11 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {announcements.map(ann => (
-                <div key={ann.id} className={`ann-card ${ann.priority === 'alta' ? 'ann-alta' : 'ann-normal'}`}>
+              {avisosVisibles.map(ann => (
+                <div key={ann.id} className="ann-card ann-normal">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 4, gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 700, fontSize: '0.86rem', color: 'var(--text-title)' }}>{ann.title}</span>
-                      {ann.priority === 'alta' && (
-                        <span className="qfdos-badge badge-amber" style={{ fontSize: '0.62rem', padding: '1px 6px' }}>URGENTE</span>
-                      )}
                     </div>
                     <span className="tabular" style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                       {ann.date}
@@ -301,6 +306,19 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                 </div>
               ))}
             </div>
+
+            {anteriores > 0 && (
+              <button
+                type="button"
+                className="ann-ver-mas"
+                onClick={() => setVerTodosAvisos(v => !v)}
+                aria-expanded={verTodosAvisos}
+              >
+                {verTodosAvisos
+                  ? 'Ver solo los 3 más recientes'
+                  : `Ver ${anteriores} aviso${anteriores === 1 ? ' anterior' : 's anteriores'}`}
+              </button>
+            )}
           </div>
 
           {/* Herramientas */}
