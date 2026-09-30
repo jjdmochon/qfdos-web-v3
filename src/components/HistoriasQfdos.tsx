@@ -17,7 +17,8 @@ import { CourseAttachment, QfdosResourceLink, QfdosTopic } from '../data/qfdosDa
 // v1: solo visible para el profesorado (lo decide HubDashboard).
 // ==========================================================================
 
-type GrupoId = 'tema1' | 'podcast' | 'enlaces' | 'materiales';
+/** Id del tema (`tema-01`) o `recursos` */
+type GrupoId = string;
 
 interface Accion {
   label: string;
@@ -30,6 +31,8 @@ interface Accion {
 interface Historia {
   id: string;
   grupo: GrupoId;
+  /** Fondo de marca de la historia cuando no hay imagen o vídeo a pantalla completa */
+  fondo: 'marca' | 'podcast' | 'recursos';
   etiqueta: string;
   titulo: string;
   texto?: string;
@@ -50,6 +53,8 @@ interface Historia {
 interface Grupo {
   id: GrupoId;
   nombre: string;
+  /** Imagen del círculo */
+  portada?: string;
   historias: Historia[];
 }
 
@@ -103,43 +108,32 @@ interface Callbacks {
 
 function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[], cb: Callbacks): Grupo[] {
   const portadaPodcast = resolver('assets/Podcast/qfdos-podcast-portada-vertical.png');
+  const grupos: Grupo[] = [];
 
-  // --- Tema 1: clip completo + imagen de portada -------------------------
-  const tema1: Historia[] = [];
+  // --- Un grupo por tema: cartel, clip, píldora de audio y vídeo podcast ---
   for (const t of topics) {
     const m = MEDIOS_TEMA[t.id];
-    if (!m) continue;
+    const audio = t.audioPodcastUrl?.trim();
+    const spotify = t.spotifyPodcastUrl?.startsWith('http') ? t.spotifyPodcastUrl : undefined;
+    if (!m && !audio) continue;
+
     const abrirTema: Accion[] = cb.onAbrirTema
       ? [{ label: `Abrir el ${t.number}`, icono: 'tema', alPulsar: () => cb.onAbrirTema?.(t) }]
       : [];
-    if (m.clip) {
-      tema1.push({
-        id: `clip-${t.id}`, grupo: 'tema1', etiqueta: 'Clip',
-        titulo: `${t.number} · ${t.title}`, texto: 'El clip completo del tema.',
-        video: resolver(m.clip), imagen: m.imagen ? resolver(m.imagen) : undefined, ajuste: 'cubrir',
-        requiere: m.clip, acciones: abrirTema, duracionMs: 12000
-      });
-    }
-    if (m.imagen) {
-      tema1.push({
-        id: `imagen-${t.id}`, grupo: 'tema1', etiqueta: t.number,
+    const historias: Historia[] = [];
+
+    if (m?.imagen) {
+      historias.push({
+        id: `imagen-${t.id}`, grupo: t.id, fondo: 'marca', etiqueta: t.number,
         titulo: `${t.number} · ${t.title}`, imagen: resolver(m.imagen),
         acciones: abrirTema, duracionMs: 6000
       });
     }
-  }
-
-  // --- Podcast: píldora de audio + vídeo podcast (30 s cada uno) ----------
-  const podcast: Historia[] = [];
-  for (const t of topics) {
-    const spotify = t.spotifyPodcastUrl?.startsWith('http') ? t.spotifyPodcastUrl : undefined;
-    const audio = t.audioPodcastUrl?.trim();
-    const m = MEDIOS_TEMA[t.id];
     if (audio) {
-      const reproductor = cb.onAbrirReproductor
+      const reproductor: Accion[] = cb.onAbrirReproductor
         ? [{
             label: 'Escuchar la píldora completa',
-            icono: 'audio' as const,
+            icono: 'audio',
             alPulsar: () => cb.onAbrirReproductor?.({
               id: `sp_${t.id}`,
               title: t.audioPodcastName || `Podcast Oficial: ${t.number} — ${t.title}`,
@@ -152,16 +146,16 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
             })
           }]
         : [];
-      podcast.push({
-        id: `podcast-audio-${t.id}`, grupo: 'podcast', etiqueta: 'Píldora de audio',
+      historias.push({
+        id: `podcast-audio-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Píldora de audio',
         titulo: `${t.number} · ${t.title}`, texto: t.audioPodcastName || t.subtitle,
         imagen: portadaPodcast, audio: resolver(audio), maxSegundos: SEGUNDOS_PODCAST,
         acciones: reproductor, duracionMs: SEGUNDOS_PODCAST * 1000
       });
     }
     if (m?.videoPodcast) {
-      podcast.push({
-        id: `podcast-video-${t.id}`, grupo: 'podcast', etiqueta: 'Vídeo podcast',
+      historias.push({
+        id: `podcast-video-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Vídeo podcast',
         titulo: `${t.number} · ${t.title}`, texto: 'Resumen en vídeo del tema.',
         video: resolver(m.videoPodcast), imagen: portadaPodcast, ajuste: 'contener',
         maxSegundos: SEGUNDOS_PODCAST, requiere: m.videoPodcast,
@@ -169,26 +163,39 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
         duracionMs: SEGUNDOS_PODCAST * 1000
       });
     }
+    if (m?.clip) {
+      historias.push({
+        id: `clip-${t.id}`, grupo: t.id, fondo: 'marca', etiqueta: 'Clip',
+        titulo: `${t.number} · ${t.title}`, texto: 'El clip completo del tema.',
+        video: resolver(m.clip), imagen: m.imagen ? resolver(m.imagen) : undefined, ajuste: 'cubrir',
+        requiere: m.clip, acciones: abrirTema, duracionMs: 12000
+      });
+    }
+    grupos.push({
+      id: t.id,
+      nombre: t.number,
+      portada: m?.imagen ? resolver(m.imagen) : portadaPodcast,
+      historias
+    });
   }
 
-  // --- Enlaces de interés: los 2 más recientes ---------------------------
+  // --- Recursos: los 2 enlaces de interés más recientes + Materiales varios ---
   const enlaces: Historia[] = resourceLinks
     .map((l, i) => ({ l, i }))
     .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
     .slice(0, 2)
     .map(({ l }) => ({
-      id: `enlace-${l.id}`, grupo: 'enlaces' as const, etiqueta: 'Enlace de interés',
+      id: `enlace-${l.id}`, grupo: 'recursos', fondo: 'recursos' as const, etiqueta: 'Enlace de interés',
       titulo: l.title, texto: recortar(l.summary, 320),
       fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
       acciones: [{ label: 'Abrir el enlace', icono: 'enlace' as const, href: resolver(l.url) }],
       duracionMs: duracionPorTexto(l.summary)
     }));
 
-  // --- Materiales varios ------------------------------------------------
   const varios = topics.find(t => t.id === 'tema-varios');
   const materiales: Historia[] = (varios?.attachments ?? []).map(a => ({
-    id: `material-${a.id}`, grupo: 'materiales' as const,
-    etiqueta: a.type === 'pdf' ? 'PDF' : 'Material',
+    id: `material-${a.id}`, grupo: 'recursos', fondo: 'recursos' as const,
+    etiqueta: a.type === 'pdf' ? 'Material · PDF' : 'Material',
     titulo: a.title, texto: [a.size, a.date].filter(Boolean).join(' · ') || undefined,
     acciones: [{
       label: a.type === 'pdf' ? 'Abrir el PDF' : 'Abrir el material',
@@ -198,12 +205,10 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     duracionMs: 7000
   }));
 
-  const grupos: Grupo[] = [
-    { id: 'tema1', nombre: 'Tema 1', historias: tema1 },
-    { id: 'podcast', nombre: 'Podcast', historias: podcast },
-    { id: 'enlaces', nombre: 'Enlaces', historias: enlaces },
-    { id: 'materiales', nombre: 'Materiales', historias: materiales }
-  ];
+  const recursos = [...enlaces, ...materiales];
+  if (recursos.length) {
+    grupos.push({ id: 'recursos', nombre: 'Recursos', portada: resolver('icons/icon-192.png'), historias: recursos });
+  }
   return grupos.filter(g => g.historias.length > 0);
 }
 
@@ -213,8 +218,7 @@ const IconoAccion: React.FC<{ tipo: Accion['icono'] }> = ({ tipo }) =>
   tipo === 'tema' ? <GraduationCap size={15} /> : <ExternalLink size={15} />;
 
 const IconoGrupo: React.FC<{ id: GrupoId; size: number }> = ({ id, size }) =>
-  id === 'podcast' ? <Headphones size={size} /> : id === 'enlaces' ? <Link2 size={size} /> :
-  id === 'materiales' ? <FolderOpen size={size} /> : <GraduationCap size={size} />;
+  id === 'recursos' ? <FolderOpen size={size} /> : <GraduationCap size={size} />;
 
 // --------------------------------------------------------------------------
 // Visor a pantalla completa
@@ -227,7 +231,7 @@ interface VisorProps {
   onVista: (id: string) => void;
 }
 
-const fondoDe = (h: Historia) => (h.grupo === 'podcast' ? 'hist-bg-podcast' : 'hist-bg-aviso');
+const fondoDe = (h: Historia) => `hist-bg-${h.fondo}`;
 
 const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   const [g, setG] = useState(inicio.g);
@@ -436,7 +440,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
           </div>
           <div className="hist-bar">
             <span className="hist-quien">
-              <span className={`hist-avatar ${historia.grupo}`} aria-hidden="true">
+              <span className={`hist-avatar${historia.grupo === 'recursos' ? ' recursos' : ''}`} aria-hidden="true">
                 <IconoGrupo id={historia.grupo} size={14} />
               </span>
               <strong>{grupo.nombre}</strong>
@@ -577,9 +581,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
       <div className="hist-circulos" role="list">
         {grupos.map((gr, g) => {
           const todasVistas = gr.historias.every(h => vistas.has(h.id));
-          const portada = gr.id === 'podcast'
-            ? resolver('assets/Podcast/qfdos-podcast-portada-cuadrada.png')
-            : gr.id === 'tema1' ? gr.historias.find(h => h.imagen)?.imagen : undefined;
+          const portada = gr.portada;
           const pendientes = gr.historias.filter(h => !vistas.has(h.id)).length;
           const primera = Math.max(0, gr.historias.findIndex(h => !vistas.has(h.id)));
           return (
@@ -592,7 +594,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
               aria-label={`${gr.nombre}: ${gr.historias.length} historia${gr.historias.length === 1 ? '' : 's'}${pendientes ? `, ${pendientes} sin ver` : ''}`}
             >
               <span className="hist-anillo">
-                <span className={`hist-foto ${gr.id}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
+                <span className={`hist-foto${gr.id === 'recursos' ? ' recursos' : ''}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
                   {!portada && <IconoGrupo id={gr.id} size={26} />}
                 </span>
               </span>
