@@ -362,10 +362,12 @@ de inicio). Una vez instalada, la opción desaparece. Empaquetarla para las tien
 ## Historias QFDOS (vista previa del profesorado)
 
 Banda rotatoria y visor 9:16 en el Hub, visibles solo para el perfil docente.
-Grupos: **Tema 1** (clip y cartel), **Podcast** (píldora de audio y vídeo podcast,
-30 s cada uno; el botón abre el reproductor de la ficha del tema), **Enlaces**
-(los 2 enlaces de interés más recientes por `addedAt`) y **Materiales** (los
-adjuntos de «Materiales varios»). El cartel está en `public/historias`; los dos
+Hay **un círculo por tema** con contenido (hoy, el Tema 1) y uno de **Recursos**.
+El del tema reúne, por este orden, el cartel, la píldora de audio (30 s; su
+botón abre el reproductor de la ficha), el vídeo podcast (30 s, con enlace a
+Spotify) y el clip completo. Recursos junta los 2 enlaces de interés más
+recientes (por `addedAt`) y los adjuntos de «Materiales varios», sobre una
+rejilla hexagonal de la marca. El cartel está en `public/historias`; los dos
 vídeos se preparan desde Drive con `scripts/preparar-historias.ps1` (recorta el
 vídeo podcast a 30 s y comprime el clip) y hasta que estén subidos esas dos
 historias no se muestran.
