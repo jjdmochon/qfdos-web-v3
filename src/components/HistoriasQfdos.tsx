@@ -14,7 +14,7 @@ import { CourseAttachment, QfdosResourceLink, QfdosTopic } from '../data/qfdosDa
 // existe en la web (podcast del tema, enlaces de interés y materiales varios)
 // más los medios de portada del Tema 1 que se guardan en /historias.
 //
-// v1: solo visible para el profesorado (lo decide HubDashboard).
+// Visible para todo el mundo desde el Hub.
 // ==========================================================================
 
 /** Id del tema (`tema-01`) o `recursos` */
@@ -574,7 +574,6 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
         <h3 id="hist-titulo-seccion">
           <Sparkles size={16} aria-hidden="true" /> Historias
         </h3>
-        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem' }}>Vista previa · solo profesorado</span>
       </div>
 
       {/* Círculos */}

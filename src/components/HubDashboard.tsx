@@ -110,15 +110,13 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
         </div>
       )}
 
-      {/* Historias: banda rotatoria + visor tipo Instagram (v1: solo profesorado) */}
-      {isProfesor && (
-        <HistoriasQfdos
-          topics={topics}
-          resourceLinks={resourceLinks}
-          onAbrirReproductor={onOpenSpotifyPlayer}
-          onAbrirTema={onSelectTopic}
-        />
-      )}
+      {/* Historias: banda rotatoria + visor tipo Instagram */}
+      <HistoriasQfdos
+        topics={topics}
+        resourceLinks={resourceLinks}
+        onAbrirReproductor={onOpenSpotifyPlayer}
+        onAbrirTema={onSelectTopic}
+      />
 
       {/*
         Examen del Tema 1.
