@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { QfdosTopic, QfdosAnnouncement, moleculaDeTarjeta } from '../data/qfdosData';
+import { QfdosTopic, QfdosAnnouncement, QfdosResourceLink, CourseAttachment, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
 import { HistoriasQfdos } from './HistoriasQfdos';
