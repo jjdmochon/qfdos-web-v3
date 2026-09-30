@@ -39,6 +39,8 @@ Prácticas v4/
 *.mp4
 !public/video-*.mp4
 !docs/video-*.mp4
+!public/historias/*.mp4
+!docs/historias/*.mp4
 
 # Ficheros comprimidos
 *.zip
