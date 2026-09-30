@@ -46,6 +46,7 @@ import { CartasDocenteModal } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
+import { conEnlacesNuevos } from './utils/enlacesNuevos';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -380,7 +381,10 @@ export const App: React.FC = () => {
       }
       if (Array.isArray(remoto.announcements)) setAnnouncements(remoto.announcements);
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
-      if (Array.isArray(remoto.resourceLinks)) setResourceLinks(remoto.resourceLinks);
+      if (Array.isArray(remoto.resourceLinks)) {
+        // Al profesorado se le ofrecen los enlaces nuevos del código para que pueda publicarlos
+        setResourceLinks(isProfesor ? conEnlacesNuevos(remoto.resourceLinks, INITIAL_RESOURCE_LINKS) : remoto.resourceLinks);
+      }
       setPublicadoEn(remoto.publicadoEn || '');
     });
 
