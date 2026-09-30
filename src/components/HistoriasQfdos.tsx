@@ -184,13 +184,18 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     .map((l, i) => ({ l, i }))
     .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
     .slice(0, 2)
-    .map(({ l }) => ({
-      id: `enlace-${l.id}`, grupo: 'recursos', fondo: 'recursos' as const, etiqueta: 'Enlace de interés',
-      titulo: l.title, texto: recortar(l.summary, 320),
-      fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
-      acciones: [{ label: 'Abrir el enlace', icono: 'enlace' as const, href: resolver(l.url) }],
-      duracionMs: duracionPorTexto(l.summary)
-    }));
+    .map(({ l }): Historia => {
+      const video = l.videoUrl && /^data:video\/|\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(l.videoUrl) ? resolver(l.videoUrl) : undefined;
+      return {
+        id: `enlace-${l.id}`, grupo: 'recursos', fondo: 'recursos', etiqueta: 'Enlace de interés',
+        titulo: l.title, texto: recortar(l.summary, video ? 240 : 320),
+        fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
+        imagen: l.imageUrl ? resolver(l.imageUrl) : undefined,
+        video, ajuste: video ? 'contener' : undefined, maxSegundos: video ? SEGUNDOS_PODCAST : undefined,
+        acciones: [{ label: l.source && l.source.length <= 24 ? `Leer en ${l.source}` : 'Abrir el enlace', icono: 'enlace', href: resolver(l.url) }],
+        duracionMs: video ? SEGUNDOS_PODCAST * 1000 : duracionPorTexto(l.summary)
+      };
+    });
 
   const varios = topics.find(t => t.id === 'tema-varios');
   const materiales: Historia[] = (varios?.attachments ?? []).map(a => ({
