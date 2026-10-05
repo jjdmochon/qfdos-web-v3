@@ -10,7 +10,10 @@ import {
   MODELO_FIR_TEST_QUESTIONS,
   MODELO_A_TEST_QUESTIONS,
   MODELO_B_TEST_QUESTIONS,
-  MODELO_C_TEST_QUESTIONS
+  MODELO_C_TEST_QUESTIONS,
+  TEMA2_MODELO_1_TEST_QUESTIONS,
+  TEMA2_MODELO_2_TEST_QUESTIONS,
+  TEMA2_MODELO_3_TEST_QUESTIONS
 } from '../data/qfdosData';
 import {
   submitAttemptToGoogleSheets,
@@ -69,7 +72,9 @@ interface QuizModalProps {
   onAttemptCompleted?: (attempt: QuizAttempt) => void;
 }
 
-export type QuizModelType = 'modelo-e' | 'modelo-fir' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis';
+export type QuizModelType = 
+  | 'modelo-e' | 'modelo-fir' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis'
+  | 't2-modelo-1' | 't2-modelo-2' | 't2-modelo-3';
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -78,8 +83,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 }) => {
   const { user, isProfesor } = useAuth();
 
-  // Model Selection State (Modelo E es el examen oficial 2026/27 sin retrosíntesis del Tema 1)
-  const [selectedModel, setSelectedModel] = useState<QuizModelType>('modelo-e');
+  // Model Selection State
+  const [selectedModel, setSelectedModel] = useState<QuizModelType>(
+    topic.id === 'tema-02' ? 't2-modelo-1' : 'modelo-e'
+  );
+
+  useEffect(() => {
+    if (topic.id === 'tema-02') {
+      setSelectedModel('t2-modelo-1');
+    } else if (topic.id === 'tema-01') {
+      setSelectedModel('modelo-e');
+    }
+  }, [topic.id]);
 
   /**
    * Modo examen.
@@ -91,7 +106,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [examMode, setExamMode] = useState<boolean>(true);
   const isExamMode = examMode;
 
-  // Compute active question bank dynamically (E, FIR y A para alumnado; B, C y Retrosíntesis exclusivos para docente)
+  // Compute active question bank dynamically (E, FIR y A para Tema 1; Modelo 1, 2 y 3 para Tema 2)
   const questions: TestQuestion[] = useMemo(() => {
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
     if (isTema1) {
@@ -103,6 +118,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         if (selectedModel === 'retrosintesis') return RETROSINTESIS_TEST_QUESTIONS;
       }
       return MODELO_E_TEST_QUESTIONS;
+    }
+    const isTema2 = topic.id === 'tema-02' || topic.number === 'Tema 02' || (topic.title && topic.title.toLowerCase().includes('adrenérgico'));
+    if (isTema2) {
+      if (selectedModel === 't2-modelo-2') return TEMA2_MODELO_2_TEST_QUESTIONS;
+      if (selectedModel === 't2-modelo-3') return TEMA2_MODELO_3_TEST_QUESTIONS;
+      return TEMA2_MODELO_1_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
   }, [topic, selectedModel, isProfesor]);
@@ -323,12 +344,84 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     }
   }, [evaluationMode, user, isProfesor]);
 
-  // Asegurar que el alumnado solo acceda a los Modelos E, FIR y A (B, C y Retrosíntesis son exclusivos del profesor)
-  useEffect(() => {
-    if (!isProfesor && selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
-      setSelectedModel('modelo-e');
+  const getModelLabel = (model: QuizModelType, variant: 'badge' | 'full' | 'short' = 'badge'): string => {
+    if (model === 't2-modelo-1') {
+      if (variant === 'full') return 'Modelo 1: Biosíntesis, Metabolismo y Agonistas (15P)';
+      if (variant === 'short') return 'Modelo 1';
+      return 'Modelo 1 (Biosíntesis y Agonistas)';
     }
-  }, [isProfesor, selectedModel]);
+    if (model === 't2-modelo-2') {
+      if (variant === 'full') return 'Modelo 2: Antagonistas, Estereoquímica CIP y Reactividad (15P)';
+      if (variant === 'short') return 'Modelo 2';
+      return 'Modelo 2 (Antagonistas y CIP)';
+    }
+    if (model === 't2-modelo-3') {
+      if (variant === 'full') return 'Modelo 3: Farmacóforo β₂, Síntesis y Bioisosterismo (15P)';
+      if (variant === 'short') return 'Modelo 3';
+      return 'Modelo 3 (Farmacóforo β₂ y Síntesis)';
+    }
+    if (model === 'modelo-e') {
+      if (variant === 'full') return 'Modelo E: Examen Oficial 2026/27 - Sin Retrosíntesis (15P)';
+      if (variant === 'short') return 'Modelo E';
+      return 'Modelo E (Oficial 2026/27)';
+    }
+    if (model === 'modelo-fir') {
+      if (variant === 'full') return 'Modelo FIR: Preguntas Oficiales Convocatorias 2020-2025 (10P)';
+      if (variant === 'short') return 'Modelo FIR';
+      return 'Modelo FIR (Oficial 2020-2025)';
+    }
+    if (model === 'modelo-a') {
+      if (variant === 'full') return 'Modelo A: Farmacología, MoA y Síntesis Directa (15P)';
+      if (variant === 'short') return 'Modelo A';
+      return 'Modelo A (Oficial Previo)';
+    }
+    if (model === 'modelo-b') {
+      if (variant === 'full') return 'Modelo B: Diferenciación, Cinética y Síntesis Directa (15P)';
+      if (variant === 'short') return 'Modelo B';
+      return 'Modelo B (Docente)';
+    }
+    if (model === 'modelo-c') {
+      if (variant === 'full') return 'Modelo C: Catálisis Enzimática, Estereoquímica y Síntesis (15P)';
+      if (variant === 'short') return 'Modelo C';
+      return 'Modelo C (Docente)';
+    }
+    if (model === 'retrosintesis') {
+      if (variant === 'full') return 'Modelo Retrosíntesis: Desconexiones y Sintones (15P)';
+      if (variant === 'short') return 'Retrosíntesis';
+      return 'Retrosíntesis (Docente)';
+    }
+    return 'Examen Oficial';
+  };
+
+  const getModelBadgeColor = (model: QuizModelType): string => {
+    switch (model) {
+      case 't2-modelo-1': return 'var(--navy)';
+      case 't2-modelo-2': return 'var(--teal)';
+      case 't2-modelo-3': return '#8b5cf6';
+      case 'modelo-e': return 'var(--navy)';
+      case 'modelo-fir': return 'var(--teal)';
+      case 'modelo-b': return '#8b5cf6';
+      case 'modelo-c': return '#ea580c';
+      case 'retrosintesis': return '#0d9488';
+      case 'modelo-a':
+      default: return '#2563eb';
+    }
+  };
+
+  // Asegurar que el alumnado solo acceda a los Modelos permitidos según tema
+  useEffect(() => {
+    if (isProfesor) return;
+    const isTema2 = topic.id === 'tema-02' || topic.number === 'Tema 02' || (topic.title && topic.title.toLowerCase().includes('adrenérgico'));
+    if (isTema2) {
+      if (selectedModel !== 't2-modelo-1' && selectedModel !== 't2-modelo-2' && selectedModel !== 't2-modelo-3') {
+        setSelectedModel('t2-modelo-1');
+      }
+    } else {
+      if (selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
+        setSelectedModel('modelo-e');
+      }
+    }
+  }, [isProfesor, selectedModel, topic.id]);
 
   /**
    * Obtiene estadísticas de realización (estado, mejor nota, intentos, última fecha)
@@ -337,9 +430,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const getModelStats = (model: QuizModelType) => {
     const currentEmail = (studentEmail || user?.email || '').toLowerCase().trim();
     const isTema1 = topic.id === 'tema-01' || topic.number === 'Tema 01' || (topic.title && topic.title.toLowerCase().includes('acetilcolina'));
+    const isTema2 = topic.id === 'tema-02' || topic.number === 'Tema 02' || (topic.title && topic.title.toLowerCase().includes('adrenérgico'));
 
     const matching = records.filter(r => {
-      const matchesTopic = r.topicId === topic.id || (isTema1 && (r.topicId === 'tema-1' || !r.topicId || r.topicId === 'tema-01'));
+      const matchesTopic = r.topicId === topic.id || (isTema1 && (r.topicId === 'tema-1' || !r.topicId || r.topicId === 'tema-01')) || (isTema2 && (r.topicId === 'tema-2' || r.topicId === 'tema-02'));
       if (!matchesTopic) return false;
 
       // Si no es profesor y hay correo, contrastar correo del alumno
@@ -349,6 +443,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       }
 
       const m = (r.modelName || '').toLowerCase();
+      if (model === 't2-modelo-1') {
+        return m.includes('modelo 1') || m.includes('modelo-1') || (m.includes('adrenérgico') && m.includes('1'));
+      }
+      if (model === 't2-modelo-2') {
+        return m.includes('modelo 2') || m.includes('modelo-2') || (m.includes('adrenérgico') && m.includes('2'));
+      }
+      if (model === 't2-modelo-3') {
+        return m.includes('modelo 3') || m.includes('modelo-3') || (m.includes('adrenérgico') && m.includes('3'));
+      }
       if (model === 'modelo-e') {
         return m.includes('modelo e');
       }
@@ -366,7 +469,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       }
       if (model === 'modelo-a') {
         // En Tema 1, los intentos iniciales decían 'Modelo A' o no tenían subtipo de modelo
-        return m.includes('modelo a') || (!m.includes('modelo e') && !m.includes('modelo fir') && !m.includes('fir') && !m.includes('modelo b') && !m.includes('modelo c') && !m.includes('retrosint'));
+        return m.includes('modelo a') || (!m.includes('modelo e') && !m.includes('modelo fir') && !m.includes('fir') && !m.includes('modelo b') && !m.includes('modelo c') && !m.includes('retrosint') && !m.includes('modelo 1') && !m.includes('modelo 2') && !m.includes('modelo 3'));
       }
       return false;
     });
@@ -495,22 +598,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         minute: '2-digit'
       });
 
-      let modelDisplayName = 'Modelo E: Examen Oficial 2026/27 - Sin Retrosíntesis (15P)';
-      if (topic.id === 'tema-01') {
-        if (selectedModel === 'modelo-fir') {
-          modelDisplayName = 'Modelo FIR: Preguntas Oficiales Convocatorias 2020-2025 (10P)';
-        } else if (selectedModel === 'modelo-a') {
-          modelDisplayName = 'Modelo A: Farmacología, MoA y Síntesis Directa (15P)';
-        } else if (selectedModel === 'modelo-b') {
-          modelDisplayName = 'Modelo B: Diferenciación, Cinética y Síntesis Directa (15P)';
-        } else if (selectedModel === 'modelo-c') {
-          modelDisplayName = 'Modelo C: Catálisis Enzimática, Estereoquímica y Síntesis (15P)';
-        } else if (selectedModel === 'retrosintesis') {
-          modelDisplayName = 'Modelo Retrosíntesis: Desconexiones y Sintones (15P)';
-        } else {
-          modelDisplayName = 'Modelo E: Examen Oficial 2026/27 - Sin Retrosíntesis (15P)';
-        }
-      }
+      const modelDisplayName = getModelLabel(selectedModel, 'full');
 
       const finalAttempt: QuizRegistrationRecord = {
         id: `rec_${Date.now()}`,
@@ -749,6 +837,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const statsB = getModelStats('modelo-b');
   const statsC = getModelStats('modelo-c');
   const statsRetro = getModelStats('retrosintesis');
+  const statsT2M1 = getModelStats('t2-modelo-1');
+  const statsT2M2 = getModelStats('t2-modelo-2');
+  const statsT2M3 = getModelStats('t2-modelo-3');
   const currentStats = getModelStats(selectedModel);
 
   return (
@@ -1038,17 +1129,17 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                       <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                        {topic.id === 'tema-01' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
+                        {topic.id === 'tema-01' || topic.id === 'tema-02' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
                       </label>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
-                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#2563eb', 
+                        background: getModelBadgeColor(selectedModel), 
                         color: '#fff',
                         fontWeight: 700,
                         whiteSpace: 'nowrap',
                         flexShrink: 0
                       }}>
-                        {selectedModel === 'modelo-e' ? 'Modelo E (Oficial 2026/27)' : selectedModel === 'modelo-fir' ? 'Modelo FIR (Oficial 2020-2025)' : selectedModel === 'modelo-b' ? 'Modelo B (Docente)' : selectedModel === 'modelo-c' ? 'Modelo C (Docente)' : selectedModel === 'retrosintesis' ? 'Retrosíntesis (Docente)' : 'Modelo A (Oficial Previo)'}
+                        {getModelLabel(selectedModel, 'badge')}
                       </span>
                     </div>
 
@@ -1279,6 +1370,166 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </details>
                     )}
 
+                    {topic.id === 'tema-02' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
+                        {/* Tarjeta Modelo 1: Biosíntesis, Metabolismo y Agonistas */}
+                        <div
+                          onClick={() => setSelectedModel('t2-modelo-1')} {...pulsable(() => setSelectedModel('t2-modelo-1'))}
+                          style={{
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-lg)',
+                            border: selectedModel === 't2-modelo-1' ? '2.5px solid var(--navy)' : '1.5px solid var(--border-color)',
+                            background: selectedModel === 't2-modelo-1' ? 'rgba(30, 58, 138, 0.05)' : 'var(--surface)',
+                            boxShadow: selectedModel === 't2-modelo-1' ? '0 3px 12px rgba(30, 58, 138, 0.12)' : 'none',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--navy-ink)' }}>
+                                  Oficial 2026/27 · Calibrado JEV
+                                </span>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy-ink)', margin: '2px 0 0 0' }}>
+                                  Modelo 1 (15 Preguntas)
+                                </h4>
+                              </div>
+                              {statsT2M1.completed ? (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                  ✓ Realizado · {statsT2M1.bestScore}/10
+                                </span>
+                              ) : (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: 'var(--surface-alt)', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                  No realizado
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                              Biosíntesis de catecolaminas (TH, AAAD, DBH, PNMT), degradación enzimática por MAO y COMT, agonistas directos e indirectos, REA del núcleo catecol y fármacos SABA/LABA.
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <span>
+                              {statsT2M1.completed ? `${statsT2M1.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                            </span>
+                            <strong style={{ color: selectedModel === 't2-modelo-1' ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
+                              {selectedModel === 't2-modelo-1' ? '● Seleccionado' : 'Elegir Modelo 1'}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Tarjeta Modelo 2: Antagonistas, Estereoquímica CIP y Reactividad */}
+                        <div
+                          onClick={() => setSelectedModel('t2-modelo-2')} {...pulsable(() => setSelectedModel('t2-modelo-2'))}
+                          style={{
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-lg)',
+                            border: selectedModel === 't2-modelo-2' ? '2.5px solid var(--teal)' : '1.5px solid var(--border-color)',
+                            background: selectedModel === 't2-modelo-2' ? 'rgba(13, 148, 136, 0.05)' : 'var(--surface)',
+                            boxShadow: selectedModel === 't2-modelo-2' ? '0 3px 12px rgba(13, 148, 136, 0.12)' : 'none',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--teal-ink)' }}>
+                                  Oficial 2026/27 · Calibrado JEV
+                                </span>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--teal-ink)', margin: '2px 0 0 0' }}>
+                                  Modelo 2 (15 Preguntas)
+                                </h4>
+                              </div>
+                              {statsT2M2.completed ? (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                  ✓ Realizado · {statsT2M2.bestScore}/10
+                                </span>
+                              ) : (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: 'var(--surface-alt)', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                  No realizado
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                              Bloqueantes α y β, farmacóforo de ariloxipropanolaminas, cardioselectividad β₁, alquilación irreversible vía ion aziridinio (fenoxibenzamina), estereoquímica CIP y biomarcadores (VMA).
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <span>
+                              {statsT2M2.completed ? `${statsT2M2.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                            </span>
+                            <strong style={{ color: selectedModel === 't2-modelo-2' ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
+                              {selectedModel === 't2-modelo-2' ? '● Seleccionado' : 'Elegir Modelo 2'}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Tarjeta Modelo 3: Farmacóforo β₂, Síntesis Orgánica y Bioisosterismo */}
+                        <div
+                          onClick={() => setSelectedModel('t2-modelo-3')} {...pulsable(() => setSelectedModel('t2-modelo-3'))}
+                          style={{
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-lg)',
+                            border: selectedModel === 't2-modelo-3' ? '2.5px solid #8b5cf6' : '1.5px solid var(--border-color)',
+                            background: selectedModel === 't2-modelo-3' ? 'rgba(139, 92, 246, 0.05)' : 'var(--surface)',
+                            boxShadow: selectedModel === 't2-modelo-3' ? '0 3px 12px rgba(139, 92, 246, 0.12)' : 'none',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div>
+                                <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#7c3aed' }}>
+                                  Examen Oficial Previo · Claude Code
+                                </span>
+                                <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: '#6d28d9', margin: '2px 0 0 0' }}>
+                                  Modelo 3 (15 Preguntas)
+                                </h4>
+                              </div>
+                              {statsT2M3.completed ? (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                  ✓ Realizado · {statsT2M3.bestScore}/10
+                                </span>
+                              ) : (
+                                <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: 'var(--surface-alt)', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                  No realizado
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                              Farmacóforo β₂ (Asp113, Ser203/207, Asn293), síntesis orgánica (salbutamol, propranolol, guanetidina), bioisosterismo no clásico, eudismia e interacciones ligando-receptor.
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                            <span>
+                              {statsT2M3.completed ? `${statsT2M3.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                            </span>
+                            <strong style={{ color: selectedModel === 't2-modelo-3' ? '#7c3aed' : 'var(--text-muted)' }}>
+                              {selectedModel === 't2-modelo-3' ? '● Seleccionado' : 'Elegir Modelo 3'}
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* SECCIÓN BONUS: Claves Farmacoquímicas Avanzadas del FIR (Solo al elegir Modelo FIR) */}
                     {selectedModel === 'modelo-fir' && (
                       <div style={{
@@ -1473,14 +1724,14 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <>
                           <CheckCircle2 size={18} color="#059669" />
                           <strong style={{ fontSize: '0.92rem', color: 'var(--ok-ink)' }}>
-                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Ya Realizado (Mejor Calificación: {currentStats.bestScore}/10)
+                            {getModelLabel(selectedModel, 'short')} · Ya Realizado (Mejor Calificación: {currentStats.bestScore}/10)
                           </strong>
                         </>
                       ) : (
                         <>
                           <Clock size={18} color="var(--navy)" />
                           <strong style={{ fontSize: '0.92rem', color: 'var(--navy-ink)' }}>
-                            {selectedModel === 'modelo-e' ? 'Modelo E Oficial 2026/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-a' ? 'Modelo A Oficial Previo' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : 'Modelo Retrosíntesis'} · Pendiente de Realización
+                            {getModelLabel(selectedModel, 'short')} · Pendiente de Realización
                           </strong>
                         </>
                       )}
@@ -1530,9 +1781,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </span>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
                         <strong>
-                          {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27:' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (Sanidad):' : selectedModel === 'modelo-b' ? 'Modelo B Oficial:' : selectedModel === 'modelo-c' ? 'Modelo C Oficial:' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis Oficial:' : 'Modelo A Oficial:'}
+                          {getModelLabel(selectedModel, 'badge')}:
                         </strong>{' '}
-                        {selectedModel === 'modelo-e'
+                        {selectedModel === 't2-modelo-1'
+                          ? '15 preguntas calibradas JEV System-1: biosíntesis de catecolaminas (TH, AAAD, DBH, PNMT), degradación enzimática por MAO y COMT, agonistas directos e indirectos, REA del núcleo catecol y fármacos SABA/LABA.'
+                          : selectedModel === 't2-modelo-2'
+                          ? '15 preguntas calibradas JEV System-1: bloqueantes α y β, farmacóforo de ariloxipropanolaminas, cardioselectividad β₁, alquilación irreversible vía ion aziridinio (fenoxibenzamina) y estereoquímica CIP.'
+                          : selectedModel === 't2-modelo-3'
+                          ? '15 preguntas calibradas Claude Code: farmacóforo β₂ (Asp113, Ser203/207, Asn293), síntesis orgánica de salbutamol, propranolol y guanetidina, bioisosterismo no clásico y eudismia.'
+                          : selectedModel === 'modelo-e'
                           ? '15 preguntas calibradas JEV System-1 (sin retrosíntesis): biosíntesis ChAT, SAR betanecol, eudismia metacolina, síntesis industrial directa, catálisis Ser/His de AChE, 2-PAM, aging, BHE y tubocurarina (1.4 nm).'
                           : selectedModel === 'modelo-fir'
                           ? '10 preguntas reales de exámenes del Ministerio de Sanidad (2020-2025): estabilidad de carbamatos, suxametonio/cetilpiridinio como fármacos blandos, atracurio y Hofmann, oximas y reactivación de AChE, donepezilo, rivastigmina y pirenzepina.'
@@ -1569,11 +1826,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     >
                       {currentStats.completed ? (
                         <>
-                          Repetir {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas · {examMode ? 'Examen' : 'Preparación'}) <RotateCcw size={16} style={{ marginLeft: '6px' }} />
+                          Repetir {getModelLabel(selectedModel, 'short')} ({questions.length} Preguntas · {examMode ? 'Examen' : 'Preparación'}) <RotateCcw size={16} style={{ marginLeft: '6px' }} />
                         </>
                       ) : (
                         <>
-                          Comenzar {selectedModel === 'modelo-e' ? 'Modelo E Oficial' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A'} ({questions.length} Preguntas · {examMode ? 'Examen' : 'Preparación'}) <ArrowRight size={16} style={{ marginLeft: '6px' }} />
+                          Comenzar {getModelLabel(selectedModel, 'short')} ({questions.length} Preguntas · {examMode ? 'Examen' : 'Preparación'}) <ArrowRight size={16} style={{ marginLeft: '6px' }} />
                         </>
                       )}
                     </button>
@@ -1608,13 +1865,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
-                        background: selectedModel === 'modelo-e' ? 'var(--navy)' : selectedModel === 'modelo-fir' ? 'var(--teal)' : selectedModel === 'modelo-b' ? '#8b5cf6' : selectedModel === 'modelo-c' ? '#ea580c' : selectedModel === 'retrosintesis' ? '#0d9488' : '#2563eb', 
+                        background: getModelBadgeColor(selectedModel), 
                         color: '#fff',
                         fontWeight: 700,
                         whiteSpace: 'nowrap',
                         flexShrink: 0
                       }}>
-                        {selectedModel === 'modelo-e' ? 'Modelo E' : selectedModel === 'modelo-fir' ? 'Modelo FIR' : selectedModel === 'modelo-b' ? 'Modelo B' : selectedModel === 'modelo-c' ? 'Modelo C' : selectedModel === 'retrosintesis' ? 'Retrosíntesis' : 'Modelo A'} · {isExamMode ? 'Examen' : 'Preparación'}
+                        {getModelLabel(selectedModel, 'short')} · {isExamMode ? 'Examen' : 'Preparación'}
                       </span>
                       <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--navy-ink)', whiteSpace: 'nowrap' }}>
                         Pregunta {currentIndex + 1} de {questions.length}
@@ -1920,7 +2177,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     return (
                       <div className="qfdos-card" style={{ maxWidth: '420px', margin: '0 auto 1.25rem', padding: '1.25rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
-                          Calificación ({topic.title} · {selectedModel === 'modelo-e' ? 'Modelo E (15P)' : selectedModel === 'modelo-fir' ? 'Modelo FIR (10P)' : selectedModel === 'modelo-b' ? 'Modelo B (15P)' : selectedModel === 'modelo-c' ? 'Modelo C (15P)' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis (15P)' : 'Modelo A (15P)'} · {isExamMode ? 'Modo Examen' : 'Modo Preparación'}):
+                          Calificación ({topic.title} · {getModelLabel(selectedModel, 'short')} ({questions.length}P) · {isExamMode ? 'Modo Examen' : 'Modo Preparación'}):
                         </div>
                         <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: isAprobado ? 'var(--teal-ink)' : 'var(--accent-red)', lineHeight: 1 }}>
                           {stats.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>

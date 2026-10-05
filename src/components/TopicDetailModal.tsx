@@ -812,8 +812,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.id === 'tema-01' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (cuatro modelos disponibles). Calificaciones volcadas en Google Sheets.`
-                                : `${topic.id === 'tema-01' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales calibradas. Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
+                                ? `${topic.id === 'tema-01' || topic.id === 'tema-02' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (${topic.id === 'tema-02' ? 'tres modelos disponibles' : 'cuatro modelos disponibles'}). Calificaciones volcadas en Google Sheets.`
+                                : `${topic.id === 'tema-01' || topic.id === 'tema-02' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales calibradas (${topic.id === 'tema-02' ? '3 modelos disponibles' : 'modelos disponibles'}). Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
                               }
                             </p>
                           </div>
@@ -822,7 +822,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             className="btn btn-sm btn-primary" 
                             style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700 }}
                           >
-                            <HelpCircle size={13} /> {isProfesor ? 'Portal Docente / Realizar Test' : 'Realizar el Examen (15 Preguntas)'}
+                            <HelpCircle size={13} /> {isProfesor ? 'Portal Docente / Realizar Test' : (topic.id === 'tema-01' || topic.id === 'tema-02') ? 'Realizar el Examen (Modelos Calibrados)' : 'Realizar el Examen (15 Preguntas)'}
                           </button>
                         </div>
                       )}
@@ -1799,7 +1799,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               <>
                 {isProfesor && testHabilitado(topic) && (
                   <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
-                    <HelpCircle size={14} /> {topic.id === 'tema-01' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
+                    <HelpCircle size={14} /> {topic.id === 'tema-01' || topic.id === 'tema-02' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
                   </button>
                 )}
                 {flashcardsHabilitadas(topic) && (

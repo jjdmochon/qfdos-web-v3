@@ -273,6 +273,21 @@ export const App: React.FC = () => {
         localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
       }
     }
+    // Auto-heal Tema 2 para garantizar que el test esté habilitado con los 3 modelos oficiales y publicado
+    const t2 = normalized.find(t => t.id === 'tema-02');
+    const base2 = INITIAL_TOPICS.find(t => t.id === 'tema-02');
+    if (t2 && base2) {
+      let modified2 = false;
+      if (!t2.testQuestions || t2.testQuestions.length !== 15 || t2.testDisponible !== true || t2.status !== 'Publicado') {
+        t2.testQuestions = base2.testQuestions;
+        t2.testDisponible = true;
+        t2.status = 'Publicado';
+        modified2 = true;
+      }
+      if (modified2) {
+        localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
+      }
+    }
     return normalized;
   });
 

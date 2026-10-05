@@ -1944,6 +1944,9 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
   }
 ];
 
+export * from './tema02ExamsData';
+import { TEMA2_MODELO_1_TEST_QUESTIONS } from './tema02ExamsData';
+
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
     id: 'tema-00',
@@ -2658,9 +2661,9 @@ flashcards: [
     slideCount: 64,
     pdbTargetId: '2RH1',
     targetName: 'Receptor β2-Adrenérgico Humano unido a Timolol',
-    status: 'Próximamente',
-    // Estructuras de las partes 1 y 2; test y flashcards todavía en preparación
-    testDisponible: false,
+    status: 'Publicado',
+    // Estructuras oficiales publicadas; test oficial disponible (3 modelos calibrados)
+    testDisponible: true,
     flashcardsDisponibles: false,
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 02: Diapositivas Oficiales Sistema Adrenérgico.pdf',
@@ -3308,39 +3311,7 @@ flashcards: [
         date: '24/09/2026'
       }
     ],
-    testQuestions: [
-      {
-        id: 't02-q1',
-        topicId: 'tema-02',
-        block: 'SAR Adrenérgico',
-        question: '¿Qué modificación química en el anillo aromático confiere al salbutamol resistencia metabólica frente a la enzima catecol-O-metiltransferasa (COMT) conservando la activación agonista β2?',
-        questionSmiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1',
-        options: [
-          'La adición de dos átomos de cloro en posiciones orto (3,5-dicloro).',
-          'La sustitución del grupo catecol 3-hidroxilo por un grupo hidroximetilo (-CH2OH, alcohol saligenínico).',
-          'La eliminación completa del grupo fenólico en posición 4.',
-          'La introducción de un grupo sulfonamida voluminoso.'
-        ],
-        correctIndex: 1,
-        explanation: 'El grupo hidroximetilo en posición 3 (alcohol saligenina) no es reconocido como sustrato por la COMT pero mantiene la capacidad de formar los enlaces de hidrógeno esenciales con el receptor β2-adrenérgico.',
-        difficulty: 'Medio'
-      },
-      {
-        id: 't02-q2',
-        topicId: 'tema-02',
-        block: 'Estructuras de β-bloqueantes',
-        question: '¿Cuál de las siguientes moléculas corresponde a un β-bloqueante cardio-selectivo (β1) que contiene una ariloxipropanolamina con sustituyente para-amida hidrofílico?',
-        options: [
-          { text: 'Atenolol (para-acetamida ariloxipropanolamina)', smiles: 'CC(C)NCC(O)COc1ccc(CC(=O)N)cc1' },
-          { text: 'Propranolol (naftil ariloxipropanolamina no selectiva)', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' },
-          { text: 'Salbutamol (agonista β2 saligenina)', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
-          { text: 'Adrenalina (catecolamina natural)', smiles: 'CNC[C@H](O)c1ccc(O)c(O)c1' }
-        ],
-        correctIndex: 0,
-        explanation: 'El atenolol incorpora el grupo p-acetamida (-CH2-CO-NH2) que interactúa específicamente con residuos del receptor β1 cardíaco y disminuye la lipofilia global, reduciendo el paso a través de la BHE.',
-        difficulty: 'Medio'
-      }
-    ],
+    testQuestions: TEMA2_MODELO_1_TEST_QUESTIONS,
     flashcards: [
       {
         id: 'fc-02-1',
