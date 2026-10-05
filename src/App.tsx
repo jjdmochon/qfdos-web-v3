@@ -387,6 +387,8 @@ export const App: React.FC = () => {
                 geminiNotebookUrl: localTopic.geminiNotebookUrl || rt.geminiNotebookUrl,
                 spotifyPodcastUrl: localTopic.spotifyPodcastUrl || rt.spotifyPodcastUrl,
                 attachments: (localTopic.attachments && localTopic.attachments.length > 0) ? localTopic.attachments : rt.attachments,
+                testDisponible: (localTopic.id === 'tema-01' || localTopic.id === 'tema-02') ? true : (localTopic.testDisponible ?? rt.testDisponible),
+                testQuestions: (localTopic.testQuestions && localTopic.testQuestions.length >= (rt.testQuestions?.length || 0)) ? localTopic.testQuestions : rt.testQuestions,
               };
             });
           }

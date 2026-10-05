@@ -70,6 +70,17 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       };
     }
 
+    if (t.id === 'tema-02') {
+      return {
+        ...base,
+        ...t,
+        status: 'Publicado' as const,
+        testDisponible: true,
+        testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
+        flashcardsDisponibles: base.flashcardsDisponibles,
+      };
+    }
+
     return {
       ...base,
       ...t,

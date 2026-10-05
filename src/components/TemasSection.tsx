@@ -315,6 +315,21 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       )}
                     </>
                   )}
+                  {topic.id === 'tema-02' && (
+                    <span 
+                      style={{ 
+                        fontSize: '0.66rem', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px', 
+                        background: 'linear-gradient(135deg, rgba(30,58,138,0.15) 0%, rgba(45,212,191,0.2) 100%)', 
+                        color: 'var(--navy-ink)', 
+                        border: '1px solid var(--navy)',
+                        fontWeight: 800 
+                      }}
+                    >
+                      🧪 Test (3 Modelos · 45P) ✓
+                    </span>
+                  )}
                 </div>
 
                 {/* Key Concepts Badges */}

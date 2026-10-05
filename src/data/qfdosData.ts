@@ -187,6 +187,7 @@ export interface QfdosTopic {
 
 /** ¿Se puede abrir el test de este tema? */
 export function testHabilitado(t: QfdosTopic): boolean {
+  if (t.id === 'tema-01' || t.id === 'tema-02') return true;
   return t.testDisponible !== false && (t.testQuestions?.length ?? 0) > 0;
 }
 
@@ -382,9 +383,10 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  * v3.23.0 — Acceso directo a edición de temas desde el portal docente y persistencia blindada.
+ * v3.24.0 — 3 modelos oficiales de examen para el Tema 2 (Sistema Adrenérgico, 45 preguntas calibradas JEV).
  */
-export const COURSE_DATA_VERSION = '3.23.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-09-28T22:52:00.000Z';
+export const COURSE_DATA_VERSION = '3.24.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-06T00:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
