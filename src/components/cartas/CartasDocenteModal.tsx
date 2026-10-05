@@ -1,19 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { MoleculeDrug } from '../../data/qfdosData';
-import { CartasDeckView } from './CartasDeckView';
+import { CartasDeckView, BARAJAS, TemaCartas } from './CartasDeckView';
 import { X, Layers, ShieldCheck } from 'lucide-react';
 
 interface CartasDocenteModalProps {
   onClose: () => void;
   onOpenAdmet?: (drug: MoleculeDrug) => void;
+  /** Baraja con la que se abre el modal; se puede cambiar desde la cabecera. */
+  temaInicial?: TemaCartas;
 }
 
 export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
   onClose,
-  onOpenAdmet
+  onOpenAdmet,
+  temaInicial = 1
 }) => {
   const { isProfesor } = useAuth();
+  const [tema, setTema] = useState<TemaCartas>(temaInicial);
+  useEffect(() => { setTema(temaInicial); }, [temaInicial]);
+  const baraja = BARAJAS[tema];
+  const nCartas = baraja.farmacos.length;
 
   // Cerrar con Escape
   useEffect(() => {
@@ -87,20 +94,37 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)' }}>
-                  Baraja de Fármacos QFDOS · Tema 1
+                  Baraja de Fármacos QFDOS · Tema {tema}
                 </h3>
                 <span className="qfdos-badge badge-mint" style={{ fontSize: '0.62rem', padding: '1px 6px', fontWeight: 800 }}>
                   <Layers size={11} style={{ marginRight: 3, verticalAlign: 'middle' }} />
-                  Colección Oficial · 15 Cartas
+                  Colección Oficial · {nCartas} Cartas
                 </span>
               </div>
               <p style={{ margin: 0, fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                15 Cartas Coleccionables de la Sinapsis Colinérgica · Escala comparativa de afinidad e índices SAR
+                {nCartas} Cartas Coleccionables · {baraja.titulo} · Escala comparativa de afinidad e índices SAR
               </p>
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Selector de baraja por tema */}
+            <div role="tablist" aria-label="Elegir baraja por tema" style={{ display: 'flex', gap: 4 }}>
+              {(Object.keys(BARAJAS).map(Number) as TemaCartas[]).map(t => (
+                <button
+                  key={t}
+                  type="button"
+                  role="tab"
+                  aria-selected={tema === t}
+                  onClick={() => setTema(t)}
+                  className={`btn btn-sm ${tema === t ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ padding: '5px 12px', fontWeight: 800, fontSize: '0.74rem' }}
+                  title={`Baraja del Tema ${t} · ${BARAJAS[t].familia} (${BARAJAS[t].farmacos.length} cartas)`}
+                >
+                  Tema {t} · {BARAJAS[t].familia}
+                </button>
+              ))}
+            </div>
             <button
               onClick={onClose}
               className="btn btn-sm btn-ghost-clean"
@@ -121,7 +145,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
             background: 'var(--neutral-bg, #f8fafc)'
           }}
         >
-          <CartasDeckView onOpenAdmet={handleAdmetFromDeck} showDocenteBanner={true} />
+          <CartasDeckView onOpenAdmet={handleAdmetFromDeck} showDocenteBanner={true} tema={tema} />
         </div>
 
         {/* Pie del Modal */}

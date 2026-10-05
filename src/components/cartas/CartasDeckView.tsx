@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import rawData from '../../data/farmacosTema01.json';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import rawTema01 from '../../data/farmacosTema01.json';
+import rawTema02 from '../../data/farmacosTema02.json';
 import { MoleculeDrug } from '../../data/qfdosData';
 import './cartas.css';
 import {
@@ -30,7 +31,7 @@ export interface FarmacoCarta {
   nombre: string;
   relevancia: number;
   rol: string;
-  grupo: 'agonista' | 'ache' | 'antidoto' | 'antagonista' | string;
+  grupo: string;
   badge: string;
   clase: string;
   formula: string;
@@ -44,16 +45,46 @@ export interface FarmacoCarta {
   examen: string;
 }
 
+export type TemaCartas = 1 | 2;
+
+interface BarajaTema {
+  tema: number;
+  titulo: string;
+  grupos: Record<string, string>;
+  farmacos: FarmacoCarta[];
+}
+
+/** Barajas disponibles. Para añadir un tema: JSON en src/data, SVG en public/cartas/estructuras y una entrada aquí. */
+export const BARAJAS: Record<TemaCartas, BarajaTema & { familia: string }> = {
+  1: { ...(rawTema01 as unknown as BarajaTema), familia: 'Colinérgicos' },
+  2: { ...(rawTema02 as unknown as BarajaTema), familia: 'Adrenérgicos' },
+};
+
 export interface CartasDeckViewProps {
   onOpenAdmet?: (drug: MoleculeDrug) => void;
   showDocenteBanner?: boolean;
+  /** Tema cuya baraja se muestra (1 por defecto). */
+  tema?: TemaCartas;
 }
 
 const ORDEN_INDICES = ['AFI', 'SEL', 'EST', 'ORA', 'SNC', 'DUR'] as const;
 
+/**
+ * Los rótulos en mayúsculas convierten α y β en Α y Β, idénticas a la A y la B latinas.
+ * Las letras griegas se envuelven en un span que anula el text-transform.
+ */
+const conGriegas = (texto: string): React.ReactNode =>
+  texto.split(/([\u0391-\u03A9\u03B1-\u03C9]+)/).map((trozo, i) =>
+    /[\u0391-\u03A9\u03B1-\u03C9]/.test(trozo)
+      ? <span key={i} className="qf-griega">{trozo}</span>
+      : trozo
+  );
+
 export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
-  showDocenteBanner = true
+  showDocenteBanner = true,
+  tema = 1
 }) => {
+  const baraja = BARAJAS[tema] ?? BARAJAS[1];
   const [activeGroup, setActiveGroup] = useState<string>('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
@@ -61,28 +92,30 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
   const [cardTheme, setCardTheme] = useState<'clean' | 'dark'>('clean');
 
   const farmacos = useMemo(() => {
-    return (rawData.farmacos || []) as FarmacoCarta[];
-  }, []);
+    return (baraja.farmacos || []) as FarmacoCarta[];
+  }, [baraja]);
+
+  // Al cambiar de baraja se reinician filtro, búsqueda y cartas volteadas
+  useEffect(() => {
+    setActiveGroup('todos');
+    setSearchTerm('');
+    setFlippedCards({});
+  }, [tema]);
 
   const baseUrl = import.meta.env.BASE_URL || '/';
   const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 
   // Agrupaciones y conteos
   const gruposConteo = useMemo(() => {
-    const counts: Record<string, number> = {
-      todos: farmacos.length,
-      agonista: 0,
-      ache: 0,
-      antidoto: 0,
-      antagonista: 0
-    };
+    const counts: Record<string, number> = { todos: farmacos.length };
+    Object.keys(baraja.grupos || {}).forEach(g => { counts[g] = 0; });
     farmacos.forEach(f => {
       if (counts[f.grupo] !== undefined) {
         counts[f.grupo]++;
       }
     });
     return counts;
-  }, [farmacos]);
+  }, [farmacos, baraja]);
 
   // Fármacos filtrados
   const filteredFarmacos = useMemo(() => {
@@ -168,13 +201,13 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
             </div>
             <div className="qf-deck-header-titles">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <h2>Cartas Coleccionables de Fármacos · Tema 1</h2>
+                <h2>Cartas Coleccionables de Fármacos · Tema {tema}</h2>
                 <span className="qf-deck-badge-docente">
                   <Sparkles size={13} /> Material Oficial de Estudio · QFDOS
                 </span>
               </div>
               <p>
-                15 Fármacos Colinérgicos analizados según el Sistema <strong>2627 QFDOS Structural Affinity Identity</strong>.
+                {farmacos.length} Fármacos {baraja.familia} · {baraja.titulo}. Sistema <strong>2627 QFDOS Structural Affinity Identity</strong>.
               </p>
             </div>
           </div>
@@ -207,34 +240,16 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
           >
             Todos <span className="qf-filtro-count">{gruposConteo.todos}</span>
           </button>
-          <button
-            type="button"
-            className={`qf-filtro-btn ${activeGroup === 'agonista' ? 'active' : ''}`}
-            onClick={() => setActiveGroup('agonista')}
-          >
-            Agonistas <span className="qf-filtro-count">{gruposConteo.agonista}</span>
-          </button>
-          <button
-            type="button"
-            className={`qf-filtro-btn ${activeGroup === 'ache' ? 'active' : ''}`}
-            onClick={() => setActiveGroup('ache')}
-          >
-            Anticolinesterásicos <span className="qf-filtro-count">{gruposConteo.ache}</span>
-          </button>
-          <button
-            type="button"
-            className={`qf-filtro-btn ${activeGroup === 'antidoto' ? 'active' : ''}`}
-            onClick={() => setActiveGroup('antidoto')}
-          >
-            Antídoto <span className="qf-filtro-count">{gruposConteo.antidoto}</span>
-          </button>
-          <button
-            type="button"
-            className={`qf-filtro-btn ${activeGroup === 'antagonista' ? 'active' : ''}`}
-            onClick={() => setActiveGroup('antagonista')}
-          >
-            Antagonistas <span className="qf-filtro-count">{gruposConteo.antagonista}</span>
-          </button>
+          {Object.entries(baraja.grupos || {}).map(([clave, etiqueta]) => (
+            <button
+              key={clave}
+              type="button"
+              className={`qf-filtro-btn ${activeGroup === clave ? 'active' : ''}`}
+              onClick={() => setActiveGroup(clave)}
+            >
+              {conGriegas(etiqueta)} <span className="qf-filtro-count">{gruposConteo[clave] ?? 0}</span>
+            </button>
+          ))}
         </div>
 
         {/* Acciones: Buscador y Flip All */}
@@ -325,7 +340,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                     <div className="qf-cabecera">
                       <div>
                         <div className="qf-rel">{f.relevancia}</div>
-                        <div className="qf-rol">{f.rol}</div>
+                        <div className="qf-rol">{conGriegas(f.rol)}</div>
                       </div>
                       <div className="qf-cabecera-der">
                         <span className="qf-badge">{f.badge}</span>

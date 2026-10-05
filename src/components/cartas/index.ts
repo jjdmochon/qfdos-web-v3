@@ -1,3 +1,3 @@
-export { CartasDeckView } from './CartasDeckView';
+export { CartasDeckView, BARAJAS } from './CartasDeckView';
 export { CartasDocenteModal } from './CartasDocenteModal';
-export type { FarmacoCarta, FarmacoCartaIndices } from './CartasDeckView';
+export type { FarmacoCarta, FarmacoCartaIndices, TemaCartas } from './CartasDeckView';

@@ -1,268 +1,265 @@
 // ==========================================================================
 // QFDOS - Exámenes Calibrados Tema 02: Sistema Adrenérgico
 // Asignatura: Química Farmacéutica II (2627 QFDOS E) - Universidad de Granada
-// Modelos 1 y 2: Certificación Jev System-1
-// Modelo 3: Síntesis Química, Farmacóforo y Bioisosterismo (Claude Code)
+// Modelo 1: Clasificación de Receptores, Síntesis, Farmacóforo β₂, CIP y Eudismia (Modelo B)
+// Modelo 2: Antagonistas (Beta y Alfa), Estereoquímica CIP y Reactividad Covalente (Jev 2)
+// Modelo 3: Farmacóforo β₂, Síntesis Orgánica, Bioisosterismo y Eudismia (Modelo A)
 // Tipografía Científica: Texto plano y caracteres Unicode directos (cero LaTeX crudo)
 // ==========================================================================
 
 import type { TestQuestion } from './qfdosData';
 
 // ==========================================================================
-// MODELO 1: Biosíntesis, Metabolismo, Agonistas Directos e Indirectos, y REA
-// 15 Preguntas · Clave: B, D, A, C, B, A, D, C, B, A, C, D, B, A, C
+// MODELO 1: Clasificación de Receptores, Síntesis, Farmacóforo β₂, CIP y Eudismia (Modelo B)
+// 15 Preguntas · Clave: A, B, C, D, A, B, C, D, A, B, C, D, A, B, C
 // ==========================================================================
 export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
   {
     id: 't02-m1-q01',
     topicId: 'tema-02',
-    block: 'Transporte Activo & BHE',
-    badge: 'JEV 1 · P1 (Conexión FIR)',
-    question: 'La dopamina administrada por vía intravenosa carece de utilidad en el tratamiento de la enfermedad de Parkinson porque es incapaz de atravesar la barrera hematoencefálica (BHE). Sin embargo, su precursor biosintético L-DOPA sí accede al sistema nervioso central. ¿Cuál es la base molecular de esta diferencia farmacocinética?',
-    questionSmiles: 'N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O',
+    block: 'Clasificación de Receptores & Escalera del N',
+    badge: 'Modelo B · P1 (Clasificación de Ahlquist)',
+    question: "La clasificación clásica de Ahlquist ordena los receptores adrenérgicos por su sensibilidad relativa a tres agonistas de referencia. ¿Qué orden de potencia caracteriza al receptor β frente al α?",
     options: [
-      { text: 'La L-DOPA difunde pasivamente gracias a que su coeficiente de reparto octanol/agua es notablemente superior al de la dopamina.' },
-      { text: 'La L-DOPA es reconocida como sustrato por el transportador de aminoácidos neutros grandes LAT1 (SLC7A5) endotelial, mientras que la dopamina catiónica carece de dicho transporte facilitado.' },
-      { text: 'La dopamina es degradada instantáneamente en la luz capilar por la dopa descarboxilasa vascular antes de tocar el endotelio cerebral.' },
-      { text: 'La L-DOPA atraviesa la barrera mediante pinocitosis mediada por caveolina estimulada por su función carboxilato.' }
+      { text: "β: isoprenalina > adrenalina > noradrenalina; α: adrenalina > noradrenalina > isoprenalina." },
+      { text: "β: noradrenalina > adrenalina > isoprenalina; α: isoprenalina > adrenalina > noradrenalina." },
+      { text: "β y α comparten el mismo orden: adrenalina > isoprenalina > noradrenalina en ambos subtipos." },
+      { text: "β: adrenalina > noradrenalina > isoprenalina; α: isoprenalina > noradrenalina > adrenalina." },
     ],
-    correctIndex: 1,
-    explanation: 'Justificación Química: La L-DOPA conserva el esqueleto α-aminoácido de la L-tirosina, lo que le permite ser sustrato del transportador facilitado dependiente de sodio LAT1 (SLC7A5) presente en las células endoteliales de los capilares cerebrales. En cambio, la dopamina es una feniletilamina catiónica a pH fisiológico (pKa ≈ 10.6) con un logP muy bajo (-1.0), lo que impide tanto la difusión pasiva transcelular como el transporte facilitado a través de LAT1.\n\n• Distractor a: Falso: la L-DOPA es un zwitterión aún más hidrófilo y polar que la dopamina; no entra por difusión pasiva.\n• Distractor c: Falso: la descarboxilasa periférica descarboxila L-DOPA a dopamina en la periferia, no destruye la dopamina vascular preformada.\n• Distractor d: Falso: el transporte de L-DOPA es selectivo y mediado por el carrier LAT1, no por pinocitosis inespecífica.',
-    difficulty: 'Medio'
+    correctIndex: 0,
+    explanation: "Justificación Química: Sobre la clasificación de Ahlquist, el receptor β responde con el orden isoprenalina > adrenalina > noradrenalina, porque la isoprenalina, con su N-isopropilo, es el agonista β de referencia. El receptor α va al revés: adrenalina > noradrenalina > isoprenalina, ya que la isoprenalina casi no tiene acción α. Es el reflejo directo de la escalera del nitrógeno: a mayor volumen del sustituyente sobre el nitrógeno, mayor actividad β y menor afinidad por receptores α.\n\n• Distractores b, c, d: Confunden el orden relativo de potencias o suponen idéntica sensibilidad entre familias de receptores.",
+    difficulty: 'Fácil'
   },
   {
     id: 't02-m1-q02',
     topicId: 'tema-02',
-    block: 'Inhibición Biosintética de Tirosina Hidroxilasa',
-    badge: 'JEV 1 · P2 (Estructura 2D)',
-    question: 'La tirosina hidroxilasa constituye el paso limitante en la biosíntesis de catecolaminas. ¿Cuál de las cuatro estructuras siguientes representa al inhibidor competitivo de esta enzima (α-metiltirosina / metirosina), capaz de deprimir la síntesis global de catecolaminas en pacientes con feocromocitoma?',
+    block: 'Síntesis Química: Transposición de Fries',
+    badge: 'Modelo B · P2 (Síntesis de Salbutamol)',
+    question: "La síntesis del salbutamol arranca en el ácido acetilsalicílico (aspirina). El primer paso, con AlCl₃ en nitrobenceno, transpone el acetilo del oxígeno fenólico al anillo aromático. ¿A qué posición migra el acilo y qué producto se obtiene?",
+    questionSmiles: 'CC(=O)Oc1ccccc1C(=O)O',
     options: [
-      { text: 'L-Tirosina (sustrato fisiológico natural de la enzima)', smiles: 'N[C@@H](Cc1ccc(O)cc1)C(=O)O' },
-      { text: 'L-DOPA (producto catecólico de la hidroxilación)', smiles: 'N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O' },
-      { text: 'Carbidopa (inhibidor periférico de DOPA descarboxilasa con hidrazina)', smiles: 'CC(NN)(Cc1ccc(O)c(O)c1)C(=O)O' },
-      { text: 'α-Metiltirosina / Metirosina (inhibidor competitivo de tirosina hidroxilasa)', smiles: 'CC(N)(Cc1ccc(O)cc1)C(=O)O' }
+      { text: "A la posición orto respecto al carboxilo, desplazándolo y generando un anhídrido intramolecular cíclico de seis miembros." },
+      { text: "A la posición para respecto al oxígeno fenólico (el orto está bloqueado por el carboxilo), rindiendo el ácido 5-acetil-2-hidroxibenzoico." },
+      { text: "Al nitrógeno del nitrobenceno disolvente, que actúa como aceptor del acilo en una aminólisis catalizada por el ácido de Lewis." },
+      { text: "A la cadena lateral del carboxilo, formando un β-cetoácido que descarboxila espontáneamente al calentar la mezcla." },
     ],
-    correctIndex: 3,
-    explanation: 'Justificación Química: La α-metiltirosina (metirosina, opción D) se diferencia de la L-tirosina por la incorporación de un grupo metilo en el carbono alfa, conservando el anillo 4-hidroxifenilo (monofenol) y la función aminoácido. Esta sustitución α-metilo le permite competir con la L-tirosina por el centro activo de la tirosina hidroxilasa bloqueando la síntesis global de catecolaminas.\n\n• Distractor a: L-Tirosina: Es el sustrato fisiológico de la enzima, no su inhibidor.\n• Distractor b: L-DOPA: Es el producto de la tirosina hidroxilasa y sustrato de la descarboxilasa.\n• Distractor c: Carbidopa: Inhibidor de la DOPA descarboxilasa periférica caracterizado por su función hidrazina (-NH-NH2) y anillo catecólico.',
-    difficulty: 'Avanzado'
+    correctIndex: 1,
+    explanation: "Justificación Química: En la transposición de Fries, el ácido de Lewis (AlCl₃) coordina el oxígeno del éster fenólico facilitando la escisión del catión acilio y su posterior ataque electrofílico sobre el anillo aromático. Debido a que una posición orto está ocupada por el grupo carboxílico (-COOH) y por impedimento estérico, el acilo migra predominantemente a la posición para respecto al oxígeno fenólico (posición 5 del ácido salicílico), regenerando el fenol libre y obteniéndose el ácido 5-acetil-2-hidroxibenzoico.\n\n• Distractor a: No hay desplazamiento del carboxilo ni anhídrido cíclico.\n• Distractor c: El nitrobenceno es un disolvente aprótico desactivado que no participa en aminólisis.\n• Distractor d: No se forma un β-cetoácido alifático; la acilación ocurre en el núcleo aromático.",
+    difficulty: 'Medio'
   },
   {
     id: 't02-m1-q03',
     topicId: 'tema-02',
-    block: 'Falsos Transmisores & Profármacos',
-    badge: 'JEV 1 · P3 (Metabolismo Central)',
-    question: 'La α-metildopa es un profármaco ampliamente prescrito en la hipertensión durante el embarazo. ¿Cuál es la ruta de bioactivación intracelular y el mecanismo de acción de su metabolito activo?',
-    questionSmiles: 'CC(N)(Cc1ccc(O)c(O)c1)C(=O)O',
+    block: 'Interacción Ligando-Receptor β₂',
+    badge: 'Modelo B · P3 (Farmacóforo β₂ Salbutamol)',
+    question: "Sobre la estructura del (R)-salbutamol, identifique la correspondencia tridimensional correcta entre cada grupo farmacofórico y el residuo del receptor β₂ con el que interacciona:",
+    questionSmiles: 'CC(C)(C)NC[C@@H](O)c1ccc(O)c(CO)c1',
     options: [
-      { text: 'Sufre descarboxilación por AADC y β-hidroxilación por DBH para formar α-metilnoradrenalina, un potente agonista de receptores α₂ presinápticos en el tronco del encéfalo.' },
-      { text: 'Es fosforilada en el anillo catecólico formando un inhibidor suicida irreversible de la enzima catecol-O-metiltransferasa (COMT).' },
-      { text: 'Es oxidada por la monoamino oxidasa B (MAO-B) transformándose en una sal de piridinio neurotóxica que destruye selectivamente las vesículas adrenérgicas.' },
-      { text: 'Se acopla directamente a receptores β₂ bronquiales provocando una liberación refleja de óxido nítrico endotelial periférico.' }
+      { text: "Amina protonada → Ser203 (enlace de H); OH bencílico → Asp113; donadores del anillo → Asn293 por apilamiento aromático." },
+      { text: "Amina protonada → Asn293; OH bencílico → Ser207 (enlace iónico); donadores del anillo → Asp113 por catión-π." },
+      { text: "Amina protonada → Asp113 (TM3, enlace iónico); OH bencílico → Asn293 (TM6, enlace de H); sustituyentes 3-CH₂OH y 4-OH del anillo → Ser203 y Ser207 (TM5, enlaces de H)." },
+      { text: "Amina protonada → Trp86 (catión-π); OH bencílico → Ser203; donadores del anillo → Asp113 por puente salino bidentado." },
     ],
-    correctIndex: 0,
-    explanation: 'Justificación Química: La α-metildopa penetra en el SNC mediante LAT1. En las neuronas noradrenérgicas centrales, la L-aminoácido aromático descarboxilasa (AADC) la convierte en α-metildopamina, y a continuación la dopamina β-hidroxilasa (DBH) la hidroxila estereoespecíficamente para rendir (1R,2S)-α-metilnoradrenalina. Este metabolito actúa como falso neurotransmisor agonista de autorreceptores α₂ adrenérgicos presinápticos en el centro vasomotor bulbar, activando el bucle de retroalimentación negativa que reduce el tono simpático periférico.\n\n• Distractor b: Falso: no sufre fosforilación ni inhibe la COMT; es sustrato secuencial de AADC y DBH.\n• Distractor c: Falso: las sales de piridinio (como MPP+) derivan de tetrahidropiridinas como MPTP; la α-metildopa no sigue esa degradación.\n• Distractor d: Falso: no actúa a nivel periférico sobre receptores β₂, sino a nivel central sobre autorreceptores α₂.',
+    correctIndex: 2,
+    explanation: "Justificación Química: El anclaje del farmacóforo β₂ se establece mediante tres puntos clave en la cavidad transmembranal: 1) El grupo amino protonado forma un enlace iónico esencial con el carboxilato del residuo Asp113 en el TM3; 2) El grupo OH bencílico en configuración (R) establece enlace de hidrógeno con Asn293 en el TM6, explicando la eudismia; 3) Los grupos donadores/aceptores de enlace de hidrógeno del anillo (el alcohol saligenínico 3-CH₂OH y el fenol 4-OH) interactúan con Ser203 y Ser207 en el TM5, desencadenando la activación conformacional agonista.\n\n• Distractores a, b, d: Asignan incorrectamente los aminoácidos del receptor (p. ej. Asp113 no hace enlaces de H con fenoles, sino puente salino con el amonio).",
     difficulty: 'Medio'
   },
   {
     id: 't02-m1-q04',
     topicId: 'tema-02',
-    block: 'Inhibidores Periféricos de AADC',
-    badge: 'JEV 1 · P4 (Estructura 2D)',
-    question: 'En la terapia antiparkinsoniana combinada (Sinemet), ¿qué estructura química corresponde a la carbidopa, inhibidor de la L-DOPA descarboxilasa que posee un grupo hidrazina polar zwitteriónica que le impide atravesar la barrera hematoencefálica?',
+    block: 'Metabolismo por COMT vs Selectividad β₂',
+    badge: 'Modelo B · P4 (Isoetarina vs Salbutamol)',
+    question: "Tanto la isoetarina como el salbutamol son agonistas β₂-selectivos, pero solo uno posee duración de acción prolongada. ¿Cuál de las siguientes estructuras corresponde a la isoetarina, que conserva el anillo catecólico 3,4-dihidroxilado intacto y por ello sufre rápida inactivación metabólica por la COMT?",
     options: [
-      { text: 'Dopamina (amina biogénica periférica descarboxilada)', smiles: 'NCCc1ccc(O)c(O)c1' },
-      { text: 'α-Metildopamina (metabolito intermedio sin función carboxilato)', smiles: 'CC(N)Cc1ccc(O)c(O)c1' },
-      { text: 'Carbidopa (inhibidor periférico irreversible de AADC con hidrazina)', smiles: 'CC(NN)(Cc1ccc(O)c(O)c1)C(=O)O' },
-      { text: 'L-DOPA (aminoácido neutro precursor que cruza la BHE)', smiles: 'N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O' }
+      { text: "Salbutamol: saligenina 3-CH₂OH, 4-OH con N-terc-butilo; resiste a la COMT.", smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
+      { text: "Terbutalina: resorcinol 3,5-(OH)₂ con N-terc-butilo; resiste a la COMT por patrón meta.", smiles: 'CC(C)(C)NCC(O)c1cc(O)cc(O)c1' },
+      { text: "Formoterol: 3-formamido, 4-OH con N-arilalquilo; LABA de 12 horas resistente a COMT.", smiles: 'COc1ccc(CC(C)NCC(O)c2ccc(O)c(NC=O)c2)cc1' },
+      { text: "Isoetarina: catecol 3,4-(OH)₂ con grupo etilo en posición α; selectiva por β₂ pero metabolizada rápidamente por la COMT.", smiles: 'CCC(NC(C)C)C(O)c1ccc(O)c(O)c1' },
     ],
-    correctIndex: 2,
-    explanation: 'Justificación Química: La carbidopa (opción C) es un análogo a la α-metildopa donde el grupo amino (-NH2) ha sido reemplazado por un grupo hidrazino (-NH-NH2) en el carbono alfa. Este grupo hidrazina condensa con el cofactor fosfato de piridoxal (PLP) de la descarboxilasa formando una hidrazona irreversible. Debido a su elevada polaridad zwitteriónica e impedimento estérico, no es reconocida por el transportador LAT1 y no cruza la BHE, inhibiendo la descarboxilación de L-DOPA exclusivamente en tejidos periféricos.\n\n• Distractor a: Dopamina: Amina descarboxilada carente de ácido carboxílico.\n• Distractor b: α-Metildopamina: Metabolito intermedio descarboxilado, no porta función hidrazina ni carboxilo.\n• Distractor d: L-DOPA: Fármaco principal administrado para cruzar la BHE, sustrato natural de AADC.',
+    correctIndex: 3,
+    explanation: "Justificación Química: La isoetarina (opción D) logra selectividad β₂ frente a β₁ gracias a la presencia del sustituyente etilo en el carbono alfa de la cadena lateral. Sin embargo, conserva el anillo catecólico (3,4-dihidroxifenilo), por lo que es un excelente sustrato para la catecol-O-metiltransferasa (COMT), que metila rápidamente el grupo 3-OH inactivándola. Esto demuestra que la selectividad de receptor y la resistencia metabólica son propiedades farmacológicas independientes gobernadas por distintas zonas del farmacóforo.\n\n• Distractor a: Salbutamol: Resiste a la COMT gracias al grupo hidroximetilo (alcohol saligenínico).\n• Distractor b: Terbutalina: Resiste a la COMT por su núcleo resorcinólico 1,3,5.\n• Distractor c: Formoterol: Resiste a la COMT y presenta semivida prolongada como LABA.",
     difficulty: 'Medio'
   },
   {
     id: 't02-m1-q05',
     topicId: 'tema-02',
-    block: 'Regioespecificidad de COMT',
-    badge: 'JEV 1 · P5 (Interacción con Receptor)',
-    question: 'La catecol-O-metiltransferasa (COMT) degrada la noradrenalina transfiriendo un grupo metilo desde la S-adenosilmetionina (SAM) coordinada por un catión Mg²⁺. ¿Sobre qué posición del anillo catecólico ocurre predominantemente la metilación y qué residuo del receptor se ve impedido de interaccionar?',
-    questionSmiles: 'NC[C@H](O)c1ccc(O)c(O)c1',
+    block: 'Génesis de las Ariloxipropanolaminas',
+    badge: 'Modelo B · P5 (Puente Oximetilénico)',
+    question: "El propranolol inauguró la clase de las ariloxipropanolaminas, el molde estructural de los β-bloqueantes modernos. ¿Cuál de las siguientes estructuras corresponde al propranolol, que incorpora un puente oximetilénico (-O-CH₂-) intercalado entre el anillo aromático y la cadena de propanolamina?",
     options: [
-      { text: 'Sobre el grupo 4-hidroxilo (para), impidiendo el enlace iónico con el residuo conservado Asp-113 en el TM3.' },
-      { text: 'Sobre el grupo 3-hidroxilo (meta), bloqueando selectivamente el enlace de hidrógeno clave con la Ser-203 en el TM5.' },
-      { text: 'Sobre el grupo amino de la cadena alifática, imposibilitando la coordinación divalente con el ion Zn²⁺ del bucle extracelular ECL2.' },
-      { text: 'Sobre el carbono bencílico secundario, destruyendo el centro estereogénico y generando una mezcla racémica inerte.' }
+      { text: "Propranolol: puente oximetilénico -O-CH₂- entre el naftaleno y la cadena de propanolamina.", smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' },
+      { text: "Pronetalol: ariletanolamina naftílica unida directamente al anillo sin oxígeno intercalado.", smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1' },
+      { text: "Isoprenalina: agonista catecólico con cadena etanolamínica directa sobre el anillo.", smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1' },
+      { text: "Dicloroisoproterenol: ariletanolamina diclorada, prototipo de antagonista sin puente oximetilénico.", smiles: 'CC(C)NCC(O)c1ccc(Cl)c(Cl)c1' },
     ],
-    correctIndex: 1,
-    explanation: 'Justificación Química: En el centro catalítico de la COMT, el catión Mg²⁺ coordina de forma bidentada a los dos oxígenos catecólicos. La disposición geométrica del complejo con SAM orienta el grupo sulfonio electrofílico selectivamente hacia el oxígeno en posición 3 (meta), rindiendo normetanefrina (3-O-metilnoradrenalina). Al metilarse el 3-OH, se suprime el dador de enlace de hidrógeno que en el receptor adrenérgico se une al residuo Ser-203 (en la hélice TM5), anulando la capacidad de inducir el cambio conformacional agonista.\n\n• Distractor a: Falso: el enlace iónico con Asp-113 (TM3) lo realiza el grupo amino protonado de la cadena lateral, no un OH fenólico.\n• Distractor c: Falso: la COMT metila fenoles catecólicos; la N-metilación la realiza la PNMT en médula adrenal.\n• Distractor d: Falso: la COMT es una O-metiltransferasa regioselectiva sobre el oxígeno fenólico en meta, no actúa sobre carbonos alifáticos.',
-    difficulty: 'Medio'
+    correctIndex: 0,
+    explanation: "Justificación Química: En la evolución de los antagonistas beta, las primeras moléculas (dicloroisoproterenol y pronetalol) eran ariletanolaminas (cadena -CH(OH)-CH2-NHR unida directamente al arilo). El descubrimiento del propranolol (opción A) introdujo un átomo de oxígeno entre el anillo naftaleno y la cadena carbonada, formando un puente oximetilénico (-O-CH2-). Este oxígeno añade un átomo a la cadena (ariloxipropanolamina), modificando la conformación espacial y maximizando el bloqueo competitivo del receptor beta.\n\n• Distractor b: Pronetalol: Es una ariletanolamina naftílica directa, sin puente oximetilénico.\n• Distractor c: Isoprenalina: Es el agonista beta de referencia (ariletanolamina catecólica).\n• Distractor d: Dicloroisoproterenol: Primer bloqueante beta pero con estructura de ariletanolamina directa.",
+    difficulty: 'Fácil'
   },
   {
     id: 't02-m1-q06',
     topicId: 'tema-02',
-    block: 'Resistencia a COMT & Saligenina',
-    badge: 'JEV 1 · P6 (Estructura 2D)',
-    question: 'Observe las siguientes feniletanolaminas. ¿Cuál de ellas corresponde al salbutamol, fármaco agonista β₂ donde el 3-OH catecólico ha sido sustituido por un grupo 3-hidroximetilo (-CH2OH) metabólicamente resistente a la COMT?',
+    block: 'Estereoquímica & CIP: Propranolol',
+    badge: 'Modelo B · P6 (Asignación CIP Propranolol)',
+    question: "La estructura mostrada corresponde al enantiómero activo (eutómero) del propranolol. Sobre su centro estereogénico (el carbono carbinólico que porta el hidroxilo), ordene los sustituyentes según las reglas de Cahn-Ingold-Prelog (CIP) y asigne su configuración absoluta:",
+    questionSmiles: 'CC(C)NC[C@H](O)COc1cccc2ccccc12',
     options: [
-      { text: 'Salbutamol (3-hidroximetil-4-hidroxifenilo con N-terc-butilo)', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
-      { text: 'Isoprenalina (catecol N-isopropilo, metabolizable por COMT)', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1' },
-      { text: 'Adrenalina (catecolamina natural con N-metilo)', smiles: 'CNC[C@H](O)c1ccc(O)c(O)c1' },
-      { text: 'Terbutalina (núcleo de resorcinol 3,5-dihidroxi con N-terc-butilo)', smiles: 'CC(C)(C)NCC(O)c1cc(O)cc(O)c1' }
+      { text: "Prioridad: -OH > -CH₂-O-naftilo > -CH₂-NH-iPr > -H; con el -H hacia atrás, el giro 1→2→3 es horario, configuración (R)." },
+      { text: "Prioridad: -OH (1) > -CH₂-O-naftilo (2) > -CH₂-NH-iPr (3) > -H (4); con el -H hacia atrás, el giro 1→2→3 es antihorario, configuración (S)." },
+      { text: "Prioridad: -CH₂-NH-iPr > -OH > -CH₂-O-naftilo > -H; al ser el nitrógeno más electrofílico, resulta configuración (R)." },
+      { text: "El carbono no es estereogénico porque los dos sustituyentes alifáticos -CH₂- son idénticos por simetría molecular." },
     ],
-    correctIndex: 0,
-    explanation: 'Justificación Química: El salbutamol (opción A) presenta un grupo 3-hidroximetilo (-CH2OH) y un grupo 4-hidroxi (-OH) en el anillo aromático (alcohol saligenínico), además de un voluminoso grupo terc-butilo (-C(CH3)3) sobre el nitrógeno. El espaciador metileno (-CH2-) entre el anillo y el oxígeno desacopla la coordinación coplanar bidentada requerida por el ion Mg²⁺ en el centro activo de la COMT, impidiendo la transferencia del metilo de SAM y otorgándole una prolongada semivida broncodilatadora.\n\n• Distractor b: Isoprenalina: Catecol clásico con sustituyente N-isopropilo; sufre metabolización inmediata por COMT (semivida de minutos).\n• Distractor c: Adrenalina: Catecol natural con N-metilo, sustrato rápido de COMT y MAO.\n• Distractor d: Terbutalina: Es un agonista β₂ resistente a COMT pero basado en el núcleo de resorcinol (3,5-dihidroxifenilo), no en alcohol saligenínico.',
-    difficulty: 'Medio'
+    correctIndex: 1,
+    explanation: "Justificación Química: En el centro quiral del propranolol:\n1) El grupo -OH tiene la prioridad 1 (oxígeno, Z=8).\n2) Comparamos los dos carbonos metilénicos adyacentes: el carbono del grupo -CH2-O-naftilo está unido a (O, H, H); el carbono del grupo -CH2-NH-iPr está unido a (N, H, H). Dado que el oxígeno (Z=8) tiene prioridad sobre el nitrógeno (Z=7), el grupo -CH2-O-naftilo tiene prioridad 2, y el grupo -CH2-NH-iPr tiene prioridad 3.\n3) El átomo de hidrógeno tiene prioridad 4.\nCon el hidrógeno hacia el fondo (enlace discontínuo), el recorrido 1 (-OH) → 2 (-CH2-O-) → 3 (-CH2-NH-) se realiza en sentido antihorario, por lo que la configuración absoluta es (S).\n\n• Distractor a: Confunde el sentido del giro con horario.\n• Distractor c: Asigna erróneamente mayor prioridad al nitrógeno que al oxígeno.\n• Distractor d: Los dos grupos -CH2- no son equivalentes, portan sustituyentes completamente distintos.",
+    difficulty: 'Avanzado'
   },
   {
     id: 't02-m1-q07',
     topicId: 'tema-02',
-    block: 'Metabolismo por MAO & Impedimento Alfa',
-    badge: 'JEV 1 · P7 (Estabilidad Estérica)',
-    question: 'La monoamino oxidasa (MAO) cataliza la desaminación oxidativa de aminas primarias y secundarias sin impedimento estérico. ¿Qué rasgo estructural presente en fármacos simpaticomiméticos como la anfetamina y la efedrina les confiere resistencia frente a la MAO, permitiendo su actividad biológica por vía oral?',
-    questionSmiles: 'CC(N)Cc1ccccc1',
+    block: 'Estereoquímica & CIP: Salbutamol',
+    badge: 'Modelo B · P7 (Asignación CIP Salbutamol)',
+    question: "La estructura mostrada corresponde al eutómero activo del salbutamol (levalbuterol). Sobre el carbono bencílico que porta el grupo hidroxilo, ordene los sustituyentes por las reglas CIP y asigne su configuración absoluta:",
+    questionSmiles: 'CC(C)(C)NC[C@@H](O)c1ccc(O)c(CO)c1',
     options: [
-      { text: 'La ausencia total de sustituyentes aromáticos en el anillo bencénico.' },
-      { text: 'La sustitución del enlace carbono-carbono por una función hidrazina bioisóstera.' },
-      { text: 'La protonación permanente del nitrógeno formando un amonio cuaternario insoluble.' },
-      { text: 'La presencia de un grupo metilo en el carbono alfa contiguo al grupo amino (-CH(CH3)-NHR).' }
+      { text: "Prioridad: -OH > -CH₂-NH-tBu > Arilo > -H; con el -H hacia atrás, el giro 1→2→3 es antihorario, configuración (S)." },
+      { text: "Prioridad: -OH > Arilo > -CH₂-NH-tBu > -H, porque el anillo aromático tiene mayor peso molecular que el metileno; configuración (S)." },
+      { text: "Prioridad: -OH (1) > -CH₂-NH-tBu (2) > Arilo (3) > -H (4); con el -H hacia atrás, el giro 1→2→3 es horario, configuración (R)." },
+      { text: "El carbono bencílico no es estereogénico porque el grupo arilo y la cadena aminada empatan en número atómico." },
     ],
-    correctIndex: 3,
-    explanation: 'Justificación Química: El mecanismo oxidativo de la MAO implica la abstracción estereoespecífica de un hidruro sobre el carbono contiguo al nitrógeno (carbono alfa) mediada por el cofactor FAD. La introducción de un grupo metilo en posición alfa (-CH(CH3)-NHR), como ocurre en la anfetamina y efedrina, genera un impedimento estérico severo en la cavidad de la MAO que bloquea el ataque del FAD. Esta protección metabólica permite que el fármaco resista el metabolismo presistémico intestinal/hepático y sea activo por vía oral con prolongada duración.\n\n• Distractor a: Falso: la anfetamina y efedrina conservan un anillo fenilo no sustituido que es esencial para su lipofilia.\n• Distractor b: Falso: las hidrazinas (como fenelzina) son inhibidores covalentes de la MAO, no el rasgo de las fenilisopropilaminas.\n• Distractor c: Falso: ni anfetamina ni efedrina son sales cuaternarias; son aminas primarias y secundarias respectivamente.',
-    difficulty: 'Fácil'
+    correctIndex: 2,
+    explanation: "Justificación Química: En las ariletanolaminas como el salbutamol:\n1) El grupo -OH tiene la prioridad 1 (oxígeno, Z=8).\n2) Comparamos el carbono metilénico alifático frente al carbono aromático ipso: el carbono alifático -CH2-NH-tBu está unido a (N, H, H); el carbono aromático ipso está unido a (C, C, C). Al desempatar en la primera diferencia, el nitrógeno (Z=7) vence al carbono (Z=6), por lo que -CH2-NH-tBu tiene prioridad 2 y el grupo arilo tiene prioridad 3.\n3) El hidrógeno es la prioridad 4.\nCon el hidrógeno hacia el fondo, la secuencia 1 (-OH) → 2 (-CH2-NH-tBu) → 3 (Arilo) sigue el sentido de las agujas del reloj (horario), correspondiendo a la configuración absoluta (R).\n\n• Distractor a: Confunde la orientación horaria con (S).\n• Distractor b: Asigna la prioridad 2 al anillo aromático basándose incorrectamente en el peso total en lugar del número atómico en la primera esfera.\n• Distractor d: No hay empate; el nitrógeno Z=7 desempata inmediatamente frente al carbono Z=6.",
+    difficulty: 'Avanzado'
   },
   {
     id: 't02-m1-q08',
     topicId: 'tema-02',
-    block: 'REA Adrenérgica: Selectividad Alfa vs Beta',
-    badge: 'JEV 1 · P8 (Escalera del Nitrógeno)',
-    question: 'Al comparar la afinidad y respuesta funcional en la serie noradrenalina (-NH2) -> adrenalina (-NHCH3) -> isoprenalina (-NH-CH(CH3)2) -> salbutamol (-NH-C(CH3)3), se produce un desplazamiento inequívoco desde una acción preferente alfa hacia una selectividad beta y beta-2. ¿Cuál es la base molecular de esta relación estructura-actividad (REA)?',
-    questionSmiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1',
+    block: 'Agonistas Indirectos: Feniletilaminas',
+    badge: 'Modelo B · P8 (Metanfetamina)',
+    question: "La dexanfetamina ((S)-(+)-anfetamina) es el eutómero estimulante central entre los simpaticomiméticos indirectos. ¿Cuál de las siguientes estructuras corresponde a la metanfetamina, su homólogo N-metilado de mayor lipofilia y penetración en el SNC?",
     options: [
-      { text: 'El aumento del volumen estérico sobre el nitrógeno polariza negativamente la amina aumentando el enlace covalente con la Ser-203.' },
-      { text: 'Los sustituyentes voluminosos impiden la protonación del nitrógeno, forzando la unión en forma neutra exclusivamente en beta-2.' },
-      { text: 'El receptor beta posee una amplia cavidad hidrofóbica adyacente al sitio del nitrógeno iónico capaz de acomodar grupos lipófilos ramificados, mientras que en el receptor alfa dicha zona está estéricamente restringida.' },
-      { text: 'El grupo terc-butilo sufre hidrólisis enzimática selectiva en las células musculares lisas bronquiales liberando isobuteno gaseoso vasodilatador.' }
+      { text: "Anfetamina: amina primaria sin sustitución sobre el nitrógeno.", smiles: 'CC(N)Cc1ccccc1' },
+      { text: "Fentermina: amina primaria con dos grupos metilo en el carbono alfa (sin quiralidad).", smiles: 'CC(C)(N)Cc1ccccc1' },
+      { text: "Efedrina: amina secundaria N-metilada con un grupo hidroxilo bencílico adicional.", smiles: 'CC(NC)[C@@H](O)c1ccccc1' },
+      { text: "Metanfetamina: amina secundaria monometilada en el nitrógeno (N-metilanfetamina).", smiles: 'CNC(C)Cc1ccccc1' },
     ],
-    correctIndex: 2,
-    explanation: 'Justificación Química: Los receptores adrenérgicos beta (y singularmente β₂) poseen una bolsa hidrofóbica auxiliar espaciosa próxima al residuo ácido Asp-113 en el TM3. Sustituyentes voluminosos ramificados sobre el nitrógeno como isopropilo (-CH(CH3)2) en isoprenalina o terc-butilo (-C(CH3)3) en salbutamol optimizan interacciones de dispersión de van der Waals en esta cavidad. En cambio, en los receptores α₁ y α₂, dicha cavidad es estrecha; sustituyentes mayores que metilo chocan estéricamente, anulando la afinidad agonista alfa.\n\n• Distractor a: Falso: los grupos alquilo donan densidad por efecto inductivo (+I), aumentando la basicidad, y nunca forman enlaces covalentes con serinas.\n• Distractor b: Falso: el pKa de aminas alifáticas secundarias es ≈ 9.5-10.0; a pH fisiológico 7.4 están protonadas en un 99% como catión amonio.\n• Distractor d: Falso: el terc-butilo es metabólicamente estable y no libera gases in vivo.',
-    difficulty: 'Medio'
+    correctIndex: 3,
+    explanation: "Justificación Química: La metanfetamina (opción D) es la N-metilanfetamina, una amina secundaria donde el nitrógeno porta un grupo metilo. Esta sustitución N-metilo incrementa el coeficiente de reparto octanol/agua (logP), facilitando una difusión pasiva más rápida a través de la barrera hematoencefálica (BHE) y potenciando su acción neuroestimulante central y liberadora de dopamina y noradrenalina.\n\n• Distractor a: Anfetamina: Es la amina primaria de referencia (-NH2).\n• Distractor b: Fentermina: Lleva dos grupos metilo en C-alfa (-C(CH3)2-NH2), no en el nitrógeno.\n• Distractor c: Efedrina: Porta un hidroxilo bencílico secundario, siendo un agonista de acción mixta con dos centros quirales.",
+    difficulty: 'Fácil'
   },
   {
     id: 't02-m1-q09',
     topicId: 'tema-02',
-    block: 'Estereoquímica: Easson-Stedman',
-    badge: 'JEV 1 · P9 (Eutómero R)',
-    question: 'Las catecolaminas presentan un centro estereogénico en el carbono bencílico que soporta el grupo hidroxilo. ¿Cuál es el enantiómero farmacológicamente activo (eutómero) en la noradrenalina y adrenalina, y cómo explica la hipótesis de Easson-Stedman su marcada eudismia?',
-    questionSmiles: 'NC[C@H](O)c1ccc(O)c(O)c1',
+    block: 'Estereoquímica de la Dexanfetamina',
+    badge: 'Modelo B · P9 (CIP Dexanfetamina)',
+    question: "La estructura mostrada corresponde a la dexanfetamina (dextroanfetamina), el enantiómero dextrorrotatorio (+) y eutómero psicoestimulante de la anfetamina. Sobre su carbono quiral alfa, asigne la configuración absoluta según las reglas CIP:",
+    questionSmiles: 'C[C@@H](N)Cc1ccccc1',
     options: [
-      { text: 'El eutómero es la forma (S), que interacciona en 4 puntos simultáneos mediante puentes disulfuro con cisteínas del ECL2.' },
-      { text: 'El eutómero es la forma (R), cuyo grupo OH bencílico se orienta favorablemente para establecer un enlace de hidrógeno con el receptor, mientras que en el distómero (S) dicho OH apunta en dirección opuesta perdiendo dicha interacción complementaria.' },
-      { text: 'El eutómero es el racemato equimolar (R,S), ya que ambos enantiómeros cooperan alostéricamente entre sí en el dímero del receptor.' },
-      { text: 'El eutómero es la forma (S), porque el distómero (R) es atacado instantáneamente por esterasas plasmáticas endoteliales.' }
+      { text: "Prioridad: -NH₂ (1) > -CH₂C₆H₅ (2) > -CH₃ (3) > -H (4); con el -H hacia atrás, el giro 1→2→3 es antihorario, configuración (S)." },
+      { text: "Prioridad: -NH₂ > -CH₂C₆H₅ > -CH₃ > -H; con el -H hacia atrás, el giro es horario y la configuración es (R)." },
+      { text: "Prioridad: -CH₂C₆H₅ > -NH₂ > -CH₃ > -H, porque el bencilo tiene mayor peso molecular que el grupo amino; configuración (R)." },
+      { text: "El carbono alfa carece de estereocentro debido a que los sustituyentes bencilo y metilo son ambos cadenas hidrocarbonadas." },
     ],
-    correctIndex: 1,
-    explanation: 'Justificación Química: Según el modelo de tres puntos de Easson-Stedman, la activación óptima del receptor adrenérgico requiere tres anclajes simultáneos: 1) interacción aromática/puentes de hidrógeno del catecol, 2) puente salino del grupo amino protonado con el carboxilato del Asp-113, y 3) enlace de hidrógeno del grupo OH bencílico secundario con un residuo complementario (Asn-293/Ser). En el eutómero (R)-noradrenalina, estos tres grupos se orientan en la conformación tridimensional idónea. En el distómero (S), para acoplar el catecol y la amina, el OH queda proyectado hacia el solvente, comportándose de forma similar a la dopamina (que carece de OH bencílico).\n\n• Distractor a: Falso: el eutómero de las catecolaminas naturales y feniletanolaminas es el enantiómero (R), no el (S).\n• Distractor c: Falso: los enantiómeros puros muestran marcada eudismia; el eutómero (R) es hasta 100 veces más potente que el (S).\n• Distractor d: Falso: no existen enlaces éster en la noradrenalina; no intervienen esterasas en su inactivación estereoselectiva.',
+    correctIndex: 0,
+    explanation: "Justificación Química: En el centro estereogénico de la dexanfetamina:\n1) El grupo amino (-NH2) tiene la prioridad 1 (nitrógeno, Z=7).\n2) Comparamos los dos carbonos alifáticos: el carbono bencílico (-CH2-Ph) está unido a (C, H, H); el carbono del metilo (-CH3) está unido a (H, H, H). Por tanto, el grupo bencilo (-CH2-Ph) tiene prioridad 2 y el metilo (-CH3) prioridad 3.\n3) El hidrógeno es la prioridad 4.\nEn la proyección tridimensional de la (S)-(+)-anfetamina, el recorrido 1 (-NH2) → 2 (-CH2-Ph) → 3 (-CH3) define la configuración absoluta (S).\n\n• Distractor b: Asigna configuración (R), que corresponde a la levanfetamina (distómero con mucha menor actividad central estimulante).\n• Distractor c: Asigna erróneamente mayor prioridad al carbono del bencilo que al nitrógeno amino.\n• Distractor d: El carbono es netamente quiral al tener cuatro sustituyentes diferentes.",
     difficulty: 'Medio'
   },
   {
     id: 't02-m1-q10',
     topicId: 'tema-02',
-    block: 'Agonistas Alfa Heterocíclicos',
-    badge: 'JEV 1 · P10 (Estructura 2D)',
-    question: 'Entre los siguientes fármacos adrenérgicos, ¿cuál corresponde a la oximetazolina, agonista alfa directo vasoconstrictor que incorpora un heterociclo de 2-imidazolina (4,5-dihidro-1H-imidazol) unido por metileno a un fenol lipófilo?',
+    block: 'REA de Agonistas Indirectos',
+    badge: 'Modelo B · P10 (Lipofilia & Acceso SNC)',
+    question: "Los agonistas adrenérgicos indirectos actúan promoviendo la liberación de noradrenalina vesicular en lugar de activar directamente el receptor. ¿Cuál de las siguientes estructuras representa el prototipo de agonista indirecto que carece totalmente de hidroxilos fenólicos y bencílicos, lo que maximiza su lipofilia y penetración al SNC?",
     options: [
-      { text: 'Oximetazolina (arilalquilimidazolina descongestionante nasal)', smiles: 'Cc1cc(C(C)(C)C)c(CC2=NCCN2)c(C)c1O' },
-      { text: 'Fenilefrina (feniletanolamina 3-hidroxifenilo directa α₁)', smiles: 'CNCC(O)c1cccc(O)c1' },
-      { text: 'Isoprenalina (agonista beta catecólico)', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1' },
-      { text: 'Salbutamol (agonista β₂ saligenina)', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' }
+      { text: "Noradrenalina: conserva catecol 3,4-(OH)₂ y OH bencílico (agonista directo puro, nulo paso a SNC).", smiles: 'NC[C@H](O)c1ccc(O)c(O)c1' },
+      { text: "Anfetamina: carece de hidroxilos fenólicos y de OH bencílico, penetra pasivamente la BHE y actúa como liberador indirecto.", smiles: 'CC(N)Cc1ccccc1' },
+      { text: "Salbutamol: conserva función fenólica y alcohol saligenínico (agonista directo periférico).", smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
+      { text: "Clonidina: anilina clorada unida a imidazolina (agonista α₂ directo central).", smiles: 'Clc1cccc(Cl)c1NC1=NCCN1' },
     ],
-    correctIndex: 0,
-    explanation: 'Justificación Química: La oximetazolina (opción A) pertenece a la familia de las arilalquilimidazolinas. Se caracteriza por un anillo bencénico densamente sustituido (grupo 6-terc-butilo, 2,4-dimetilo y 3-hidroxi) conectado por un puente metileno (-CH2-) a la posición 2 de un heterociclo de 4,5-dihidro-1H-imidazol (2-imidazolina). Este catión amidinio a pH fisiológico actúa como un potente agonista directo α₁ y α₂ empleado como descongestionante nasal tópico.\n\n• Distractor b: Fenilefrina: Es una feniletanolamina monocíclica con cadena lineal abierta, sin heterociclo.\n• Distractor c: Isoprenalina: Catecolamina prototipo agonista beta con amina alifática secundaria isopropílica.\n• Distractor d: Salbutamol: Feniletanolamina sustituida con 3-hidroximetilo y N-terc-butilo, agonista β₂ broncodilatador.',
-    difficulty: 'Medio'
+    correctIndex: 1,
+    explanation: "Justificación Química: La anfetamina (opción B) carece de los grupos hidroxilo fenólicos en las posiciones 3 y 4 del anillo y carece del hidroxilo bencílico en la cadena lateral. Esta ausencia de funciones polares donadoras de enlaces de hidrógeno aumenta de manera muy notable su coeficiente de lipofilia (logP), permitiéndole cruzar con facilidad la barrera hematoencefálica por difusión pasiva. Una vez en el citoplasma neuronal, actúa como sustrato del transportador de recaptación (NET) e induce la liberación no vesicular de noradrenalina hacia la hendidura sináptica.\n\n• Distractor a: Noradrenalina: Es el neurotransmisor fisiológico directo, muy polar y excluida del SNC.\n• Distractor c: Salbutamol: Agonista β₂ directo diseñado para evitar efectos centrales.\n• Distractor d: Clonidina: Agonista directo de receptores α₂ presinápticos.",
+    difficulty: 'Fácil'
   },
   {
     id: 't02-m1-q11',
     topicId: 'tema-02',
-    block: 'Agonistas Indirectos & Síndrome del Queso',
-    badge: 'JEV 1 · P11 (Interacción Farmacológica)',
-    question: 'La ingestión de alimentos ricos en tiramina (como quesos curados o vino tinto) en pacientes tratados con inhibidores de la monoamino oxidasa (IMAO) desencadena el denominado "síndrome del queso", caracterizado por crisis hipertensivas potencialmente letales. ¿Cuál es el mecanismo farmacológico responsable de este cuadro?',
-    questionSmiles: 'NCCc1ccc(O)cc1',
+    block: 'Síntesis Química: Apertura de Epóxidos',
+    badge: 'Modelo B · P11 (Regioquímica Epóxidos)',
+    question: "La apertura regioespecífica de epóxidos aromáticos (arilglicidil éteres) es la reacción nuclear en la síntesis de ariloxipropanolaminas. ¿Qué principio rige la diferencia de regioquímica en la apertura de un epóxido asimétrico en medio básico frente a medio ácido?",
     options: [
-      { text: 'La tiramina es un antagonista irreversible de receptores β₂ que bloquea por completo la vasodilatación fisiológica periférica.' },
-      { text: 'La tiramina estimula directamente los receptores muscarínicos vasculares causando una vasoconstricción coronaria masiva.' },
-      { text: 'Al no ser degradada por la MAO intestinal/hepática, la tiramina entra en las terminales adrenérgicas por NET y expulsa masivamente la noradrenalina vesicular al espacio sináptico.' },
-      { text: 'La tiramina forma un aducto covalente con la albúmina que bloquea los canales de potasio endoteliales.' }
+      { text: "En medio básico el nucleófilo ataca el carbono más impedido; en medio ácido ataca el menos sustituido, ambos con retención." },
+      { text: "En ambos medios el ataque se dirige siempre al carbono más sustituido por efectos electrostáticos de densidad electrónica." },
+      { text: "En medio básico el nucleófilo fuerte ataca por SN2 el carbono menos impedido estéricamente (con inversión); en medio ácido la protonación previa del oxígeno induce carácter de carbocatión, favoreciendo el ataque en el carbono más sustituido." },
+      { text: "En ambos medios el ataque se dirige exclusivamente al carbono menos impedido estéricamente, pues el impedimento supera a cualquier factor electrónico." },
     ],
     correctIndex: 2,
-    explanation: 'Justificación Química: La tiramina es un agonista adrenérgico indirecto. Normalmente se metaboliza por la MAO intestinal y hepática sin alcanzar la circulación sistémica. Bajo tratamiento con IMAO, pasa a la sangre, cruza al terminal axónico mediante el transportador de recaptación NET y compite con la noradrenalina por el transportador vesicular VMAT, desplazando la noradrenalina almacenada al citoplasma axonal y de ahí al espacio sináptico por inversión de NET, provocando vasoconstricción y picos de tensión arterial severos.\n\n• Distractor a: Falso: la tiramina no es un antagonista de β₂; su acción es presináptica indirecta liberadora de catecolaminas.\n• Distractor b: Falso: los receptores muscarínicos vasculares median vasodilatación por NO y no son activados por tiramina.\n• Distractor d: Falso: la fisiopatología radica en la liberación descontrolada de noradrenalina endógena, no en aductos con albúmina.',
-    difficulty: 'Fácil'
+    explanation: "Justificación Química: La apertura de epóxidos asimétricos está controlada por el mecanismo de reacción:\n1) En medio básico o con nucleófilos neutros fuertes (como aminas primarias, ej. isopropilamina), opera un mecanismo SN2 bimolecular donde el factor dominante es el impedimento estérico: el nucleófilo ataca selectivamente el carbono terminal menos sustituido (-CH2-) con inversión de configuración.\n2) En medio ácido, el átomo de oxígeno del epóxido se protona inicialmente formando un ion oxonio; el enlace C-O se debilita y la carga positiva parcial se localiza preferentemente sobre el carbono más sustituido (carbocatión más estable), guiando el ataque nucleofílico hacia esa posición con marcado carácter SN1.\n\n• Distractores a, b, d: Contradicen los principios fundamentales de sustitución nucleofílica alifática bimolecular vs monomolecular en anillos de tres miembros.",
+    difficulty: 'Medio'
   },
   {
     id: 't02-m1-q12',
     topicId: 'tema-02',
-    block: 'Antagonistas Presinápticos: Reserpina vs Deserpidina',
-    badge: 'JEV 1 · P12 (Alcaloides Rauwolfia)',
-    question: 'La reserpina es un alcaloide de Rauwolfia serpentina que vacía las reservas vesiculares de noradrenalina; sin embargo, induce una profunda depresión central y sedación. Por su parte, la deserpidina conserva la potencia hipotensora con mínima acción depresora sobre el SNC. ¿Qué diferencia química estructural distingue a la deserpidina de la reserpina?',
-    questionSmiles: 'COc1ccc2[nH]c3c(c2c1)CC[C@H]4N3C[C@H]5[C@@H](C4)[C@H](C(=O)OC)[C@H](OC(=O)c6cc(OC)c(OC)c(OC)c6)[C@@H](OC)C5',
+    block: 'Antagonistas α₁: Núcleo Quinazolínico',
+    badge: 'Modelo B · P12 (Prazosina)',
+    question: "Entre los fármacos antagonistas adrenérgicos, uno destaca como antagonista competitivo altamente selectivo de los receptores α₁ postsinápticos vasculares, de estructura quinazolínica con núcleo piperazina y furoílo, utilizado en la hipertensión arterial y en la hiperplasia benigna de próstata (HBP). ¿Cuál es?",
     options: [
-      { text: 'La deserpidina carece por completo de la cadena de 3,4,5-trimetoxibenzoato en el anillo E.' },
-      { text: 'La deserpidina posee un anillo indólico cuaternizado con un catión piridinio permanente.' },
-      { text: 'La deserpidina incorpora un grupo flúor en el C18 que impide su unión a los transportadores VMAT.' },
-      { text: 'La deserpidina carece del grupo metoxilo (-OCH3) en la posición C11 del núcleo indólico (anillo A).' }
+      { text: "Fenoxibenzamina: β-haloalquilamina que forma un ion aziridinio alquilante covalente irreversible.", smiles: 'CCOC(C)CN(CCCl)Cc1ccccc1' },
+      { text: "Fentolamina: imidazolina antagonista α₁/α₂ competitiva no selectiva de semivida corta.", smiles: 'Cc1ccc(N(Cc2ccccc2)Cc2nc[nH]2)cc1O' },
+      { text: "Yohimbina: alcaloide indólico antagonista selectivo de los autorreceptores α₂ presinápticos.", smiles: 'COC(=O)[C@H]1[C@@H]2C[C@@H]3c4[nH]c5ccccc5c4CCN3C[C@H]2C[C@@H](O)[C@@H]1C' },
+      { text: "Prazosina: quinazolina 6,7-dimetoxilada unida a piperazina y 2-furoílo, antagonista α₁ selectivo.", smiles: 'COc1cc2nc(N3CCN(C(=O)c4ccco4)CC3)nc(N)c2cc1OC' },
     ],
     correctIndex: 3,
-    explanation: 'Justificación Química: La reserpina y la deserpidina comparten el esqueleto pentacíclico del alcaloide yohimbano esterificado con el éster 3,4,5-trimetoxibenzoato en C18. La única diferencia estructural reside en que la reserpina porta un grupo metoxilo (-OCH3) en la posición 11 del anillo indólico (anillo A), mientras que la deserpidina carece de él (11-desmetoxireserpina). Esta pequeña variación reduce significativamente los efectos secundarios depresores sobre el SNC manteniendo el bloqueo periférico de VMAT.\n\n• Distractor a: Falso: el éster trimetoxibenzoato en C18 es esencial para la actividad y está presente en ambos alcaloides.\n• Distractor b: Falso: no hay nitrógenos cuaternarios; ambos son alcaloides indólicos neutros terciarios.\n• Distractor c: Falso: la molécula carece de átomos de flúor en su estructura natural.',
-    difficulty: 'Avanzado'
+    explanation: "Justificación Química: La prazosina (opción D) es el prototipo de los antagonistas α₁ selectivos. Su estructura química está constituida por un núcleo de 2,4-diamino-6,7-dimetoxiquinazolina enlazado a un anillo central de piperazina acilado con un grupo 2-furoílo. Al antagonizar competitivamente los receptores α₁ postsinápticos del músculo liso vascular sin bloquear los autorreceptores α₂ presinápticos, evita la liberación refleja de noradrenalina y previene la taquicardia refleja.\n\n• Distractor a: Fenoxibenzamina: Bloqueante α irreversible por alquilación covalente vía aziridinio.\n• Distractor b: Fentolamina: Antagonista reversible no selectivo derivado de imidazolina.\n• Distractor c: Yohimbina: Bloqueante selectivo de autorreceptores α₂.",
+    difficulty: 'Medio'
   },
   {
     id: 't02-m1-q13',
     topicId: 'tema-02',
-    block: 'Síntesis Orgánica de Salbutamol',
-    badge: 'JEV 1 · P13 (Ruta Industrial)',
-    question: 'En la síntesis industrial del salbutamol a partir de salicilato de metilo, ¿cuál es la secuencia correcta de transformaciones químicas sobre la cadena lateral y el sustituyente éster?',
-    questionSmiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1',
+    block: 'Eudismia en Ariloxipropanolaminas',
+    badge: 'Modelo B · P13 ((S)-Propranolol Eutómero)',
+    question: "En las ariloxipropanolaminas, el enantiómero más potente (eutómero) posee configuración absoluta (S), a diferencia de las ariletanolaminas donde el eutómero es (R). ¿Cuál de las siguientes estructuras representa al eutómero biológicamente activo (S)-propranolol?",
     options: [
-      { text: 'Bromación directa sobre el anillo aromático con Br2/FeBr3 seguida de condensación con terc-butilamina y oxidación a ácido carboxílico.' },
-      { text: 'Acilación de Friedel-Crafts con cloruro de cloroacetilo -> aminación nucleófila con terc-butilamina -> reducción simultánea de la cetona a alcohol secundario y del éster metílico a alcohol primario con LiAlH4.' },
-      { text: 'Formilación de Vilsmeier-Haack -> hidrólisis alcalina con NaOH -> alquilación con cloruro de terc-butilo bajo catálisis de paladio.' },
-      { text: 'Reacción de Diels-Alder con butadieno -> apertura electrofílica del aducto con terc-butanol concentrado.' }
+      { text: "(S)-Propranolol: configuración (S) en el carbono carbinólico, orienta el OH hacia el residuo conservado del receptor β.", smiles: 'CC(C)NC[C@H](O)COc1cccc2ccccc12' },
+      { text: "(R)-Propranolol: configuración (R), distómero con afinidad hasta 100 veces inferior.", smiles: 'CC(C)NC[C@@H](O)COc1cccc2ccccc12' },
+      { text: "Desoxipropranolol: análogo desoxigenado carente de centro estereogénico y de función OH carbinólica.", smiles: 'CC(C)NCCCOc1cccc2ccccc12' },
+      { text: "Pronetalol: ariletanolamina naftílica directa cuyo eutómero es el enantiómero (R).", smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1' },
     ],
-    correctIndex: 1,
-    explanation: 'Justificación Química: La ruta industrial parte de salicilato de metilo. Se realiza una acilación de Friedel-Crafts con cloruro de cloroacetilo para introducir la cadena -CO-CH2-Cl en la posición para al fenol. A continuación, el cloro se desplaza por aminación nucleófila con terc-butilamina rindiendo una aminocetona intermedia. Finalmente, el tratamiento con hidruro de litio y aluminio (LiAlH4) reduce simultáneamente la cetona al alcohol secundario bencílico (-CH(OH)-) y el éster salicilato al alcohol primario bencílico (-CH2OH), rindiendo el salbutamol racémico.\n\n• Distractor a: Falso: la bromación aromática directa no genera la cadena aminada de feniletanolamina.\n• Distractor c: Falso: Vilsmeier-Haack introduce un formilo (-CHO), no la cadena haloacetilo requerida para la aminación con amina voluminosa.\n• Distractor d: Falso: no se emplean cicloadiciones de Diels-Alder en la construcción de feniletanolaminas.',
+    correctIndex: 0,
+    explanation: "Justificación Química: El eutómero activo del propranolol es el enantiómero (S)-propranolol (opción A). La aparente inversión en la letra de configuración entre ariletanolaminas (R) y ariloxipropanolaminas (S) se debe exclusivamente a una regla formal de prioridad CIP: al intercalar el oxígeno del puente oximetilénico (-O-CH2-), el carbono alifático adyacente pasa a tener mayor prioridad que el carbono aromático, invirtiendo la designación (R/S) sin alterar la orientación tridimensional efectiva del grupo hidroxilo en el bolsillo de unión del receptor.\n\n• Distractor b: (R)-Propranolol: Distómero de muy baja afinidad beta-bloqueante.\n• Distractor c: Desoxipropranolol: Carece del grupo -OH que realiza el enlace de hidrógeno esencial con el receptor.\n• Distractor d: Pronetalol: Es una ariletanolamina y su eutómero activo es (R).",
     difficulty: 'Medio'
   },
   {
     id: 't02-m1-q14',
     topicId: 'tema-02',
-    block: 'Antagonistas Presinápticos & Beckmann',
-    badge: 'JEV 1 · P14 (Estructura 2D)',
-    question: 'La guanetidina es un bloqueador presináptico que se prepara industrialmente mediante expansión de anillo con transposición de Beckmann. ¿Cuál de las siguientes estructuras químicas representa a la guanetidina?',
+    block: 'Transporte Activo & BHE: L-DOPA',
+    badge: 'Modelo B · P14 (Transporte por LAT1)',
+    question: "La dopamina administrada por vía periférica no cruza la barrera hematoencefálica (BHE), pero su precursor biosintético L-DOPA sí accede al SNC para el tratamiento del párkinson. Sobre la estructura mostrada de la L-DOPA, ¿qué rasgo químico explica su transporte facilitado activo al cerebro?",
+    questionSmiles: 'N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O',
     options: [
-      { text: 'Guanetidina (anillo de perhidroazocina de 8 miembros + etilguanidina)', smiles: 'NC(=N)NCCN1CCCCCCC1' },
-      { text: 'Clonidina (2-(2,6-dicloroanilino)-2-imidazolina)', smiles: 'Clc1cccc(Cl)c1NC2=NCCN2' },
-      { text: 'Fentolamina (fenilamino-metilimidazolina)', smiles: 'Cc1ccc(N(CC2=NCCN2)c2cccc(O)c2)cc1' },
-      { text: 'Tolazolina (2-bencil-4,5-dihidro-1H-imidazol)', smiles: 'c1ccc(CC2=NCCN2)cc1' }
+      { text: "Su núcleo catecólico dihidroxilado le aporta elevada lipofilia, permitiendo su difusión pasiva transcelular." },
+      { text: "Conserva el esqueleto de α-aminoácido neutro (grupo amino y carboxilo en el carbono α), lo que permite su reconocimiento por el transportador facilitado LAT1 (SLC7A5) de la BHE." },
+      { text: "Su carga catiónica neta a pH fisiológico le permite circular libremente por los canales de potasio endoteliales." },
+      { text: "La ausencia de centros quirales le confiere reconocimiento universal por los transportadores de glucosa GLUT1." },
     ],
-    correctIndex: 0,
-    explanation: 'Justificación Química: La guanetidina (opción A) consta de un heterociclo saturado de 8 miembros con un nitrógeno (perhidroazocina u octahidroazocina) unido por una cadena etileno (-CH2-CH2-) a una función guanidina libre terminal (-NH-C(=NH)-NH2). Sintéticamente, el anillo de azocina se obtiene por transposición de Beckmann de la cicloheptanona oxima a azaciclooctanona seguida de reducción del lactámico con LiAlH4, alquilación y guanilación final con S-metilisotiourea.\n\n• Distractor b: Clonidina: Es una 2-(2,6-diclorofenilamino)-2-imidazolina, agonista α₂.\n• Distractor c: Fentolamina: Es una fenilamino-metilimidazolina, antagonista competitivo de receptores alfa.\n• Distractor d: Tolazolina: Es 2-bencil-4,5-dihidro-1H-imidazol, antagonista alfa vasodilatador periférico.',
-    difficulty: 'Avanzado'
+    correctIndex: 1,
+    explanation: "Justificación Química: La L-DOPA (opción B) conserva intacto el esqueleto de L-alfa-aminoácido (un grupo carboxilo y un grupo amino unidos al mismo carbono estereogénico con configuración L). Esta estructura es el sustrato específico del transportador de aminoácidos neutros grandes LAT1 (SLC7A5) expresado en la membrana apical y basolateral de las células endoteliales de los capilares cerebrales. La dopamina, al ser descarboxilada, pierde el grupo carboxilato y deja de ser reconocida por LAT1, quedando bloqueada en la periferia.\n\n• Distractor a: Falso: la L-DOPA es extremadamente polar y zwitteriónica a pH fisiológico; no difunde pasivamente.\n• Distractor c: Falso: la L-DOPA es zwitteriónica neutra a pH fisiológico, no catiónica.\n• Distractor d: Falso: la L-DOPA posee un carbono quiral alfa y no utiliza el transportador GLUT1.",
+    difficulty: 'Fácil'
   },
   {
     id: 't02-m1-q15',
     topicId: 'tema-02',
-    block: 'LABAs & Exositios',
-    badge: 'JEV 1 · P15 (Persistencia de Acción)',
-    question: 'El salmeterol es un agonista β₂ de acción prolongada (LABA) con una duración clínica superior a 12 horas. ¿A qué rasgo molecular específico se debe su persistencia en el receptor bronquial?',
-    questionSmiles: 'c1ccccc1CCCCOCCCCCCNCC(O)c2ccc(O)c(CO)c2',
+    block: 'Dualidad Agonista vs Antagonista β₂',
+    badge: 'Modelo B · P15 (Agonismo vs Antagonismo β₂)',
+    question: "El receptor adrenérgico β₂ bronquial ilustra de forma ejemplar la dualidad farmacológica entre agonistas y antagonistas sobre una misma diana terapéutica. ¿Qué pareja de fármacos refleja con precisión esta oposición de efectos clínicos sobre el receptor β₂ pulmonar?",
     options: [
-      { text: 'A la presencia de un grupo azida terminal que forma un enlace covalente cruzado irreversible con una cisteína del TM6.' },
-      { text: 'A que se formula como una nanopartícula polimérica que precipita en la luz bronquial formando un cristal insoluble.' },
-      { text: 'A su larga y flexible cadena hidrófoba lateral (4-fenilbutoxihexilo), que interactúa fuertemente con un exositio lipófilo adyacente del receptor manteniéndolo anclado cerca del sitio ortostérico.' },
-      { text: 'A que inhibe de forma irreversible la adenilato ciclasa de las células epiteliales respiratorias impidiendo la caída de AMPc.' }
+      { text: "Clonidina (agonista α₂ central) frente a Prazosina (antagonista α₁ periférico); ambos sin acción bronquial.", smiles: 'Clc1cccc(Cl)c1NC1=NCCN1' },
+      { text: "Fenoxibenzamina (antagonista α irreversible) frente a Fentolamina (antagonista α reversible); ambos ajenos al árbol bronquial.", smiles: 'CCOC(C)CN(CCCl)Cc1ccccc1' },
+      { text: "Salbutamol (agonista selectivo β₂, induce broncodilatación terapéutica en asma) frente a Propranolol (antagonista no selectivo β₁/β₂, provoca broncoconstricción refleja y está contraindicado en pacientes asmáticos).", smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
+      { text: "Reserpina (depletor vesicular presináptico) frente a Guanetidina (bloqueante de la exocitosis); ambos sin contacto directo con el receptor β₂.", smiles: 'COc1cc2c(cc1OC)[C@@H]1[C@@H]3C[C@H](OC(=O)c4cc(OC)c(OC)c(OC)c4)[C@@H](OC)C[C@H]3N2CCC1' },
     ],
     correctIndex: 2,
-    explanation: 'Justificación Química: El salmeterol combina el farmacóforo de feniletanolamina del salbutamol (3-hidroximetil-4-hidroxifenilo) con una cadena N-alquílica muy prolongada: -(CH2)6-O-(CH2)4-C6H5 (cadena 4-fenilbutoxihexilo). Esta extensión lipófila se inserta en una zona hidrofóbica secundaria ("exositio") de la membrana lipídica y del receptor β₂. Este anclaje físico evita el lavado del fármaco fuera del microentorno del receptor, permitiendo que la cabeza polar se una y se disocie repetidamente del sitio activo durante más de 12 horas.\n\n• Distractor a: Falso: el salmeterol carece de grupos azida y su unión es puramente reversible, no covalente.\n• Distractor b: Falso: la duración prolongada es una propiedad intrínseca de su estructura química (farmacocinética de exositio), no de excipientes particulados.\n• Distractor d: Falso: los agonistas β₂ activan la adenilato ciclasa mediante proteína Gs aumentando el AMPc intracelular para causar broncodilatación.',
+    explanation: "Justificación Química: El receptor β₂ bronquial está acoplado a proteína Gs, aumentando el AMPc intracelular y fosforilando la quinasa de las cadenas ligeras de miosina (MLCK), lo que produce relajación de la musculatura lisa (broncodilatación). El salbutamol actúa como agonista selectivo de este receptor aliviando el broncoespasmo. En contraste, el propranolol es un antagonista competitivo no selectivo (β₁ y β₂): al ocupar el receptor β₂ bloquea la vía del AMPc, desencadenando broncoconstricción severa potencialmente letal, lo que contraindica formalmente los β-bloqueantes no selectivos en asma y EPOC.\n\n• Distractores a, b, d: Actúan sobre receptores alfa adrenérgicos o sobre los mecanismos presinápticos de almacenamiento y liberación de catecolaminas, sin actividad sobre el receptor β₂ bronquial.",
     difficulty: 'Medio'
-  }
+  },
 ];
 
 // ==========================================================================

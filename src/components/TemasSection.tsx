@@ -27,7 +27,7 @@ interface TemasSectionProps {
   onSelectTopic: (topic: QfdosTopic, tab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas') => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
-  onOpenCartas?: () => void;
+  onOpenCartas?: (tema?: 1 | 2) => void;
   onEditTopic?: (topicId: string) => void;
   onOpenAdminCms?: () => void;
 }
@@ -500,11 +500,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                 )}
 
-                {/* Fila 3: Baraja Coleccionable (Tema 01) */}
-                {topic.id === 'tema-01' && onOpenCartas && (
+                {/* Fila 3: Baraja Coleccionable (Temas 01 y 02) */}
+                {(topic.id === 'tema-01' || topic.id === 'tema-02') && onOpenCartas && (
                   <div style={{ display: 'flex', gap: '6px', width: '100%', marginTop: '2px' }}>
                     <button
-                      onClick={onOpenCartas}
+                      onClick={() => onOpenCartas(topic.id === 'tema-02' ? 2 : 1)}
                       className="btn btn-sm"
                       style={{ 
                         flex: 1, 
@@ -522,11 +522,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         gap: '6px',
                         whiteSpace: 'nowrap'
                       }}
-                      title="Baraja Coleccionable de Fármacos Colinérgicos · 15 cartas"
+                      title={topic.id === 'tema-02' ? 'Baraja Coleccionable de Fármacos Adrenérgicos · 20 cartas' : 'Baraja Coleccionable de Fármacos Colinérgicos · 15 cartas'}
                     >
                       <Layers size={13} color="var(--teal)" /> Cartas Fármacos
                       <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', fontWeight: 800 }}>
-                        15 Cartas
+                        {topic.id === 'tema-02' ? 20 : 15} Cartas
                       </span>
                     </button>
                   </div>

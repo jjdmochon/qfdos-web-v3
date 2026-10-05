@@ -888,3 +888,6 @@
     font-size: 18px;
   }
 }
+
+/* Letras griegas en rótulos en mayúsculas: α y β no deben convertirse en Α y Β */
+.qf-griega { text-transform: none; }

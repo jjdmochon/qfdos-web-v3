@@ -404,9 +404,10 @@ export interface StudentQuestion {
  * v3.23.0 — Acceso directo a edición de temas desde el portal docente y persistencia blindada.
  * v3.24.0 — Noticia de Isomorphic Labs en enlaces de interés y en las Historias.
  * v3.25.0 — 3 modelos oficiales de examen para el Tema 2 (Sistema Adrenérgico, 45 preguntas calibradas JEV).
+ * v3.26.0 — Renderizado 2D RDKit de estructuras químicas en opciones del quiz y Modelo 1 actualizado con Modelo B (Ahlquist, Fries, β₂, CIP y Eudismia).
  */
-export const COURSE_DATA_VERSION = '3.25.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-06T00:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.26.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-06T00:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

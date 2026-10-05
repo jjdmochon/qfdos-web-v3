@@ -335,6 +335,8 @@ export const App: React.FC = () => {
   const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
   const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
   const [isCartasModalOpen, setIsCartasModalOpen] = useState(false);
+  const [cartasTema, setCartasTema] = useState<1 | 2>(1);
+  const abrirCartas = (tema: 1 | 2 = 1) => { setCartasTema(tema); setIsCartasModalOpen(true); };
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
 
   const handleOpenAdmet = (drug: MoleculeDrug) => {
@@ -436,7 +438,9 @@ export const App: React.FC = () => {
         setIsFirModalOpen(true);
       }
       if (raw === 'cartas' || raw === 'cartas-tema-01' || raw === 'baraja') {
-        setIsCartasModalOpen(true);
+        abrirCartas(1);
+      } else if (raw === 'cartas-tema-02') {
+        abrirCartas(2);
       } else {
         setIsCartasModalOpen(false);
       }
@@ -561,7 +565,7 @@ export const App: React.FC = () => {
             }}
             onOpenQuiz={t => { if (testHabilitado(t)) setSelectedQuizTopic(t); }}
             onOpenFlashcards={t => { if (flashcardsHabilitadas(t)) setSelectedFlashcardsTopic(t); }}
-            onOpenCartas={() => setIsCartasModalOpen(true)}
+            onOpenCartas={(tema?: 1 | 2) => abrirCartas(tema ?? 1)}
             onEditTopic={handleOpenAdminCmsForTopic}
             onOpenAdminCms={() => handleOpenAdminCmsForTopic()}
           />
@@ -700,6 +704,7 @@ export const App: React.FC = () => {
       {/* Baraja Coleccionable de Cartas: accesible a todos */}
       {isCartasModalOpen && (
         <CartasDocenteModal
+          temaInicial={cartasTema}
           onClose={() => {
             setIsCartasModalOpen(false);
             if (window.location.hash.includes('cartas')) {

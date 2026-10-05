@@ -346,9 +346,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   const getModelLabel = (model: QuizModelType, variant: 'badge' | 'full' | 'short' = 'badge'): string => {
     if (model === 't2-modelo-1') {
-      if (variant === 'full') return 'Modelo 1: Biosíntesis, Metabolismo y Agonistas (15P)';
+      if (variant === 'full') return 'Modelo 1: Clasificación Ahlquist, Síntesis Fries, Farmacóforo β₂, CIP y Eudismia (15P)';
       if (variant === 'short') return 'Modelo 1';
-      return 'Modelo 1 (Biosíntesis y Agonistas)';
+      return 'Modelo 1 (Clasificación, Síntesis y Farmacóforo)';
     }
     if (model === 't2-modelo-2') {
       if (variant === 'full') return 'Modelo 2: Antagonistas, Estereoquímica CIP y Reactividad (15P)';
@@ -1393,7 +1393,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
                               <div>
                                 <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--navy-ink)' }}>
-                                  Oficial 2026/27 · Calibrado JEV
+                                  Oficial 2026/27 · Modelo B
                                 </span>
                                 <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--navy-ink)', margin: '2px 0 0 0' }}>
                                   Modelo 1 (15 Preguntas)
@@ -1410,7 +1410,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                               )}
                             </div>
                             <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
-                              Biosíntesis de catecolaminas (TH, AAAD, DBH, PNMT), degradación enzimática por MAO y COMT, agonistas directos e indirectos, REA del núcleo catecol y fármacos SABA/LABA.
+                              Clasificación de Ahlquist, transposición de Fries, farmacóforo β₂ en salbutamol, isoetarina vs COMT, puente oximetilénico, estereoquímica CIP y eudismia.
                             </p>
                           </div>
 
@@ -1784,7 +1784,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           {getModelLabel(selectedModel, 'badge')}:
                         </strong>{' '}
                         {selectedModel === 't2-modelo-1'
-                          ? '15 preguntas calibradas JEV System-1: biosíntesis de catecolaminas (TH, AAAD, DBH, PNMT), degradación enzimática por MAO y COMT, agonistas directos e indirectos, REA del núcleo catecol y fármacos SABA/LABA.'
+                          ? '15 preguntas calibradas Modelo B: clasificación de Ahlquist, transposición de Fries, farmacóforo β₂ en salbutamol, isoetarina vs COMT, puente oximetilénico, estereoquímica CIP y eudismia.'
                           : selectedModel === 't2-modelo-2'
                           ? '15 preguntas calibradas JEV System-1: bloqueantes α y β, farmacóforo de ariloxipropanolaminas, cardioselectividad β₁, alquilación irreversible vía ion aziridinio (fenoxibenzamina) y estereoquímica CIP.'
                           : selectedModel === 't2-modelo-3'
@@ -2065,7 +2065,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             transition: 'all var(--transition-fast)'
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flex: 1, minWidth: 0 }}>
                             <span 
                               className="font-mono" 
                               style={{
@@ -2079,17 +2079,32 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 color: selectedOption === idx ? '#fff' : 'var(--text-main)',
                                 fontSize: '0.78rem',
                                 fontWeight: 700,
-                                flexShrink: 0
+                                flexShrink: 0,
+                                marginTop: '2px'
                               }}
                             >
                               {String.fromCharCode(65 + idx)}
                             </span>
-                            <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>
-                              {optText}
-                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 }}>
+                              <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>
+                                {optText}
+                              </span>
+                              {optSmiles && (
+                                <div style={{ 
+                                  marginTop: '4px', 
+                                  padding: '4px 8px',
+                                  borderRadius: 'var(--radius-sm)',
+                                  background: 'var(--surface-alt)',
+                                  maxWidth: '100%', 
+                                  overflowX: 'auto',
+                                  display: 'inline-flex',
+                                  justifyContent: 'center'
+                                }}>
+                                  <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} />
+                                </div>
+                              )}
+                            </div>
                           </div>
-
-{/* Opciones en texto limpio conforme a instrucción docente */}
 
                           {showExplanation && idx === currentQ.correctIndex && (
                             <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginLeft: '6px' }} />

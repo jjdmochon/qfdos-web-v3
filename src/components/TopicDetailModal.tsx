@@ -362,7 +362,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 </span>
               </button>
             )}
-            {topic.id === 'tema-01' && (
+            {(topic.id === 'tema-01' || topic.id === 'tema-02') && (
               <button
                 onClick={() => setActiveTab('cartas')}
                 className={`tab-btn ${activeTab === 'cartas' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'cartas'}
@@ -376,9 +376,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   boxShadow: '0 2px 8px rgba(30, 58, 138, 0.12)'
                 }}
               >
-                <Layers size={14} /> Cartas Colinérgicas
+                <Layers size={14} /> {topic.id === 'tema-02' ? 'Cartas Adrenérgicas' : 'Cartas Colinérgicas'}
                 <span className="qfdos-badge badge-mint" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px', fontWeight: 800 }}>
-                  15 Cartas
+                  {topic.id === 'tema-02' ? 20 : 15} Cartas
                 </span>
               </button>
             )}
@@ -1777,8 +1777,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             <RetrosintesisWorkshop isProfesor={isProfesor} />
           )}
 
-          {/* TAB 5: Cartas Coleccionables (Tema 1) */}
-          {activeTab === 'cartas' && topic.id === 'tema-01' && (
+          {/* TAB 5: Cartas Coleccionables (Temas 1 y 2) */}
+          {activeTab === 'cartas' && (topic.id === 'tema-01' || topic.id === 'tema-02') && (
             <div style={{ padding: '0.25rem 0' }}>
               <CartasDeckView
                 onOpenAdmet={(drug) => {
@@ -1786,6 +1786,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   onOpenAdmet?.(drug);
                 }}
                 showDocenteBanner={true}
+                tema={topic.id === 'tema-02' ? 2 : 1}
               />
             </div>
           )}
