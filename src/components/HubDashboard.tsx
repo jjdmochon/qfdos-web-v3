@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { QfdosTopic, QfdosAnnouncement, moleculaDeTarjeta, QfdosResourceLink, CourseAttachment } from '../data/qfdosData';
+import { QfdosTopic, QfdosAnnouncement, QfdosResourceLink, CourseAttachment, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
 import { HistoriasQfdos } from './HistoriasQfdos';
@@ -110,15 +110,13 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
         </div>
       )}
 
-      {/* Historias: banda rotatoria + visor tipo Instagram (v1: solo profesorado) */}
-      {isProfesor && (
-        <HistoriasQfdos
-          topics={topics}
-          resourceLinks={resourceLinks}
-          onAbrirReproductor={onOpenSpotifyPlayer}
-          onAbrirTema={onSelectTopic}
-        />
-      )}
+      {/* Historias: banda rotatoria + visor tipo Instagram */}
+      <HistoriasQfdos
+        topics={topics}
+        resourceLinks={resourceLinks}
+        onAbrirReproductor={onOpenSpotifyPlayer}
+        onAbrirTema={onSelectTopic}
+      />
 
       {/*
         Examen del Tema 1.

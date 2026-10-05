@@ -359,9 +359,9 @@ en iPhone y iPad muestra los tres pasos de Safari (Compartir → Añadir a panta
 de inicio). Una vez instalada, la opción desaparece. Empaquetarla para las tiendas
 (Capacitor) no está hecho: requiere cuentas de desarrollador de Google y Apple.
 
-## Historias QFDOS (vista previa del profesorado)
+## Historias QFDOS
 
-Banda rotatoria y visor 9:16 en el Hub, visibles solo para el perfil docente.
+Banda rotatoria y visor 9:16 en el Hub, visibles para todos los perfiles.
 Hay **un círculo por tema** con contenido (hoy, el Tema 1) y uno de **Recursos**.
 El del tema reúne, por este orden, el cartel, la píldora de audio (30 s; su
 botón abre el reproductor de la ficha), el vídeo podcast (30 s, con enlace a

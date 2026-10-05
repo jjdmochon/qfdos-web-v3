@@ -226,6 +226,10 @@ export interface QfdosResourceLink {
   /** Recomendado: se destaca al principio de la sección */
   featured?: boolean;
   addedAt: string;
+  /** Portada de la noticia: se usa como fondo en las Historias */
+  imageUrl?: string;
+  /** MP4/WebM directo: se reproduce en las Historias (primeros 30 s) */
+  videoUrl?: string;
 }
 
 export const RESOURCE_CATEGORIES = [
@@ -240,6 +244,21 @@ export const RESOURCE_CATEGORIES = [
 export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
+  {
+    id: 'link-isomorphic-labs-iso-dde',
+    title: 'Isomorphic Labs: una nueva vía para fabricar medicamentos con IA',
+    url: 'https://www.isomorphiclabs.com/articles/building-a-new-path-to-make-medicines-with-ai',
+    summary:
+      'Isomorphic Labs (fundada en 2021, nacida en torno a AlphaFold) presenta su motor de diseño de fármacos, IsoDDE, que va más allá de predecir estructuras: agentes generativos exploran en días un espacio químico de unas 10⁶⁰ moléculas pequeñas, frente a los 10⁵–10⁹ compuestos que cubre un cribado clásico en meses o años. Fijaos en lo que la empresa afirma y en lo que muestra: hay datos preclínicos, pero ninguna diana ni ensayo clínico concretos. Buen texto para conectar con el diseño basado en estructura y con el cribado virtual.',
+    category: 'Descubrimiento de fármacos',
+    source: 'Isomorphic Labs',
+    duration: '6 min · con vídeos',
+    relatedTopic: 'Tema 00',
+    featured: true,
+    addedAt: '2026-09-30',
+    imageUrl: 'https://cdn.prod.website-files.com/6846c7b5a78f3e9225c64f10/6aaa84d4e30dc0dd73568a6c_iso-max-jaderberg-1920x1080.jpg',
+    videoUrl: 'https://storage.googleapis.com/isomorphiclabs-website-public-artifacts/videos/blogs/IsomorphicLabs_MultiSearchVideo_4K_Compressed.mp4'
+  },
   {
     id: 'link-estructuras-qfdos-db',
     title: 'Base de Datos Oficial de Estructuras QFDOS (40 Moléculas · XLSX y CSV)',
@@ -383,9 +402,10 @@ export interface StudentQuestion {
  *          enalapril, levodopa, rivastigmina, valaciclovir, ranitidina y
  *          pralidoxima carecían de estereoquímica.
  * v3.23.0 — Acceso directo a edición de temas desde el portal docente y persistencia blindada.
- * v3.24.0 — 3 modelos oficiales de examen para el Tema 2 (Sistema Adrenérgico, 45 preguntas calibradas JEV).
+ * v3.24.0 — Noticia de Isomorphic Labs en enlaces de interés y en las Historias.
+ * v3.25.0 — 3 modelos oficiales de examen para el Tema 2 (Sistema Adrenérgico, 45 preguntas calibradas JEV).
  */
-export const COURSE_DATA_VERSION = '3.24.0';
+export const COURSE_DATA_VERSION = '3.25.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-06T00:00:00.000Z';
 
 export const QFDOS_INFO = {
@@ -2893,7 +2913,7 @@ flashcards: [
       },
       {
         name: '(-)-Efedrina',
-        smiles: 'CN[C@@H](C)[C@@H](O)c1ccccc1',
+        smiles: 'CN[C@@H](C)[C@H](O)c1ccccc1',
         formula: 'C10H15NO',
         mw: 165.24,
         logP: 1.33,
@@ -2905,7 +2925,7 @@ flashcards: [
       },
       {
         name: '(+)-Pseudoefedrina',
-        smiles: 'CN[C@@H](C)[C@H](O)c1ccccc1',
+        smiles: 'CN[C@@H](C)[C@@H](O)c1ccccc1',
         formula: 'C10H15NO',
         mw: 165.24,
         logP: 1.33,
@@ -2941,7 +2961,7 @@ flashcards: [
       },
       {
         name: 'Dextroanfetamina',
-        smiles: 'C[C@@H](N)Cc1ccccc1',
+        smiles: 'C[C@H](N)Cc1ccccc1',
         formula: 'C9H13N',
         mw: 135.21,
         logP: 1.58,
@@ -3158,10 +3178,10 @@ flashcards: [
       },
       {
         name: 'Piperoxano',
-        smiles: 'C1CCN(CC2Oc3ccccc3O2)CC1',
-        formula: 'C13H17NO2',
-        mw: 219.28,
-        logP: 2.27,
+        smiles: 'C1CCN(CC2COc3ccccc3O2)CC1',
+        formula: 'C14H19NO2',
+        mw: 233.31,
+        logP: 2.31,
         hbd: 0,
         hba: 3,
         tpsa: 21.7,
@@ -3170,10 +3190,10 @@ flashcards: [
       },
       {
         name: '(S)-Prosimpal',
-        smiles: 'CCN(CC)C[C@@H]1Oc2ccccc2O1',
-        formula: 'C12H17NO2',
-        mw: 207.27,
-        logP: 2.13,
+        smiles: 'CCN(CC)C[C@H]1COc2ccccc2O1',
+        formula: 'C13H19NO2',
+        mw: 221.3,
+        logP: 2.17,
         hbd: 0,
         hba: 3,
         tpsa: 21.7,
@@ -3182,10 +3202,10 @@ flashcards: [
       },
       {
         name: '(R)-Prosimpal',
-        smiles: 'CCN(CC)C[C@H]1Oc2ccccc2O1',
-        formula: 'C12H17NO2',
-        mw: 207.27,
-        logP: 2.13,
+        smiles: 'CCN(CC)C[C@@H]1COc2ccccc2O1',
+        formula: 'C13H19NO2',
+        mw: 221.3,
+        logP: 2.17,
         hbd: 0,
         hba: 3,
         tpsa: 21.7,

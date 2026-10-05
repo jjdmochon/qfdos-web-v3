@@ -14,7 +14,7 @@ import { CourseAttachment, QfdosResourceLink, QfdosTopic } from '../data/qfdosDa
 // existe en la web (podcast del tema, enlaces de interés y materiales varios)
 // más los medios de portada del Tema 1 que se guardan en /historias.
 //
-// v1: solo visible para el profesorado (lo decide HubDashboard).
+// Visible para todo el mundo desde el Hub.
 // ==========================================================================
 
 /** Id del tema (`tema-01`) o `recursos` */
@@ -157,7 +157,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
       historias.push({
         id: `podcast-video-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Vídeo podcast',
         titulo: `${t.number} · ${t.title}`, texto: 'Resumen en vídeo del tema.',
-        video: resolver(m.videoPodcast), imagen: portadaPodcast, ajuste: 'contener',
+        video: resolver(m.videoPodcast), imagen: resolver('assets/Podcast/qfdos-podcast-ep01-16x9.png'), ajuste: 'contener',
         maxSegundos: SEGUNDOS_PODCAST, requiere: m.videoPodcast,
         acciones: spotify ? [{ label: 'Ver el episodio en Spotify', icono: 'spotify', href: spotify }] : [],
         duracionMs: SEGUNDOS_PODCAST * 1000
@@ -184,13 +184,18 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     .map((l, i) => ({ l, i }))
     .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
     .slice(0, 2)
-    .map(({ l }) => ({
-      id: `enlace-${l.id}`, grupo: 'recursos', fondo: 'recursos' as const, etiqueta: 'Enlace de interés',
-      titulo: l.title, texto: recortar(l.summary, 320),
-      fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
-      acciones: [{ label: 'Abrir el enlace', icono: 'enlace' as const, href: resolver(l.url) }],
-      duracionMs: duracionPorTexto(l.summary)
-    }));
+    .map(({ l }): Historia => {
+      const video = l.videoUrl && /^data:video\/|\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(l.videoUrl) ? resolver(l.videoUrl) : undefined;
+      return {
+        id: `enlace-${l.id}`, grupo: 'recursos', fondo: 'recursos', etiqueta: 'Enlace de interés',
+        titulo: l.title, texto: recortar(l.summary, video ? 240 : 320),
+        fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
+        imagen: l.imageUrl ? resolver(l.imageUrl) : undefined,
+        video, ajuste: video ? 'contener' : undefined, maxSegundos: video ? SEGUNDOS_PODCAST : undefined,
+        acciones: [{ label: l.source && l.source.length <= 24 ? `Leer en ${l.source}` : 'Abrir el enlace', icono: 'enlace', href: resolver(l.url) }],
+        duracionMs: video ? SEGUNDOS_PODCAST * 1000 : duracionPorTexto(l.summary)
+      };
+    });
 
   const varios = topics.find(t => t.id === 'tema-varios');
   const materiales: Historia[] = (varios?.attachments ?? []).map(a => ({
@@ -389,9 +394,13 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
       <div className="hist-stage" aria-label="Historias QFDOS" aria-roledescription="carrusel">
         {/* Fondo: vídeo, imagen o degradado */}
         <div className={`hist-bg ${fondoClase}`} aria-hidden="true">
+          {historia.ajuste === 'contener' && historia.imagen && (
+            <div className="hist-difuminado" style={{ backgroundImage: `url("${historia.imagen}")` }} />
+          )}
           {historia.video && !mediaFailed ? (
             <video
               key={historia.id}
+              poster={historia.imagen}
               ref={el => { mediaRef.current = el; }}
               className={`hist-media${historia.ajuste === 'contener' ? ' contener' : ''}`}
               src={historia.video}
@@ -403,7 +412,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
           ) : historia.imagen ? (
             <img
               key={historia.id}
-              className="hist-media"
+              className={`hist-media${historia.ajuste === 'contener' ? ' contener' : ''}`}
               src={historia.imagen}
               alt=""
               onError={e => { e.currentTarget.style.display = 'none'; }}
@@ -574,7 +583,6 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
         <h3 id="hist-titulo-seccion">
           <Sparkles size={16} aria-hidden="true" /> Historias
         </h3>
-        <span className="qfdos-badge badge-teal" style={{ fontSize: '0.62rem' }}>Vista previa · solo profesorado</span>
       </div>
 
       {/* Círculos */}
@@ -622,7 +630,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
           onClick={() => setAbierto({ g: actual.g, i: actual.i })}
           aria-label={`Abrir historia: ${actual.h.titulo}`}
         >
-          {actual.h.imagen && <img src={actual.h.imagen} alt="" className="hist-banda-img" loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
+          {actual.h.imagen && <img src={actual.h.imagen} alt="" className={`hist-banda-img${actual.h.ajuste === 'contener' ? ' difuminada' : ''}`} loading="lazy" onError={e => { e.currentTarget.style.display = 'none'; }} />}
           <span className="hist-banda-scrim" aria-hidden="true" />
           <span className="hist-banda-texto">
             <span className="hist-chip">
