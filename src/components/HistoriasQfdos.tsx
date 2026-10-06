@@ -132,7 +132,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     };
   });
   if (novedades.length) {
-    grupos.push({ id: 'avisos', nombre: 'Novedades', portada: novedades.find(n => n.imagen)?.imagen, historias: novedades });
+    grupos.push({ id: 'avisos', nombre: 'Novedades del curso', portada: novedades.find(n => n.imagen)?.imagen, historias: novedades });
   }
 
   // --- Un grupo por tema: cartel, clip, píldora de audio y vídeo podcast ---
@@ -204,7 +204,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     });
   }
 
-  // --- Recursos: los 2 enlaces de interés más recientes + Materiales varios ---
+  // --- Noticias: los 2 enlaces de interés más recientes + Materiales varios ---
   const enlaces: Historia[] = resourceLinks
     .map((l, i) => ({ l, i }))
     .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
@@ -237,7 +237,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
 
   const recursos = [...enlaces, ...materiales];
   if (recursos.length) {
-    grupos.push({ id: 'recursos', nombre: 'Recursos', portada: resolver('icons/icon-192.png'), historias: recursos });
+    grupos.push({ id: 'recursos', nombre: 'Noticias', portada: resolver('icons/icon-192.png'), historias: recursos });
   }
   return grupos.filter(g => g.historias.length > 0);
 }
@@ -550,9 +550,14 @@ interface HistoriasQfdosProps extends Callbacks {
   topics: QfdosTopic[];
   resourceLinks: QfdosResourceLink[];
   announcements?: QfdosAnnouncement[];
+  /** Qué se pinta: los círculos (encima de la portada), la banda rotatoria (debajo) o ambos */
+  partes?: 'circulos' | 'banda' | 'todo';
 }
 
-export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema }) => {
+/** Aviso entre instancias (círculos y banda) de que se ha visto una historia */
+const EVENTO_VISTAS = 'qfdos-historias-vistas';
+
+export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema, partes = 'todo' }) => {
   // Los medios locales que aún no se han subido (vídeos de /historias) se comprueban una vez
   const [ausentes, setAusentes] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -588,13 +593,19 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
   );
 
   const marcarVista = useCallback((id: string) => {
-    setVistas(prev => {
-      if (prev.has(id)) return prev;
-      const n = new Set(prev);
-      n.add(id);
-      guardarVistas(n);
-      return n;
-    });
+    const n = leerVistas();
+    if (n.has(id)) return;
+    n.add(id);
+    guardarVistas(n);
+    setVistas(n);
+    window.dispatchEvent(new Event(EVENTO_VISTAS));
+  }, []);
+
+  // Círculos y banda son dos instancias: lo que se ve en una apaga el anillo en la otra
+  useEffect(() => {
+    const releer = () => setVistas(leerVistas());
+    window.addEventListener(EVENTO_VISTAS, releer);
+    return () => window.removeEventListener(EVENTO_VISTAS, releer);
   }, []);
 
   if (grupos.length === 0) return null;
@@ -603,8 +614,16 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
   const avanzarBanda = () => setBanda(b => (b + 1) % planas.length);
   const retrocederBanda = () => setBanda(b => (b - 1 + planas.length) % planas.length);
 
+  const verCirculos = partes !== 'banda';
+  const verBanda = partes !== 'circulos';
+
   return (
-    <section className="hist-seccion" aria-labelledby="hist-titulo-seccion">
+    <section
+      className={`hist-seccion${verCirculos ? '' : ' hist-seccion-banda'}`}
+      aria-labelledby={verCirculos ? 'hist-titulo-seccion' : undefined}
+      aria-label={verCirculos ? undefined : 'Novedades destacadas'}
+    >
+      {verCirculos && (<>
       <div className="hist-cabecera">
         <h3 id="hist-titulo-seccion">
           <Sparkles size={16} aria-hidden="true" /> Historias
@@ -637,8 +656,10 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
           );
         })}
       </div>
+      </>)}
 
       {/* Banda rotatoria */}
+      {verBanda && (
       <div
         className={`hist-banda${bandaPausada ? ' is-paused' : ''}`}
         role="region"
@@ -698,6 +719,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
           </>
         )}
       </div>
+      )}
 
       {abierto && (
         <Visor

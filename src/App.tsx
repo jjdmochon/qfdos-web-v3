@@ -23,6 +23,7 @@ import { LoginPage } from './components/LoginPage';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { HubDashboard } from './components/HubDashboard';
+import { HistoriasQfdos } from './components/HistoriasQfdos';
 import { TemasSection } from './components/TemasSection';
 import { TopicDetailModal } from './components/TopicDetailModal';
 import { AffinitySimulator } from './components/AffinitySimulator';
@@ -533,6 +534,20 @@ const App: React.FC = () => {
         onOpenCartas={() => setIsCartasModalOpen(true)}
       />
 
+      {/* Historias (círculos): debajo del menú y por encima de la portada, como en Instagram */}
+      {activeTab === 'hub' && (
+        <div className="container hist-portada">
+          <HistoriasQfdos
+            partes="circulos"
+            topics={topics}
+            resourceLinks={resourceLinks}
+            announcements={announcements}
+            onAbrirReproductor={att => setSelectedSpotifyAttachment(att)}
+            onAbrirTema={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
+          />
+        </div>
+      )}
+
       {activeTab === 'hub' && (
         <Hero
           onNavigateToTemas={() => navigateTo('temas')}
@@ -557,6 +572,7 @@ const App: React.FC = () => {
             onNavigateToSimulador={() => navigateTo('simulador')}
             onNavigateToAdmet={() => navigateTo('admet')}
             onNavigateToPracticas={() => navigateTo('practicas')}
+            onNavigateToEnlaces={() => navigateTo('enlaces')}
             onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
             onOpenAdminCms={() => setIsAdminCmsOpen(true)}
             onOpenFirSimulator={() => setIsFirModalOpen(true)}
