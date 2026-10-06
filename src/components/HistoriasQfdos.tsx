@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { CourseAttachment, QfdosAnnouncement, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
 import { avisosRecientesPrimero } from '../utils/avisos';
+import { sonarMusica, silenciarMusica, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
 
 // ==========================================================================
 // Historias QFDOS
@@ -274,7 +275,8 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   const [held, setHeld] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
   const [hidden, setHidden] = useState(typeof document !== 'undefined' && document.hidden);
-  const [muted, setMuted] = useState(false);
+  // El silencio que elige el usuario se recuerda; el automático (navegador sin permiso de sonido) no
+  const [muted, setMuted] = useState(leerSilencio);
   const [failedId, setFailedId] = useState<string | null>(null);
 
   const autoplay = useMemo(() => !reduceMotion(), []);
@@ -416,6 +418,20 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   const hayAudio = !!historia.audio && !historia.video;
   const fondoClase = fondoDe(historia);
 
+  // Música de fondo: solo en historias sin sonido propio, sin pausa ni silencio
+  const conMusica = autoplay && !muted && !paused && !tieneMedio;
+  useEffect(() => {
+    if (conMusica) sonarMusica();
+    else silenciarMusica();
+  }, [conMusica]);
+  useEffect(() => () => silenciarMusica(0.3), []);
+
+  const alternarSonido = () => {
+    const nuevo = !muted;
+    guardarSilencio(nuevo);
+    setMuted(nuevo);
+  };
+
   const visor = (
     <div
       className="modal-overlay hist-overlay"
@@ -486,11 +502,9 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
               {historia.fecha && <span className="hist-fecha">{historia.fecha}</span>}
             </span>
             <span className="hist-ctrls">
-              {(tieneMedio || hayAudio) && (
-                <button type="button" className="hist-icon" onClick={() => setMuted(m => !m)} aria-label={muted ? 'Activar sonido' : 'Silenciar'}>
-                  {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                </button>
-              )}
+              <button type="button" className="hist-icon" onClick={alternarSonido} aria-label={muted ? 'Activar sonido' : 'Silenciar'} aria-pressed={muted}>
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </button>
               <button type="button" className="hist-icon" onClick={() => setUserPaused(p => !p)} aria-label={userPaused ? 'Reanudar' : 'Pausar'} aria-pressed={userPaused}>
                 {userPaused ? <Play size={18} /> : <Pause size={18} />}
               </button>
