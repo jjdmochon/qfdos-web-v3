@@ -4,6 +4,7 @@ import {
   COURSE_DATA_VERSION,
   INITIAL_TOPICS,
   INITIAL_ANNOUNCEMENTS,
+  AVISOS_A_OFRECER,
   INITIAL_GLOSSARY,
   INITIAL_RESOURCE_LINKS,
   QfdosTopic,
@@ -46,7 +47,7 @@ import { CartasDocenteModal } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
-import { conEnlacesNuevos } from './utils/enlacesNuevos';
+import { conAvisosNuevos, conEnlacesNuevos } from './utils/enlacesNuevos';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -398,7 +399,10 @@ export const App: React.FC = () => {
           return normalizedRemoto;
         });
       }
-      if (Array.isArray(remoto.announcements)) setAnnouncements(remoto.announcements);
+      if (Array.isArray(remoto.announcements)) {
+        // Igual que los enlaces: al profesorado se le ofrecen los avisos nuevos del código para publicarlos
+        setAnnouncements(isProfesor ? conAvisosNuevos(remoto.announcements, INITIAL_ANNOUNCEMENTS, AVISOS_A_OFRECER) : remoto.announcements);
+      }
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
       if (Array.isArray(remoto.resourceLinks)) {
         // Al profesorado se le ofrecen los enlaces nuevos del código para que pueda publicarlos

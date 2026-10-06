@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Headphones, X, Pause, Play, Volume2, VolumeX, Link2, FolderOpen, GraduationCap,
+  Headphones, X, Pause, Play, Volume2, VolumeX, Link2, FolderOpen, GraduationCap, Bell,
   ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles, Image as ImagenIcono
 } from 'lucide-react';
-import { CourseAttachment, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
+import { CourseAttachment, QfdosAnnouncement, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
+import { avisosRecientesPrimero } from '../utils/avisos';
 
 // ==========================================================================
 // Historias QFDOS
@@ -111,9 +112,28 @@ interface Callbacks {
   onAbrirTema?: (topic: QfdosTopic) => void;
 }
 
-function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[], cb: Callbacks): Grupo[] {
+function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[], announcements: QfdosAnnouncement[], cb: Callbacks): Grupo[] {
   const portadaPodcast = resolver('assets/Podcast/qfdos-podcast-portada-vertical.png');
   const grupos: Grupo[] = [];
+
+  // --- Novedades: avisos marcados para las Historias, siempre los primeros ---
+  const novedades: Historia[] = avisosRecientesPrimero(announcements.filter(a => a.enHistorias)).map((a): Historia => {
+    const tema = a.temaId ? topics.find(t => t.id === a.temaId) : undefined;
+    const acciones: Accion[] = [];
+    if (tema && cb.onAbrirTema) acciones.push({ label: `Ir al ${tema.number}`, icono: 'tema', alPulsar: () => cb.onAbrirTema?.(tema) });
+    if (a.pdfUrl) acciones.push({ label: a.pdfName || 'Abrir el PDF', icono: 'pdf', href: resolver(a.pdfUrl) });
+    if (a.linkUrl) acciones.push({ label: a.linkLabel || 'Más información', icono: 'enlace', href: resolver(a.linkUrl) });
+    return {
+      id: `aviso-${a.id}`, grupo: 'avisos', fondo: 'marca', etiqueta: 'Novedad',
+      titulo: a.title, texto: recortar(a.content, 330), fecha: a.date,
+      imagen: a.imageUrl ? resolver(a.imageUrl) : undefined,
+      acciones: acciones.slice(0, 2),
+      duracionMs: Math.max(9000, duracionPorTexto(a.content))
+    };
+  });
+  if (novedades.length) {
+    grupos.push({ id: 'avisos', nombre: 'Novedades', portada: novedades.find(n => n.imagen)?.imagen, historias: novedades });
+  }
 
   // --- Un grupo por tema: cartel, clip, píldora de audio y vídeo podcast ---
   for (const t of topics) {
@@ -228,7 +248,7 @@ const IconoAccion: React.FC<{ tipo: Accion['icono'] }> = ({ tipo }) =>
   tipo === 'tema' ? <GraduationCap size={15} /> : <ExternalLink size={15} />;
 
 const IconoGrupo: React.FC<{ id: GrupoId; size: number }> = ({ id, size }) =>
-  id === 'recursos' ? <FolderOpen size={size} /> : <GraduationCap size={size} />;
+  id === 'recursos' ? <FolderOpen size={size} /> : id === 'avisos' ? <Bell size={size} /> : <GraduationCap size={size} />;
 
 // --------------------------------------------------------------------------
 // Visor a pantalla completa
@@ -529,9 +549,10 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
 interface HistoriasQfdosProps extends Callbacks {
   topics: QfdosTopic[];
   resourceLinks: QfdosResourceLink[];
+  announcements?: QfdosAnnouncement[];
 }
 
-export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, onAbrirReproductor, onAbrirTema }) => {
+export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema }) => {
   // Los medios locales que aún no se han subido (vídeos de /historias) se comprueban una vez
   const [ausentes, setAusentes] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -551,10 +572,10 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
   }, []);
 
   const grupos = useMemo(
-    () => construirGrupos(topics, resourceLinks, { onAbrirReproductor, onAbrirTema })
+    () => construirGrupos(topics, resourceLinks, announcements, { onAbrirReproductor, onAbrirTema })
       .map(g => ({ ...g, historias: g.historias.filter(h => !h.requiere || !ausentes.has(h.requiere)) }))
       .filter(g => g.historias.length > 0),
-    [topics, resourceLinks, onAbrirReproductor, onAbrirTema, ausentes]
+    [topics, resourceLinks, announcements, onAbrirReproductor, onAbrirTema, ausentes]
   );
   const [vistas, setVistas] = useState<Set<string>>(leerVistas);
   const [abierto, setAbierto] = useState<{ g: number; i: number } | null>(null);

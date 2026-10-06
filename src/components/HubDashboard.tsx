@@ -114,6 +114,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
       <HistoriasQfdos
         topics={topics}
         resourceLinks={resourceLinks}
+        announcements={announcements}
         onAbrirReproductor={onOpenSpotifyPlayer}
         onAbrirTema={onSelectTopic}
       />
