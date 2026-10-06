@@ -250,6 +250,31 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-nobel-medicina-2026',
+    title: 'Nobel de Medicina 2026: la optogenética y el control de neuronas con luz',
+    url: 'https://www.nobelprize.org/prizes/medicine/2026/press-release/',
+    summary:
+      'En cuanto al Nobel de Medicina, el premio es para Karl Deisseroth (Stanford), Peter Hegemann (Universidad Humboldt de Berlín) y Georg Nagel (Universidad de Würzburg) por la optogenética. Hegemann y Nagel identificaron en el alga Chlamydomonas la canalrodopsina, un canal iónico que se abre con la luz gracias a su cromóforo de retinal, y Deisseroth la llevó a neuronas de mamífero para encenderlas y apagarlas con pulsos de luz. Para nosotros tiene un interés muy directo, porque es una herramienta de validación de dianas: cuando activamos o silenciamos un circuito concreto, como las neuronas dopaminérgicas que estamos viendo en el Tema 3 en modelos de Parkinson o de adicción, sabemos qué efecto tendría un fármaco que actuara solo ahí antes de diseñarlo. Ya hay ensayos clínicos iniciales para recuperar visión en la retinosis pigmentaria, y la fotofarmacología persigue ese mismo control con moléculas fotoconmutables en lugar de genes. Os recomiendo leerlo con el temario de receptores delante.',
+    category: 'Descubrimiento de fármacos',
+    source: 'NobelPrize.org',
+    duration: '5 min',
+    relatedTopic: 'Tema 03',
+    featured: true,
+    addedAt: '2026-10-06'
+  },
+  {
+    id: 'link-nobel-fisica-2026',
+    title: 'Nobel de Física 2026: IceCube y los neutrinos de alta energía, de la Antártida a la medicina nuclear',
+    url: 'https://www.nobelprize.org/prizes/physics/2026/press-release/',
+    summary:
+      'Respecto al Nobel de Física, Francis Halzen (Universidad de Wisconsin-Madison) lo recibe por su papel decisivo en IceCube, un kilómetro cúbico de hielo antártico instrumentado con sensores de luz, y por el descubrimiento de neutrinos de alta energía de origen astrofísico. El detector registra la luz Cherenkov que emiten las partículas cargadas generadas cuando un neutrino choca en el hielo. El vínculo con la farmacia está más cerca de lo que parece, y creo que merece la pena verlo con calma: cada desintegración β⁺ de un radiofármaco de PET, como el [¹⁸F]FDG, emite un positrón y un neutrino, y la luz Cherenkov de esos positrones ya se aprovecha en imagen óptica de radiotrazadores, de modo que la misma física que estudia IceCube trabaja a diario en medicina nuclear.',
+    category: 'Divulgación',
+    source: 'NobelPrize.org',
+    duration: '5 min',
+    featured: true,
+    addedAt: '2026-10-06'
+  },
+  {
     id: 'link-isomorphic-labs-iso-dde',
     title: 'Isomorphic Labs: una nueva vía para fabricar medicamentos con IA',
     url: 'https://www.isomorphiclabs.com/articles/building-a-new-path-to-make-medicines-with-ai',
@@ -420,8 +445,9 @@ export interface StudentQuestion {
  * v3.30.0 — Generador de estructuras del Tema 3 como adjunto solo para el profesorado.
  * v3.31.0 — Tema 3: baraja de 20 cartas dopaminérgicas y 43 fármacos con estructura en Fármacos & Quimioinformática.
  * v3.32.0 — Tema 3 sin test ni flashcards (se retiran del código y del contenido publicado).
+ * v3.33.0 — Enlaces de interés: Nobel de Medicina 2026 (optogenética) y de Física 2026 (IceCube).
  */
-export const COURSE_DATA_VERSION = '3.32.0';
+export const COURSE_DATA_VERSION = '3.33.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-06T13:30:00.000Z';
 
 export const QFDOS_INFO = {
