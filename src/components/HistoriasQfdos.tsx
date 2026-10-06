@@ -110,6 +110,8 @@ const recortar = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1).
 interface Callbacks {
   onAbrirReproductor?: (att: CourseAttachment) => void;
   onAbrirTema?: (topic: QfdosTopic) => void;
+  /** Abre la ficha del enlace en la sección Enlaces de interés (resumen completo para el curso) */
+  onAbrirEnlace?: (link: QfdosResourceLink) => void;
 }
 
 function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[], announcements: QfdosAnnouncement[], cb: Callbacks): Grupo[] {
@@ -217,7 +219,10 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
         fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
         imagen: l.imageUrl ? resolver(l.imageUrl) : undefined,
         video, ajuste: video ? 'contener' : undefined, maxSegundos: video ? SEGUNDOS_PODCAST : undefined,
-        acciones: [{ label: l.source && l.source.length <= 24 ? `Leer en ${l.source}` : 'Abrir el enlace', icono: 'enlace', href: resolver(l.url) }],
+        acciones: [
+          ...(cb.onAbrirEnlace ? [{ label: 'Leer la noticia completa', icono: 'tema' as const, alPulsar: () => cb.onAbrirEnlace?.(l) }] : []),
+          { label: l.source && l.source.length <= 24 ? `Leer en ${l.source}` : 'Abrir el enlace', icono: 'enlace', href: resolver(l.url) }
+        ],
         duracionMs: video ? SEGUNDOS_PODCAST * 1000 : duracionPorTexto(l.summary)
       };
     });
@@ -557,7 +562,7 @@ interface HistoriasQfdosProps extends Callbacks {
 /** Aviso entre instancias (círculos y banda) de que se ha visto una historia */
 const EVENTO_VISTAS = 'qfdos-historias-vistas';
 
-export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema, partes = 'todo' }) => {
+export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema, onAbrirEnlace, partes = 'todo' }) => {
   // Los medios locales que aún no se han subido (vídeos de /historias) se comprueban una vez
   const [ausentes, setAusentes] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -577,10 +582,10 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
   }, []);
 
   const grupos = useMemo(
-    () => construirGrupos(topics, resourceLinks, announcements, { onAbrirReproductor, onAbrirTema })
+    () => construirGrupos(topics, resourceLinks, announcements, { onAbrirReproductor, onAbrirTema, onAbrirEnlace })
       .map(g => ({ ...g, historias: g.historias.filter(h => !h.requiere || !ausentes.has(h.requiere)) }))
       .filter(g => g.historias.length > 0),
-    [topics, resourceLinks, announcements, onAbrirReproductor, onAbrirTema, ausentes]
+    [topics, resourceLinks, announcements, onAbrirReproductor, onAbrirTema, onAbrirEnlace, ausentes]
   );
   const [vistas, setVistas] = useState<Set<string>>(leerVistas);
   const [abierto, setAbierto] = useState<{ g: number; i: number } | null>(null);

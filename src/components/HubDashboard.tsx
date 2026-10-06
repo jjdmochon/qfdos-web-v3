@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { QfdosTopic, QfdosAnnouncement, QfdosResourceLink, CourseAttachment, moleculaDeTarjeta } from '../data/qfdosData';
-import { HistoriasQfdos } from './HistoriasQfdos';
+import { QfdosTopic, QfdosAnnouncement, QfdosResourceLink, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
 import { avisosRecientesPrimero } from '../utils/avisos';
@@ -26,7 +25,6 @@ interface HubDashboardProps {
   topics: QfdosTopic[];
   announcements: QfdosAnnouncement[];
   resourceLinks?: QfdosResourceLink[];
-  onOpenSpotifyPlayer?: (att: CourseAttachment) => void;
   onSelectTopic: (topic: QfdosTopic) => void;
   onNavigateToCourseInfo: () => void;
   onNavigateToTemas: () => void;
@@ -44,7 +42,6 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
   topics,
   announcements,
   resourceLinks = [],
-  onOpenSpotifyPlayer,
   onSelectTopic,
   onNavigateToCourseInfo,
   onNavigateToTemas,
@@ -134,15 +131,8 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
         </div>
       )}
 
-      {/* Carrusel de historias: debajo de la portada (los círculos van encima, en App) */}
-      <HistoriasQfdos
-        partes="banda"
-        topics={topics}
-        resourceLinks={resourceLinks}
-        announcements={announcements}
-        onAbrirReproductor={onOpenSpotifyPlayer}
-        onAbrirTema={onSelectTopic}
-      />
+      {/* Carrusel de historias (HistoriasQfdos partes="banda") escondido de momento: con los
+          círculos sobre la portada basta. Para recuperarlo, montarlo aquí con partes="banda". */}
 
       {/*
         Examen del Tema 1.
