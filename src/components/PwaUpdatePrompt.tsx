@@ -8,9 +8,12 @@ const UNA_HORA = 60 * 60 * 1000;
  * Aviso de versión nueva.
  *
  * El service worker sirve la plataforma desde la caché del móvil. Cuando se
- * publica una versión nueva, se descarga en segundo plano pero no se activa
- * sola: así nadie pierde lo que está escribiendo en una entrega. Este aviso
- * deja actualizar con un toque. Con la app abierta, se comprueba cada hora.
+ * publica una versión nueva se descarga en segundo plano y se activa sola
+ * (skipWaiting + clientsClaim en vite.config.ts): la siguiente carga ya usa el
+ * código nuevo, sin recargar la página que está abierta, para que nadie pierda
+ * lo que está escribiendo en una entrega. Este aviso queda como red de
+ * seguridad por si algún navegador deja una versión en espera: deja actualizar
+ * con un toque. Con la app abierta, se comprueba cada hora.
  */
 export const PwaUpdatePrompt: React.FC = () => {
   const {

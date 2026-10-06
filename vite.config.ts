@@ -52,6 +52,11 @@ const pwa = VitePWA({
     globPatterns: ['**/*.{js,css,html,ico,woff2}', 'icons/*.png', '*.webp'],
     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
     cleanupOutdatedCaches: true,
+    // La versión nueva se activa sola en cuanto se descarga: la siguiente carga ya
+    // usa el código nuevo. No se fuerza ninguna recarga (registerType 'prompt'), así
+    // que quien está haciendo un test o una entrega no pierde lo que lleva escrito.
+    skipWaiting: true,
+    clientsClaim: true,
     navigateFallbackDenylist: [/\.[a-z0-9]{2,5}$/i],
     runtimeCaching: [
       {
