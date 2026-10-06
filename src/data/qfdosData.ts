@@ -405,8 +405,9 @@ export interface StudentQuestion {
  * v3.24.0 — Noticia de Isomorphic Labs en enlaces de interés y en las Historias.
  * v3.25.0 — 3 modelos oficiales de examen para el Tema 2 (Sistema Adrenérgico, 45 preguntas calibradas JEV).
  * v3.26.0 — Renderizado 2D RDKit de estructuras químicas en opciones del quiz y Modelo 1 actualizado con Modelo B (Ahlquist, Fries, β₂, CIP y Eudismia).
+ * v3.27.0 — Historias del Tema 2: cartel, clip, vídeo resumen (Spotify) y píldora de audio.
  */
-export const COURSE_DATA_VERSION = '3.26.0';
+export const COURSE_DATA_VERSION = '3.27.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-06T00:30:00.000Z';
 
 export const QFDOS_INFO = {
@@ -2693,7 +2694,10 @@ flashcards: [
     notesPdfUrl: '',
     notesPdfName: 'Tema 02: Apuntes de Agonistas β2 y β-bloqueantes.pdf',
     geminiNotebookUrl: '',
-    spotifyPodcastUrl: '',
+    spotifyPodcastUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
+    videoPodcastUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
+    audioPodcastUrl: 'audio/podcast_adrenergicos.mp3',
+    audioPodcastName: 'Píldora Docente 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
     drugs: [
       {
         name: 'L-Tirosina',
