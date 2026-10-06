@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { CourseAttachment, QfdosAnnouncement, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
 import { avisosRecientesPrimero } from '../utils/avisos';
-import { sonarMusica, silenciarMusica, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
+import { sonarMusica, silenciarMusica, efectoHistoria, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
 
 // ==========================================================================
 // Historias QFDOS
@@ -426,10 +426,26 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   }, [conMusica]);
   useEffect(() => () => silenciarMusica(0.3), []);
 
+  // Efectos de interfaz (los de brag): golpe suave al abrir y carta que se desliza al cambiar de
+  // historia, salvo que la nueva traiga su propio sonido
+  const primeraHistoria = useRef(true);
+  useEffect(() => {
+    const abriendo = primeraHistoria.current;
+    primeraHistoria.current = false;
+    if (muted || !autoplay) return;
+    if (abriendo) void efectoHistoria('abrir');
+    else if (!tieneMedio) void efectoHistoria('deslizar');
+  }, [historia.id]);
+
   const alternarSonido = () => {
     const nuevo = !muted;
     guardarSilencio(nuevo);
     setMuted(nuevo);
+    if (!nuevo && autoplay) void efectoHistoria('toque');
+  };
+  const alternarPausa = () => {
+    if (!muted && autoplay) void efectoHistoria('toque');
+    setUserPaused(p => !p);
   };
 
   const visor = (
@@ -505,7 +521,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
               <button type="button" className="hist-icon" onClick={alternarSonido} aria-label={muted ? 'Activar sonido' : 'Silenciar'} aria-pressed={muted}>
                 {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
               </button>
-              <button type="button" className="hist-icon" onClick={() => setUserPaused(p => !p)} aria-label={userPaused ? 'Reanudar' : 'Pausar'} aria-pressed={userPaused}>
+              <button type="button" className="hist-icon" onClick={alternarPausa} aria-label={userPaused ? 'Reanudar' : 'Pausar'} aria-pressed={userPaused}>
                 {userPaused ? <Play size={18} /> : <Pause size={18} />}
               </button>
               <button type="button" className="hist-icon" onClick={onClose} aria-label="Cerrar historias" title="Cerrar (Esc)">
