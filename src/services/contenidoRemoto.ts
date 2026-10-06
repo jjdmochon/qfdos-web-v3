@@ -49,6 +49,9 @@ export function limpiarCacheRemota(): void {
  * Sanitiza la lista de temas para garantizar que Tema 00 nunca quede
  * atrapado en una versión obsoleta de la hoja remota o enlaces caídos.
  */
+/** Temas que no llevan test ni flashcards: se vacían aunque el contenido publicado o la copia local los traiga. */
+const TEMAS_SIN_TEST_NI_FLASHCARDS = new Set(['tema-03']);
+
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
   const mapped = topics.map(t => {
@@ -94,8 +97,12 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       audioPodcastUrl: t.audioPodcastUrl || base.audioPodcastUrl || '',
       audioPodcastName: t.audioPodcastName || base.audioPodcastName || '',
       attachments: (t.attachments && t.attachments.length > 0) ? t.attachments : (base.attachments || []),
-      testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
-      flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
+      testQuestions: TEMAS_SIN_TEST_NI_FLASHCARDS.has(t.id)
+        ? []
+        : (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
+      flashcards: TEMAS_SIN_TEST_NI_FLASHCARDS.has(t.id)
+        ? []
+        : (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
       drugs: (Array.isArray(t.drugs) && t.drugs.length >= (base.drugs?.length || 0)) ? t.drugs : (base.drugs || []),
       // Habilitar test y flashcards se decide en el código, no en lo publicado
       testDisponible: base.testDisponible,

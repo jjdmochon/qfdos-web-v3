@@ -419,8 +419,9 @@ export interface StudentQuestion {
  * v3.29.0 — Aviso del Tema 2 (tipo test y recursos) en el tablón y como primera historia.
  * v3.30.0 — Generador de estructuras del Tema 3 como adjunto solo para el profesorado.
  * v3.31.0 — Tema 3: baraja de 20 cartas dopaminérgicas y 43 fármacos con estructura en Fármacos & Quimioinformática.
+ * v3.32.0 — Tema 3 sin test ni flashcards (se retiran del código y del contenido publicado).
  */
-export const COURSE_DATA_VERSION = '3.31.0';
+export const COURSE_DATA_VERSION = '3.32.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-06T13:30:00.000Z';
 
 export const QFDOS_INFO = {
@@ -3947,35 +3948,8 @@ flashcards: [
         soloDocente: true
       }
     ],
-    testQuestions: [
-      {
-        id: 't03-q1',
-        topicId: 'tema-03',
-        block: 'Antipsicóticos',
-        question: '¿Cuál es la razón principal por la que los antipsicóticos atípicos como la clozapina u olanzapina presentan una incidencia significativamente menor de síntomas extrapiramidales (SEP) que los neurolépticos típicos como el haloperidol?',
-        options: [
-          'Su afinidad nula por todos los receptores del sistema nervioso central.',
-          'Su elevada relación de antagonismo 5-HT2A frente a D2 y su rápida velocidad de disociación ("fast-off") del receptor D2.',
-          'Su capacidad para degradar químicamente la dopamina sináptica.',
-          'Su bloqueo exclusivo en la médula espinal.'
-        ],
-        correctIndex: 1,
-        explanation: 'El bloqueo de receptores 5-HT2A en la vía nigroestriada desinhibe la liberación de dopamina localmente, compitiendo con el fármaco y reduciendo el bloqueo D2 excesivo responsable de los síntomas extrapiramidales.',
-        difficulty: 'Medio'
-      }
-    ],
-    flashcards: [
-      {
-        id: 'fc-03-1',
-        topicId: 'tema-03',
-        concept: 'Transporte de Levodopa por LAT1',
-        front: '¿Por qué la dopamina exógena no es eficaz en el Parkinson y se debe administrar Levodopa?',
-        back: 'La dopamina es demasiado hidrofílica y se encuentra protonada a pH fisiológico, sin transportador en la barrera hematoencefálica (BHE). La Levodopa, al ser un aminoácido neutro zwitteriónico, utiliza el transportador de aminoácidos neutros grandes (LAT1) para ingresar activamente al cerebro, donde es descarboxilada a dopamina por la DOPA descarboxilasa central.',
-        smiles: 'C1=CC(=C(C=C1C[C@@H](C(=O)O)N)O)O',
-        difficulty: 'medium',
-        category: 'Transporte & ADMET'
-      }
-    ]
+    testQuestions: [],
+    flashcards: []
   },
   {
     id: 'tema-04',
