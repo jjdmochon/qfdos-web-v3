@@ -372,6 +372,10 @@ export interface QfdosAnnouncement {
   videoUrl?: string;
   linkUrl?: string;
   linkLabel?: string;
+  /** Entra en las Historias de la portada, como primera pieza */
+  enHistorias?: boolean;
+  /** Tema al que lleva el botón de la historia, p. ej. `tema-02` */
+  temaId?: string;
 }
 
 export interface StudentQuestion {
@@ -409,9 +413,10 @@ export interface StudentQuestion {
  * v3.26.0 — Renderizado 2D RDKit de estructuras químicas en opciones del quiz y Modelo 1 actualizado con Modelo B (Ahlquist, Fries, β₂, CIP y Eudismia).
  * v3.27.0 — Ocultación de nombres de fármacos en opciones con estructuras (se evita desvelar respuestas; nombres accesibles solo tras contestar y en revisión).
  * v3.28.0 — Historias del Tema 2: cartel, clip, vídeo resumen (Spotify) y píldora de audio.
+ * v3.29.0 — Aviso del Tema 2 (tipo test y recursos) en el tablón y como primera historia.
  */
-export const COURSE_DATA_VERSION = '3.28.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-06T01:15:00.000Z';
+export const COURSE_DATA_VERSION = '3.29.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-06T02:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -438,7 +443,25 @@ export const QFDOS_INFO = {
   }
 };
 
+/** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
+export const AVISOS_A_OFRECER = ['ann-tema02-tests-recursos'];
+
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-tema02-tests-recursos',
+    title: '📝 Tema 2 · Sistema Adrenérgico: ya están disponibles los tipo test y el resto de recursos',
+    content: 'Ya podéis hacer los tres modelos de examen tipo test del Tema 2 (45 preguntas en total, 15 por modelo) desde el botón de test de la tarjeta del Tema 02 en el temario. Además tenéis la píldora de audio del tema (6 min y medio), el vídeo resumen en Spotify y, en las Historias de la portada, el cartel y el clip del tema. Os recomendamos escuchar el audio y ver el resumen antes de enfrentaros a los tests.',
+    date: '6 Octubre 2026',
+    priority: 'normal',
+    imageUrl: 'historias/tema-02-brag.jpg',
+    imageCaption: 'Noradrenalina, (R): la molécula de la lucha o la huida',
+    audioUrl: 'audio/podcast_adrenergicos.mp3',
+    audioName: 'Píldora Docente 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
+    linkUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
+    linkLabel: 'Ver el vídeo resumen en Spotify',
+    enHistorias: true,
+    temaId: 'tema-02'
+  },
   {
     id: 'ann-podcast-t01',
     title: '🎙️ Nueva Píldora de Audio del Tema 1: Sistema Colinérgico (MP3 & Spotify)',
