@@ -884,7 +884,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   ? ['rcsb.org/3d-view/8J8L/1', 'estructuras/tema2/estructuras_qfdos.xlsx', 'estructuras/tema2/propiedades_qfdos.csv']
                   : [];
                 const adjuntos = (topic.attachments ?? []).filter(
-                  att => !yaIncluidos.some(u => att.url.endsWith(u))
+                  att => !yaIncluidos.some(u => att.url.endsWith(u)) && (!att.soloDocente || isProfesor)
                 );
                 if (adjuntos.length + interactivos === 0) return null;
                 return (
