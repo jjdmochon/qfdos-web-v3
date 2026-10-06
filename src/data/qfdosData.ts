@@ -20,6 +20,8 @@ export interface CourseAttachment {
 export interface TestQuestionOption {
   text: string;
   smiles?: string;
+  /** Nombre o descripción que se revela exclusivamente tras contestar o en el solucionario para mantener el rigor del examen */
+  revealedName?: string;
 }
 
 export interface TestQuestion {
@@ -405,10 +407,11 @@ export interface StudentQuestion {
  * v3.24.0 — Noticia de Isomorphic Labs en enlaces de interés y en las Historias.
  * v3.25.0 — 3 modelos oficiales de examen para el Tema 2 (Sistema Adrenérgico, 45 preguntas calibradas JEV).
  * v3.26.0 — Renderizado 2D RDKit de estructuras químicas en opciones del quiz y Modelo 1 actualizado con Modelo B (Ahlquist, Fries, β₂, CIP y Eudismia).
- * v3.27.0 — Historias del Tema 2: cartel, clip, vídeo resumen (Spotify) y píldora de audio.
+ * v3.27.0 — Ocultación de nombres de fármacos en opciones con estructuras (se evita desvelar respuestas; nombres accesibles solo tras contestar y en revisión).
+ * v3.28.0 — Historias del Tema 2: cartel, clip, vídeo resumen (Spotify) y píldora de audio.
  */
-export const COURSE_DATA_VERSION = '3.27.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-06T00:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.28.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-06T01:15:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

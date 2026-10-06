@@ -70,11 +70,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Metabolismo por COMT vs Selectividad β₂',
     badge: 'Modelo B · P4 (Isoetarina vs Salbutamol)',
     question: "Tanto la isoetarina como el salbutamol son agonistas β₂-selectivos, pero solo uno posee duración de acción prolongada. ¿Cuál de las siguientes estructuras corresponde a la isoetarina, que conserva el anillo catecólico 3,4-dihidroxilado intacto y por ello sufre rápida inactivación metabólica por la COMT?",
-    options: [
-      { text: "Salbutamol: saligenina 3-CH₂OH, 4-OH con N-terc-butilo; resiste a la COMT.", smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
-      { text: "Terbutalina: resorcinol 3,5-(OH)₂ con N-terc-butilo; resiste a la COMT por patrón meta.", smiles: 'CC(C)(C)NCC(O)c1cc(O)cc(O)c1' },
-      { text: "Formoterol: 3-formamido, 4-OH con N-arilalquilo; LABA de 12 horas resistente a COMT.", smiles: 'COc1ccc(CC(C)NCC(O)c2ccc(O)c(NC=O)c2)cc1' },
-      { text: "Isoetarina: catecol 3,4-(OH)₂ con grupo etilo en posición α; selectiva por β₂ pero metabolizada rápidamente por la COMT.", smiles: 'CCC(NC(C)C)C(O)c1ccc(O)c(O)c1' },
+    options: [      { text: 'Estructura A', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1', revealedName: 'Salbutamol (saligenina 3-CH₂OH, 4-OH con N-terc-butilo; resiste a la COMT)' },
+      { text: 'Estructura B', smiles: 'CC(C)(C)NCC(O)c1cc(O)cc(O)c1', revealedName: 'Terbutalina (resorcinol 3,5-(OH)₂ con N-terc-butilo; resiste a la COMT)' },
+      { text: 'Estructura C', smiles: 'COc1ccc(CC(C)NCC(O)c2ccc(O)c(NC=O)c2)cc1', revealedName: 'Formoterol (3-formamido, 4-OH con N-arilalquilo; LABA de 12 h)' },
+      { text: 'Estructura D', smiles: 'CCC(NC(C)C)C(O)c1ccc(O)c(O)c1', revealedName: 'Isoetarina (catecol 3,4-(OH)₂ con grupo etilo en posición α)' }
+    
     ],
     correctIndex: 3,
     explanation: "Justificación Química: La isoetarina (opción D) logra selectividad β₂ frente a β₁ gracias a la presencia del sustituyente etilo en el carbono alfa de la cadena lateral. Sin embargo, conserva el anillo catecólico (3,4-dihidroxifenilo), por lo que es un excelente sustrato para la catecol-O-metiltransferasa (COMT), que metila rápidamente el grupo 3-OH inactivándola. Esto demuestra que la selectividad de receptor y la resistencia metabólica son propiedades farmacológicas independientes gobernadas por distintas zonas del farmacóforo.\n\n• Distractor a: Salbutamol: Resiste a la COMT gracias al grupo hidroximetilo (alcohol saligenínico).\n• Distractor b: Terbutalina: Resiste a la COMT por su núcleo resorcinólico 1,3,5.\n• Distractor c: Formoterol: Resiste a la COMT y presenta semivida prolongada como LABA.",
@@ -86,11 +86,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Génesis de las Ariloxipropanolaminas',
     badge: 'Modelo B · P5 (Puente Oximetilénico)',
     question: "El propranolol inauguró la clase de las ariloxipropanolaminas, el molde estructural de los β-bloqueantes modernos. ¿Cuál de las siguientes estructuras corresponde al propranolol, que incorpora un puente oximetilénico (-O-CH₂-) intercalado entre el anillo aromático y la cadena de propanolamina?",
-    options: [
-      { text: "Propranolol: puente oximetilénico -O-CH₂- entre el naftaleno y la cadena de propanolamina.", smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' },
-      { text: "Pronetalol: ariletanolamina naftílica unida directamente al anillo sin oxígeno intercalado.", smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1' },
-      { text: "Isoprenalina: agonista catecólico con cadena etanolamínica directa sobre el anillo.", smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1' },
-      { text: "Dicloroisoproterenol: ariletanolamina diclorada, prototipo de antagonista sin puente oximetilénico.", smiles: 'CC(C)NCC(O)c1ccc(Cl)c(Cl)c1' },
+    options: [      { text: 'Estructura A', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12', revealedName: 'Propranolol (puente oximetilénico -O-CH₂- entre naftaleno y cadena)' },
+      { text: 'Estructura B', smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1', revealedName: 'Pronetalol (ariletanolamina naftílica directa sin puente oximetilénico)' },
+      { text: 'Estructura C', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1', revealedName: 'Isoprenalina (ariletanolamina catecólica directa)' },
+      { text: 'Estructura D', smiles: 'CC(C)NCC(O)c1ccc(Cl)c(Cl)c1', revealedName: 'Dicloroisoproterenol / DCI (ariletanolamina diclorada)' }
+    
     ],
     correctIndex: 0,
     explanation: "Justificación Química: En la evolución de los antagonistas beta, las primeras moléculas (dicloroisoproterenol y pronetalol) eran ariletanolaminas (cadena -CH(OH)-CH2-NHR unida directamente al arilo). El descubrimiento del propranolol (opción A) introdujo un átomo de oxígeno entre el anillo naftaleno y la cadena carbonada, formando un puente oximetilénico (-O-CH2-). Este oxígeno añade un átomo a la cadena (ariloxipropanolamina), modificando la conformación espacial y maximizando el bloqueo competitivo del receptor beta.\n\n• Distractor b: Pronetalol: Es una ariletanolamina naftílica directa, sin puente oximetilénico.\n• Distractor c: Isoprenalina: Es el agonista beta de referencia (ariletanolamina catecólica).\n• Distractor d: Dicloroisoproterenol: Primer bloqueante beta pero con estructura de ariletanolamina directa.",
@@ -136,11 +136,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Agonistas Indirectos: Feniletilaminas',
     badge: 'Modelo B · P8 (Metanfetamina)',
     question: "La dexanfetamina ((S)-(+)-anfetamina) es el eutómero estimulante central entre los simpaticomiméticos indirectos. ¿Cuál de las siguientes estructuras corresponde a la metanfetamina, su homólogo N-metilado de mayor lipofilia y penetración en el SNC?",
-    options: [
-      { text: "Anfetamina: amina primaria sin sustitución sobre el nitrógeno.", smiles: 'CC(N)Cc1ccccc1' },
-      { text: "Fentermina: amina primaria con dos grupos metilo en el carbono alfa (sin quiralidad).", smiles: 'CC(C)(N)Cc1ccccc1' },
-      { text: "Efedrina: amina secundaria N-metilada con un grupo hidroxilo bencílico adicional.", smiles: 'CC(NC)[C@@H](O)c1ccccc1' },
-      { text: "Metanfetamina: amina secundaria monometilada en el nitrógeno (N-metilanfetamina).", smiles: 'CNC(C)Cc1ccccc1' },
+    options: [      { text: 'Estructura A', smiles: 'CC(N)Cc1ccccc1', revealedName: 'Anfetamina (amina primaria sin sustitución en nitrógeno)' },
+      { text: 'Estructura B', smiles: 'CC(C)(N)Cc1ccccc1', revealedName: 'Fentermina (amina primaria con dos metilos en C-alfa)' },
+      { text: 'Estructura C', smiles: 'CC(NC)[C@@H](O)c1ccccc1', revealedName: 'Efedrina (amina secundaria N-metilada con OH bencílico)' },
+      { text: 'Estructura D', smiles: 'CNC(C)Cc1ccccc1', revealedName: 'Metanfetamina (amina secundaria monometilada en nitrógeno)' }
+    
     ],
     correctIndex: 3,
     explanation: "Justificación Química: La metanfetamina (opción D) es la N-metilanfetamina, una amina secundaria donde el nitrógeno porta un grupo metilo. Esta sustitución N-metilo incrementa el coeficiente de reparto octanol/agua (logP), facilitando una difusión pasiva más rápida a través de la barrera hematoencefálica (BHE) y potenciando su acción neuroestimulante central y liberadora de dopamina y noradrenalina.\n\n• Distractor a: Anfetamina: Es la amina primaria de referencia (-NH2).\n• Distractor b: Fentermina: Lleva dos grupos metilo en C-alfa (-C(CH3)2-NH2), no en el nitrógeno.\n• Distractor c: Efedrina: Porta un hidroxilo bencílico secundario, siendo un agonista de acción mixta con dos centros quirales.",
@@ -169,11 +169,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'REA de Agonistas Indirectos',
     badge: 'Modelo B · P10 (Lipofilia & Acceso SNC)',
     question: "Los agonistas adrenérgicos indirectos actúan promoviendo la liberación de noradrenalina vesicular en lugar de activar directamente el receptor. ¿Cuál de las siguientes estructuras representa el prototipo de agonista indirecto que carece totalmente de hidroxilos fenólicos y bencílicos, lo que maximiza su lipofilia y penetración al SNC?",
-    options: [
-      { text: "Noradrenalina: conserva catecol 3,4-(OH)₂ y OH bencílico (agonista directo puro, nulo paso a SNC).", smiles: 'NC[C@H](O)c1ccc(O)c(O)c1' },
-      { text: "Anfetamina: carece de hidroxilos fenólicos y de OH bencílico, penetra pasivamente la BHE y actúa como liberador indirecto.", smiles: 'CC(N)Cc1ccccc1' },
-      { text: "Salbutamol: conserva función fenólica y alcohol saligenínico (agonista directo periférico).", smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
-      { text: "Clonidina: anilina clorada unida a imidazolina (agonista α₂ directo central).", smiles: 'Clc1cccc(Cl)c1NC1=NCCN1' },
+    options: [      { text: 'Estructura A', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', revealedName: 'Noradrenalina (conserva catecol 3,4-(OH)₂ y OH bencílico)' },
+      { text: 'Estructura B', smiles: 'CC(N)Cc1ccccc1', revealedName: 'Anfetamina (carece de hidroxilos fenólicos y de OH bencílico)' },
+      { text: 'Estructura C', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1', revealedName: 'Salbutamol (conserva alcohol saligenínico polar)' },
+      { text: 'Estructura D', smiles: 'Clc1cccc(Cl)c1NC1=NCCN1', revealedName: 'Clonidina (derivado 2,6-dicloroanilino-imidazolina)' }
+    
     ],
     correctIndex: 1,
     explanation: "Justificación Química: La anfetamina (opción B) carece de los grupos hidroxilo fenólicos en las posiciones 3 y 4 del anillo y carece del hidroxilo bencílico en la cadena lateral. Esta ausencia de funciones polares donadoras de enlaces de hidrógeno aumenta de manera muy notable su coeficiente de lipofilia (logP), permitiéndole cruzar con facilidad la barrera hematoencefálica por difusión pasiva. Una vez en el citoplasma neuronal, actúa como sustrato del transportador de recaptación (NET) e induce la liberación no vesicular de noradrenalina hacia la hendidura sináptica.\n\n• Distractor a: Noradrenalina: Es el neurotransmisor fisiológico directo, muy polar y excluida del SNC.\n• Distractor c: Salbutamol: Agonista β₂ directo diseñado para evitar efectos centrales.\n• Distractor d: Clonidina: Agonista directo de receptores α₂ presinápticos.",
@@ -201,11 +201,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Antagonistas α₁: Núcleo Quinazolínico',
     badge: 'Modelo B · P12 (Prazosina)',
     question: "Entre los fármacos antagonistas adrenérgicos, uno destaca como antagonista competitivo altamente selectivo de los receptores α₁ postsinápticos vasculares, de estructura quinazolínica con núcleo piperazina y furoílo, utilizado en la hipertensión arterial y en la hiperplasia benigna de próstata (HBP). ¿Cuál es?",
-    options: [
-      { text: "Fenoxibenzamina: β-haloalquilamina que forma un ion aziridinio alquilante covalente irreversible.", smiles: 'CCOC(C)CN(CCCl)Cc1ccccc1' },
-      { text: "Fentolamina: imidazolina antagonista α₁/α₂ competitiva no selectiva de semivida corta.", smiles: 'Cc1ccc(N(Cc2ccccc2)Cc2nc[nH]2)cc1O' },
-      { text: "Yohimbina: alcaloide indólico antagonista selectivo de los autorreceptores α₂ presinápticos.", smiles: 'COC(=O)[C@H]1[C@@H]2C[C@@H]3c4[nH]c5ccccc5c4CCN3C[C@H]2C[C@@H](O)[C@@H]1C' },
-      { text: "Prazosina: quinazolina 6,7-dimetoxilada unida a piperazina y 2-furoílo, antagonista α₁ selectivo.", smiles: 'COc1cc2nc(N3CCN(C(=O)c4ccco4)CC3)nc(N)c2cc1OC' },
+    options: [      { text: 'Estructura A', smiles: 'CCOC(C)CN(CCCl)Cc1ccccc1', revealedName: 'Fenoxibenzamina (β-haloalquilamina con catión aziridinio)' },
+      { text: 'Estructura B', smiles: 'Cc1ccc(N(Cc2ccccc2)Cc2nc[nH]2)cc1O', revealedName: 'Fentolamina (imidazolina reversible no selectiva)' },
+      { text: 'Estructura C', smiles: 'COC(=O)[C@H]1[C@@H]2C[C@@H]3c4[nH]c5ccccc5c4CCN3C[C@H]2C[C@@H](O)[C@@H]1C', revealedName: 'Yohimbina (alcaloide indólico antagonista α₂)' },
+      { text: 'Estructura D', smiles: 'COc1cc2nc(N3CCN(C(=O)c4ccco4)CC3)nc(N)c2cc1OC', revealedName: 'Prazosina (quinazolina 6,7-dimetoxilada con piperazina y furoílo)' }
+    
     ],
     correctIndex: 3,
     explanation: "Justificación Química: La prazosina (opción D) es el prototipo de los antagonistas α₁ selectivos. Su estructura química está constituida por un núcleo de 2,4-diamino-6,7-dimetoxiquinazolina enlazado a un anillo central de piperazina acilado con un grupo 2-furoílo. Al antagonizar competitivamente los receptores α₁ postsinápticos del músculo liso vascular sin bloquear los autorreceptores α₂ presinápticos, evita la liberación refleja de noradrenalina y previene la taquicardia refleja.\n\n• Distractor a: Fenoxibenzamina: Bloqueante α irreversible por alquilación covalente vía aziridinio.\n• Distractor b: Fentolamina: Antagonista reversible no selectivo derivado de imidazolina.\n• Distractor c: Yohimbina: Bloqueante selectivo de autorreceptores α₂.",
@@ -217,11 +217,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Eudismia en Ariloxipropanolaminas',
     badge: 'Modelo B · P13 ((S)-Propranolol Eutómero)',
     question: "En las ariloxipropanolaminas, el enantiómero más potente (eutómero) posee configuración absoluta (S), a diferencia de las ariletanolaminas donde el eutómero es (R). ¿Cuál de las siguientes estructuras representa al eutómero biológicamente activo (S)-propranolol?",
-    options: [
-      { text: "(S)-Propranolol: configuración (S) en el carbono carbinólico, orienta el OH hacia el residuo conservado del receptor β.", smiles: 'CC(C)NC[C@H](O)COc1cccc2ccccc12' },
-      { text: "(R)-Propranolol: configuración (R), distómero con afinidad hasta 100 veces inferior.", smiles: 'CC(C)NC[C@@H](O)COc1cccc2ccccc12' },
-      { text: "Desoxipropranolol: análogo desoxigenado carente de centro estereogénico y de función OH carbinólica.", smiles: 'CC(C)NCCCOc1cccc2ccccc12' },
-      { text: "Pronetalol: ariletanolamina naftílica directa cuyo eutómero es el enantiómero (R).", smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1' },
+    options: [      { text: 'Estructura A', smiles: 'CC(C)NC[C@H](O)COc1cccc2ccccc12', revealedName: '(S)-Propranolol (eutómero activo en carbono carbinólico)' },
+      { text: 'Estructura B', smiles: 'CC(C)NC[C@@H](O)COc1cccc2ccccc12', revealedName: '(R)-Propranolol (distómero con afinidad hasta 100 veces inferior)' },
+      { text: 'Estructura C', smiles: 'CC(C)NCCCOc1cccc2ccccc12', revealedName: 'Desoxipropranolol (análogo desoxigenado sin estereocentro)' },
+      { text: 'Estructura D', smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1', revealedName: 'Pronetalol (ariletanolamina naftílica directa)' }
+    
     ],
     correctIndex: 0,
     explanation: "Justificación Química: El eutómero activo del propranolol es el enantiómero (S)-propranolol (opción A). La aparente inversión en la letra de configuración entre ariletanolaminas (R) y ariloxipropanolaminas (S) se debe exclusivamente a una regla formal de prioridad CIP: al intercalar el oxígeno del puente oximetilénico (-O-CH2-), el carbono alifático adyacente pasa a tener mayor prioridad que el carbono aromático, invirtiendo la designación (R/S) sin alterar la orientación tridimensional efectiva del grupo hidroxilo en el bolsillo de unión del receptor.\n\n• Distractor b: (R)-Propranolol: Distómero de muy baja afinidad beta-bloqueante.\n• Distractor c: Desoxipropranolol: Carece del grupo -OH que realiza el enlace de hidrógeno esencial con el receptor.\n• Distractor d: Pronetalol: Es una ariletanolamina y su eutómero activo es (R).",
@@ -250,11 +250,11 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Dualidad Agonista vs Antagonista β₂',
     badge: 'Modelo B · P15 (Agonismo vs Antagonismo β₂)',
     question: "El receptor adrenérgico β₂ bronquial ilustra de forma ejemplar la dualidad farmacológica entre agonistas y antagonistas sobre una misma diana terapéutica. ¿Qué pareja de fármacos refleja con precisión esta oposición de efectos clínicos sobre el receptor β₂ pulmonar?",
-    options: [
-      { text: "Clonidina (agonista α₂ central) frente a Prazosina (antagonista α₁ periférico); ambos sin acción bronquial.", smiles: 'Clc1cccc(Cl)c1NC1=NCCN1' },
-      { text: "Fenoxibenzamina (antagonista α irreversible) frente a Fentolamina (antagonista α reversible); ambos ajenos al árbol bronquial.", smiles: 'CCOC(C)CN(CCCl)Cc1ccccc1' },
-      { text: "Salbutamol (agonista selectivo β₂, induce broncodilatación terapéutica en asma) frente a Propranolol (antagonista no selectivo β₁/β₂, provoca broncoconstricción refleja y está contraindicado en pacientes asmáticos).", smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1' },
-      { text: "Reserpina (depletor vesicular presináptico) frente a Guanetidina (bloqueante de la exocitosis); ambos sin contacto directo con el receptor β₂.", smiles: 'COc1cc2c(cc1OC)[C@@H]1[C@@H]3C[C@H](OC(=O)c4cc(OC)c(OC)c(OC)c4)[C@@H](OC)C[C@H]3N2CCC1' },
+    options: [      { text: 'Clonidina (agonista α₂ central) frente a Prazosina (antagonista α₁ periférico); ambos sin acción bronquial.' },
+      { text: 'Fenoxibenzamina (antagonista α irreversible) frente a Fentolamina (antagonista α reversible); ambos ajenos al árbol bronquial.' },
+      { text: 'Salbutamol (agonista selectivo β₂, induce broncodilatación terapéutica en asma) frente a Propranolol (antagonista no selectivo β₁/β₂, provoca broncoconstricción refleja y está contraindicado en pacientes asmáticos).' },
+      { text: 'Reserpina (depletor vesicular presináptico) frente a Guanetidina (bloqueante de la exocitosis); ambos sin contacto directo con el receptor β₂.' }
+    
     ],
     correctIndex: 2,
     explanation: "Justificación Química: El receptor β₂ bronquial está acoplado a proteína Gs, aumentando el AMPc intracelular y fosforilando la quinasa de las cadenas ligeras de miosina (MLCK), lo que produce relajación de la musculatura lisa (broncodilatación). El salbutamol actúa como agonista selectivo de este receptor aliviando el broncoespasmo. En contraste, el propranolol es un antagonista competitivo no selectivo (β₁ y β₂): al ocupar el receptor β₂ bloquea la vía del AMPc, desencadenando broncoconstricción severa potencialmente letal, lo que contraindica formalmente los β-bloqueantes no selectivos en asma y EPOC.\n\n• Distractores a, b, d: Actúan sobre receptores alfa adrenérgicos o sobre los mecanismos presinápticos de almacenamiento y liberación de catecolaminas, sin actividad sobre el receptor β₂ bronquial.",
@@ -274,10 +274,10 @@ export const TEMA2_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: 'JEV 2 · P1 (Estructura 2D)',
     question: '¿Cuál de las siguientes estructuras corresponde al dicloroisoproterenol (DCI), primer β-bloqueante sintetizado en 1958 donde se reemplazaron los dos OH catecólicos por átomos de cloro, mostrando agonismo parcial?',
     options: [
-      { text: 'Isoprenalina (catecolamina agonista beta clásica completa)', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1' },
-      { text: 'Pronetalol (primer antagonista beta puro con núcleo de naftilo)', smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1' },
-      { text: 'Dicloroisoproterenol / DCI (3,4-diclorofenil feniletanolamina con agonismo parcial)', smiles: 'CC(C)NCC(O)c1ccc(Cl)c(Cl)c1' },
-      { text: 'Propranolol (ariloxipropanolamina prototipo no selectivo)', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' }
+      { text: 'Estructura A', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1', revealedName: 'Isoprenalina (catecolamina agonista beta clásica completa)' },
+      { text: 'Estructura B', smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1', revealedName: 'Pronetalol (primer antagonista beta puro con núcleo de naftilo)' },
+      { text: 'Estructura C', smiles: 'CC(C)NCC(O)c1ccc(Cl)c(Cl)c1', revealedName: 'Dicloroisoproterenol / DCI (3,4-diclorofenil feniletanolamina con agonismo parcial)' },
+      { text: 'Estructura D', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12', revealedName: 'Propranolol (ariloxipropanolamina prototipo no selectivo)' }
     ],
     correctIndex: 2,
     explanation: 'Justificación Química: El dicloroisoproterenol (DCI, opción C) fue obtenido sustituyendo los dos hidroxilos catecólicos (3,4-di-OH) de la isoprenalina por dos átomos de cloro (3,4-diclorofenilo). Esta modificación eliminó los donadores de enlace de hidrógeno esenciales para la activación completa del receptor pero conservó suficiente afinidad para bloquear la respuesta de la adrenalina. No obstante, conservaba una notable actividad simpaticomimética intrínseca (ISA / agonismo parcial) que impedía su uso seguro en clínica.\n\n• Distractor a: Isoprenalina: Catecolamina agonista beta clásica completa, dotada de dos OH fenólicos.\n• Distractor b: Pronetalol: Posee un anillo condensado de naftilo; fue el primer antagonista beta puro sin actividad agonista residual.\n• Distractor d: Propranolol: Ariloxipropanolamina con espaciador oxietileno entre el naftilo y la cadena propanolamina.',
@@ -307,10 +307,10 @@ export const TEMA2_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: 'JEV 2 · P3 (Estructura 2D)',
     question: '¿Qué estructura química representa al propranolol, prototipo de los β-bloqueantes que inaugura la familia de las ariloxipropanolaminas al incorporar un espaciador oximetileno (-O-CH2-) entre el naftilo y la cadena de propanolamina?',
     options: [
-      { text: 'Pronetalol (ariletanolamina naftílica directa sin oxígeno etéreo)', smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1' },
-      { text: 'Practolol (ariloxipropanolamina monocíclica p-acetamido)', smiles: 'CC(=O)Nc1ccc(OCC(O)CNC(C)C)cc1' },
-      { text: 'Atenolol (ariloxipropanolamina p-acetamida cardioselectiva β₁)', smiles: 'NC(=O)Cc1ccc(OCC(O)CNC(C)C)cc1' },
-      { text: 'Propranolol (1-naftil ariloxipropanolamina no selectiva)', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' }
+      { text: 'Estructura A', smiles: 'CC(C)NCC(O)c1ccc2ccccc2c1', revealedName: 'Pronetalol (ariletanolamina naftílica directa sin oxígeno etéreo)' },
+      { text: 'Estructura B', smiles: 'CC(=O)Nc1ccc(OCC(O)CNC(C)C)cc1', revealedName: 'Practolol (ariloxipropanolamina monocíclica p-acetamido)' },
+      { text: 'Estructura C', smiles: 'NC(=O)Cc1ccc(OCC(O)CNC(C)C)cc1', revealedName: 'Atenolol (ariloxipropanolamina p-acetamida cardioselectiva β₁)' },
+      { text: 'Estructura D', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12', revealedName: 'Propranolol (1-naftil ariloxipropanolamina no selectiva)' }
     ],
     correctIndex: 3,
     explanation: 'Justificación Química: El propranolol (opción D) es el fármaco de referencia de las ariloxipropanolaminas: presenta un anillo 1-naftilo conectado a una cadena de -O-CH2-CH(OH)-CH2-NH-CH(CH3)2. La inserción de la unidad oxietileno (-O-CH2-) aumentó de 10 a 20 veces la potencia antagonista beta respecto al pronetalol (opción A) y suprimió completamente la carcinogenicidad tímica observada en su predecesor.\n\n• Distractor a: Pronetalol: Es una ariletanolamina (unión naftilo directa al C-OH sin oxígeno etéreo intercalado).\n• Distractor b: Practolol: Ariloxipropanolamina monocíclica con sustituyente acetamido en para (-NH-CO-CH3), cardioselectivo β₁.\n• Distractor c: Atenolol: Ariloxipropanolamina con sustituyente acetamida terminal (-CH2-CO-NH2) en posición para.',
@@ -340,10 +340,10 @@ export const TEMA2_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: 'JEV 2 · P5 (Estructura 2D)',
     question: '¿Cuál de las siguientes estructuras representa al atenolol, antagonista cardioselectivo β₁ que posee una función acetamida terminal en la posición para del anillo bencénico?',
     options: [
-      { text: 'Propranolol (bloqueante no cardioselectivo muy lipófilo)', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12' },
-      { text: 'Carvedilol (bloqueante mixto beta y alfa-1 con carbazol)', smiles: 'COc1ccccc1OCCNCC(O)COc2cccc3[nH]c4ccccc4c23' },
-      { text: 'Atenolol (ariloxipropanolamina p-acetamida cardioselectiva β₁)', smiles: 'NC(=O)Cc1ccc(OCC(O)CNC(C)C)cc1' },
-      { text: 'Metoprolol (beta-1 selectivo con p-metoxietilo)', smiles: 'COCCc1ccc(OCC(O)CNC(C)C)cc1' }
+      { text: 'Estructura A', smiles: 'CC(C)NCC(O)COc1cccc2ccccc12', revealedName: 'Propranolol (bloqueante no cardioselectivo muy lipófilo)' },
+      { text: 'Estructura B', smiles: 'COc1ccccc1OCCNCC(O)COc2cccc3[nH]c4ccccc4c23', revealedName: 'Carvedilol (bloqueante mixto beta y alfa-1 con carbazol)' },
+      { text: 'Estructura C', smiles: 'NC(=O)Cc1ccc(OCC(O)CNC(C)C)cc1', revealedName: 'Atenolol (ariloxipropanolamina p-acetamida cardioselectiva β₁)' },
+      { text: 'Estructura D', smiles: 'COCCc1ccc(OCC(O)CNC(C)C)cc1', revealedName: 'Metoprolol (beta-1 selectivo con p-metoxietilo)' }
     ],
     correctIndex: 2,
     explanation: 'Justificación Química: El atenolol (opción C) es un antagonista β₁ selectivo de segunda generación. Su estructura química se caracteriza por un anillo bencénico para-sustituido con el grupo 2-(4-hidroxifenil)acetamida (-CH2-CO-NH2) conectado a la cadena de ariloxipropanolamina. Esta función amida polar terminal interacciona específicamente con un bolsillo complementario del subtipo β₁ miocárdico y le otorga gran hidrofilia, reduciendo drásticamente su paso al SNC.\n\n• Distractor a: Propranolol: Bloqueante no cardioselectivo muy lipófilo con anillo de 1-naftilo.\n• Distractor b: Carvedilol: Bloqueante mixto beta-no-selectivo y α₁ con núcleo de carbazol y grupo fenoxietilamino.\n• Distractor d: Metoprolol: β₁ selectivo pero portador de un éter alifático en para (-CH2-CH2-OCH3), más lipófilo que el atenolol.',
@@ -389,11 +389,11 @@ export const TEMA2_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Antagonistas Alfa Irreversibles',
     badge: 'JEV 2 · P8 (Estructura 2D)',
     question: '¿Qué estructura corresponde a la fenoxibenzamina, antagonista alfa-adrenérgico irreversible que forma espontáneamente un ion aziridinio cíclico altamente electrófilo que alquila al receptor?',
-    options: [
-      { text: 'Fenoxibenzamina (β-haloetilamina alquilante irreversible)', smiles: 'c1ccccc1CN(CCCl)C(C)COc2ccccc2' },
-      { text: 'Prazosina (quinazolina antagonista selectivo α₁)', smiles: 'COc1cc2nc(nc(N)c2cc1OC)N3CCN(CC3)C(=O)c4ccco4' },
-      { text: 'Fentolamina (antagonista alfa competitivo reversible derivado de imidazolina)', smiles: 'Cc1ccc(N(CC2=NCCN2)c2cccc(O)c2)cc1' },
-      { text: 'Tolazolina (antagonista alfa simple)', smiles: 'c1ccc(CC2=NCCN2)cc1' }
+    options: [      { text: 'Estructura A', smiles: 'c1ccccc1CN(CCCl)C(C)COc2ccccc2', revealedName: 'Fenoxibenzamina (β-haloetilamina alquilante irreversible)' },
+      { text: 'Estructura B', smiles: 'COc1cc2nc(nc(N)c2cc1OC)N3CCN(C(=O)c4ccco4)CC3', revealedName: 'Prazosina (quinazolina antagonista selectivo α₁)' },
+      { text: 'Estructura C', smiles: 'Cc1ccc(N(Cc2ccccc2)Cc2nc[nH]2)cc1O', revealedName: 'Fentolamina (antagonista alfa competitivo reversible derivado de imidazolina)' },
+      { text: 'Estructura D', smiles: 'c1ccc(CC2=NCCN2)cc1', revealedName: 'Tolazolina (antagonista alfa simple)' }
+    
     ],
     correctIndex: 0,
     explanation: 'Justificación Química: La fenoxibenzamina (opción A) pertenece a la clase de las β-haloetilaminas (mostazas nitrogenadas). Está constituida por un grupo bencilamina secundario sustituido con una cadena 2-cloroetilo (-CH2-CH2-Cl) y un grupo 1-metil-2-fenoxietilo (-CH(CH3)-CH2-O-Ph). A pH fisiológico, el nitrógeno terciario ataca intramolecularmente al carbono beta con salida del cloruro por sustitución nucleófila interna, generando un catión aziridinio cíclico de tres miembros de gran reactividad que alquila covalentemente un resto nucleófilo en el receptor alfa.\n\n• Distractor b: Prazosina: Es una quinazolina sustituida con piperazina y furoilo, antagonista competitivo selectivo α₁.\n• Distractor c: Fentolamina: Antagonista alfa competitivo reversible derivado de imidazolina.\n• Distractor d: Tolazolina: Agonista/antagonista alfa simple competitivo con heterociclo de 2-imidazolina.',
@@ -405,11 +405,11 @@ export const TEMA2_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     block: 'Antagonistas Selectivos Alfa-1',
     badge: 'JEV 2 · P9 (Estructura 2D)',
     question: 'Observe las siguientes estructuras. ¿Cuál corresponde a la prazosina, antagonista selectivo α₁ postsináptico constituido por un núcleo heterocíclico de quinazolina fusionado a un anillo de piperazina acilada con 2-furoilo?',
-    options: [
-      { text: 'Fentolamina (antagonista no selectivo α₁/α₂)', smiles: 'Cc1ccc(N(CC2=NCCN2)c2cccc(O)c2)cc1' },
-      { text: 'Clonidina (derivado 2,6-dicloroanilino-imidazolínico)', smiles: 'Clc1cccc(Cl)c1NC2=NCCN2' },
-      { text: 'Fenoxibenzamina (β-haloetilamina alquilante)', smiles: 'c1ccccc1CN(CCCl)C(C)COc2ccccc2' },
-      { text: 'Prazosina (4-amino-6,7-dimetoxiquinazolina α₁ selectiva)', smiles: 'COc1cc2nc(nc(N)c2cc1OC)N3CCN(CC3)C(=O)c4ccco4' }
+    options: [      { text: 'Estructura A', smiles: 'Cc1ccc(N(CC2=NCCN2)c2cccc(O)c2)cc1', revealedName: 'Fentolamina (antagonista no selectivo α₁/α₂)' },
+      { text: 'Estructura B', smiles: 'Clc1cccc(Cl)c1NC2=NCCN2', revealedName: 'Clonidina (derivado 2,6-dicloroanilino-imidazolínico)' },
+      { text: 'Estructura C', smiles: 'c1ccccc1CN(CCCl)C(C)COc2ccccc2', revealedName: 'Fenoxibenzamina (β-haloetilamina alquilante)' },
+      { text: 'Estructura D', smiles: 'COc1cc2nc(nc(N)c2cc1OC)N3CCN(C(=O)c4ccco4)CC3', revealedName: 'Prazosina (4-amino-6,7-dimetoxiquinazolina α₁ selectiva)' }
+    
     ],
     correctIndex: 3,
     explanation: 'Justificación Química: La prazosina (opción D) es el prototipo de los antagonistas α₁ postsinápticos de núcleo quinazolínico. Su estructura molecular comprende: 1) un heterociclo bicíclico de 4-amino-6,7-dimetoxiquinazolina, 2) un puente intermedio de piperazina, y 3) una función carbonilo acilada con un anillo de furano (2-furoilo). Al bloquear selectivamente los receptores α₁ vasculares sin antagonizar los autorreceptores α₂ presinápticos, causa vasodilatación arteriolar sin provocar la taquicardia refleja masiva característica de los bloqueantes no selectivos.\n\n• Distractor a: Fentolamina: Antagonista no selectivo α₁/α₂ con núcleo de fenol e imidazolina.\n• Distractor b: Clonidina: Derivado 2,6-dicloroanilino-imidazolínico, agonista α₂.\n• Distractor c: Fenoxibenzamina: β-haloetilamina bloqueante irreversible no selectiva.',
