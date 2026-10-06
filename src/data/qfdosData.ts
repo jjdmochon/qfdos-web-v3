@@ -15,6 +15,8 @@ export interface CourseAttachment {
   date: string;
   spotifyUri?: string;
   isPodcastVideo?: boolean;
+  /** Solo lo ve el profesorado (el alumnado no lo ve aunque el tema esté publicado) */
+  soloDocente?: boolean;
 }
 
 export interface TestQuestionOption {
@@ -414,9 +416,10 @@ export interface StudentQuestion {
  * v3.27.0 — Ocultación de nombres de fármacos en opciones con estructuras (se evita desvelar respuestas; nombres accesibles solo tras contestar y en revisión).
  * v3.28.0 — Historias del Tema 2: cartel, clip, vídeo resumen (Spotify) y píldora de audio.
  * v3.29.0 — Aviso del Tema 2 (tipo test y recursos) en el tablón y como primera historia.
+ * v3.30.0 — Generador de estructuras del Tema 3 como adjunto solo para el profesorado.
  */
-export const COURSE_DATA_VERSION = '3.29.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-06T02:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.30.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-06T13:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -3437,7 +3440,17 @@ flashcards: [
         rotBonds: 3
       }
     ],
-    attachments: [],
+    attachments: [
+      {
+        id: 'att-t03-generador-estructuras',
+        title: 'Generador de estructuras del Tema 3 (RDKit · Python): regenera CSV, XLSX, imágenes y figuras QFDOS-127 a 169',
+        type: 'data',
+        url: 'estructuras/tema3/generar_tema3_completo.py',
+        size: '40 KB',
+        date: '06/10/2026',
+        soloDocente: true
+      }
+    ],
     testQuestions: [
       {
         id: 't03-q1',
