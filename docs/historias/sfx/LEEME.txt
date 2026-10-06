@@ -1,0 +1,4 @@
+Efectos de sonido de las Historias (abrir.mp3, deslizar.mp3, toque.mp3).
+Proceden de los paquetes de Kenney (kenney.nl), licencia CC0 (dominio publico):
+impact/impactSoft_medium_001, casino/card-slide-3 y ui/click2. Convertidos a MP3 mono
+de 64 kbps para que suenen tambien en iOS y pesen menos de 6 KB cada uno.
