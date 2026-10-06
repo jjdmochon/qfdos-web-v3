@@ -571,7 +571,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         const getOptText = (optIndex: number) => {
           if (optIndex < 0 || optIndex >= q.options.length) return 'Sin respuesta';
           const opt = q.options[optIndex];
-          return typeof opt === 'string' ? opt : opt.text;
+          if (typeof opt === 'string') return opt;
+          if (opt.revealedName) return `${opt.text} (${opt.revealedName})`;
+          return opt.text;
         };
 
         return {
@@ -2029,6 +2031,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     {currentQ.options.map((opt, idx) => {
                       const optText = typeof opt === 'string' ? opt : opt.text;
                       const optSmiles = typeof opt === 'string' ? undefined : opt.smiles;
+                      const optRevealedName = typeof opt === 'string' ? undefined : opt.revealedName;
 
                       let optionBg = 'var(--surface)';
                       let optionBorder = 'var(--border-color)';
@@ -2085,13 +2088,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                             >
                               {String.fromCharCode(65 + idx)}
                             </span>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 }}>
-                              <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minWidth: 0 }}>
+                              <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45, fontWeight: optSmiles ? 600 : 400 }}>
                                 {optText}
                               </span>
                               {optSmiles && (
                                 <div style={{ 
-                                  marginTop: '4px', 
+                                  marginTop: '2px', 
                                   padding: '4px 8px',
                                   borderRadius: 'var(--radius-sm)',
                                   background: 'var(--surface-alt)',
@@ -2101,6 +2104,23 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   justifyContent: 'center'
                                 }}>
                                   <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} />
+                                </div>
+                              )}
+                              {showExplanation && optRevealedName && (
+                                <div style={{
+                                  fontSize: '0.78rem',
+                                  fontWeight: 700,
+                                  color: idx === currentQ.correctIndex ? 'var(--ok-ink)' : 'var(--text-muted)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  marginTop: '2px',
+                                  padding: '3px 8px',
+                                  borderRadius: 'var(--radius-sm)',
+                                  background: idx === currentQ.correctIndex ? 'rgba(16, 185, 129, 0.08)' : 'rgba(100, 116, 139, 0.08)'
+                                }}>
+                                  <span>Fármaco:</span>
+                                  <span>{optRevealedName}</span>
                                 </div>
                               )}
                             </div>
