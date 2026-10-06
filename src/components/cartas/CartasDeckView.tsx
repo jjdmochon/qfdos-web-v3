@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import rawTema01 from '../../data/farmacosTema01.json';
 import rawTema02 from '../../data/farmacosTema02.json';
+import rawTema03 from '../../data/farmacosTema03.json';
 import { MoleculeDrug } from '../../data/qfdosData';
 import './cartas.css';
 import {
@@ -45,7 +46,7 @@ export interface FarmacoCarta {
   examen: string;
 }
 
-export type TemaCartas = 1 | 2;
+export type TemaCartas = 1 | 2 | 3;
 
 interface BarajaTema {
   tema: number;
@@ -58,6 +59,7 @@ interface BarajaTema {
 export const BARAJAS: Record<TemaCartas, BarajaTema & { familia: string }> = {
   1: { ...(rawTema01 as unknown as BarajaTema), familia: 'Colinérgicos' },
   2: { ...(rawTema02 as unknown as BarajaTema), familia: 'Adrenérgicos' },
+  3: { ...(rawTema03 as unknown as BarajaTema), familia: 'Dopaminérgicos' },
 };
 
 export interface CartasDeckViewProps {

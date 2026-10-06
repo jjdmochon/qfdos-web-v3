@@ -141,7 +141,8 @@ export interface MoleculeDrug {
  * panel, que puede traer los fármacos en otro orden.
  */
 const MOLECULA_DE_TARJETA: Record<string, RegExp> = {
-  'tema-02': /salbutamol/i
+  'tema-02': /salbutamol/i,
+  'tema-03': /^haloperidol$/i
 };
 
 export function moleculaDeTarjeta(topic: { id: string; drugs?: MoleculeDrug[] }): MoleculeDrug | undefined {
@@ -417,8 +418,9 @@ export interface StudentQuestion {
  * v3.28.0 — Historias del Tema 2: cartel, clip, vídeo resumen (Spotify) y píldora de audio.
  * v3.29.0 — Aviso del Tema 2 (tipo test y recursos) en el tablón y como primera historia.
  * v3.30.0 — Generador de estructuras del Tema 3 como adjunto solo para el profesorado.
+ * v3.31.0 — Tema 3: baraja de 20 cartas dopaminérgicas y 43 fármacos con estructura en Fármacos & Quimioinformática.
  */
-export const COURSE_DATA_VERSION = '3.30.0';
+export const COURSE_DATA_VERSION = '3.31.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-06T13:30:00.000Z';
 
 export const QFDOS_INFO = {
@@ -3407,15 +3409,520 @@ flashcards: [
     spotifyPodcastUrl: '',
     drugs: [
       {
+        name: 'Epinina (N-metildopamina)',
+        smiles: 'CNCCc1ccc(O)c(O)c1',
+        formula: 'C9H13NO2',
+        mw: 167.21,
+        logP: 0.86,
+        hbd: 3,
+        hba: 3,
+        tpsa: 52.49,
+        rotBonds: 3,
+        role: 'N-metildopamina (desoxiadrenalina). Conserva el catecol y la amina básica de la dopamina con libre giro en la cadena etilamínica: muchas conformaciones accesibles.'
+      },
+      {
+        name: 'ADTN (2-amino-6,7-dihidroxitetralina)',
+        smiles: 'NC1CCc2cc(O)c(O)cc2C1',
+        formula: 'C10H13NO2',
+        mw: 179.22,
+        logP: 0.91,
+        hbd: 3,
+        hba: 3,
+        tpsa: 66.48,
+        rotBonds: 0,
+        role: '2-Amino-6,7-dihidroxi-1,2,3,4-tetrahidronaftaleno. Agonista dopaminérgico potente: la tetralina fija la cadena etilamínica de la dopamina en conformación antiperiplanar (trans extendida) con el catecol.'
+      },
+      {
+        name: 'Apomorfina',
+        smiles: 'CN1CCc2cccc3c2[C@H]1Cc1ccc(O)c(O)c1-3',
+        formula: 'C17H17NO2',
+        mw: 267.33,
+        logP: 2.85,
+        hbd: 2,
+        hba: 3,
+        tpsa: 43.7,
+        rotBonds: 0,
+        role: 'Agonista D1/D2 obtenido por transposición ácida de la morfina (HCl, deshidratación y migración que aromatiza el anillo C, ver QFDOS-130). Contiene la epinina con la conformación antiperiplanar congelada en el sistema aporfínico.'
+      },
+      {
+        name: 'Morfina',
+        smiles: 'CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5',
+        formula: 'C17H19NO3',
+        mw: 285.34,
+        logP: 1.2,
+        hbd: 2,
+        hba: 4,
+        tpsa: 52.93,
+        rotBonds: 0,
+        role: 'Material de partida de la apomorfina. En medio ácido fuerte se abre el puente éter 4,5, se pierde agua y el anillo C aromatiza, generando el catecol y el esqueleto aporfínico.'
+      },
+      {
+        name: 'Benserazida',
+        smiles: 'NC(CO)C(=O)NNCc1ccc(O)c(O)c1O',
+        formula: 'C10H15N3O5',
+        mw: 257.25,
+        logP: -1.76,
+        hbd: 7,
+        hba: 7,
+        tpsa: 148.07,
+        rotBonds: 5,
+        role: 'Inhibidor de la dopa-descarboxilasa periférica (AADC) asociado a levodopa (Madopar). Hidrazida de la serina con un 2,3,4-trihidroxibencilo: la función hidrazina atrapa el piridoxal fosfato, igual que la carbidopa (QFDOS-094).'
+      },
+      {
+        name: 'Dipivaloildopamina',
+        smiles: 'CC(C)(C)C(=O)Oc1ccc(CCN)cc1OC(=O)C(C)(C)C',
+        formula: 'C18H27NO4',
+        mw: 321.42,
+        logP: 3.09,
+        hbd: 1,
+        hba: 5,
+        tpsa: 78.62,
+        rotBonds: 4,
+        role: 'Profármaco por latentización del catecol como diéster de ácido piválico. Suficientemente lipófilo para atravesar la BHE, pero no queda retenido en el cerebro y su acción es breve;'
+      },
+      {
+        name: 'Doble profarmaco dihidropiridinico de dopamina',
+        smiles: 'CN1C=CCC(C(=O)NCCc2ccc(OC(=O)C(C)(C)C)c(OC(=O)C(C)(C)C)c2)=C1',
+        formula: 'C25H34N2O5',
+        mw: 442.56,
+        logP: 3.98,
+        hbd: 1,
+        hba: 6,
+        tpsa: 84.94,
+        rotBonds: 6,
+        role: 'Sistema de liberación química de Bodor. La amina primaria va como amida del ácido 1-metil-1,4-dihidropiridina-3-carboxílico y el catecol como dipivalato: molécula neutra y lipófila que entra en el SNC.'
+      },
+      {
+        name: 'Sal de piridinio del profarmaco (forma retenida)',
+        smiles: 'C[n+]1cccc(C(=O)NCCc2ccc(O)c(O)c2)c1',
+        formula: 'C15H17N2O3+',
+        mw: 273.31,
+        logP: 0.89,
+        hbd: 3,
+        hba: 3,
+        tpsa: 73.44,
+        rotBonds: 4,
+        role: 'Intermedio del doble profármaco tras la oxidación de la dihidropiridina y la hidrólisis de los pivalatos. Catión permanente (amonio aromático cuaternario), por eso queda atrapado tras la BHE: es la forma depósito en el SNC.'
+      },
+      {
+        name: 'Trigonelina',
+        smiles: 'C[n+]1cccc(C(=O)[O-])c1',
+        formula: 'C7H7NO2',
+        mw: 137.14,
+        logP: -1.13,
+        hbd: 0,
+        hba: 2,
+        tpsa: 44.01,
+        rotBonds: 1,
+        role: 'N-metilnicotinato (betaína, sal interna). Subproducto del doble profármaco en el SNC: no tóxico, polar, se elimina. Alcaloide natural del café y de la alholva y metabolito de la niacina.'
+      },
+      {
+        name: '(R)-Selegilina',
+        smiles: 'C#CCN(C)[C@H](C)Cc1ccccc1',
+        formula: 'C13H17N',
+        mw: 187.29,
+        logP: 2.18,
+        hbd: 0,
+        hba: 1,
+        tpsa: 3.24,
+        rotBonds: 4,
+        role: 'N,α-dimetil-N-propargilfenetilamina. Inhibidor irreversible y selectivo de la MAO-B (inhibidor suicida: el propargilo se oxida y forma un aducto covalente con el FAD).'
+      },
+      {
+        name: '(S)-Selegilina',
+        smiles: 'C#CCN(C)[C@@H](C)Cc1ccccc1',
+        formula: 'C13H17N',
+        mw: 187.29,
+        logP: 2.18,
+        hbd: 0,
+        hba: 1,
+        tpsa: 3.24,
+        rotBonds: 4,
+        role: 'Distómero de la selegilina. Su N-desalquilación produce (S)-metanfetamina (dextrometanfetamina, QFDOS-068), estimulante central responsable de los efectos indeseados; por eso se comercializa el enantiómero (R).'
+      },
+      {
+        name: 'Rasagilina',
+        smiles: 'C#CCN[C@@H]1CCc2ccccc21',
+        formula: 'C12H13N',
+        mw: 171.24,
+        logP: 1.9,
+        hbd: 1,
+        hba: 1,
+        tpsa: 12.03,
+        rotBonds: 2,
+        role: 'N-propargil-1-(R)-aminoindano. Análogo cíclico de la selegilina: la cadena fenilisopropílica queda cerrada en un indano, y el nitrógeno pasa a secundario sin metilo.'
+      },
+      {
+        name: 'Tolcapona',
+        smiles: 'Cc1ccc(C(=O)c2cc(O)c(O)c([N+](=O)[O-])c2)cc1',
+        formula: 'C14H11NO5',
+        mw: 273.24,
+        logP: 2.55,
+        hbd: 2,
+        hba: 5,
+        tpsa: 100.67,
+        rotBonds: 3,
+        role: 'Inhibidor reversible de la COMT, periférico y central. El nitro en orto al catecol baja el pKa del OH adyacente (≈ 4.5): a pH 7.4 circula como fenolato y es un mal sustrato de la metilación, pero se une con alta afinidad.'
+      },
+      {
+        name: 'Amantadina',
+        smiles: 'NC12CC3CC(CC(C3)C1)C2',
+        formula: 'C10H17N',
+        mw: 151.25,
+        logP: 1.91,
+        hbd: 1,
+        hba: 1,
+        tpsa: 26.02,
+        rotBonds: 0,
+        role: '1-Aminoadamantano. Único fármaco de uso clínico que provoca la liberación presináptica de dopamina (además bloquea receptores NMDA). También antivírico frente a influenza A (bloqueo del canal M2).'
+      },
+      {
+        name: 'N-(1-Adamantil)acetamida',
+        smiles: 'CC(=O)NC12CC3CC(CC(C3)C1)C2',
+        formula: 'C12H19NO',
+        mw: 193.29,
+        logP: 2.09,
+        hbd: 1,
+        hba: 1,
+        tpsa: 29.1,
+        rotBonds: 1,
+        role: 'Producto de la reacción de Ritter: el carbocatión 1-adamantilo (a partir de adamantan-1-ol o 1-bromoadamantano en medio ácido) es atrapado por el nitrilo (acetonitrilo) y el ion nitrilio se hidrata a la amida.'
+      },
+      {
+        name: 'Fenotiazina',
+        smiles: 'c1ccc2c(c1)Nc1ccccc1S2',
+        formula: 'C12H9NS',
+        mw: 199.28,
+        logP: 3.89,
+        hbd: 1,
+        hba: 2,
+        tpsa: 12.03,
+        rotBonds: 0,
+        role: 'Núcleo tricíclico (10H-dibenzo-1,4-tiazina) de los neurolépticos tricíclicos. Numeración: N10, S5, posición 2 la que recibe el grupo atrayente (Cl, CF3, SCH3...). Se obtiene por tionación de la difenilamina con azufre e I2.'
+      },
+      {
+        name: '3-Clorodifenilamina',
+        smiles: 'Clc1cccc(Nc2ccccc2)c1',
+        formula: 'C12H10ClN',
+        mw: 203.67,
+        logP: 4.08,
+        hbd: 1,
+        hba: 1,
+        tpsa: 12.03,
+        rotBonds: 2,
+        role: 'Sustrato de la tionación (S8, I2, calor) para la síntesis de la 2-clorofenotiazina. El cierre puede producirse en orto o para al cloro y genera dos isómeros (2-cloro y 4-cloro) que deben separarse;'
+      },
+      {
+        name: '2-Clorofenotiazina',
+        smiles: 'Clc1ccc2c(c1)Nc1ccccc1S2',
+        formula: 'C12H8ClNS',
+        mw: 233.72,
+        logP: 4.55,
+        hbd: 1,
+        hba: 2,
+        tpsa: 12.03,
+        rotBonds: 0,
+        role: 'Intermedio clave de la clorpromazina. Se N-alquila con NaNH2 y 3-cloro-N,N-dimetilpropilamina. El Cl en 2 es el grupo atrayente que optimiza la actividad neuroléptica (región C del farmacóforo de Gordon).'
+      },
+      {
+        name: 'Prometazina',
+        smiles: 'CC(CN1c2ccccc2Sc2ccccc21)N(C)C',
+        formula: 'C17H20N2S',
+        mw: 284.43,
+        logP: 4.24,
+        hbd: 0,
+        hba: 3,
+        tpsa: 6.48,
+        rotBonds: 3,
+        role: 'Fenotiazina antihistamínica H1 con efecto sedante: puente de 2 carbonos ramificado con metilo entre los nitrógenos y sin sustituyente en 2.'
+      },
+      {
+        name: 'Clorpromazina',
+        smiles: 'CN(C)CCCN1c2ccccc2Sc2ccc(Cl)cc21',
+        formula: 'C17H19ClN2S',
+        mw: 318.87,
+        logP: 4.89,
+        hbd: 0,
+        hba: 3,
+        tpsa: 6.48,
+        rotBonds: 4,
+        role: 'Prototipo de los neurolépticos (1952). Cumple las tres zonas del farmacóforo de Gordon: A, amina terciaria protonable; B, cadena de exactamente 3 carbonos entre nitrógenos; C, tricíclico con Cl en 2.'
+      },
+      {
+        name: 'Levomepromazina',
+        smiles: 'COc1ccc2c(c1)N(C[C@H](C)CN(C)C)c1ccccc1S2',
+        formula: 'C19H24N2OS',
+        mw: 328.48,
+        logP: 4.5,
+        hbd: 0,
+        hba: 4,
+        tpsa: 15.71,
+        rotBonds: 5,
+        role: 'Metotrimeprazina (Sinogán). 2-Metoxi y cadena de 3 carbonos ramificada con metilo en β: perfil intermedio entre clorpromazina y prometazina, muy sedante y analgésico. Eutómero (R)-(−) (levo).'
+      },
+      {
+        name: 'Carfenazina',
+        smiles: 'CCC(=O)c1ccc2c(c1)N(CCCN1CCN(CCO)CC1)c1ccccc1S2',
+        formula: 'C24H31N3O2S',
+        mw: 425.6,
+        logP: 3.88,
+        hbd: 1,
+        hba: 6,
+        tpsa: 47.02,
+        rotBonds: 8,
+        role: '2-Propionilfenotiazina con cadena hidroxietilpiperazinilpropilo. Síntesis: N-acilación protectora con EtCOCl, Friedel-Crafts en 2 (el S dirige al desaparecer la activación del N acilado), desprotección, alquilación con…'
+      },
+      {
+        name: 'Flufenazina',
+        smiles: 'OCCN1CCN(CCCN2c3ccccc3Sc3ccc(C(F)(F)F)cc32)CC1',
+        formula: 'C22H26F3N3OS',
+        mw: 437.53,
+        logP: 4.31,
+        hbd: 1,
+        hba: 5,
+        tpsa: 29.95,
+        rotBonds: 6,
+        role: 'Neuroléptico piperazínico de alta potencia. CF3 en 2 (más atrayente y lipófilo que Cl) y N básico incluido en una piperazina, dos modificaciones que aumentan la potencia D2 frente a la clorpromazina y desplazan el perfil a más…'
+      },
+      {
+        name: 'Decanoato de flufenazina',
+        smiles: 'CCCCCCCCCC(=O)OCCN1CCN(CCCN2c3ccccc3Sc3ccc(C(F)(F)F)cc32)CC1',
+        formula: 'C32H44F3N3O2S',
+        mw: 591.78,
+        logP: 8,
+        hbd: 0,
+        hba: 6,
+        tpsa: 36.02,
+        rotBonds: 15,
+        role: 'Éster del ácido decanoico (cáprico) sobre el OH de la flufenazina. Latentización para acción muy prolongada: en solución oleosa intramuscular se libera lentamente del depósito y se hidroliza a flufenazina, con efecto de 2 a 4…'
+      },
+      {
+        name: 'Enantato de flufenazina',
+        smiles: 'CCCCCCC(=O)OCCN1CCN(CCCN2c3ccccc3Sc3ccc(C(F)(F)F)cc32)CC1',
+        formula: 'C29H38F3N3O2S',
+        mw: 549.7,
+        logP: 6.83,
+        hbd: 0,
+        hba: 6,
+        tpsa: 36.02,
+        rotBonds: 12,
+        role: 'Éster del ácido heptanoico (enántico). Cadena tres carbonos más corta que el decanoato: liberación algo más rápida y duración menor.'
+      },
+      {
+        name: '1-(2-Hidroxietil)piperazina',
+        smiles: 'OCCN1CCNCC1',
+        formula: 'C6H14N2O',
+        mw: 130.19,
+        logP: -1.12,
+        hbd: 2,
+        hba: 3,
+        tpsa: 35.5,
+        rotBonds: 2,
+        role: 'Reactivo para introducir la cadena lateral de carfenazina y flufenazina. Se prepara protegiendo un N de la piperazina como uretano (ClCOOEt), alquilando el otro con óxido de etileno y desprotegiendo con NaOH: monofuncionalización…'
+      },
+      {
+        name: 'Clorprotixeno',
+        smiles: 'CN(C)CC/C=C1/c2ccccc2Sc2ccc(Cl)cc21',
+        formula: 'C18H18ClNS',
+        mw: 315.87,
+        logP: 5.19,
+        hbd: 0,
+        hba: 2,
+        tpsa: 3.24,
+        rotBonds: 3,
+        role: 'Tioxanteno: el N10 de la fenotiazina se sustituye por un carbono sp2 unido a la cadena por un doble enlace exocíclico. Isosterismo N→C que conserva el farmacóforo. El doble enlace genera isómeros geométricos;'
+      },
+      {
+        name: 'Estructura 1 (Ejercicio 3.3)',
+        smiles: 'CN(C)C1Cc2cccc3c2N(C1)c1ccccc1S3',
+        formula: 'C17H18N2S',
+        mw: 282.41,
+        logP: 3.78,
+        hbd: 0,
+        hba: 3,
+        tpsa: 6.48,
+        rotBonds: 1,
+        role: 'Fenotiazina tetracíclica del ejercicio 3.3: la cadena trimetilénica se cierra sobre el carbono peri de un anillo bencénico.'
+      },
+      {
+        name: 'Petidina',
+        smiles: 'CCOC(=O)C1(c2ccccc2)CCN(C)CC1',
+        formula: 'C15H21NO2',
+        mw: 247.34,
+        logP: 2.21,
+        hbd: 0,
+        hba: 3,
+        tpsa: 29.54,
+        rotBonds: 3,
+        role: 'Analgésico opioide sintético (Dolantina), simplificación de la morfina por supresión de los anillos B, C y D: conserva fenilo, carbono cuaternario y piperidina N-metilada.'
+      },
+      {
+        name: 'Analogo butirofenonico de la petidina',
+        smiles: 'CCOC(=O)C1(c2ccccc2)CCN(CCCC(=O)c2ccccc2)CC1',
+        formula: 'C24H29NO3',
+        mw: 379.5,
+        logP: 4.25,
+        hbd: 0,
+        hba: 4,
+        tpsa: 46.61,
+        rotBonds: 8,
+        role: 'Intermedio conceptual (analgésico y neuroléptico). La cadena 4-oxo-4-fenilbutilo sobre el N de la petidina aporta la acción neuroléptica.'
+      },
+      {
         name: 'Haloperidol',
-        smiles: 'C1CN(CCC1(C2=CC=C(C=C2)Cl)O)CCCC(=O)C3=CC=C(C=C3)F',
-        role: 'Antipsicótico clásico butirofenona de alta potencia D2',
-        mw: 375.86,
-        logP: 4.30,
+        smiles: 'O=C(CCCN1CCC(O)(c2ccc(Cl)cc2)CC1)c1ccc(F)cc1',
+        formula: 'C21H23ClFNO2',
+        mw: 375.87,
+        logP: 4.43,
         hbd: 1,
         hba: 3,
-        tpsa: 40.5,
-        rotBonds: 6
+        tpsa: 40.54,
+        rotBonds: 6,
+        role: 'Prototipo de las butirofenonas: 4-[4-(4-clorofenil)-4-hidroxipiperidino]-4\'-fluorobutirofenona. Antagonista D2 de alta potencia y escasa acción sobre otros receptores: poco sedante e hipotensor, muchos efectos extrapiramidales.'
+      },
+      {
+        name: '4-(4-Clorofenil)piperidin-4-ol',
+        smiles: 'OC1(c2ccc(Cl)cc2)CCNCC1',
+        formula: 'C11H14ClNO',
+        mw: 211.69,
+        logP: 1.91,
+        hbd: 2,
+        hba: 2,
+        tpsa: 32.26,
+        rotBonds: 1,
+        role: 'Fragmento 4-aril-4-piperidinol del haloperidol. En la síntesis: tetrahidropiridina (QFDOS-161) + HBr/AcOH (adición Markovnikov del acetato o bromuro) e hidrólisis con NaOH.'
+      },
+      {
+        name: '4-Cloro-4\'-fluorobutirofenona',
+        smiles: 'O=C(CCCCl)c1ccc(F)cc1',
+        formula: 'C10H10ClFO',
+        mw: 200.64,
+        logP: 3.03,
+        hbd: 0,
+        hba: 1,
+        tpsa: 17.07,
+        rotBonds: 4,
+        role: 'Agente alquilante común a casi todas las butirofenonas (haloperidol, droperidol, trifluperidol). Se obtiene por Friedel-Crafts del fluorobenceno con cloruro de 4-clorobutanoílo.'
+      },
+      {
+        name: 'alfa-Metil-p-cloroestireno',
+        smiles: 'C=C(C)c1ccc(Cl)cc1',
+        formula: 'C9H9Cl',
+        mw: 152.62,
+        logP: 3.37,
+        hbd: 0,
+        hba: 0,
+        tpsa: 0,
+        rotBonds: 1,
+        role: 'Alqueno de partida de la síntesis del haloperidol. Reacciona con formaldehído y NH4Cl (catión iminio CH2=NH2+): adición electrófila al alqueno que recuerda a la reacción de Mannich, segunda adición de formaldehído y ciclación a…'
+      },
+      {
+        name: '4-(4-Clorofenil)-1,2,3,6-tetrahidropiridina',
+        smiles: 'Clc1ccc(C2=CCNCC2)cc1',
+        formula: 'C11H12ClN',
+        mw: 193.68,
+        logP: 2.72,
+        hbd: 1,
+        hba: 1,
+        tpsa: 12.03,
+        rotBonds: 1,
+        role: 'Intermedio del haloperidol (vía Mannich/Prins). Mismo tipo de anillo que el droperidol conserva en el fármaco final.'
+      },
+      {
+        name: 'Droperidol',
+        smiles: 'O=C(CCCN1CC=C(n2c(=O)[nH]c3ccccc32)CC1)c1ccc(F)cc1',
+        formula: 'C22H22FN3O2',
+        mw: 379.44,
+        logP: 3.68,
+        hbd: 1,
+        hba: 3,
+        tpsa: 58.1,
+        rotBonds: 6,
+        role: 'Butirofenona en la que el 4-arilpiperidinol se sustituye por una 4-(2-oxobencimidazolinil)-1,2,3,6-tetrahidropiridina. Neuroléptico de acción corta y antiemético; en anestesia (neuroleptoanalgesia con fentanilo).'
+      },
+      {
+        name: 'Pimozida',
+        smiles: 'O=c1[nH]c2ccccc2n1C1CCN(CCCC(c2ccc(F)cc2)c2ccc(F)cc2)CC1',
+        formula: 'C28H29F2N3O',
+        mw: 461.56,
+        logP: 5.86,
+        hbd: 1,
+        hba: 2,
+        tpsa: 41.03,
+        rotBonds: 7,
+        role: 'Difenilbutilpiperidina: el carbonilo de la butirofenona se sustituye por un segundo anillo p-fluorofenilo, demostrando que la cetona no es imprescindible. Conserva el bencimidazolona-piperidina del droperidol.'
+      },
+      {
+        name: 'Trifluperidol',
+        smiles: 'O=C(CCCN1CCC(O)(c2cccc(C(F)(F)F)c2)CC1)c1ccc(F)cc1',
+        formula: 'C22H23F4NO2',
+        mw: 409.42,
+        logP: 4.79,
+        hbd: 1,
+        hba: 3,
+        tpsa: 40.54,
+        rotBonds: 6,
+        role: 'Análogo del haloperidol con 3-CF3-fenilo en lugar de 4-clorofenilo en el piperidinol. Más potente.'
+      },
+      {
+        name: 'orto-Metoxiprocainamida',
+        smiles: 'CCN(CC)CCNC(=O)c1ccc(N)cc1OC',
+        formula: 'C14H23N3O2',
+        mw: 265.36,
+        logP: 1.35,
+        hbd: 2,
+        hba: 4,
+        tpsa: 67.59,
+        rotBonds: 7,
+        role: 'Procainamida con 2-OMe. Mostró, además de la acción anestésica local esperada, una notable actividad antiemética. Cabeza de serie de las ortopramidas.'
+      },
+      {
+        name: 'Metoclopramida',
+        smiles: 'CCN(CC)CCNC(=O)c1cc(Cl)c(N)cc1OC',
+        formula: 'C14H22ClN3O2',
+        mw: 299.8,
+        logP: 2,
+        hbd: 2,
+        hba: 4,
+        tpsa: 67.59,
+        rotBonds: 7,
+        role: '4-Amino-5-cloro-2-metoxi-N-(2-dietilaminoetil)benzamida (Primperan). Antagonista D2 en la zona quimiorreceptora gatillo: antiemético potente, procinético (también agonista 5-HT4), anestésico local moderado.'
+      },
+      {
+        name: 'Dopamina',
+        smiles: 'NCCc1ccc(O)c(O)c1',
+        formula: 'C8H11NO2',
+        mw: 153.18,
+        logP: 0.6,
+        hbd: 3,
+        hba: 3,
+        tpsa: 66.48,
+        rotBonds: 2,
+        role: 'Protagonista del Tema 3 (misma molécula que QFDOS-008 y QFDOS-048, aquí con su contexto dopaminérgico).'
+      },
+      {
+        name: 'L-DOPA (Levodopa)',
+        smiles: 'N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O',
+        formula: 'C9H11NO4',
+        mw: 197.19,
+        logP: 0.05,
+        hbd: 4,
+        hba: 4,
+        tpsa: 103.78,
+        rotBonds: 3,
+        role: 'Misma molécula que QFDOS-047, aquí como antiparkinsoniano. Profármaco de la dopamina: el resto aminoácido la hace sustrato del transportador LAT1, que la lleva a través de la mucosa intestinal y de la BHE;'
+      },
+      {
+        name: 'Carbidopa',
+        smiles: 'C[C@@](Cc1ccc(O)c(O)c1)(NN)C(=O)O',
+        formula: 'C10H14N2O4',
+        mw: 226.23,
+        logP: -0.05,
+        hbd: 5,
+        hba: 5,
+        tpsa: 115.81,
+        rotBonds: 4,
+        role: 'Misma molécula que QFDOS-094. Inhibidor de la dopa-descarboxilasa periférica (Sinemet con levodopa): análogo α-hidrazínico de la α-metildopa cuya hidrazina forma una hidrazona con el piridoxal fosfato de la AADC.'
       },
       {
         name: 'Olanzapina',
@@ -3427,17 +3934,6 @@ flashcards: [
         hba: 3,
         tpsa: 36.6,
         rotBonds: 1
-      },
-      {
-        name: 'Levodopa',
-        smiles: 'C1=CC(=C(C=C1C[C@@H](C(=O)O)N)O)O',
-        role: 'Precursor biosintético de dopamina que cruza BHE vía LAT1',
-        mw: 197.19,
-        logP: -2.39,
-        hbd: 4,
-        hba: 4,
-        tpsa: 103.8,
-        rotBonds: 3
       }
     ],
     attachments: [
