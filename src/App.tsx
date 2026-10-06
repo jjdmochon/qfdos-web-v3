@@ -229,7 +229,7 @@ function trackPageView(hash: string) {
   }
 }
 
-export /** Hora de la compilación en hora de Madrid, p. ej. «06/10/2026 12:27». */
+/** Hora de la compilación en hora de Madrid, p. ej. «06/10/2026 12:27». */
 const horaCompilacion = (() => {
   const d = new Date(typeof __BUILD_TIME__ === 'string' ? __BUILD_TIME__ : Date.now());
   return isNaN(d.getTime())
@@ -237,7 +237,7 @@ const horaCompilacion = (() => {
     : d.toLocaleString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
 })();
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
   const { isAuthenticated, isProfesor } = useAuth();
 
   const initialRoute = useMemo(() => parseUrlHash(), []);
@@ -544,6 +544,7 @@ const App: React.FC = () => {
             announcements={announcements}
             onAbrirReproductor={att => setSelectedSpotifyAttachment(att)}
             onAbrirTema={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
+            onAbrirEnlace={link => navigateTo('enlaces', link.id)}
           />
         </div>
       )}
@@ -565,7 +566,6 @@ const App: React.FC = () => {
             topics={topics}
             announcements={announcements}
             resourceLinks={resourceLinks}
-            onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
             onSelectTopic={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
             onNavigateToCourseInfo={() => navigateTo('info')}
             onNavigateToTemas={() => navigateTo('temas')}
@@ -576,10 +576,8 @@ const App: React.FC = () => {
             onOpenExamGenerator={() => setIsExamGeneratorOpen(true)}
             onOpenAdminCms={() => setIsAdminCmsOpen(true)}
             onOpenFirSimulator={() => setIsFirModalOpen(true)}
-            onOpenTema1Exam={() => {
-              const tema1 = topics.find(t => t.id === 'tema-01');
-              if (tema1) setSelectedQuizTopic(tema1);
-            }}
+            /* Panel del examen del Tema 1 retirado del Hub: volverá cuando haya exámenes
+               completos, no por temas. Para reactivarlo, pasar aquí onOpenTema1Exam. */
           />
         )}
         {activeTab === 'info' && <CourseInfoSection />}

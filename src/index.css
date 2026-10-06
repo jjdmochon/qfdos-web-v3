@@ -2830,6 +2830,8 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   align-items: start;
 }
 
+/* Ficha a la que se llega desde una historia de Noticias */
+.resource-card.is-destacado { outline: 3px solid var(--mint); outline-offset: 3px; box-shadow: 0 0 0 6px color-mix(in srgb, var(--mint) 25%, transparent); }
 .resource-card {
   display: flex;
   flex-direction: column;

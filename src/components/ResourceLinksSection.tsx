@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { QfdosResourceLink, RESOURCE_CATEGORIES } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -45,6 +45,26 @@ export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
   const { isProfesor } = useAuth();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('todas');
+
+  // Llegada desde una historia: #/enlaces/<id> lleva a la ficha y la resalta un momento
+  const [destacado, setDestacado] = useState<string | null>(null);
+  useEffect(() => {
+    let temporizador = 0;
+    const irAlEnlace = () => {
+      const id = decodeURIComponent(window.location.hash.replace(/^#\/?/, '').split('/')[1] ?? '');
+      if (!id) return;
+      setDestacado(id);
+      requestAnimationFrame(() => {
+        const suave = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        document.getElementById(`enlace-${id}`)?.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'center' });
+      });
+      window.clearTimeout(temporizador);
+      temporizador = window.setTimeout(() => setDestacado(null), 2600);
+    };
+    irAlEnlace();
+    window.addEventListener('hashchange', irAlEnlace);
+    return () => { window.removeEventListener('hashchange', irAlEnlace); window.clearTimeout(temporizador); };
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -156,10 +176,11 @@ export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
             return (
               <a
                 key={link.id}
+                id={`enlace-${link.id}`}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`resource-card ${link.featured ? 'is-featured' : ''}`}
+                className={`resource-card ${link.featured ? 'is-featured' : ''}${destacado === link.id ? ' is-destacado' : ''}`}
                 style={{ borderTopColor: accent }}
               >
                 <div className="resource-card-top">
