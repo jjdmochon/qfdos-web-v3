@@ -288,6 +288,9 @@
    Historias QFDOS (HistoriasQfdos.tsx): banda rotatoria + círculos + visor
    ========================================================================== */
 .hist-seccion { margin-bottom: 1.75rem; }
+/* Historias en la cabecera del Hub, entre el menú y la portada */
+.hist-portada { padding-top: 1rem; padding-bottom: 0.25rem; }
+.hist-portada .hist-seccion { margin-bottom: 1rem; }
 .hist-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .hist-cabecera h3 { display: flex; align-items: center; gap: 7px; font-size: 1.05rem; font-weight: 600; color: var(--text-title); margin: 0; }
 
@@ -328,13 +331,17 @@
 }
 .hist-foto { background-color: var(--navy-dark); }
 .hist-foto.recursos { background-color: #fff; background-size: contain; background-repeat: no-repeat; }
-.hist-etiqueta { font-size: 0.74rem; font-weight: 600; color: var(--text-main); }
+.hist-etiqueta { font-size: 0.74rem; font-weight: 600; color: var(--text-main); max-width: 88px; text-align: center; line-height: 1.2; }
 .hist-circulo.vista .hist-etiqueta { color: var(--text-muted); font-weight: 500; }
 
 /* Banda rotatoria */
-.hist-banda { position: relative; margin-top: 6px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+/* Altura fija: la banda mide lo mismo sea cual sea la historia (imagen, vídeo o solo texto) */
+.hist-banda { position: relative; margin-top: 6px; height: 240px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+@media (max-width: 640px) { .hist-banda { height: 210px; } }
+.hist-seccion-banda { margin-bottom: 1.75rem; }
+.hist-seccion-banda .hist-banda { margin-top: 0; }
 .hist-banda-slide {
-  position: relative; display: flex; align-items: flex-end; width: 100%; min-height: 170px; height: clamp(170px, 26vw, 250px);
+  position: relative; display: flex; align-items: flex-end; width: 100%; height: 100%;
   padding: 18px 20px 34px; border: 0; cursor: pointer; text-align: left; color: #fff; font: inherit; overflow: hidden;
   animation: histFundido 320ms ease-out;
 }
@@ -344,7 +351,7 @@
 .hist-banda-img.difuminada { filter: blur(16px) brightness(0.6); transform: scale(1.15); }
 .hist-banda-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 15, 35, 0) 25%, rgba(8, 15, 35, 0.82) 100%); }
 .hist-banda-texto { position: relative; display: flex; flex-direction: column; gap: 6px; max-width: min(640px, 85%); }
-.hist-banda-texto strong { font-size: clamp(1.05rem, 2.4vw, 1.4rem); font-weight: 800; line-height: 1.2; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4); }
+.hist-banda-texto strong { font-size: clamp(1.05rem, 2.4vw, 1.4rem); font-weight: 800; line-height: 1.2; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .hist-banda-sub { font-size: 0.85rem; line-height: 1.45; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .hist-banda-play { position: absolute; right: 18px; top: 16px; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(4px); }
 .hist-banda-flecha {

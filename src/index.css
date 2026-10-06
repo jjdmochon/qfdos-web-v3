@@ -2760,6 +2760,31 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   .spotlight-card { position: static; }
 }
 
+/* Columna derecha del Hub: foco estructural y últimas noticias. Con dos
+   tarjetas, el foco deja de ser sticky para no tapar la segunda. */
+.hub-col-derecha { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
+.hub-col-derecha .spotlight-card { position: static; }
+.hub-noticias { padding: 1.25rem; display: flex; flex-direction: column; gap: 12px; }
+.hub-noticias-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.hub-noticia {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 12px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-color); background: var(--surface-raised);
+  color: inherit; text-decoration: none;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.hub-noticia:hover { border-color: var(--teal); background: var(--surface-alt); }
+.hub-noticia:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.hub-noticia-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 0.68rem; color: var(--text-muted); }
+.hub-noticia-cat { font-weight: 700; color: var(--teal-ink); text-transform: uppercase; letter-spacing: 0.04em; }
+.hub-noticia-titulo { font-weight: 700; font-size: 0.86rem; color: var(--text-title); line-height: 1.35; }
+.hub-noticia-titulo svg { vertical-align: -1px; opacity: 0.6; }
+.hub-noticia-resumen {
+  font-size: 0.78rem; color: var(--text-main); line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.hub-noticia-fuente { font-size: 0.7rem; color: var(--text-muted); }
+
 /* ==========================================================================
    Enlaces de interés
    ========================================================================== */

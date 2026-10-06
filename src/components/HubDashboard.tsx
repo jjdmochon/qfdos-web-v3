@@ -1,15 +1,26 @@
 import React, { useMemo, useState } from 'react';
 import { QfdosTopic, QfdosAnnouncement, QfdosResourceLink, CourseAttachment, moleculaDeTarjeta } from '../data/qfdosData';
+import { HistoriasQfdos } from './HistoriasQfdos';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MolPropertyStrip } from './MolPropertyStrip';
-import { HistoriasQfdos } from './HistoriasQfdos';
 import { avisosRecientesPrimero } from '../utils/avisos';
 import { useAuth } from '../context/AuthContext';
 import {
   Award, Activity, Bell, ArrowRight, ChevronRight, FileText,
   ShieldCheck, UploadCloud, FlaskConical, Shuffle, Lock, Calendar,
-  Globe, Database, ExternalLink, Headphones, Download, Video
+  Globe, Database, ExternalLink, Headphones, Download, Video, Newspaper
 } from 'lucide-react';
+
+/** Fecha de un enlace (`2026-10-06`) como «6 oct 2026». */
+const fechaCorta = (iso?: string) => {
+  const d = iso ? new Date(`${iso}T12:00:00`) : null;
+  return d && !isNaN(d.getTime())
+    ? d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+};
+
+/** Las rutas relativas (estructuras/x.xlsx) cuelgan de BASE_URL. */
+const urlEnlace = (u: string) => (/^(https?:|data:|blob:|\/)/i.test(u) ? u : `${import.meta.env.BASE_URL}${u}`);
 
 interface HubDashboardProps {
   topics: QfdosTopic[];
@@ -26,6 +37,7 @@ interface HubDashboardProps {
   onOpenAdminCms: () => void;
   onOpenFirSimulator?: () => void;
   onOpenTema1Exam?: () => void;
+  onNavigateToEnlaces?: () => void;
 }
 
 export const HubDashboard: React.FC<HubDashboardProps> = ({
@@ -42,7 +54,8 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
   onOpenExamGenerator,
   onOpenAdminCms,
   onOpenFirSimulator,
-  onOpenTema1Exam
+  onOpenTema1Exam,
+  onNavigateToEnlaces
 }) => {
   const { isProfesor } = useAuth();
 
@@ -52,6 +65,17 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
   const avisosOrdenados = useMemo(() => avisosRecientesPrimero(announcements), [announcements]);
   const avisosVisibles = verTodosAvisos ? avisosOrdenados : avisosOrdenados.slice(0, AVISOS_A_LA_VISTA);
   const anteriores = Math.max(0, avisosOrdenados.length - AVISOS_A_LA_VISTA);
+
+  // Últimas noticias: los enlaces de interés más recientes (a igual fecha, el orden de la lista)
+  const NOTICIAS_A_LA_VISTA = 4;
+  const ultimasNoticias = useMemo(
+    () => resourceLinks
+      .map((l, i) => ({ l, i }))
+      .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
+      .slice(0, NOTICIAS_A_LA_VISTA)
+      .map(x => x.l),
+    [resourceLinks]
+  );
 
   // Catálogo plano de fármacos con estructura, para el foco estructural
   const catalogue = useMemo(
@@ -110,8 +134,9 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
         </div>
       )}
 
-      {/* Historias: banda rotatoria + visor tipo Instagram */}
+      {/* Carrusel de historias: debajo de la portada (los círculos van encima, en App) */}
       <HistoriasQfdos
+        partes="banda"
         topics={topics}
         resourceLinks={resourceLinks}
         announcements={announcements}
@@ -441,7 +466,8 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
           </div>
         </div>
 
-        {/* Columna derecha: foco estructural */}
+        {/* Columna derecha: foco estructural y últimas noticias */}
+        <div className="hub-col-derecha">
         <div className="qfdos-card spotlight-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -537,6 +563,46 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             <div style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
               Aún no hay fármacos con estructura registrada.
             </div>
+          )}
+        </div>
+
+          {/* Últimas noticias: los enlaces de interés más recientes */}
+          {ultimasNoticias.length > 0 && (
+            <section className="qfdos-card card-teal hub-noticias" aria-labelledby="hub-noticias-titulo">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                  <Newspaper size={17} color="var(--teal-ink)" />
+                  <h3 id="hub-noticias-titulo" style={{ fontSize: '1.02rem', fontWeight: 600, color: 'var(--text-title)' }}>
+                    Últimas noticias
+                  </h3>
+                </div>
+                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem' }}>Enlaces de interés</span>
+              </div>
+              <ul className="hub-noticias-lista">
+                {ultimasNoticias.map(l => (
+                  <li key={l.id}>
+                    <a href={urlEnlace(l.url)} target="_blank" rel="noopener noreferrer" className="hub-noticia">
+                      <span className="hub-noticia-meta">
+                        <span className="hub-noticia-cat">{l.category}</span>
+                        <span className="tabular">{fechaCorta(l.addedAt)}</span>
+                      </span>
+                      <span className="hub-noticia-titulo">
+                        {l.title} <ExternalLink size={12} aria-hidden="true" />
+                      </span>
+                      <span className="hub-noticia-resumen">{l.summary}</span>
+                      {(l.source || l.duration) && (
+                        <span className="hub-noticia-fuente">{[l.source, l.duration].filter(Boolean).join(' · ')}</span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              {onNavigateToEnlaces && (
+                <button onClick={onNavigateToEnlaces} className="btn btn-sm btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
+                  Ver los {resourceLinks.length} enlaces de interés <ChevronRight size={13} />
+                </button>
+              )}
+            </section>
           )}
         </div>
       </div>
