@@ -117,6 +117,8 @@ const pwa = VitePWA({
 
 export default defineConfig({
   base,
+  // Hora real de la compilación: se muestra en el pie para saber qué versión se está ejecutando
+  define: { __BUILD_TIME__: JSON.stringify(new Date().toISOString()) },
   plugins: [react(), pwa],
   css: {
     postcss: {

@@ -228,7 +228,15 @@ function trackPageView(hash: string) {
   }
 }
 
-export const App: React.FC = () => {
+export /** Hora de la compilación en hora de Madrid, p. ej. «06/10/2026 12:27». */
+const horaCompilacion = (() => {
+  const d = new Date(typeof __BUILD_TIME__ === 'string' ? __BUILD_TIME__ : Date.now());
+  return isNaN(d.getTime())
+    ? '—'
+    : d.toLocaleString('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+})();
+
+const App: React.FC = () => {
   const { isAuthenticated, isProfesor } = useAuth();
 
   const initialRoute = useMemo(() => parseUrlHash(), []);
@@ -829,7 +837,9 @@ export const App: React.FC = () => {
               <span>•</span>
               <button type="button" className="link-boton" onClick={abrirPreferencias}>Preferencias de cookies</button>
               <span>•</span>
-              <span>Plataforma QFDOS v3.2</span>
+              <span title={`Versión de los datos ${COURSE_DATA_VERSION} · compilada el ${horaCompilacion}`}>
+                Plataforma QFDOS v{COURSE_DATA_VERSION} · compilación {horaCompilacion}
+              </span>
             </div>
           </div>
         </div>
