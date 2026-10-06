@@ -7,6 +7,13 @@ import { RetrosintesisWorkshop } from './RetrosintesisWorkshop';
 import { BotonSubirDrive } from './BotonSubirDrive';
 import { Model3DViewerModal } from './Model3DViewerModal';
 import { CartasDeckView } from './cartas';
+import { BARAJAS, TemaCartas } from './cartas/CartasDeckView';
+
+/** Número de baraja de cartas de un tema (`tema-03` → 3), o undefined si no tiene. */
+const numeroTemaCartas = (topicId: string): TemaCartas | undefined => {
+  const n = Number(topicId.replace('tema-', ''));
+  return n in BARAJAS ? (n as TemaCartas) : undefined;
+};
 import { 
   X, 
   Search,
@@ -362,7 +369,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 </span>
               </button>
             )}
-            {(topic.id === 'tema-01' || topic.id === 'tema-02') && (
+            {numeroTemaCartas(topic.id) && (
               <button
                 onClick={() => setActiveTab('cartas')}
                 className={`tab-btn ${activeTab === 'cartas' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'cartas'}
@@ -376,9 +383,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   boxShadow: '0 2px 8px rgba(30, 58, 138, 0.12)'
                 }}
               >
-                <Layers size={14} /> {topic.id === 'tema-02' ? 'Cartas Adrenérgicas' : 'Cartas Colinérgicas'}
+                <Layers size={14} /> Cartas {BARAJAS[numeroTemaCartas(topic.id)!].familia.replace(/os$/, 'as')}
                 <span className="qfdos-badge badge-mint" style={{ fontSize: '0.62rem', padding: '1px 6px', marginLeft: '6px', fontWeight: 800 }}>
-                  {topic.id === 'tema-02' ? 20 : 15} Cartas
+                  {BARAJAS[numeroTemaCartas(topic.id)!].farmacos.length} Cartas
                 </span>
               </button>
             )}
@@ -1777,8 +1784,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
             <RetrosintesisWorkshop isProfesor={isProfesor} />
           )}
 
-          {/* TAB 5: Cartas Coleccionables (Temas 1 y 2) */}
-          {activeTab === 'cartas' && (topic.id === 'tema-01' || topic.id === 'tema-02') && (
+          {/* TAB 5: Cartas Coleccionables (Temas 1, 2 y 3) */}
+          {activeTab === 'cartas' && numeroTemaCartas(topic.id) && (
             <div style={{ padding: '0.25rem 0' }}>
               <CartasDeckView
                 onOpenAdmet={(drug) => {
@@ -1786,7 +1793,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   onOpenAdmet?.(drug);
                 }}
                 showDocenteBanner={true}
-                tema={topic.id === 'tema-02' ? 2 : 1}
+                tema={numeroTemaCartas(topic.id) ?? 1}
               />
             </div>
           )}
