@@ -6,8 +6,12 @@ import { QfdosAnnouncement, QfdosResourceLink } from '../data/qfdosData';
 // El contenido publicado desde el CMS sustituye por completo a los enlaces y
 // avisos del fichero de datos, así que uno añadido al código nunca llegaba a
 // Gestión Docente y no había forma de publicarlo. Para el profesorado, los
-// que figuran como «nuevos» y no estén ya en lo publicado se añaden una sola
-// vez. Si después se borran, no vuelven: el identificador queda anotado.
+// que figuran como «nuevos» se añaden a la lista mientras no estén publicados.
+//
+// Solo se dejan de ofrecer si el profesor los borra desde el CMS: el borrado
+// anota el identificador (anotarDescartados). No se usa «ya se ofreció una
+// vez»: la lista se recalcula en cada arranque y la copia local se pisa antes
+// de poder consultarla, así que aquello perdía el aviso en la segunda carga.
 //
 // Enlaces: los de fecha igual o posterior a SEMBRAR_DESDE (la fecha corta el
 // paso a enlaces antiguos que se retiraron a propósito).
@@ -16,7 +20,10 @@ import { QfdosAnnouncement, QfdosResourceLink } from '../data/qfdosData';
 
 export const SEMBRAR_DESDE = '2026-09-30';
 
-function leerSembrados(clave: string): Set<string> {
+const CLAVE_AVISOS_DESCARTADOS = 'qfdos_v3_avisos_descartados';
+const CLAVE_LINKS_DESCARTADOS = 'qfdos_v3_links_descartados';
+
+function leerIds(clave: string): Set<string> {
   try {
     const raw = localStorage.getItem(clave);
     const arr = raw ? JSON.parse(raw) : [];
@@ -26,48 +33,33 @@ function leerSembrados(clave: string): Set<string> {
   }
 }
 
-/** Identificadores de la copia local del profesorado (la que escribe la app en cada cambio). */
-function idsEnCopiaLocal(clave: string): Set<string> {
+/** Anota como descartados los elementos que estaban en `antes` y ya no están en `despues`. */
+function anotarDescartados(clave: string, antes: { id: string }[], despues: { id: string }[]): void {
+  const siguen = new Set(despues.map(x => x.id));
+  const borrados = antes.filter(x => !siguen.has(x.id)).map(x => x.id);
+  if (borrados.length === 0) return;
+  const ids = leerIds(clave);
+  borrados.forEach(id => ids.add(id));
   try {
-    const arr = JSON.parse(localStorage.getItem(clave) ?? '[]');
-    return new Set(Array.isArray(arr) ? arr.map((x: { id?: unknown }) => String(x?.id)) : []);
-  } catch {
-    return new Set();
-  }
+    localStorage.setItem(clave, JSON.stringify([...ids]));
+  } catch { /* sin almacenamiento: el elemento puede volver a ofrecerse */ }
 }
 
-/**
- * Se ofrece un elemento nuevo si nunca se había ofrecido, o si se ofreció y
- * sigue en la copia local (la carga publicada lo pisó, pero el profesor no lo
- * borró).
- */
-function ofrecer<T extends { id: string }>(
-  publicados: T[],
-  nuevos: T[],
-  claveSembrados: string,
-  claveCopiaLocal: string
-): T[] {
-  const sembrados = leerSembrados(claveSembrados);
-  const locales = idsEnCopiaLocal(claveCopiaLocal);
+export const anotarAvisosDescartados = (antes: QfdosAnnouncement[], despues: QfdosAnnouncement[]) =>
+  anotarDescartados(CLAVE_AVISOS_DESCARTADOS, antes, despues);
+
+export const anotarEnlacesDescartados = (antes: QfdosResourceLink[], despues: QfdosResourceLink[]) =>
+  anotarDescartados(CLAVE_LINKS_DESCARTADOS, antes, despues);
+
+function ofrecer<T extends { id: string }>(publicados: T[], nuevos: T[], claveDescartados: string): T[] {
+  const descartados = leerIds(claveDescartados);
   const presentes = new Set(publicados.map(x => x.id));
-  const candidatos = nuevos.filter(x => !presentes.has(x.id) && (!sembrados.has(x.id) || locales.has(x.id)));
-  if (candidatos.length === 0) return publicados;
-
-  candidatos.forEach(x => sembrados.add(x.id));
-  try {
-    localStorage.setItem(claveSembrados, JSON.stringify([...sembrados]));
-  } catch { /* sin almacenamiento: volverá a ofrecerse en la próxima carga */ }
-
-  return [...candidatos, ...publicados];
+  const candidatos = nuevos.filter(x => !presentes.has(x.id) && !descartados.has(x.id));
+  return candidatos.length === 0 ? publicados : [...candidatos, ...publicados];
 }
 
 export function conEnlacesNuevos(publicados: QfdosResourceLink[], iniciales: QfdosResourceLink[]): QfdosResourceLink[] {
-  return ofrecer(
-    publicados,
-    iniciales.filter(l => l.addedAt >= SEMBRAR_DESDE),
-    'qfdos_v3_links_sembrados',
-    'qfdos_v3_links'
-  );
+  return ofrecer(publicados, iniciales.filter(l => l.addedAt >= SEMBRAR_DESDE), CLAVE_LINKS_DESCARTADOS);
 }
 
 export function conAvisosNuevos(
@@ -75,10 +67,5 @@ export function conAvisosNuevos(
   iniciales: QfdosAnnouncement[],
   idsAOfrecer: string[]
 ): QfdosAnnouncement[] {
-  return ofrecer(
-    publicados,
-    iniciales.filter(a => idsAOfrecer.includes(a.id)),
-    'qfdos_v3_avisos_sembrados',
-    'qfdos_v3_announcements'
-  );
+  return ofrecer(publicados, iniciales.filter(a => idsAOfrecer.includes(a.id)), CLAVE_AVISOS_DESCARTADOS);
 }

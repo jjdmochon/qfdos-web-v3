@@ -47,7 +47,7 @@ import { CartasDocenteModal } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
-import { conAvisosNuevos, conEnlacesNuevos } from './utils/enlacesNuevos';
+import { conAvisosNuevos, conEnlacesNuevos, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -692,9 +692,9 @@ export const App: React.FC = () => {
           resourceLinks={resourceLinks}
           onClose={() => setIsAdminCmsOpen(false)}
           onUpdateTopics={setTopics}
-          onUpdateAnnouncements={setAnnouncements}
+          onUpdateAnnouncements={nuevos => { anotarAvisosDescartados(announcements, nuevos); setAnnouncements(nuevos); }}
           onUpdateGlossary={setGlossary}
-          onUpdateResourceLinks={setResourceLinks}
+          onUpdateResourceLinks={nuevos => { anotarEnlacesDescartados(resourceLinks, nuevos); setResourceLinks(nuevos); }}
           publicadoEn={publicadoEn}
           onPublicado={(cuando: string) => setPublicadoEn(cuando)}
           onOpenCartas={() => setIsCartasModalOpen(true)}
