@@ -61,6 +61,8 @@ export interface Flashcard {
   difficulty?: 'easy' | 'medium' | 'hard';
   imagePath?: string;
   structures?: FlashcardStructure[];
+  /** Ampliación de temario: se marca en la tarjeta y se puede ocultar */
+  ampliacion?: boolean;
 }
 
 export interface LectureAudioNote {
@@ -473,10 +475,11 @@ export interface StudentQuestion {
  * v3.37.0 — Las ilustraciones de los Nobel llegan también a los enlaces ya publicados (el alumnado no las veía en Medicina y Física).
  * v3.38.0 — Se retira la música sintetizada de las historias sin sonido; quedan los efectos de brag.
  * v3.39.0 — Tema 2: 10 flashcards de autoevaluación (SAR, interacción con el receptor β2, síntesis de salbutamol y guanetidina, estereoquímica) con valoración fácil/difícil.
- * v3.39.1 — Las flashcards del Tema 2 que trae eexport const COURSE_BUILD_TIMESTAMP = '2026-10-07T21:45:00.000Z';a 1 tarjeta en vez de 10).
+ * v3.39.1 — Las flashcards del Tema 2 que trae eexport const COURSE_BUILD_TIMESTAMP = '2026-10-07T21:51:00.000Z';a 1 tarjeta en vez de 10).
  * v3.40.0 — Tema 2: 6 flashcards nuevas sobre lo que más se repite en los exámenes (desarrollo de β-bloqueantes, practolol, fentermina, isoprenalina, imidazolinas y niveles de la sinapsis) y 4 completadas.
+ * v3.41.0 — Flashcards de ampliación de temario: se marcan con su etiqueta y se pueden ocultar.
  */
-export const COURSE_DATA_VERSION = '3.40.0';
+export const COURSE_DATA_VERSION = '3.41.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-07T14:55:00.000Z';
 
 export const QFDOS_INFO = {
@@ -3432,7 +3435,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Escalera del Sustituyente en el Nitrógeno',
         front: '¿Cómo cambia el perfil α/β al aumentar el volumen del sustituyente sobre el nitrógeno, desde la noradrenalina hasta el salbutamol?',
-        back: '**A más volumen en el N, menos α y más β.**\n\n1. **–H (noradrenalina):** preferencia α, con β1 y escasa β2.\n2. **–CH₃ (adrenalina):** perfil mixto α + β.\n3. **–CH(CH₃)₂ (isoprenalina):** β pura, sin α, pero β1 = β2.\n4. **–C(CH₃)₃ (salbutamol, terbutalina):** selectividad **β2 > β1**.\n\n**Por qué:** el receptor β tiene un **bolsillo hidrofóbico** junto al Asp113 donde encajan los grupos ramificados; en el α no cabe nada mayor que un metilo.\n\n**Doble función:** ese mismo volumen impide el acceso de la **MAO**, que oxida bien las aminas primarias y poco sustituidas.',
+        back: '**A más volumen en el N, menos α y más β.**\n\n1. **–H (noradrenalina):** preferencia α, con β1 y escasa β2.\n2. **–CH₃ (adrenalina):** perfil mixto α + β.\n3. **–CH(CH₃)₂ (isoprenalina):** β pura, sin α, pero β1 = β2.\n4. **–C(CH₃)₃ (salbutamol, terbutalina):** selectividad **β2 > β1**.\n\n**Ampliación · por qué:** el receptor β tiene un **bolsillo hidrofóbico** junto al Asp113 donde encajan los grupos ramificados; en el α no cabe nada mayor que un metilo.\n\n**Doble función:** ese mismo volumen impide el acceso de la **MAO**, que oxida bien las aminas primarias y poco sustituidas.',
         structures: [
           { name: 'Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'N–H · α > β' },
           { name: 'Adrenalina', smiles: 'CNC[C@H](O)c1ccc(O)c(O)c1', badge: 'N–CH₃ · α + β' },
@@ -3473,7 +3476,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Farmacóforo β2 en Tres Puntos y Eutómero (R)',
         front: '¿Con qué tres residuos del receptor β2 interacciona el salbutamol y por qué solo el enantiómero (R) es activo?',
-        back: '**Tres puntos de anclaje en el bolsillo ortostérico:**\n1. **Amina protonada → Asp113 (TM3):** enlace iónico. Sin carga positiva no hay agonismo.\n2. **OH bencílico → Asn293 (TM6):** enlace de hidrógeno.\n3. **Donadores del anillo (3-CH₂OH, 4-OH) → Ser203/Ser207 (TM5):** disparan la activación. En algunos textos aparece **Ser204**; las tres serinas están en la misma hélice.\n\n**Además:** el anillo aromático se apila con **Phe290** (TM6). Y la distancia es estricta: **dos carbonos** entre el anillo y el nitrógeno.\n\n**Easson-Stedman:** solo la configuración **(R)** del carbono bencílico satisface los tres contactos a la vez; el (S) alcanza dos. Asigna por CIP: **–OH > –CH₂NHR > arilo > –H**.\n\nEl salbutamol se comercializa como **racemato**; el (R) puro es el **levalbuterol**.',
+        back: '**Tres puntos de anclaje en el bolsillo ortostérico:**\n1. **Amina protonada → Asp113 (TM3):** enlace iónico. Sin carga positiva no hay agonismo.\n2. **OH bencílico → Asn293 (TM6):** enlace de hidrógeno.\n3. **Donadores del anillo (3-CH₂OH, 4-OH) → Ser203/Ser207 (TM5):** disparan la activación.\n\n**Ampliación:** en algunos textos aparece **Ser204** (las tres serinas están en el TM5); el anillo aromático se apila con **Phe290** (TM6), y la distancia entre el anillo y el nitrógeno es estricta: **dos carbonos**.\n\n**Easson-Stedman:** solo la configuración **(R)** del carbono bencílico satisface los tres contactos a la vez; el (S) alcanza dos. Asigna por CIP: **–OH > –CH₂NHR > arilo > –H**.\n\nEl salbutamol se comercializa como **racemato**; el (R) puro es el **levalbuterol**.',
         smiles: 'CC(C)(C)NC[C@H](O)c1ccc(O)c(CO)c1',
         difficulty: 'hard',
         category: 'Interacción Ligando-Receptor'
@@ -3497,7 +3500,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Síntesis de la Guanetidina (Transposición de Beckmann)',
         front: '¿Cómo se sintetiza la guanetidina a partir de la cicloheptanona y por qué no produce sedación, a diferencia de la reserpina?',
-        back: '**Ruta:**\n1. **NH₂OH:** cicloheptanona → oxima.\n2. **Beckmann (medio ácido):** migra el grupo en **anti** al –OH; el anillo de 7 se expande a la lactama de **8 miembros** (azocan-2-ona).\n3. **LiAlH₄:** lactama → **azocano** (amina cíclica).\n4. **ClCH₂CN:** N-alquilación → (azocan-1-il)acetonitrilo.\n5. **LiAlH₄:** nitrilo → amina primaria.\n6. **S-metilisotiourea:** guanilación → **guanetidina**.\n\n**Sin sedación:** la guanidina (pKa ≈ 13) está siempre **protonada** a pH 7,4 y no cruza la barrera hematoencefálica. Actúa solo en el terminal periférico, bloqueando la liberación de NA.\n\n**Misma causa, otro problema:** por estar siempre cargada se **absorbe mal y de forma errática por vía oral**. Lo mismo ocurre con **betanidina** y **debrisoquina**, que también llevan guanidina.',
+        back: '**Ruta:**\n1. **NH₂OH:** cicloheptanona → oxima.\n2. **Beckmann (medio ácido):** migra el grupo en **anti** al –OH; el anillo de 7 se expande a la lactama de **8 miembros** (azocan-2-ona).\n3. **LiAlH₄:** lactama → **azocano** (amina cíclica).\n4. **ClCH₂CN:** N-alquilación → (azocan-1-il)acetonitrilo.\n5. **LiAlH₄:** nitrilo → amina primaria.\n6. **S-metilisotiourea:** guanilación → **guanetidina**.\n\n**Sin sedación:** la guanidina (pKa ≈ 13) está siempre **protonada** a pH 7,4 y no cruza la barrera hematoencefálica. Actúa solo en el terminal periférico, bloqueando la liberación de NA.\n\n**Ampliación · misma causa, otro problema:** por estar siempre cargada se **absorbe mal y de forma errática por vía oral**. Lo mismo ocurre con **betanidina** y **debrisoquina**, que también llevan guanidina.',
         structures: [
           { name: 'Cicloheptanona', smiles: 'O=C1CCCCCC1', badge: 'Anillo de 7' },
           { name: 'Oxima', smiles: 'ON=C1CCCCCC1', badge: 'Sustrato de Beckmann' },
@@ -3512,7 +3515,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Falso Transmisor: α-Metildopa frente a Carbidopa',
         front: '¿Por qué la α-metildopa baja la presión arterial actuando en el SNC, mientras que la carbidopa, tan parecida, actúa solo en la periferia?',
-        back: '**α-Metildopa:** profármaco con esqueleto de α-aminoácido, sustrato de **LAT1**, que la introduce en el SNC. Allí se descarboxila a α-metildopamina y se β-hidroxila a **α-metilnoradrenalina**, un **falso transmisor** que estimula los **α2 centrales** y reduce el tono simpático. Es de elección en la hipertensión del embarazo. **Mecanismo múltiple:** además es sustrato e **inhibidor competitivo de la descarboxilasa**, y su metabolito desplaza a la NA de las vesículas.\n\n**Carbidopa:** cambia el NH₂ por una **hidrazina** (–NH–NH₂). Muy polar, no cruza la barrera: inhibe la **L-aminoácido aromático descarboxilasa periférica** y se asocia a la levodopa para que esta llegue intacta al cerebro.\n\nEl **metilo en α** de ambas frena además la acción de la MAO.',
+        back: '**α-Metildopa:** profármaco con esqueleto de α-aminoácido, sustrato de **LAT1**, que la introduce en el SNC. Allí se descarboxila a α-metildopamina y se β-hidroxila a **α-metilnoradrenalina**, un **falso transmisor** que estimula los **α2 centrales** y reduce el tono simpático. Es de elección en la hipertensión del embarazo. **Ampliación · mecanismo múltiple:** además es sustrato e **inhibidor competitivo de la descarboxilasa**, y su metabolito desplaza a la NA de las vesículas.\n\n**Carbidopa:** cambia el NH₂ por una **hidrazina** (–NH–NH₂). Muy polar, no cruza la barrera: inhibe la **L-aminoácido aromático descarboxilasa periférica** y se asocia a la levodopa para que esta llegue intacta al cerebro.\n\nEl **metilo en α** de ambas frena además la acción de la MAO.',
         structures: [
           { name: 'α-Metildopa', smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Profármaco · SNC' },
           { name: 'α-Metilnoradrenalina', smiles: 'C[C@H](N)[C@H](O)c1ccc(O)c(O)c1', badge: 'Falso transmisor · α2' },
@@ -3577,6 +3580,20 @@ flashcards: [
         category: 'Antagonistas β'
       },
       {
+        id: 'fc-02-16',
+        topicId: 'tema-02',
+        concept: 'Niveles para Disminuir la Transmisión Simpática',
+        front: '¿En qué niveles de la sinapsis adrenérgica se puede reducir la estimulación simpática? Da un fármaco para cada uno.',
+        back: '1. **Biosíntesis:** **(S)-α-metiltirosina** (metirosina) inhibe la **tirosina hidroxilasa**, el paso limitante. El **disulfiramo** inhibe la dopamina-β-hidroxilasa.\n2. **Falso transmisor:** **α-metildopa** → α-metilnoradrenalina, agonista α2 central.\n3. **Almacenamiento:** **reserpina** bloquea el **VMAT**; la NA queda en el citosol y la MAO la degrada.\n4. **Liberación:** **guanetidina** entra por el transportador de NA y bloquea la salida de las vesículas.\n5. **Autorreceptor central:** **clonidina** (α2) frena la salida simpática desde el tronco del encéfalo.\n6. **Receptores postsinápticos:** α-bloqueantes (**prazosina**, **fenoxibenzamina**) y β-bloqueantes (**propranolol**).\n\nLa **metirosina** se usa en el **feocromocitoma**, cuando no se puede operar.',
+        structures: [
+          { name: '(S)-α-Metiltirosina', smiles: 'C[C@](N)(Cc1ccc(O)cc1)C(=O)O', badge: 'Inhibe tirosina hidroxilasa' },
+          { name: 'α-Metildopa', smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Falso transmisor' },
+          { name: 'Guanetidina', smiles: 'NC(=N)NCCN1CCCCCCC1', badge: 'Bloquea la liberación' }
+        ],
+        difficulty: 'easy',
+        category: 'Presinápticos'
+      },
+      {
         id: 'fc-02-12',
         topicId: 'tema-02',
         concept: 'Cardioselectividad β1 y Síntesis del Practolol',
@@ -3589,6 +3606,7 @@ flashcards: [
           { name: 'Atenolol', smiles: 'CC(C)NCC(O)COc1ccc(CC(N)=O)cc1', badge: 'β1 · p-carbamoilmetilo' }
         ],
         difficulty: 'hard',
+        ampliacion: true,
         category: 'Antagonistas β'
       },
       {
@@ -3603,6 +3621,7 @@ flashcards: [
           { name: 'Fentermina', smiles: 'CC(C)(N)Cc1ccccc1', badge: 'Sin H en Cα · anorexígeno' }
         ],
         difficulty: 'medium',
+        ampliacion: true,
         category: 'Agonistas Indirectos'
       },
       {
@@ -3618,6 +3637,7 @@ flashcards: [
           { name: 'Isoprenalina', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1', badge: 'Producto (racemato)' }
         ],
         difficulty: 'hard',
+        ampliacion: true,
         category: 'Síntesis Orgánica'
       },
       {
@@ -3632,21 +3652,8 @@ flashcards: [
           { name: 'Clonidina', smiles: 'Clc1cccc(Cl)c1NC1=NCCN1', badge: 'Tipo II · α2 central' }
         ],
         difficulty: 'medium',
+        ampliacion: true,
         category: 'Agonistas α'
-      },
-      {
-        id: 'fc-02-16',
-        topicId: 'tema-02',
-        concept: 'Niveles para Disminuir la Transmisión Simpática',
-        front: '¿En qué niveles de la sinapsis adrenérgica se puede reducir la estimulación simpática? Da un fármaco para cada uno.',
-        back: '1. **Biosíntesis:** **(S)-α-metiltirosina** (metirosina) inhibe la **tirosina hidroxilasa**, el paso limitante. El **disulfiramo** inhibe la dopamina-β-hidroxilasa.\n2. **Falso transmisor:** **α-metildopa** → α-metilnoradrenalina, agonista α2 central.\n3. **Almacenamiento:** **reserpina** bloquea el **VMAT**; la NA queda en el citosol y la MAO la degrada.\n4. **Liberación:** **guanetidina** entra por el transportador de NA y bloquea la salida de las vesículas.\n5. **Autorreceptor central:** **clonidina** (α2) frena la salida simpática desde el tronco del encéfalo.\n6. **Receptores postsinápticos:** α-bloqueantes (**prazosina**, **fenoxibenzamina**) y β-bloqueantes (**propranolol**).\n\nLa **metirosina** se usa en el **feocromocitoma**, cuando no se puede operar.',
-        structures: [
-          { name: '(S)-α-Metiltirosina', smiles: 'C[C@](N)(Cc1ccc(O)cc1)C(=O)O', badge: 'Inhibe tirosina hidroxilasa' },
-          { name: 'α-Metildopa', smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Falso transmisor' },
-          { name: 'Guanetidina', smiles: 'NC(=N)NCCN1CCCCCCC1', badge: 'Bloquea la liberación' }
-        ],
-        difficulty: 'easy',
-        category: 'Presinápticos'
       }
     ]
   },

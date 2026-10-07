@@ -51,6 +51,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
   // Modo de filtro: Todas o solo las marcadas como difíciles
   const [filterHardOnly, setFilterHardOnly] = useState(false);
+  // Ocultar las tarjetas de ampliación de temario
+  const [ocultarAmpliacion, setOcultarAmpliacion] = useState(false);
 
   // Almacenamiento local persistente por tema
   // Por cuenta: dos personas que comparten equipo no mezclan sus valoraciones.
@@ -80,10 +82,13 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
   // Tarjetas a mostrar según filtro
   const displayCards = useMemo(() => {
-    if (!filterHardOnly) return allCards;
-    const hardFiltered = allCards.filter(c => cardStats[c.id] === 'hard');
-    return hardFiltered.length > 0 ? hardFiltered : allCards;
-  }, [allCards, filterHardOnly, cardStats]);
+    const base = ocultarAmpliacion ? allCards.filter(c => !c.ampliacion) : allCards;
+    const visibles = base.length > 0 ? base : allCards;
+    if (!filterHardOnly) return visibles;
+    const hardFiltered = visibles.filter(c => cardStats[c.id] === 'hard');
+    return hardFiltered.length > 0 ? hardFiltered : visibles;
+  }, [allCards, filterHardOnly, ocultarAmpliacion, cardStats]);
+  const ampliacionCount = allCards.filter(c => c.ampliacion).length;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -297,6 +302,21 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                 <Filter size={11} /> {filterHardOnly ? 'Ver Todas' : 'Solo Difíciles'}
               </button>
             )}
+            {ampliacionCount > 0 && (
+              <button
+                onClick={() => {
+                  setOcultarAmpliacion(!ocultarAmpliacion);
+                  setCurrentIndex(0);
+                  setIsFlipped(false);
+                }}
+                className={`btn btn-sm ${ocultarAmpliacion ? 'btn-secondary' : 'btn-outline'}`}
+                style={{ fontSize: '0.7rem', padding: '2px 6px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                title="Mostrar u ocultar las tarjetas de ampliación de temario"
+                aria-pressed={ocultarAmpliacion}
+              >
+                <Filter size={11} /> {ocultarAmpliacion ? `Con ampliación (${ampliacionCount})` : 'Sin ampliación'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -394,6 +414,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                               {c.category}
                             </span>
                           )}
+                          {c.ampliacion && (
+                            <span className="qfdos-badge badge-amber" style={{ fontSize: '0.65rem' }}>
+                              Ampliación
+                            </span>
+                          )}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <button
@@ -483,7 +508,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                           width: '26px',
                           height: '26px',
                           borderRadius: '6px',
-                          border: isCurrent ? '2px solid var(--navy)' : '1px solid transparent',
+                          border: isCurrent ? '2px solid var(--navy)' : c.ampliacion ? '1px dashed var(--accent-amber)' : '1px solid transparent',
                           background: isCurrent && !st ? 'var(--primary-bg)' : bg,
                           color: isCurrent && !st ? 'var(--navy-ink)' : color,
                           fontSize: '0.72rem',
@@ -496,7 +521,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                           transform: isCurrent ? 'scale(1.15)' : 'none',
                           transition: 'all 150ms ease'
                         }}
-                        title={`Tarjeta ${idx + 1}: ${c.concept} (${st ? (st === 'easy' ? 'Fácil' : 'Difícil') : 'Sin valorar'})`}
+                        title={`Tarjeta ${idx + 1}: ${c.concept}${c.ampliacion ? ' · Ampliación de temario' : ''} (${st ? (st === 'easy' ? 'Fácil' : 'Difícil') : 'Sin valorar'})`}
                       >
                         {idx + 1}
                       </button>
@@ -508,6 +533,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   {currentCard.category && (
                     <span className="qfdos-badge badge-teal" style={{ fontSize: '0.72rem' }}>
                       {currentCard.category}
+                    </span>
+                  )}
+                  {currentCard.ampliacion && (
+                    <span className="qfdos-badge badge-amber" style={{ fontSize: '0.72rem' }} title="Ampliación de temario">
+                      Ampliación
                     </span>
                   )}
                   {cardStats[currentCard.id] && (
@@ -577,6 +607,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     <h4 style={{ fontSize: '1.18rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.55 }}>
                       {currentCard.front}
                     </h4>
+                    {currentCard.ampliacion && (
+                      <p style={{ fontSize: '0.8rem', color: 'var(--warn-ink)', fontWeight: 600, marginTop: '0.9rem' }}>
+                        Ampliación de temario.
+                      </p>
+                    )}
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem' }}>
                       (Haz clic sobre la tarjeta para revelar la respuesta y las estructuras moleculares)
                     </p>
