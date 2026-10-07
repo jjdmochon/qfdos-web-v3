@@ -48,7 +48,7 @@ import { CartasDocenteModal } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
-import { conAvisosNuevos, conEnlacesNuevos, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
+import { conAvisosNuevos, conEnlacesNuevos, conMediosDelCodigo, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -311,7 +311,7 @@ export const App: React.FC = () => {
   );
 
   const [resourceLinks, setResourceLinks] = useState<QfdosResourceLink[]>(() =>
-    contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS)
+    conMediosDelCodigo(contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS), INITIAL_RESOURCE_LINKS)
   );
 
   // Modal states
@@ -415,7 +415,8 @@ export const App: React.FC = () => {
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
       if (Array.isArray(remoto.resourceLinks)) {
         // Al profesorado se le ofrecen los enlaces nuevos del código para que pueda publicarlos
-        setResourceLinks(isProfesor ? conEnlacesNuevos(remoto.resourceLinks, INITIAL_RESOURCE_LINKS) : remoto.resourceLinks);
+        const publicados = conMediosDelCodigo(remoto.resourceLinks, INITIAL_RESOURCE_LINKS);
+        setResourceLinks(isProfesor ? conEnlacesNuevos(publicados, INITIAL_RESOURCE_LINKS) : publicados);
       }
       setPublicadoEn(remoto.publicadoEn || '');
     });
