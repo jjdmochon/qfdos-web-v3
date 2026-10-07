@@ -471,9 +471,10 @@ export interface StudentQuestion {
  * v3.35.0 — Enlace de interés y Historia: Nobel de Química 2026 (Kagan y Soai).
  * v3.36.0 — Ilustraciones de la Academia (Niklas Elmehed) como fondo de las noticias de los tres Nobel 2026 y énfasis en la estereoquímica.
  * v3.37.0 — Las ilustraciones de los Nobel llegan también a los enlaces ya publicados (el alumnado no las veía en Medicina y Física).
+ * v3.38.0 — Se retira la música sintetizada de las historias sin sonido; quedan los efectos de brag.
  */
-export const COURSE_DATA_VERSION = '3.37.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-07T12:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.38.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-07T13:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
