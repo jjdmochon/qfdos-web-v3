@@ -446,9 +446,10 @@ export interface StudentQuestion {
  * v3.31.0 — Tema 3: baraja de 20 cartas dopaminérgicas y 43 fármacos con estructura en Fármacos & Quimioinformática.
  * v3.32.0 — Tema 3 sin test ni flashcards (se retiran del código y del contenido publicado).
  * v3.33.0 — Enlaces de interés: Nobel de Medicina 2026 (optogenética) y de Física 2026 (IceCube).
+ * v3.34.0 — Las claves de corrección incluyen los 3 modelos del Tema 2 (antes solo el Modelo 1 llegaba al servidor).
  */
-export const COURSE_DATA_VERSION = '3.33.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-06T13:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.34.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-07T00:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
