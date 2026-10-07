@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { CourseAttachment, QfdosAnnouncement, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
 import { avisosRecientesPrimero } from '../utils/avisos';
-import { sonarMusica, silenciarMusica, efectoHistoria, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
+import { efectoHistoria, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
 
 // ==========================================================================
 // Historias QFDOS
@@ -420,14 +420,6 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   const tieneMedio = !!(historia.video || historia.audio) && !mediaFailed;
   const hayAudio = !!historia.audio && !historia.video;
   const fondoClase = fondoDe(historia);
-
-  // Música de fondo: solo en historias sin sonido propio, sin pausa ni silencio
-  const conMusica = autoplay && !muted && !paused && !tieneMedio;
-  useEffect(() => {
-    if (conMusica) sonarMusica();
-    else silenciarMusica();
-  }, [conMusica]);
-  useEffect(() => () => silenciarMusica(0.3), []);
 
   // Efectos de interfaz (los de brag): golpe suave al abrir y carta que se desliza al cambiar de
   // historia, salvo que la nueva traiga su propio sonido
