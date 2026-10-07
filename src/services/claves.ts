@@ -12,6 +12,7 @@ import {
   MODELO_E_TEST_QUESTIONS, MODELO_FIR_TEST_QUESTIONS, RETROSINTESIS_TEST_QUESTIONS,
   type QfdosTopic, type TestQuestion
 } from '../data/qfdosData';
+import { TEMA2_MODELO_1_TEST_QUESTIONS, TEMA2_MODELO_2_TEST_QUESTIONS, TEMA2_MODELO_3_TEST_QUESTIONS } from '../data/tema02ExamsData';
 import { getGoogleSheetsUrl } from './googleSheetsService';
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 
@@ -36,6 +37,7 @@ export function construirClaves(topics: QfdosTopic[]): { claves: Record<string, 
   const bancos: TestQuestion[][] = [
     MODELO_A_TEST_QUESTIONS, MODELO_B_TEST_QUESTIONS, MODELO_C_TEST_QUESTIONS,
     MODELO_E_TEST_QUESTIONS, MODELO_FIR_TEST_QUESTIONS, RETROSINTESIS_TEST_QUESTIONS,
+    TEMA2_MODELO_1_TEST_QUESTIONS, TEMA2_MODELO_2_TEST_QUESTIONS, TEMA2_MODELO_3_TEST_QUESTIONS,
     ...topics.map(t => t.testQuestions ?? [])
   ];
   const claves: Record<string, number> = {};
