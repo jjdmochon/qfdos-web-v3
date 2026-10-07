@@ -233,6 +233,8 @@ export interface QfdosResourceLink {
   addedAt: string;
   /** Portada de la noticia: se usa como fondo en las Historias */
   imageUrl?: string;
+  /** Crédito de la imagen, visible en las Historias */
+  imageCredit?: string;
   /** MP4/WebM directo: se reproduce en las Historias (primeros 30 s) */
   videoUrl?: string;
 }
@@ -254,11 +256,13 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
     title: 'Nobel de Química 2026: Kagan y Soai, efectos no lineales y autocatálisis en síntesis asimétrica',
     url: 'https://www.nobelprize.org/prizes/chemistry/2026/press-release/',
     summary:
-      'En cuanto al Nobel de Química, la Academia Sueca premia a Henri B. Kagan (Universidad Paris-Saclay, emérito) y Kenso Soai (Universidad de Ciencias de Tokio, emérito) por el descubrimiento de los efectos no lineales y la autocatálisis en la síntesis orgánica asimétrica. Kagan mostró que la pureza enantiomérica del producto no tiene por qué ser proporcional a la del catalizador quiral, y su bisfosfina DIOP abrió la hidrogenación asimétrica con rodio. Soai describió en 1995 la primera reacción autocatalítica con amplificación asimétrica: un alcohol pirimidílico quiral cataliza su propia formación a partir de pirimidina-5-carbaldehído y diisopropilcinc, y un exceso enantiomérico ínfimo termina en un producto casi enantiopuro. Es el modelo experimental más claro de cómo una pequeña asimetría inicial pudo imponer la homoquiralidad de la vida. Para nosotros conecta de lleno con la eudismia que vemos en el Tema 2: cada enantiómero de un β2 agonista o de un β-bloqueante tiene una actividad distinta, y fabricar solo el activo es un problema de química orgánica antes que farmacológico. Os recomiendo leerlo con los apuntes de estereoquímica delante.',
+      'En cuanto al Nobel de Química, quiero que os quedéis con una idea: la vida es enantiopura. Los aminoácidos son L, los azúcares son D, y todas las dianas que nos interesan (receptores, enzimas, canales) son entornos quirales que distinguen a los dos enantiómeros de un fármaco con precisión absoluta. Por eso sintetizar moléculas enantioméricamente puras es el camino para interaccionar con los sistemas biológicos de forma mucho más precisa: un enantiómero es el eutómero y el otro, el distómero, puede ser inactivo, más tóxico o incluso antagonista. Es la eudismia que veis en el Tema 2, con los β2 agonistas y los β-bloqueantes. La Academia Sueca premia a Henri B. Kagan (Universidad Paris-Saclay, emérito) y Kenso Soai (Universidad de Ciencias de Tokio, emérito) por el descubrimiento de los efectos no lineales y la autocatálisis en la síntesis orgánica asimétrica. Kagan demostró que la pureza enantiomérica del producto no tiene por qué ser proporcional a la del catalizador quiral (efectos no lineales), y su bisfosfina DIOP abrió la hidrogenación asimétrica con rodio. Soai describió en 1995 la primera reacción autocatalítica con amplificación asimétrica: un alcohol pirimidílico quiral cataliza su propia formación a partir de pirimidina-5-carbaldehído y diisopropilcinc, y un exceso enantiomérico ínfimo acaba en un producto casi enantiopuro. Es el modelo experimental más claro de cómo una asimetría mínima pudo imponer la homoquiralidad de la vida. Un fármaco racémico es, en la práctica, una mezcla de dos compuestos distintos, y dominar la síntesis asimétrica es lo que permite administrar solo el que hace el trabajo. Os recomiendo leerlo con los apuntes de estereoquímica delante.',
     category: 'Divulgación',
     source: 'NobelPrize.org',
     duration: '6 min',
     relatedTopic: 'Tema 02',
+    imageUrl: 'historias/nobel-quimica-2026.jpg',
+    imageCredit: 'Ilustración: Niklas Elmehed © Nobel Prize Outreach',
     featured: true,
     addedAt: '2026-10-07'
   },
@@ -272,6 +276,8 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
     source: 'NobelPrize.org',
     duration: '5 min',
     relatedTopic: 'Tema 03',
+    imageUrl: 'historias/nobel-medicina-2026.jpg',
+    imageCredit: 'Ilustración: Niklas Elmehed © Nobel Prize Outreach',
     featured: true,
     addedAt: '2026-10-06'
   },
@@ -284,6 +290,8 @@ export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
     category: 'Divulgación',
     source: 'NobelPrize.org',
     duration: '5 min',
+    imageUrl: 'historias/nobel-fisica-2026.jpg',
+    imageCredit: 'Ilustración: Niklas Elmehed © Nobel Prize Outreach',
     featured: true,
     addedAt: '2026-10-06'
   },
@@ -461,9 +469,10 @@ export interface StudentQuestion {
  * v3.33.0 — Enlaces de interés: Nobel de Medicina 2026 (optogenética) y de Física 2026 (IceCube).
  * v3.34.0 — Las claves de corrección incluyen los 3 modelos del Tema 2 (antes solo el Modelo 1 llegaba al servidor).
  * v3.35.0 — Enlace de interés y Historia: Nobel de Química 2026 (Kagan y Soai).
+ * v3.36.0 — Ilustraciones de la Academia (Niklas Elmehed) como fondo de las noticias de los tres Nobel 2026 y énfasis en la estereoquímica.
  */
-export const COURSE_DATA_VERSION = '3.35.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-07T11:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.36.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-07T11:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

@@ -41,6 +41,8 @@ interface Historia {
   fecha?: string;
   video?: string;
   imagen?: string;
+  /** Crédito de la imagen, visible bajo el texto */
+  credito?: string;
   audio?: string;
   /** Cómo encaja el vídeo en el 9:16: vertical = cubrir, apaisado = contener */
   ajuste?: 'cubrir' | 'contener';
@@ -219,7 +221,8 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
         titulo: l.title, texto: recortar(l.summary, video ? 240 : 320),
         fecha: [l.source, l.duration].filter(Boolean).join(' · ') || undefined,
         imagen: l.imageUrl ? resolver(l.imageUrl) : undefined,
-        video, ajuste: video ? 'contener' : undefined, maxSegundos: video ? SEGUNDOS_PODCAST : undefined,
+        credito: l.imageUrl ? l.imageCredit : undefined,
+        video, ajuste: video || l.imageUrl ? 'contener' : undefined, maxSegundos: video ? SEGUNDOS_PODCAST : undefined,
         acciones: [
           ...(cb.onAbrirEnlace ? [{ label: 'Leer la noticia completa', icono: 'tema' as const, alPulsar: () => cb.onAbrirEnlace?.(l) }] : []),
           { label: l.source && l.source.length <= 24 ? `Leer en ${l.source}` : 'Abrir el enlace', icono: 'enlace', href: resolver(l.url) }
@@ -543,6 +546,7 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
           </span>
           <h2 className="hist-titulo">{historia.titulo}</h2>
           {historia.texto && <p className="hist-texto">{historia.texto}</p>}
+          {historia.credito && <span className="hist-credito">{historia.credito}</span>}
           {historia.acciones.length > 0 && (
             <div className="hist-acciones">
               {historia.acciones.map(a => a.href ? (

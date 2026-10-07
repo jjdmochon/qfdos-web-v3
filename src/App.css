@@ -408,6 +408,7 @@
 .hist-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 20px 28px; display: flex; flex-direction: column; gap: 10px; z-index: 2; pointer-events: none; }
 .hist-body a, .hist-body button { pointer-events: auto; }
 .hist-titulo { margin: 0; font-size: clamp(1.25rem, 5vw, 1.6rem); font-weight: 800; line-height: 1.2; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45); }
+.hist-credito { font-size: 0.68rem; color: rgba(255, 255, 255, 0.6); }
 .hist-texto { margin: 0; font-size: 0.95rem; line-height: 1.55; color: rgba(255, 255, 255, 0.92); display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
 .hist-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .hist-cta { border: 0; cursor: pointer; font: inherit; font-weight: 700; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px; border-radius: 999px; background: #fff; color: var(--navy-dark); font-weight: 700; font-size: 0.85rem; text-decoration: none; }
