@@ -475,11 +475,12 @@ export interface StudentQuestion {
  * v3.37.0 — Las ilustraciones de los Nobel llegan también a los enlaces ya publicados (el alumnado no las veía en Medicina y Física).
  * v3.38.0 — Se retira la música sintetizada de las historias sin sonido; quedan los efectos de brag.
  * v3.39.0 — Tema 2: 10 flashcards de autoevaluación (SAR, interacción con el receptor β2, síntesis de salbutamol y guanetidina, estereoquímica) con valoración fácil/difícil.
- * v3.39.1 — Las flashcards del Tema 2 que trae eexport const COURSE_BUILD_TIMESTAMP = '2026-10-07T21:51:00.000Z';a 1 tarjeta en vez de 10).
+ * v3.39.1 — Las flashcards del Tema 2 que trae eexport const COURSE_BUILD_TIMESTAMP = '2026-10-07T21:59:00.000Z';a 1 tarjeta en vez de 10).
  * v3.40.0 — Tema 2: 6 flashcards nuevas sobre lo que más se repite en los exámenes (desarrollo de β-bloqueantes, practolol, fentermina, isoprenalina, imidazolinas y niveles de la sinapsis) y 4 completadas.
  * v3.41.0 — Flashcards de ampliación de temario: se marcan con su etiqueta y se pueden ocultar.
+ * v3.42.0 — Reversos de las flashcards de los Temas 1 y 2 reescritos en la voz del profesor (certificados con Jev); la química no cambia.
  */
-export const COURSE_DATA_VERSION = '3.41.0';
+export const COURSE_DATA_VERSION = '3.42.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-07T14:55:00.000Z';
 
 export const QFDOS_INFO = {
@@ -2649,7 +2650,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Regla de los Cinco Átomos de Ing',
         front: '¿En qué consiste la Regla de Ing para agonistas colinérgicos y cómo se numeran los 5 átomos de la cadena de la acetilcolina?',
-        back: '**Regla de los Cinco Átomos de Ing:** Para una actividad agonista muscarínica óptima, la cadena principal unida al catión amonio cuaternario no debe sobrepasar 5 átomos de longitud (distancia exacta de la acetilcolina). Cadenas más largas superan las dimensiones del bolsillo del receptor, perdiendo afinidad agonista o actuando como antagonistas.\n\n**Numeración de los 5 átomos de la cadena (desde N⁺):**\n1. **Átomo 1:** Carbono α (-CH₂- unido directamente al nitrógeno)\n2. **Átomo 2:** Carbono β (-CH₂- espaciador etilénico)\n3. **Átomo 3:** Oxígeno del éster (-O-)\n4. **Átomo 4:** Carbono del carbonilo (-C=O)\n5. **Átomo 5:** Carbono del metilo terminal (-CH₃)\n\n**Efecto Trietilo:** Sustituir los 3 metilos por etilos desplaza el catión de r ≈ 3.2 Å a r > 7.5 Å de la cavidad receptora, permitiendo la intrusión de agua (la constante dieléctrica ε aumenta de ~3 a ~80) y colapsando la atracción de Coulomb (molécula inactiva).',
+        back: 'En cuanto a la regla de Ing, para que un agonista muscarínico funcione bien la cadena unida al amonio cuaternario no debe pasar de **cinco átomos**, que es justo lo que mide la acetilcolina. Si la alargamos, la molécula ya no cabe en el bolsillo del receptor: pierde afinidad o acaba comportándose como antagonista.\n\nContamos los cinco átomos desde el N⁺:\n1. **Carbono α**, el –CH₂– unido al nitrógeno.\n2. **Carbono β**, el segundo –CH₂– del puente etilénico.\n3. **Oxígeno** del éster.\n4. **Carbono carbonílico**.\n5. **Metilo terminal**.\n\nSobre el efecto trietilo: si cambiamos los tres metilos por etilos, el catión se aleja del sitio aniónico, de r ≈ 3,2 Å a más de 7,5 Å. Entra agua en la cavidad, la constante dieléctrica sube de ~3 a ~80 y la atracción de Coulomb se desploma: la molécula queda inactiva.',
         smiles: 'CC(=O)OCC[N+](C)(C)C',
         imagePath: 'assets/tema-01/acetilcolina_regla_5_atomos.svg',
         difficulty: 'easy',
@@ -2660,7 +2661,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Eudismia de la Metacolina ((S) vs (R))',
         front: '¿Por qué el enantiómero (S)-metacolina es ~250 veces más potente sobre receptores muscarínicos que el distómero (R)?',
-        back: 'Porque la disposición espacial tridimensional de la **(S)-metacolina** mimetiza con fidelidad absoluta la conformación activa de la **(+)-(2S,4R,5S)-muscarina**, encajando perfectamente en los 3 puntos de fijación del receptor muscarínico sin choques estéricos.',
+        back: 'Respecto a la eudismia, la **(S)-metacolina** coloca sus grupos en el espacio igual que la **(+)-(2S,4R,5S)-muscarina** en su conformación activa. Por eso encaja en los tres puntos de fijación del receptor muscarínico sin choques estéricos y es unas 250 veces más potente que la (R), que no consigue ese ajuste.',
         smiles: 'C[C@@H](C[N+](C)(C)C)OC(=O)C',
         difficulty: 'easy',
         category: 'Estereoquímica'
@@ -2670,7 +2671,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Sinergia Estérica y Electrónica en Betanecol',
         front: '¿Qué modificaciones estructurales convierten al Betanecol en un agonista muscarínico oral resistente a la acetilcolinesterasa?',
-        back: '1. **Protección Electrónica:** Grupo éster carbámico (-O-CO-NH₂), cuya resonancia amídica reduce el carácter electrófilo del carbonilo.\n2. **Protección Estérica:** Metilo en el carbono beta, que apantalla físicamente el acceso nucleofílico de la Ser-203 de la AChE.',
+        back: 'En el betanecol juntamos dos protecciones distintas. La **electrónica** viene del carbamato (–O–CO–NH₂): la resonancia de la amida rebaja el carácter electrófilo del carbonilo y la AChE lo hidroliza mal. La **estérica** viene del metilo en el carbono β, que tapa el acceso de la Ser203 de la AChE. Con las dos a la vez tenemos un agonista muscarínico estable que podemos dar por vía oral.',
         smiles: 'CC(C[N+](C)(C)C)OC(=O)N',
         difficulty: 'medium',
         category: 'SAR Agonistas'
@@ -2680,7 +2681,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Aminoácidos Clave de la AChE y su Función Catalítica',
         front: '¿Cuáles son los 4 aminoácidos esenciales del centro activo de la Acetilcolinesterasa y qué papel molecular cumple cada uno?',
-        back: '• **Aspartato (Asp):** Ubicado en el **sitio aniónico**, establece la atracción iónica esencial con el catión trimetilamonio de la acetilcolina.\n• **Tirosina (Tyr):** Ubicada en el **sitio esterásico**, dona un enlace de hidrógeno al oxígeno carbonílico, polarizándolo y orientando el sustrato.\n• **Serina (Ser):** Actúa como el **nucleófilo principal**, cuyo grupo hidroxilo ataca al éster para formar el intermediario covalente acetil-enzima.\n• **Histidina (His):** Funciona como **catalizador ácido/base general**, asistiendo indispensablemente a la serina en la acetilación y desacetilación.',
+        back: 'Sobre el centro activo de la AChE, trabajamos con cuatro residuos. El **aspartato**, en el sitio aniónico, sujeta por atracción iónica el trimetilamonio de la acetilcolina. La **tirosina**, en el sitio esterásico, dona un enlace de hidrógeno al oxígeno del carbonilo, lo polariza y orienta el sustrato.\n\nLa **serina** es el nucleófilo: su OH ataca el éster y forma el intermedio covalente acetil-enzima. La **histidina** hace de catalizador ácido/base general y asiste a la serina tanto en la acetilación como en la desacetilación.',
         structures: [
           { name: 'Aspartato (Asp)', smiles: 'N[C@@H](CC(=O)O)C(=O)O', badge: 'Sitio Aniónico' },
           { name: 'Tirosina (Tyr)', smiles: 'N[C@@H](Cc1ccc(O)cc1)C(=O)O', badge: 'Sitio Esterásico (H-bond)' },
@@ -2695,7 +2696,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Mecanismo de Desfosforilación por Pralidoxima (2-PAM)',
         front: '¿Cuál es el fundamento químico de la reactivación de la AChE fosforilada mediante Pralidoxima?',
-        back: 'El catión piridínico de PAM se ancla en el sitio aniónico libre, situando el grupo oxima (=N-OH) en vecindad inmediata al fósforo. El anión oximato efectúa un ataque nucleofílico concertado (efecto alfa) desplazando la Ser-203 y regenerando la enzima libre activa.',
+        back: 'En la reactivación con pralidoxima, el catión piridinio se ancla en el sitio aniónico, que está libre, y deja el grupo oxima (=N–OH) justo al lado del fósforo. El oximato ataca al fósforo de forma concertada, ayudado por el **efecto α**, desplaza a la Ser203 y nos devuelve la enzima activa.',
         smiles: 'C[N+]1=CC=CC=C1C=NO',
         imagePath: 'assets/tema-01/structure_image_70.png',
         difficulty: 'medium',
@@ -2706,7 +2707,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Fenómeno de Envejecimiento (Aging) de la AChE',
         front: '¿Qué transformación química impide que un organofosforado sea revertido por oximas tras varias horas?',
-        back: 'La **descalquilación hidrolítica** de una de las cadenas alcóxido unidas al fósforo. Esto genera un oxígeno aniónico terminal (-P-O⁻), cuya carga negativa repele electrostáticamente a la oxima nucleófila impidiendo la reactivación.',
+        back: 'Sobre el envejecimiento, lo que ocurre con las horas es una **desalquilación hidrolítica** de una de las cadenas alcoxilo unidas al fósforo. Queda un oxígeno aniónico terminal (P–O⁻) y esa carga negativa repele a la oxima nucleófila. A partir de ahí ya no podemos reactivar la enzima; por eso la oxima hay que darla pronto.',
         smiles: 'CC(C)OP(=O)(C)F',
         difficulty: 'hard',
         category: 'Toxicología'
@@ -2716,7 +2717,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'BHE: Fisostigmina vs Neostigmina',
         front: '¿Por qué la Fisostigmina cruza la BHE mientras que la Neostigmina carece de acción central?',
-        back: '• **Fisostigmina (Amina Terciaria):** Contiene un nitrógeno básico terciario. A pH fisiológico 7.4 coexiste en equilibrio entre la forma protonada y la forma neutra lipófila; esta fracción no ionizada **SÍ atraviesa la BHE**, permitiendo revertir intoxicaciones anticolinérgicas centrales en el SNC.\n\n• **Neostigmina (Amonio Cuaternario):** Posee una cabeza catiónica de trimetilamonio cuaternario (-N⁺(CH₃)₃) con carga positiva permanente. Por su alta polaridad e incapacidad de desprotonarse, **NO atraviesa la BHE**, restringiendo su acción a la placa motora (miastenia gravis) y vísceras periféricas.',
+        back: 'Respecto a la barrera hematoencefálica, la clave está en el nitrógeno. La **fisostigmina** es una amina terciaria: a pH 7,4 convive la forma protonada con una fracción neutra y lipófila, y esa fracción **sí cruza la BHE**. Por eso la usamos para revertir intoxicaciones anticolinérgicas centrales.\n\nLa **neostigmina** lleva un trimetilamonio cuaternario (–N⁺(CH₃)₃) con carga permanente. No puede desprotonarse, es muy polar y **no cruza la BHE**: su acción se queda en la placa motora (miastenia gravis) y en las vísceras.',
         structures: [
           { name: 'Fisostigmina', smiles: 'CC12CCN(C1N(C3=C2C=C(C=C3)OC(=O)NC)C)C', badge: 'Amina 3ª · Cruza BHE' },
           { name: 'Neostigmina', smiles: 'CN(C)C(=O)OC1=CC=CC(=C1)[N+](C)(C)C', badge: 'Amonio 4º · NO Cruza BHE' }
@@ -2729,7 +2730,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Síntesis Industrial de Metacolina y Betanecol',
         front: '¿Cómo se diferencian las síntesis industriales de Metacolina y Betanecol a partir del alcohol secundario común?',
-        back: 'Ambas parten del mismo **alcohol secundario**, el **1-(trimetilamonio)propan-2-ol**: bromación de la acetona, cuaternización con trimetilamina y reducción con LiAlH₄.\n• **Metacolina:** Se acila directamente con **anhídrido acético** ((CH₃CO)₂O).\n• **Betanecol:** Reacciona primero con **fosgeno (COCl₂)** dando un cloroformiato y luego con **amoniaco (NH₃)** rindiendo el carbamato terminal.',
+        back: 'En las dos síntesis partimos del mismo alcohol secundario, el **1-(trimetilamonio)propan-2-ol**, que sale de bromar la acetona, cuaternizar con trimetilamina y reducir con LiAlH₄. A partir de ahí se separan. Para la **metacolina** acilamos directamente con **anhídrido acético**. Para el **betanecol** tratamos primero con **fosgeno**, que da el cloroformiato, y después con **amoniaco**, que nos deja el carbamato.',
         smiles: 'CC(C[N+](C)(C)C)OC(=O)C',
         difficulty: 'medium',
         imagePath: 'assets/tema-01/sintesis_metacolina_betanecol.png',
@@ -2740,7 +2741,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Bioisostería del Enlace Éster en Antiparkinsonianos',
         front: '¿Cómo se evita la hidrólisis metabólica de los anticolinérgicos sintéticos en Trihexifenidilo y Biperideno?',
-        back: 'Sustituyendo el enlace éster hidrolizable (-COO-) por un **alcohol terciario alifático (-C(OH)-)** unido a cadenas alicíclicas y a un anillo de piperidina, logrando fármacos resistentes a esterasas con alta penetración en el SNC.',
+        back: 'Para que el trihexifenidilo y el biperideno no se hidrolicen, cambiamos el éster (–COO–) por un **alcohol terciario** (–C(OH)–) unido a anillos alicíclicos y a una piperidina. Las esterasas ya no tienen nada que cortar, y la molécula, lipófila, entra bien en el SNC: por eso son antiparkinsonianos centrales.',
         smiles: 'C1CCC(CC1)C(CCN2CCCCC2)(C3=CC=CC=C3)O',
         difficulty: 'medium',
         category: 'Bioisostería'
@@ -2750,7 +2751,7 @@ flashcards: [
         topicId: 'tema-01',
         concept: 'Tubocurarina y Distancia Nicotínica',
         front: '¿Qué características estructurales definen a la Tubocurarina como bloqueante neuromuscular competitivo prototipo?',
-        back: 'Es un alcaloide natural con **dos centros catiónicos separados por una distancia rígida de 1.4 nm (14 Å)**. Esta separación complementa con exactitud los dos bolsillos de unión de las dos subunidades alfa del receptor nicotínico muscular de la placa motora.',
+        back: 'La tubocurarina es un alcaloide natural con **dos centros catiónicos** separados por una distancia rígida de **1,4 nm (14 Å)**. Esa separación coincide con la que hay entre los sitios de unión de las dos subunidades α del receptor nicotínico muscular, así que los ocupa a la vez y bloquea la placa motora de forma competitiva.',
         smiles: 'CN1CCC2=CC(=C3C=C2C1CC4=CC=C(C=C4)OC5=C6C(CC7=CC(=C(C=C7)O)O3)[N+](CCC6=CC(=C5O)OC)(C)C)OC',
         imagePath: 'assets/tema-01/image_47.png',
         difficulty: 'hard',
@@ -3435,7 +3436,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Escalera del Sustituyente en el Nitrógeno',
         front: '¿Cómo cambia el perfil α/β al aumentar el volumen del sustituyente sobre el nitrógeno, desde la noradrenalina hasta el salbutamol?',
-        back: '**A más volumen en el N, menos α y más β.**\n\n1. **–H (noradrenalina):** preferencia α, con β1 y escasa β2.\n2. **–CH₃ (adrenalina):** perfil mixto α + β.\n3. **–CH(CH₃)₂ (isoprenalina):** β pura, sin α, pero β1 = β2.\n4. **–C(CH₃)₃ (salbutamol, terbutalina):** selectividad **β2 > β1**.\n\n**Ampliación · por qué:** el receptor β tiene un **bolsillo hidrofóbico** junto al Asp113 donde encajan los grupos ramificados; en el α no cabe nada mayor que un metilo.\n\n**Doble función:** ese mismo volumen impide el acceso de la **MAO**, que oxida bien las aminas primarias y poco sustituidas.',
+        back: 'En cuanto a la escalera del nitrógeno, a más volumen en el N, menos α y más β. Con **–H** (noradrenalina) domina la acción α, con algo de β1 y poca β2. Con **–CH₃** (adrenalina) tenemos un perfil mixto α + β. Con **–CH(CH₃)₂** (isoprenalina) ya es β pura, pero sin distinguir β1 de β2. Y con **–C(CH₃)₃** (salbutamol, terbutalina) llegamos a la selectividad **β2 > β1**.\n\nEse mismo volumen nos protege además de la **MAO**, que oxida bien las aminas primarias y poco sustituidas.\n\n**Ampliación:** el receptor β tiene un **bolsillo hidrofóbico** junto al Asp113 donde encajan los grupos ramificados; en el α no cabe nada mayor que un metilo.',
         structures: [
           { name: 'Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'N–H · α > β' },
           { name: 'Adrenalina', smiles: 'CNC[C@H](O)c1ccc(O)c(O)c1', badge: 'N–CH₃ · α + β' },
@@ -3450,7 +3451,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Metilación por COMT del 3-OH',
         front: '¿Qué hidroxilo del catecol metila la COMT, con qué cofactores, y por qué el metabolito pierde la actividad?',
-        back: '**La COMT metila siempre el 3-OH (meta), nunca el 4-OH.** El metilo procede de la **S-adenosil-L-metionina (SAM)** y el **Mg²⁺** coordina los dos oxígenos del catecol en orto.\n\n• Noradrenalina → **normetanefrina**\n• Adrenalina → **metanefrina**\n• Dopamina → **3-metoxitiramina**\n\n**Por qué es inactivo:** el 3-OCH₃ ya no dona enlace de hidrógeno a la **Ser203** del TM5 y además añade volumen donde el bolsillo es estrecho.',
+        back: 'Respecto a la COMT, la enzima metila siempre el **3-OH (meta)**, nunca el 4-OH. Toma el metilo de la **S-adenosil-L-metionina (SAM)** y usa el **Mg²⁺** para coordinar los dos oxígenos del catecol en orto. Así la noradrenalina pasa a **normetanefrina**, la adrenalina a **metanefrina** y la dopamina a **3-metoxitiramina**.\n\nEl metabolito es inactivo porque el 3-OCH₃ ya no puede donar el enlace de hidrógeno a la **Ser203** del TM5 y, además, mete volumen donde el bolsillo es estrecho.',
         structures: [
           { name: '(R)-Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'Sustrato · 3-OH libre' },
           { name: 'Normetanefrina', smiles: 'NC[C@H](O)c1ccc(O)c(OC)c1', badge: 'Metabolito inactivo · 3-OCH₃' }
@@ -3463,7 +3464,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Dos Soluciones a la COMT: Salbutamol y Terbutalina',
         front: 'Salbutamol y terbutalina resisten la COMT. ¿Qué estrategia estructural usa cada uno y qué significa que «el sitio del 3-OH es un volumen, no un punto»?',
-        back: '**Salbutamol (saligenina):** cambia el 3-OH por **3-CH₂OH**. El donador sigue alcanzando la Ser203, pero ya no hay catecol: cambia la *identidad* del grupo.\n\n**Terbutalina (resorcinol):** conserva dos fenoles, pero en **3,5 (meta)**. Demasiado separados para quelar el Mg²⁺ de la COMT: cambia la *geometría*.\n\n**Volumen del 3-OH:** –OH, –CH₂OH y –CH₂CH₂OH alcanzan el mismo aceptor del receptor; con **–(CH₂)₃OH** el hidroxilo ya no cabe y la actividad se pierde.',
+        back: 'Sobre las dos soluciones a la COMT, el **salbutamol** cambia el 3-OH por un **3-CH₂OH** (saligenina): el donador sigue llegando a la Ser203, pero ya no hay catecol. Cambia la *identidad* del grupo. La **terbutalina** conserva dos fenoles verdaderos, pero los pone en **3,5 (meta)**: quedan demasiado separados para quelar el Mg²⁺ de la COMT. Cambia la *geometría*.\n\nDetrás está una idea que repetimos mucho: el sitio del 3-OH es un volumen, no un punto. Con –OH, –CH₂OH o –CH₂CH₂OH alcanzamos el aceptor del receptor; con **–(CH₂)₃OH** el hidroxilo ya no cabe y perdemos la actividad.',
         structures: [
           { name: 'Salbutamol', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1', badge: '3-CH₂OH, 4-OH' },
           { name: 'Terbutalina', smiles: 'CC(C)(C)NCC(O)c1cc(O)cc(O)c1', badge: '3,5-(OH)₂' }
@@ -3476,7 +3477,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Farmacóforo β2 en Tres Puntos y Eutómero (R)',
         front: '¿Con qué tres residuos del receptor β2 interacciona el salbutamol y por qué solo el enantiómero (R) es activo?',
-        back: '**Tres puntos de anclaje en el bolsillo ortostérico:**\n1. **Amina protonada → Asp113 (TM3):** enlace iónico. Sin carga positiva no hay agonismo.\n2. **OH bencílico → Asn293 (TM6):** enlace de hidrógeno.\n3. **Donadores del anillo (3-CH₂OH, 4-OH) → Ser203/Ser207 (TM5):** disparan la activación.\n\n**Ampliación:** en algunos textos aparece **Ser204** (las tres serinas están en el TM5); el anillo aromático se apila con **Phe290** (TM6), y la distancia entre el anillo y el nitrógeno es estricta: **dos carbonos**.\n\n**Easson-Stedman:** solo la configuración **(R)** del carbono bencílico satisface los tres contactos a la vez; el (S) alcanza dos. Asigna por CIP: **–OH > –CH₂NHR > arilo > –H**.\n\nEl salbutamol se comercializa como **racemato**; el (R) puro es el **levalbuterol**.',
+        back: 'En cuanto al farmacóforo β2, el salbutamol se ancla en tres puntos del bolsillo ortostérico. La **amina protonada** forma un enlace iónico con el **Asp113** (TM3); sin carga positiva no hay agonismo. El **OH bencílico** da un enlace de hidrógeno a la **Asn293** (TM6). Y los **donadores del anillo** (3-CH₂OH y 4-OH) hablan con las **Ser203/Ser207** (TM5), que son las que disparan la activación.\n\nPor Easson-Stedman, solo la configuración **(R)** del carbono bencílico satisface los tres contactos a la vez; la (S) se queda en dos. Asignamos por CIP: **–OH > –CH₂NHR > arilo > –H**. El salbutamol se vende como racemato; el (R) puro es el **levalbuterol**.\n\n**Ampliación:** en algunos textos aparece **Ser204** (las tres serinas están en el TM5); el anillo aromático se apila con **Phe290** (TM6), y la distancia entre el anillo y el nitrógeno es estricta: **dos carbonos**.',
         smiles: 'CC(C)(C)NC[C@H](O)c1ccc(O)c(CO)c1',
         difficulty: 'hard',
         category: 'Interacción Ligando-Receptor'
@@ -3486,7 +3487,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Síntesis del Salbutamol desde el Ácido Acetilsalicílico',
         front: 'Desde el ácido acetilsalicílico, ¿cuáles son los seis pasos de la síntesis del salbutamol y qué dos decisiones de la ruta hay que saber justificar?',
-        back: '1. **AlCl₃, PhNO₂:** transposición de Fries → ácido 5-acetil-2-hidroxibenzoico (el acilo pasa del O al C, en para).\n2. **MeOH, HCl:** esterificación del carboxilo.\n3. **Br₂:** bromación en α del carbonilo → α-bromocetona.\n4. **N-bencil-terc-butilamina:** SN2 sobre el C–Br.\n5. **LiAlH₄, THF:** doble reducción.\n6. **H₂, Pd/C:** hidrogenólisis del bencilo → salbutamol racémico.\n\n**Decisión 1 (paso 4):** la amina **secundaria** bencilada da una amina terciaria que no vuelve a alquilar; con terc-butilamina primaria habría **polialquilación**.\n\n**Decisión 2 (paso 5):** el **LiAlH₄** reduce a la vez la cetona (OH bencílico) y el **éster** (–CH₂OH). El NaBH₄ no reduce ésteres.',
+        back: 'En la síntesis del salbutamol partimos de la aspirina y vamos en seis pasos:\n1. **AlCl₃, PhNO₂:** Fries; el acilo pasa del O al C, en para.\n2. **MeOH, HCl:** esterificamos el carboxilo.\n3. **Br₂:** bromamos en α del carbonilo.\n4. **N-bencil-terc-butilamina:** SN2 sobre el C–Br.\n5. **LiAlH₄, THF:** doble reducción.\n6. **H₂, Pd/C:** quitamos el bencilo y queda el salbutamol racémico.\n\nHay dos decisiones que conviene saber justificar. En el paso 4 usamos la amina **secundaria** bencilada porque da una amina terciaria que ya no vuelve a alquilar; con terc-butilamina tendríamos **polialquilación**. En el paso 5 el **LiAlH₄** reduce a la vez la cetona y el **éster**, y así nace el –CH₂OH; el NaBH₄ no toca los ésteres.',
         structures: [
           { name: 'Ácido acetilsalicílico', smiles: 'CC(=O)Oc1ccccc1C(=O)O', badge: 'Material de partida' },
           { name: '5-(Bromoacetil)salicilato de metilo', smiles: 'BrCC(=O)c1ccc(O)c(C(=O)OC)c1', badge: 'Electrófilo (paso 3)' },
@@ -3500,7 +3501,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Síntesis de la Guanetidina (Transposición de Beckmann)',
         front: '¿Cómo se sintetiza la guanetidina a partir de la cicloheptanona y por qué no produce sedación, a diferencia de la reserpina?',
-        back: '**Ruta:**\n1. **NH₂OH:** cicloheptanona → oxima.\n2. **Beckmann (medio ácido):** migra el grupo en **anti** al –OH; el anillo de 7 se expande a la lactama de **8 miembros** (azocan-2-ona).\n3. **LiAlH₄:** lactama → **azocano** (amina cíclica).\n4. **ClCH₂CN:** N-alquilación → (azocan-1-il)acetonitrilo.\n5. **LiAlH₄:** nitrilo → amina primaria.\n6. **S-metilisotiourea:** guanilación → **guanetidina**.\n\n**Sin sedación:** la guanidina (pKa ≈ 13) está siempre **protonada** a pH 7,4 y no cruza la barrera hematoencefálica. Actúa solo en el terminal periférico, bloqueando la liberación de NA.\n\n**Ampliación · misma causa, otro problema:** por estar siempre cargada se **absorbe mal y de forma errática por vía oral**. Lo mismo ocurre con **betanidina** y **debrisoquina**, que también llevan guanidina.',
+        back: 'Sobre la guanetidina, partimos de la cicloheptanona y la pasamos a oxima con **NH₂OH**. Con la **Beckmann**, en medio ácido, migra el grupo en anti al –OH y el anillo de siete se expande a la lactama de **ocho** (azocan-2-ona). El **LiAlH₄** la reduce al **azocano**, lo alquilamos con **ClCH₂CN**, reducimos el nitrilo a amina primaria y terminamos con la guanilación con **S-metilisotiourea**.\n\nNo seda porque la guanidina, con pKa ≈ 13, está siempre **protonada** a pH 7,4 y no cruza la barrera hematoencefálica. Se queda en el terminal periférico y bloquea la liberación de NA.\n\n**Ampliación:** esa misma carga hace que se **absorba mal y de forma errática por vía oral**, igual que la **betanidina** y la **debrisoquina**, que también llevan guanidina.',
         structures: [
           { name: 'Cicloheptanona', smiles: 'O=C1CCCCCC1', badge: 'Anillo de 7' },
           { name: 'Oxima', smiles: 'ON=C1CCCCCC1', badge: 'Sustrato de Beckmann' },
@@ -3515,7 +3516,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Falso Transmisor: α-Metildopa frente a Carbidopa',
         front: '¿Por qué la α-metildopa baja la presión arterial actuando en el SNC, mientras que la carbidopa, tan parecida, actúa solo en la periferia?',
-        back: '**α-Metildopa:** profármaco con esqueleto de α-aminoácido, sustrato de **LAT1**, que la introduce en el SNC. Allí se descarboxila a α-metildopamina y se β-hidroxila a **α-metilnoradrenalina**, un **falso transmisor** que estimula los **α2 centrales** y reduce el tono simpático. Es de elección en la hipertensión del embarazo. **Ampliación · mecanismo múltiple:** además es sustrato e **inhibidor competitivo de la descarboxilasa**, y su metabolito desplaza a la NA de las vesículas.\n\n**Carbidopa:** cambia el NH₂ por una **hidrazina** (–NH–NH₂). Muy polar, no cruza la barrera: inhibe la **L-aminoácido aromático descarboxilasa periférica** y se asocia a la levodopa para que esta llegue intacta al cerebro.\n\nEl **metilo en α** de ambas frena además la acción de la MAO.',
+        back: 'En cuanto a la **α-metildopa**, es un profármaco con esqueleto de α-aminoácido que entra en el SNC por **LAT1**. Allí se descarboxila a α-metildopamina y se β-hidroxila a **α-metilnoradrenalina**, un falso transmisor que estimula los **α2 centrales** y baja el tono simpático. Es de elección en la hipertensión del embarazo.\n\nLa **carbidopa** cambia el NH₂ por una **hidrazina**. Es muy polar y no cruza la barrera, así que inhibe solo la **descarboxilasa periférica**; la damos con levodopa para que esta llegue intacta al cerebro. En las dos, el **metilo en α** frena además a la MAO.\n\n**Ampliación:** la metildopa tiene un mecanismo múltiple: además de sustrato es **inhibidor competitivo de la descarboxilasa**, y su metabolito desplaza a la NA de las vesículas.',
         structures: [
           { name: 'α-Metildopa', smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Profármaco · SNC' },
           { name: 'α-Metilnoradrenalina', smiles: 'C[C@H](N)[C@H](O)c1ccc(O)c(O)c1', badge: 'Falso transmisor · α2' },
@@ -3529,7 +3530,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Agonistas Indirectos: Anfetamina y Efedrina',
         front: '¿Qué tres cambios estructurales, respecto a la noradrenalina, convierten la anfetamina en un estimulante central de acción indirecta?',
-        back: '**Agonista indirecto:** no activa el receptor; entra en el terminal por el transportador y **desplaza la NA** de las vesículas.\n\n1. **Sin OH fenólicos:** más lipofilia, buena absorción oral y paso a SNC.\n2. **Sin OH bencílico:** todavía más lipófila y más central.\n3. **Metilo en α:** impide la desaminación por la **MAO** y alarga la acción.\n\n**Efedrina:** recupera el OH bencílico y lleva N-metilo. Más polar, menos central y de **acción mixta** (directa e indirecta), con dos estereocentros.\n\n**Metanfetamina:** anfetamina N-metilada, todavía más central. El eutómero central de la anfetamina es la **(S)-(+)**, la dexanfetamina.',
+        back: 'Sobre los agonistas indirectos, la anfetamina no activa el receptor: entra en el terminal por el transportador y **desplaza la NA** de las vesículas. Para llegar ahí hacen falta tres cambios respecto a la noradrenalina. Sin **OH fenólicos** gana lipofilia, absorción oral y paso al SNC. Sin **OH bencílico** es todavía más central. Y el **metilo en α** le impide la desaminación por la MAO y alarga la acción.\n\nLa **efedrina** recupera el OH bencílico y lleva N-metilo: es más polar, menos central y de acción mixta, con dos estereocentros. La **metanfetamina**, anfetamina N-metilada, es todavía más central. El eutómero central de la anfetamina es la **(S)-(+)**, la dexanfetamina.',
         structures: [
           { name: 'Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'Directo · no cruza BHE' },
           { name: 'Anfetamina', smiles: 'CC(N)Cc1ccccc1', badge: 'Indirecto · SNC' },
@@ -3543,7 +3544,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Ariloxipropanolaminas (S) frente a Ariletanolaminas (R)',
         front: 'El eutómero del propranolol es (S) y el del pronetalol es (R). ¿Significa esto que se unen al receptor β con una geometría distinta?',
-        back: '**No. La disposición espacial del OH es la misma; solo cambia la letra.**\n\n**Ariletanolamina (pronetalol):** en el carbono carbinólico, **–OH > –CH₂NHR > arilo > –H** → eutómero **(R)**.\n\n**Ariloxipropanolamina (propranolol):** el puente **–O–CH₂–** intercala un oxígeno. Ahora el metileno unido al O (O,H,H) supera al metileno unido al N (N,H,H): **–OH > –CH₂O–Ar > –CH₂NHR > –H** → eutómero **(S)**.\n\nAmbos colocan el OH igual frente al receptor. Las prioridades CIP describen la molécula, no su modo de unión.\n\nEl puente oximetilénico define la clase de todos los β-bloqueantes actuales.',
+        back: 'No: el OH ocupa el mismo sitio; lo que cambia es la letra. En la ariletanolamina (pronetalol) priorizamos **–OH > –CH₂NHR > arilo > –H** y el eutómero sale **(R)**. En la ariloxipropanolamina (propranolol) el puente –O–CH₂– mete un oxígeno: el metileno unido al O (O,H,H) pasa por delante del unido al N (N,H,H), y queda **–OH > –CH₂O–Ar > –CH₂NHR > –H**, con eutómero **(S)**.\n\nLos dos colocan el OH igual frente al receptor. Las prioridades CIP describen la molécula, no cómo se une. Ese puente oximetilénico es el que define a todos los β-bloqueantes actuales.',
         structures: [
           { name: '(R)-Pronetalol', smiles: 'CC(C)NC[C@H](O)c1ccc2ccccc2c1', badge: 'Ariletanolamina · (R)' },
           { name: '(S)-Propranolol', smiles: 'CC(C)NC[C@H](O)COc1cccc2ccccc12', badge: 'Ariloxipropanolamina · (S)' }
@@ -3556,7 +3557,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Fenoxibenzamina: Ión Aziridinio y Bloqueo Irreversible',
         front: '¿Qué especie reactiva forma la fenoxibenzamina en el organismo y por qué su bloqueo α no se revierte aumentando la dosis de agonista?',
-        back: '**Ión aziridinio:** el par libre del nitrógeno desplaza intramolecularmente al cloruro de la cadena β-cloroetilo y cierra un anillo de **tres miembros con carga positiva**, muy tenso y muy electrófilo.\n\n**Alquilación:** un nucleófilo del receptor α (p. ej., el carboxilato de un **aspartato**) abre el anillo y queda unido por **enlace covalente**.\n\n**Consecuencia:** antagonismo **irreversible e insuperable**. El efecto dura días, hasta que la célula sintetiza receptores nuevos. Se usa en la preparación preoperatoria del **feocromocitoma**.',
+        back: 'En la fenoxibenzamina, el par libre del nitrógeno desplaza al cloruro de la cadena β-cloroetilo y cierra un **ion aziridinio**: un anillo de tres miembros con carga positiva, muy tenso y muy electrófilo. Un nucleófilo del receptor α, por ejemplo el carboxilato de un **aspartato**, lo abre y se queda unido por **enlace covalente**.\n\nPor eso el antagonismo es **irreversible e insuperable**: subir el agonista no lo desplaza, y el efecto dura días, hasta que la célula fabrica receptores nuevos. La usamos para preparar la cirugía del **feocromocitoma**.',
         structures: [
           { name: 'Fenoxibenzamina', smiles: 'ClCCN(Cc1ccccc1)C(C)COc1ccccc1', badge: 'β-Haloalquilamina' },
           { name: 'Ión aziridinio', smiles: 'C1C[N+]1(Cc1ccccc1)C(C)COc1ccccc1', badge: 'Electrófilo activo' }
@@ -3569,7 +3570,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Desarrollo de los β-Bloqueantes: de la Isoprenalina al Propranolol',
         front: '¿Qué tres pasos estructurales llevan de la isoprenalina al propranolol y qué problema resolvió cada uno?',
-        back: '1. **Dicloroisoproterenol (1958):** los dos OH del catecol se cambian por **Cl**. Conserva la afinidad pero ya no activa el receptor: primer β-bloqueante, aunque con **agonismo parcial** residual.\n2. **Pronetalol (1962):** el anillo pasa a **naftaleno**. Antagonista puro, sin actividad intrínseca, pero se **retiró por inducir tumores** en animales.\n3. **Propranolol (1964):** se intercala un puente **–O–CH₂–** entre el naftaleno y la cadena: nace la **ariloxipropanolamina**, 10-20 veces más potente que el pronetalol y sin carcinogenicidad.\n\nTodos conservan el **N-isopropilo**, que da la afinidad β. El propranolol es el molde de todos los β-bloqueantes actuales, pero bloquea β1 y β2 por igual: **contraindicado en el asma**.',
+        back: 'Sobre el desarrollo de los β-bloqueantes, partimos de la isoprenalina. En 1958 cambiamos los dos OH del catecol por **cloro**: el **dicloroisoproterenol** conserva la afinidad, pero ya no activa el receptor. Es el primer β-bloqueante, aunque con **agonismo parcial** residual.\n\nEn 1962 llega el **pronetalol**, con **naftaleno**: antagonista puro, pero se retiró porque **inducía tumores** en animales. En 1964, al intercalar un puente **–O–CH₂–**, nace el **propranolol**, la primera **ariloxipropanolamina**, entre 10 y 20 veces más potente que el pronetalol y sin ese problema.\n\nTodos conservan el **N-isopropilo**, que da la afinidad β. El propranolol bloquea β1 y β2 por igual, así que está **contraindicado en el asma**.',
         structures: [
           { name: 'Isoprenalina', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1', badge: 'Agonista β' },
           { name: 'Dicloroisoproterenol', smiles: 'CC(C)NCC(O)c1ccc(Cl)c(Cl)c1', badge: 'Agonista parcial' },
@@ -3584,7 +3585,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Niveles para Disminuir la Transmisión Simpática',
         front: '¿En qué niveles de la sinapsis adrenérgica se puede reducir la estimulación simpática? Da un fármaco para cada uno.',
-        back: '1. **Biosíntesis:** **(S)-α-metiltirosina** (metirosina) inhibe la **tirosina hidroxilasa**, el paso limitante. El **disulfiramo** inhibe la dopamina-β-hidroxilasa.\n2. **Falso transmisor:** **α-metildopa** → α-metilnoradrenalina, agonista α2 central.\n3. **Almacenamiento:** **reserpina** bloquea el **VMAT**; la NA queda en el citosol y la MAO la degrada.\n4. **Liberación:** **guanetidina** entra por el transportador de NA y bloquea la salida de las vesículas.\n5. **Autorreceptor central:** **clonidina** (α2) frena la salida simpática desde el tronco del encéfalo.\n6. **Receptores postsinápticos:** α-bloqueantes (**prazosina**, **fenoxibenzamina**) y β-bloqueantes (**propranolol**).\n\nLa **metirosina** se usa en el **feocromocitoma**, cuando no se puede operar.',
+        back: 'Para reducir la transmisión simpática podemos actuar en varios niveles. En la **biosíntesis**, la **(S)-α-metiltirosina** (metirosina) inhibe la **tirosina hidroxilasa**, el paso limitante, y el **disulfiramo** inhibe la dopamina-β-hidroxilasa. Con un **falso transmisor**, la **α-metildopa** genera α-metilnoradrenalina, agonista α2 central. En el **almacenamiento**, la **reserpina** bloquea el **VMAT**, y la NA que queda en el citosol la degrada la MAO.\n\nEn la **liberación**, la **guanetidina** entra por el transportador de NA y bloquea la salida de las vesículas. Sobre el **autorreceptor central**, la **clonidina** (α2) frena la salida simpática desde el tronco del encéfalo. Y en los **receptores postsinápticos** tenemos los α-bloqueantes (**prazosina**, **fenoxibenzamina**) y los β-bloqueantes (**propranolol**). La metirosina se reserva para el **feocromocitoma** que no se puede operar.',
         structures: [
           { name: '(S)-α-Metiltirosina', smiles: 'C[C@](N)(Cc1ccc(O)cc1)C(=O)O', badge: 'Inhibe tirosina hidroxilasa' },
           { name: 'α-Metildopa', smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Falso transmisor' },
@@ -3598,7 +3599,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Cardioselectividad β1 y Síntesis del Practolol',
         front: '¿Qué modificación da cardioselectividad β1 a practolol, atenolol y metoprolol frente al propranolol, y cómo se sintetiza el practolol?',
-        back: '**Cardioselectividad:** se cambia el naftaleno por un **benceno con un sustituyente polar en para**: acetamido en el **practolol**, carbamoilmetilo en el **atenolol**, metoxietilo en el **metoprolol**. El benceno para-sustituido deja que la cadena adopte una conformación **extendida (transoide)**, y el sustituyente en para refuerza la unión al **β1 cardíaco**. Bloquean el corazón con menos broncoespasmo que el propranolol.\n\n**Síntesis del practolol:**\n1. **Paracetamol + epiclorhidrina (NaOH):** el fenolato desplaza al cloruro y queda el **glicidil éter** con el epóxido intacto.\n2. **Isopropilamina:** abre el epóxido por **SN2 en el carbono menos sustituido** y da el aminoalcohol: **practolol** racémico, con eutómero **(S)**.\n\nEl practolol se retiró por el síndrome oculomucocutáneo; el atenolol y el metoprolol ocuparon su lugar.',
+        back: 'En cuanto a la cardioselectividad, cambiamos el naftaleno por un **benceno con un sustituyente polar en para**: acetamido en el **practolol**, carbamoilmetilo en el **atenolol**, metoxietilo en el **metoprolol**. Con el benceno para-sustituido la cadena puede extenderse (conformación **transoide**) y el sustituyente en para refuerza la unión al **β1 cardíaco**. Bloquean el corazón con menos broncoespasmo que el propranolol.\n\nLa síntesis del practolol es corta. Hacemos reaccionar **paracetamol con epiclorhidrina** en NaOH: el fenolato desplaza al cloruro y queda el **glicidil éter** con el epóxido intacto. Después la **isopropilamina** abre el epóxido por **SN2 en el carbono menos sustituido** y nos da el practolol racémico, con eutómero **(S)**.\n\nEl practolol se retiró por el síndrome oculomucocutáneo; su sitio lo ocuparon el atenolol y el metoprolol.',
         structures: [
           { name: 'Paracetamol', smiles: 'CC(=O)Nc1ccc(O)cc1', badge: 'Fenol de partida' },
           { name: 'Glicidil éter', smiles: 'CC(=O)Nc1ccc(OCC2CO2)cc1', badge: 'Epóxido intermedio' },
@@ -3614,7 +3615,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Adrenérgico Indirecto Resistente a la MAO: Fentermina',
         front: 'Diseña un adrenérgico indirecto sin acción agonista directa y que sea mal sustrato de la MAO. ¿Por qué cumple la fentermina y cómo se sintetiza?',
-        back: '**Sin agonismo directo:** no tiene catecol ni OH bencílico, así que no cumple el ajuste en tres puntos del receptor. Actúa **liberando NA** desde el terminal.\n\n**Mal sustrato de la MAO:** lleva **dos metilos en el carbono α** al nitrógeno. La MAO necesita arrancar un **H del Cα** para oxidar la amina a imina; la fentermina no tiene ninguno. La anfetamina, con un solo metilo en α, solo frena a la MAO; la fentermina la bloquea del todo.\n\n**Síntesis (reacción de Ritter):**\n1. **Cloruro de bencilo + Mg, luego acetona:** adición de Grignard → 2-metil-1-fenilpropan-2-ol (alcohol terciario).\n2. **CH₃CN, H₂SO₄:** reacción de Ritter; el carbocatión terciario captura el nitrilo → N-acetilfentermina.\n3. **Hidrólisis de la amida** → **fentermina**.\n\n¿Por qué no SN2? Sobre un carbono terciario no hay sustitución, solo eliminación. La Ritter instala el N justo en ese carbono.',
+        back: 'Para diseñar un indirecto sin acción directa, quitamos el catecol y el OH bencílico: sin ellos no hay ajuste en tres puntos con el receptor, y la molécula actúa **liberando NA** del terminal. Para que además sea mal sustrato de la MAO, ponemos **dos metilos en el carbono α**. La MAO necesita arrancar un **H del Cα** para oxidar la amina a imina, y la fentermina no tiene ninguno. La anfetamina, con un solo metilo, solo frena a la MAO; la fentermina la bloquea del todo.\n\nLa síntesis va por **Ritter**. El Grignard del cloruro de bencilo se adiciona a la **acetona** y da el 2-metil-1-fenilpropan-2-ol. Con **CH₃CN y H₂SO₄**, el carbocatión terciario captura el nitrilo y obtenemos la N-acetilfentermina, que hidrolizamos a **fentermina**. No podemos ir por SN2 porque sobre un carbono terciario solo hay eliminación; la Ritter pone el N justo en ese carbono.',
         structures: [
           { name: '2-Metil-1-fenilpropan-2-ol', smiles: 'CC(C)(O)Cc1ccccc1', badge: 'Alcohol terciario (Grignard)' },
           { name: 'N-Acetilfentermina', smiles: 'CC(=O)NC(C)(C)Cc1ccccc1', badge: 'Producto de Ritter' },
@@ -3629,7 +3630,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: 'Síntesis de la Isoprenalina desde el Pirocatecol',
         front: '¿Cómo se sintetiza la isoprenalina a partir de pirocatecol y cloruro de cloroacetilo, y qué diferencia esta ruta de la del salbutamol?',
-        back: '1. **Pirocatecol + ClCH₂COCl:** acilación del anillo en para respecto a un OH, por Friedel-Crafts o por transposición de Fries del éster de cloroacetilo (AlCl₃) → **2-cloro-3′,4′-dihidroxiacetofenona** (α-clorocetona).\n2. **Isopropilamina en exceso:** SN2 sobre el C–Cl → α-aminocetona (**isoprenalona**).\n3. **Reducción del carbonilo** (H₂/Pd o NaBH₄) → **isoprenalina** racémica; el eutómero es el **(R)**.\n\n**Frente al salbutamol:**\n• Aquí la amina primaria se usa **en exceso** para frenar la doble alquilación; en el salbutamol se recurre a la amina secundaria **N-bencilada**.\n• Aquí basta un reductor suave porque **no hay éster** que reducir; en el salbutamol el **LiAlH₄** reduce a la vez la cetona y el éster.\n\nEl producto conserva el **catecol**: la COMT lo inactiva en minutos.',
+        back: 'En la síntesis de la isoprenalina acilamos primero el **pirocatecol** con **ClCH₂COCl**, en para respecto a un OH, por Friedel-Crafts o por transposición de Fries del éster con AlCl₃. Obtenemos la α-clorocetona, la **2-cloro-3′,4′-dihidroxiacetofenona**. Con **isopropilamina en exceso** hacemos la SN2 sobre el C–Cl y llegamos a la isoprenalona; al **reducir el carbonilo** (H₂/Pd o NaBH₄) tenemos la isoprenalina racémica, con eutómero **(R)**.\n\nFrente al salbutamol hay dos diferencias. Aquí frenamos la doble alquilación con **exceso de amina** primaria; allí usamos la amina secundaria **N-bencilada**. Y aquí basta un reductor suave porque **no hay éster**; allí el **LiAlH₄** reduce cetona y éster a la vez. El producto conserva el **catecol**, así que la COMT lo inactiva en minutos.',
         structures: [
           { name: 'Pirocatecol', smiles: 'Oc1ccccc1O', badge: 'Material de partida' },
           { name: 'α-Clorocetona', smiles: 'ClCC(=O)c1ccc(O)c(O)c1', badge: 'Friedel-Crafts' },
@@ -3645,7 +3646,7 @@ flashcards: [
         topicId: 'tema-02',
         concept: '2-Imidazolinas: Tipo I (Nafazolina) frente a Tipo II (Clonidina)',
         front: '¿Qué diferencia estructural separa a las imidazolinas vasoconstrictoras tópicas de la clonidina, y por qué la clonidina actúa en el SNC sobre α2?',
-        back: '**Tipo I · 2-arilmetil-2-imidazolinas** (nafazolina, xilometazolina, oximetazolina): el anillo aromático se une a la imidazolina por un **–CH₂–**. Agonistas **α1** periféricos: **vasoconstrictores tópicos** y descongestivos nasales y oculares.\n\n**Tipo II · 2-arilamino-2-imidazolinas** (clonidina): el puente es un **–NH–**, que forma con la imidazolina una **guanidina cíclica**. Los dos **cloros en 2,6** chocan con la imidazolina y fuerzan los dos anillos a quedar **casi perpendiculares**.\n\n**Por qué es central:** el arilo diclorado baja la basicidad de la guanidina (pKa ≈ 8). A pH 7,4 queda una **fracción neutra** que cruza la barrera hematoencefálica. Allí estimula los **α2 presinápticos** y baja el tono simpático: es **antihipertensiva**.',
+        back: 'Sobre las 2-imidazolinas, distinguimos dos tipos por el puente. En las de **tipo I** (nafazolina, xilometazolina, oximetazolina) el anillo aromático se une por un **–CH₂–**. Son agonistas **α1** periféricos y las usamos como **vasoconstrictores tópicos** y descongestivos nasales y oculares.\n\nEn las de **tipo II** (clonidina) el puente es un **–NH–**, que forma con la imidazolina una **guanidina cíclica**. Los dos **cloros en 2,6** chocan con la imidazolina y dejan los anillos **casi perpendiculares**. El arilo diclorado rebaja la basicidad (pKa ≈ 8), así que a pH 7,4 queda una **fracción neutra** que cruza la barrera. En el SNC estimula los **α2 presinápticos** y baja el tono simpático: es **antihipertensiva**.',
         structures: [
           { name: 'Nafazolina', smiles: 'C(c1cccc2ccccc12)C1=NCCN1', badge: 'Tipo I · α1 tópico' },
           { name: 'Oximetazolina', smiles: 'Cc1cc(C(C)(C)C)cc(CC2=NCCN2)c1O', badge: 'Tipo I · descongestivo' },
