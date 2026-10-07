@@ -69,3 +69,20 @@ export function conAvisosNuevos(
 ): QfdosAnnouncement[] {
   return ofrecer(publicados, iniciales.filter(a => idsAOfrecer.includes(a.id)), CLAVE_AVISOS_DESCARTADOS);
 }
+
+/**
+ * Completa con la imagen y el crédito del código los enlaces publicados que
+ * aún no los llevan (se publicaron antes de que existiera la ilustración).
+ * Nunca pisa lo que el profesor haya puesto a mano.
+ */
+export function conMediosDelCodigo(enlaces: QfdosResourceLink[], iniciales: QfdosResourceLink[]): QfdosResourceLink[] {
+  const porId = new Map(iniciales.map(l => [l.id, l]));
+  let cambiado = false;
+  const res = enlaces.map(l => {
+    const base = porId.get(l.id);
+    if (!base || l.imageUrl || !base.imageUrl) return l;
+    cambiado = true;
+    return { ...l, imageUrl: base.imageUrl, imageCredit: l.imageCredit ?? base.imageCredit };
+  });
+  return cambiado ? res : enlaces;
+}
