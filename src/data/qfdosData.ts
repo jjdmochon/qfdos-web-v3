@@ -250,6 +250,19 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-nobel-quimica-2026',
+    title: 'Nobel de Química 2026: Kagan y Soai, efectos no lineales y autocatálisis en síntesis asimétrica',
+    url: 'https://www.nobelprize.org/prizes/chemistry/2026/press-release/',
+    summary:
+      'En cuanto al Nobel de Química, la Academia Sueca premia a Henri B. Kagan (Universidad Paris-Saclay, emérito) y Kenso Soai (Universidad de Ciencias de Tokio, emérito) por el descubrimiento de los efectos no lineales y la autocatálisis en la síntesis orgánica asimétrica. Kagan mostró que la pureza enantiomérica del producto no tiene por qué ser proporcional a la del catalizador quiral, y su bisfosfina DIOP abrió la hidrogenación asimétrica con rodio. Soai describió en 1995 la primera reacción autocatalítica con amplificación asimétrica: un alcohol pirimidílico quiral cataliza su propia formación a partir de pirimidina-5-carbaldehído y diisopropilcinc, y un exceso enantiomérico ínfimo termina en un producto casi enantiopuro. Es el modelo experimental más claro de cómo una pequeña asimetría inicial pudo imponer la homoquiralidad de la vida. Para nosotros conecta de lleno con la eudismia que vemos en el Tema 2: cada enantiómero de un β2 agonista o de un β-bloqueante tiene una actividad distinta, y fabricar solo el activo es un problema de química orgánica antes que farmacológico. Os recomiendo leerlo con los apuntes de estereoquímica delante.',
+    category: 'Divulgación',
+    source: 'NobelPrize.org',
+    duration: '6 min',
+    relatedTopic: 'Tema 02',
+    featured: true,
+    addedAt: '2026-10-07'
+  },
+  {
     id: 'link-nobel-medicina-2026',
     title: 'Nobel de Medicina 2026: la optogenética y el control de neuronas con luz',
     url: 'https://www.nobelprize.org/prizes/medicine/2026/press-release/',
@@ -447,9 +460,10 @@ export interface StudentQuestion {
  * v3.32.0 — Tema 3 sin test ni flashcards (se retiran del código y del contenido publicado).
  * v3.33.0 — Enlaces de interés: Nobel de Medicina 2026 (optogenética) y de Física 2026 (IceCube).
  * v3.34.0 — Las claves de corrección incluyen los 3 modelos del Tema 2 (antes solo el Modelo 1 llegaba al servidor).
+ * v3.35.0 — Enlace de interés y Historia: Nobel de Química 2026 (Kagan y Soai).
  */
-export const COURSE_DATA_VERSION = '3.34.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-07T00:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.35.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-07T11:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

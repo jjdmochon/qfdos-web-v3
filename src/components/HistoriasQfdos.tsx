@@ -207,11 +207,11 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     });
   }
 
-  // --- Noticias: los 2 enlaces de interés más recientes + Materiales varios ---
+  // --- Noticias: los 3 enlaces de interés más recientes + Materiales varios ---
   const enlaces: Historia[] = resourceLinks
     .map((l, i) => ({ l, i }))
     .sort((a, b) => (b.l.addedAt ?? '').localeCompare(a.l.addedAt ?? '') || a.i - b.i)
-    .slice(0, 2)
+    .slice(0, 3)
     .map(({ l }): Historia => {
       const video = l.videoUrl && /^data:video\/|\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(l.videoUrl) ? resolver(l.videoUrl) : undefined;
       return {
