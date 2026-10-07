@@ -472,9 +472,10 @@ export interface StudentQuestion {
  * v3.36.0 — Ilustraciones de la Academia (Niklas Elmehed) como fondo de las noticias de los tres Nobel 2026 y énfasis en la estereoquímica.
  * v3.37.0 — Las ilustraciones de los Nobel llegan también a los enlaces ya publicados (el alumnado no las veía en Medicina y Física).
  * v3.38.0 — Se retira la música sintetizada de las historias sin sonido; quedan los efectos de brag.
+ * v3.39.0 — Tema 2: 10 flashcards de autoevaluación (SAR, interacción con el receptor β2, síntesis de salbutamol y guanetidina, estereoquímica) con valoración fácil/difícil.
  */
-export const COURSE_DATA_VERSION = '3.38.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-07T13:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.39.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-07T14:55:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -2770,9 +2771,9 @@ flashcards: [
     pdbTargetId: '2RH1',
     targetName: 'Receptor β2-Adrenérgico Humano unido a Timolol',
     status: 'Publicado',
-    // Estructuras oficiales publicadas; test oficial disponible (3 modelos calibrados)
+    // Estructuras oficiales publicadas; test oficial (3 modelos calibrados) y 10 flashcards disponibles
     testDisponible: true,
-    flashcardsDisponibles: false,
+    flashcardsDisponibles: true,
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 02: Diapositivas Oficiales Sistema Adrenérgico.pdf',
     notesPdfUrl: '',
@@ -3425,14 +3426,138 @@ flashcards: [
     testQuestions: TEMA2_MODELO_1_TEST_QUESTIONS,
     flashcards: [
       {
-        id: 'fc-02-1',
+        id: 'fc-02-01',
         topicId: 'tema-02',
-        concept: 'SAR de Ariloxipropanolaminas',
-        front: '¿Cuál es el motivo estructural común presente en la mayoría de los antagonistas β-bloqueantes de segunda y tercera generación?',
-        back: 'La cadena lateral de ariloxipropanolamina: Ar-O-CH2-CH(OH)-CH2-NH-R, donde la configuración estereoquímica activa es siempre (S) debido a la inserción del átomo de oxígeno que altera las reglas CIP respecto a las feniletanolaminas (R).',
-        smiles: 'CC(C)NCC(O)COc1cccc2ccccc12',
+        concept: 'Escalera del Sustituyente en el Nitrógeno',
+        front: '¿Cómo cambia el perfil α/β al aumentar el volumen del sustituyente sobre el nitrógeno, desde la noradrenalina hasta el salbutamol?',
+        back: '**A más volumen en el N, menos α y más β.**\n\n1. **–H (noradrenalina):** preferencia α, con β1 y escasa β2.\n2. **–CH₃ (adrenalina):** perfil mixto α + β.\n3. **–CH(CH₃)₂ (isoprenalina):** β pura, sin α, pero β1 = β2.\n4. **–C(CH₃)₃ (salbutamol, terbutalina):** selectividad **β2 > β1**.\n\n**Doble función:** ese mismo volumen impide el acceso de la **MAO**, que oxida bien las aminas primarias y poco sustituidas.',
+        structures: [
+          { name: 'Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'N–H · α > β' },
+          { name: 'Adrenalina', smiles: 'CNC[C@H](O)c1ccc(O)c(O)c1', badge: 'N–CH₃ · α + β' },
+          { name: 'Isoprenalina', smiles: 'CC(C)NCC(O)c1ccc(O)c(O)c1', badge: 'N–iPr · β1 + β2' },
+          { name: 'Salbutamol', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1', badge: 'N–tBu · β2' }
+        ],
+        difficulty: 'easy',
+        category: 'SAR Agonistas'
+      },
+      {
+        id: 'fc-02-02',
+        topicId: 'tema-02',
+        concept: 'Metilación por COMT del 3-OH',
+        front: '¿Qué hidroxilo del catecol metila la COMT, con qué cofactores, y por qué el metabolito pierde la actividad?',
+        back: '**La COMT metila siempre el 3-OH (meta), nunca el 4-OH.** El metilo procede de la **S-adenosil-L-metionina (SAM)** y el **Mg²⁺** coordina los dos oxígenos del catecol en orto.\n\n• Noradrenalina → **normetanefrina**\n• Adrenalina → **metanefrina**\n• Dopamina → **3-metoxitiramina**\n\n**Por qué es inactivo:** el 3-OCH₃ ya no dona enlace de hidrógeno a la **Ser203** del TM5 y además añade volumen donde el bolsillo es estrecho.',
+        structures: [
+          { name: '(R)-Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'Sustrato · 3-OH libre' },
+          { name: 'Normetanefrina', smiles: 'NC[C@H](O)c1ccc(O)c(OC)c1', badge: 'Metabolito inactivo · 3-OCH₃' }
+        ],
+        difficulty: 'easy',
+        category: 'Metabolismo'
+      },
+      {
+        id: 'fc-02-03',
+        topicId: 'tema-02',
+        concept: 'Dos Soluciones a la COMT: Salbutamol y Terbutalina',
+        front: 'Salbutamol y terbutalina resisten la COMT. ¿Qué estrategia estructural usa cada uno y qué significa que «el sitio del 3-OH es un volumen, no un punto»?',
+        back: '**Salbutamol (saligenina):** cambia el 3-OH por **3-CH₂OH**. El donador sigue alcanzando la Ser203, pero ya no hay catecol: cambia la *identidad* del grupo.\n\n**Terbutalina (resorcinol):** conserva dos fenoles, pero en **3,5 (meta)**. Demasiado separados para quelar el Mg²⁺ de la COMT: cambia la *geometría*.\n\n**Volumen del 3-OH:** –OH, –CH₂OH y –CH₂CH₂OH alcanzan el mismo aceptor del receptor; con **–(CH₂)₃OH** el hidroxilo ya no cabe y la actividad se pierde.',
+        structures: [
+          { name: 'Salbutamol', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1', badge: '3-CH₂OH, 4-OH' },
+          { name: 'Terbutalina', smiles: 'CC(C)(C)NCC(O)c1cc(O)cc(O)c1', badge: '3,5-(OH)₂' }
+        ],
+        difficulty: 'medium',
+        category: 'SAR Agonistas β2'
+      },
+      {
+        id: 'fc-02-04',
+        topicId: 'tema-02',
+        concept: 'Farmacóforo β2 en Tres Puntos y Eutómero (R)',
+        front: '¿Con qué tres residuos del receptor β2 interacciona el salbutamol y por qué solo el enantiómero (R) es activo?',
+        back: '**Tres puntos de anclaje en el bolsillo ortostérico:**\n1. **Amina protonada → Asp113 (TM3):** enlace iónico. Sin carga positiva no hay agonismo.\n2. **OH bencílico → Asn293 (TM6):** enlace de hidrógeno.\n3. **Donadores del anillo (3-CH₂OH, 4-OH) → Ser203/Ser207 (TM5):** disparan la activación.\n\n**Easson-Stedman:** solo la configuración **(R)** del carbono bencílico satisface los tres contactos a la vez; el (S) alcanza dos. Asigna por CIP: **–OH > –CH₂NHR > arilo > –H**.\n\nEl salbutamol se comercializa como **racemato**; el (R) puro es el **levalbuterol**.',
+        smiles: 'CC(C)(C)NC[C@H](O)c1ccc(O)c(CO)c1',
         difficulty: 'hard',
-        category: 'SAR & Estereoquímica'
+        category: 'Interacción Ligando-Receptor'
+      },
+      {
+        id: 'fc-02-05',
+        topicId: 'tema-02',
+        concept: 'Síntesis del Salbutamol desde el Ácido Acetilsalicílico',
+        front: 'Desde el ácido acetilsalicílico, ¿cuáles son los seis pasos de la síntesis del salbutamol y qué dos decisiones de la ruta hay que saber justificar?',
+        back: '1. **AlCl₃, PhNO₂:** transposición de Fries → ácido 5-acetil-2-hidroxibenzoico (el acilo pasa del O al C, en para).\n2. **MeOH, HCl:** esterificación del carboxilo.\n3. **Br₂:** bromación en α del carbonilo → α-bromocetona.\n4. **N-bencil-terc-butilamina:** SN2 sobre el C–Br.\n5. **LiAlH₄, THF:** doble reducción.\n6. **H₂, Pd/C:** hidrogenólisis del bencilo → salbutamol racémico.\n\n**Decisión 1 (paso 4):** la amina **secundaria** bencilada da una amina terciaria que no vuelve a alquilar; con terc-butilamina primaria habría **polialquilación**.\n\n**Decisión 2 (paso 5):** el **LiAlH₄** reduce a la vez la cetona (OH bencílico) y el **éster** (–CH₂OH). El NaBH₄ no reduce ésteres.',
+        structures: [
+          { name: 'Ácido acetilsalicílico', smiles: 'CC(=O)Oc1ccccc1C(=O)O', badge: 'Material de partida' },
+          { name: '5-(Bromoacetil)salicilato de metilo', smiles: 'BrCC(=O)c1ccc(O)c(C(=O)OC)c1', badge: 'Electrófilo (paso 3)' },
+          { name: 'Salbutamol', smiles: 'CC(C)(C)NCC(O)c1ccc(O)c(CO)c1', badge: 'Producto (racemato)' }
+        ],
+        difficulty: 'medium',
+        category: 'Síntesis Orgánica'
+      },
+      {
+        id: 'fc-02-06',
+        topicId: 'tema-02',
+        concept: 'Síntesis de la Guanetidina (Transposición de Beckmann)',
+        front: '¿Cómo se sintetiza la guanetidina a partir de la cicloheptanona y por qué no produce sedación, a diferencia de la reserpina?',
+        back: '**Ruta:**\n1. **NH₂OH:** cicloheptanona → oxima.\n2. **Beckmann (medio ácido):** migra el grupo en **anti** al –OH; el anillo de 7 se expande a la lactama de **8 miembros** (azocan-2-ona).\n3. **LiAlH₄:** lactama → **azocano** (amina cíclica).\n4. **ClCH₂CN:** N-alquilación → (azocan-1-il)acetonitrilo.\n5. **LiAlH₄:** nitrilo → amina primaria.\n6. **S-metilisotiourea:** guanilación → **guanetidina**.\n\n**Sin sedación:** la guanidina (pKa ≈ 13) está siempre **protonada** a pH 7,4 y no cruza la barrera hematoencefálica. Actúa solo en el terminal periférico, bloqueando la liberación de NA.',
+        structures: [
+          { name: 'Cicloheptanona', smiles: 'O=C1CCCCCC1', badge: 'Anillo de 7' },
+          { name: 'Oxima', smiles: 'ON=C1CCCCCC1', badge: 'Sustrato de Beckmann' },
+          { name: 'Azocan-2-ona', smiles: 'O=C1CCCCCCN1', badge: 'Lactama de 8' },
+          { name: 'Guanetidina', smiles: 'NC(=N)NCCN1CCCCCCC1', badge: 'Guanidina · pKa ≈ 13' }
+        ],
+        difficulty: 'hard',
+        category: 'Síntesis Orgánica'
+      },
+      {
+        id: 'fc-02-07',
+        topicId: 'tema-02',
+        concept: 'Falso Transmisor: α-Metildopa frente a Carbidopa',
+        front: '¿Por qué la α-metildopa baja la presión arterial actuando en el SNC, mientras que la carbidopa, tan parecida, actúa solo en la periferia?',
+        back: '**α-Metildopa:** profármaco con esqueleto de α-aminoácido, sustrato de **LAT1**, que la introduce en el SNC. Allí se descarboxila a α-metildopamina y se β-hidroxila a **α-metilnoradrenalina**, un **falso transmisor** que estimula los **α2 centrales** y reduce el tono simpático. Es de elección en la hipertensión del embarazo.\n\n**Carbidopa:** cambia el NH₂ por una **hidrazina** (–NH–NH₂). Muy polar, no cruza la barrera: inhibe la **L-aminoácido aromático descarboxilasa periférica** y se asocia a la levodopa para que esta llegue intacta al cerebro.\n\nEl **metilo en α** de ambas frena además la acción de la MAO.',
+        structures: [
+          { name: 'α-Metildopa', smiles: 'C[C@](N)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Profármaco · SNC' },
+          { name: 'α-Metilnoradrenalina', smiles: 'C[C@H](N)[C@H](O)c1ccc(O)c(O)c1', badge: 'Falso transmisor · α2' },
+          { name: 'Carbidopa', smiles: 'NN[C@@](C)(Cc1ccc(O)c(O)c1)C(=O)O', badge: 'Hidrazina · periférica' }
+        ],
+        difficulty: 'medium',
+        category: 'Biosíntesis y Falsos Transmisores'
+      },
+      {
+        id: 'fc-02-08',
+        topicId: 'tema-02',
+        concept: 'Agonistas Indirectos: Anfetamina y Efedrina',
+        front: '¿Qué tres cambios estructurales, respecto a la noradrenalina, convierten la anfetamina en un estimulante central de acción indirecta?',
+        back: '**Agonista indirecto:** no activa el receptor; entra en el terminal por el transportador y **desplaza la NA** de las vesículas.\n\n1. **Sin OH fenólicos:** más lipofilia, buena absorción oral y paso a SNC.\n2. **Sin OH bencílico:** todavía más lipófila y más central.\n3. **Metilo en α:** impide la desaminación por la **MAO** y alarga la acción.\n\n**Efedrina:** recupera el OH bencílico y lleva N-metilo. Más polar, menos central y de **acción mixta** (directa e indirecta), con dos estereocentros.\n\n**Metanfetamina:** anfetamina N-metilada, todavía más central. El eutómero central de la anfetamina es la **(S)-(+)**, la dexanfetamina.',
+        structures: [
+          { name: 'Noradrenalina', smiles: 'NC[C@H](O)c1ccc(O)c(O)c1', badge: 'Directo · no cruza BHE' },
+          { name: 'Anfetamina', smiles: 'CC(N)Cc1ccccc1', badge: 'Indirecto · SNC' },
+          { name: 'Efedrina', smiles: 'CN[C@@H](C)[C@H](O)c1ccccc1', badge: 'Acción mixta' }
+        ],
+        difficulty: 'easy',
+        category: 'Agonistas Indirectos'
+      },
+      {
+        id: 'fc-02-09',
+        topicId: 'tema-02',
+        concept: 'Ariloxipropanolaminas (S) frente a Ariletanolaminas (R)',
+        front: 'El eutómero del propranolol es (S) y el del pronetalol es (R). ¿Significa esto que se unen al receptor β con una geometría distinta?',
+        back: '**No. La disposición espacial del OH es la misma; solo cambia la letra.**\n\n**Ariletanolamina (pronetalol):** en el carbono carbinólico, **–OH > –CH₂NHR > arilo > –H** → eutómero **(R)**.\n\n**Ariloxipropanolamina (propranolol):** el puente **–O–CH₂–** intercala un oxígeno. Ahora el metileno unido al O (O,H,H) supera al metileno unido al N (N,H,H): **–OH > –CH₂O–Ar > –CH₂NHR > –H** → eutómero **(S)**.\n\nAmbos colocan el OH igual frente al receptor. Las prioridades CIP describen la molécula, no su modo de unión.\n\nEl puente oximetilénico define la clase de todos los β-bloqueantes actuales.',
+        structures: [
+          { name: '(R)-Pronetalol', smiles: 'CC(C)NC[C@H](O)c1ccc2ccccc2c1', badge: 'Ariletanolamina · (R)' },
+          { name: '(S)-Propranolol', smiles: 'CC(C)NC[C@H](O)COc1cccc2ccccc12', badge: 'Ariloxipropanolamina · (S)' }
+        ],
+        difficulty: 'hard',
+        category: 'Estereoquímica'
+      },
+      {
+        id: 'fc-02-10',
+        topicId: 'tema-02',
+        concept: 'Fenoxibenzamina: Ión Aziridinio y Bloqueo Irreversible',
+        front: '¿Qué especie reactiva forma la fenoxibenzamina en el organismo y por qué su bloqueo α no se revierte aumentando la dosis de agonista?',
+        back: '**Ión aziridinio:** el par libre del nitrógeno desplaza intramolecularmente al cloruro de la cadena β-cloroetilo y cierra un anillo de **tres miembros con carga positiva**, muy tenso y muy electrófilo.\n\n**Alquilación:** un nucleófilo del receptor α (p. ej., el carboxilato de un **aspartato**) abre el anillo y queda unido por **enlace covalente**.\n\n**Consecuencia:** antagonismo **irreversible e insuperable**. El efecto dura días, hasta que la célula sintetiza receptores nuevos. Se usa en la preparación preoperatoria del **feocromocitoma**.',
+        structures: [
+          { name: 'Fenoxibenzamina', smiles: 'ClCCN(Cc1ccccc1)C(C)COc1ccccc1', badge: 'β-Haloalquilamina' },
+          { name: 'Ión aziridinio', smiles: 'C1C[N+]1(Cc1ccccc1)C(C)COc1ccccc1', badge: 'Electrófilo activo' }
+        ],
+        difficulty: 'medium',
+        category: 'Antagonistas α'
       }
     ]
   },
