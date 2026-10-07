@@ -473,8 +473,9 @@ export interface StudentQuestion {
  * v3.37.0 — Las ilustraciones de los Nobel llegan también a los enlaces ya publicados (el alumnado no las veía en Medicina y Física).
  * v3.38.0 — Se retira la música sintetizada de las historias sin sonido; quedan los efectos de brag.
  * v3.39.0 — Tema 2: 10 flashcards de autoevaluación (SAR, interacción con el receptor β2, síntesis de salbutamol y guanetidina, estereoquímica) con valoración fácil/difícil.
+ * v3.39.1 — Las flashcards del Tema 2 que trae eexport const COURSE_BUILD_TIMESTAMP = '2026-10-07T15:47:00.000Z';a 1 tarjeta en vez de 10).
  */
-export const COURSE_DATA_VERSION = '3.39.0';
+export const COURSE_DATA_VERSION = '3.39.1';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-07T14:55:00.000Z';
 
 export const QFDOS_INFO = {

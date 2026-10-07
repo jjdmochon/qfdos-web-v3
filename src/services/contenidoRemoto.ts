@@ -80,6 +80,8 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
         status: 'Publicado' as const,
         testDisponible: true,
         testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
+        // Como en el resto de temas: si el código trae flashcards, mandan sobre las publicadas
+        flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
         flashcardsDisponibles: base.flashcardsDisponibles,
       };
     }
