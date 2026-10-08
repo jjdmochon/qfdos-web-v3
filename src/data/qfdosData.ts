@@ -481,9 +481,10 @@ export interface StudentQuestion {
  * v3.42.0 — Reversos de las flashcards de los Temas 1 y 2 reescritos en la voz del profesor (certificados con Jev); la química no cambia.
  * v3.43.0 — Tests del Tema 2 (Modelos 1, 2 y 3): la opción correcta ya no es la más larga, claves del Modelo 1 rebarajadas (ids -v2), justificaciones certificadas con Jev una a una y estructuras corregidas (salbutamol y dexanfetamina con su enantiómero, yohimbina, fenoxibenzamina, fentolamina, indacaterol).
  * v3.44.0 — Tests del Tema 1 (Modelos E, A, B, C, FIR y Retrosíntesis): justificaciones certificadas con Jev una a una, la opción correcta ya no es la más larga y estructuras corregidas (pilocarpina, donepezilo, galantamina, rivastigmina, tropicamida); claves sin cambios.
+ * v3.45.0 — Tema 2, Modelo 1, pregunta 1: el orden α corregido según Ahlquist (noradrenalina ≥ adrenalina > isoprenalina).
  */
-export const COURSE_DATA_VERSION = '3.44.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-08T10:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.45.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-08T12:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

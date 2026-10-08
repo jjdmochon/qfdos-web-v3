@@ -27,7 +27,7 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     options: [
       { text: "β: noradrenalina > adrenalina > isoprenalina; α: isoprenalina > adrenalina > noradrenalina." },
       { text: "β y α comparten el orden adrenalina > isoprenalina > noradrenalina en los dos receptores." },
-      { text: "β: isoprenalina > adrenalina > noradrenalina; α: adrenalina > noradrenalina > isoprenalina." },
+      { text: "β: isoprenalina > adrenalina > noradrenalina; α: noradrenalina ≥ adrenalina > isoprenalina." },
       { text: "β: adrenalina > noradrenalina > isoprenalina; α: isoprenalina > noradrenalina > adrenalina." },
     ],
     correctIndex: 2,
