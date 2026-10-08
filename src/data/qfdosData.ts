@@ -483,9 +483,10 @@ export interface StudentQuestion {
  * v3.44.0 — Tests del Tema 1 (Modelos E, A, B, C, FIR y Retrosíntesis): justificaciones certificadas con Jev una a una, la opción correcta ya no es la más larga y estructuras corregidas (pilocarpina, donepezilo, galantamina, rivastigmina, tropicamida); claves sin cambios.
  * v3.45.0 — Tema 2, Modelo 1, pregunta 1: el orden α corregido según Ahlquist (noradrenalina ≥ adrenalina > isoprenalina).
  * v3.46.0 — Tema 1: 6 flashcards de ampliación de temario (neostigmina y piridostigmina frente a fisostigmina, síntesis de neostigmina, gangliopléjicos, atracurio, atropina y homatropina, teoría de Beckett), revisadas con Jev.
+ * v3.47.0 — Tema 1 según los apuntes: precursor común de metacolina y betanecol 1-cloro-2-propanol (antes, la ruta de la acetona), sin cifras de eudismia no verificadas, tarjetas de neostigmina/atracurio/atropina como contenido principal y nuevas tarjetas de donepezilo y pilocarpina.
  */
-export const COURSE_DATA_VERSION = '3.46.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-08T14:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.47.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-08T16:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -669,10 +670,10 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
       { text: "El enantiómero (R) es más potente porque su metilo orienta el par electrónico del éster hacia los residuos básicos del canal iónico." },
       { text: "Ambos enantiómeros presentan idéntica afinidad biológica porque el receptor colinérgico carece de asimetría quiral en su bolsillo." },
       { text: "El enantiómero (R) presenta mayor afinidad debido a que se hidroliza con mayor lentitud por la enzima acetilcolinesterasa neuronal." },
-      { text: "El enantiómero (S) es unas 250 veces más activo al reproducir con fidelidad la disposición espacial de la (+)-muscarina natural." },
+      { text: "El enantiómero (S) es más activo al reproducir con fidelidad la disposición espacial de la (+)-muscarina natural." },
     ],
     correctIndex: 3,
-    explanation: "Respecto a la metacolina, hemos comprobado en clase que el metilo en β crea un centro estereogénico y que el receptor muscarínico distingue muy bien los dos enantiómeros: la (S)-metacolina es más de 200 veces más potente que la (R), porque coloca ese metilo como lo dispone la (+)-(2S,4R,5S)-muscarina natural. El bolsillo del receptor está construido con aminoácidos L y es quiral.\n\nProponemos descartar la A y la C porque el eutómero es el (S), no el (R), y además la A habla de un canal iónico que el receptor muscarínico no tiene. La B la descartamos porque, si el bolsillo no fuera quiral, no habría eudismia.",
+    explanation: "Respecto a la metacolina, hemos comprobado en clase que el metilo en β crea un centro estereogénico y que el receptor muscarínico distingue muy bien los dos enantiómeros: la (S)-metacolina es mucho más potente que la (R), porque coloca ese metilo como lo dispone la (+)-(2S,4R,5S)-muscarina natural. El bolsillo del receptor está construido con aminoácidos L y es quiral.\n\nProponemos descartar la A y la C porque el eutómero es el (S), no el (R), y además la A habla de un canal iónico que el receptor muscarínico no tiene. La B la descartamos porque, si el bolsillo no fuera quiral, no habría eudismia.",
     difficulty: "Medio"
   },
   {
@@ -833,8 +834,8 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
     topicId: "tema-01",
     block: "Bloque 5 · Síntesis Directa: Metacolina y Betanecol",
     badge: "Bifurcación Sintética: Metacolina vs Betanecol",
-    question: "La metacolina y el betanecol comparten el intermedio 1-(trimetilamonio)propan-2-ol. ¿Qué etapa final diferencia la obtención de cada fármaco a partir de ese precursor común?",
-    questionSmiles: "OC(C)C[N+](C)(C)C",
+    question: "La metacolina y el betanecol comparten el intermedio 1-cloro-2-propanol. ¿Qué etapa diferencia la obtención de cada fármaco a partir de ese precursor común?",
+    questionSmiles: "CC(O)CCl",
     options: [
       { text: "La acilación con cloruro de acetilo rinde betanecol, mientras que el calentamiento con urea en ácido sulfúrico concentrado rinde metacolina." },
       { text: "La reacción con isocianato de metilo rinde metacolina, mientras que la esterificación de Fischer con ácido fórmico en medio ácido rinde betanecol." },
@@ -842,7 +843,7 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
       { text: "La acilación del hidroxilo con anhídrido acético rinde metacolina, mientras que la carbamoilación vía fosgeno y amoníaco anhidro rinde betanecol." },
     ],
     correctIndex: 3,
-    explanation: "En cuanto a la bifurcación entre metacolina y betanecol, hemos visto en clase que las dos salen del mismo 1-(trimetilamonio)propan-2-ol y que solo cambia el acilo que ponemos en el hidroxilo. Con anhídrido acético obtenemos el acetato, la metacolina, que la AChE aún hidroliza, aunque más despacio que la acetilcolina. Con fosgeno formamos el cloroformiato y el amoníaco lo convierte en carbamato: el betanecol, que resiste la hidrólisis y se toma por vía oral 3 o 4 veces al día.\n\nProponemos descartar la A porque invierte los dos productos; la B porque el isocianato de metilo daría un N-metilcarbamato y el ácido fórmico un formiato; y la C porque oxidar y aminar el carbinol elimina el oxígeno que ambos fármacos necesitan para el éster.",
+    explanation: "En cuanto a la bifurcación entre metacolina y betanecol, hemos visto en clase que las dos salen del mismo 1-cloro-2-propanol y que solo cambia el acilo que ponemos en el hidroxilo. En los dos casos la trimetilamina desplaza el cloro al final. Con anhídrido acético obtenemos el acetato, la metacolina, que la AChE aún hidroliza, aunque más despacio que la acetilcolina. Con fosgeno formamos el cloroformiato y el amoníaco lo convierte en carbamato: el betanecol, que resiste la hidrólisis y se toma por vía oral 3 o 4 veces al día.\n\nProponemos descartar la A porque invierte los dos productos; la B porque el isocianato de metilo daría un N-metilcarbamato y el ácido fórmico un formiato; y la C porque oxidar y aminar el carbinol elimina el oxígeno que ambos fármacos necesitan para el éster.",
     difficulty: "Medio"
   },
   {
@@ -850,8 +851,8 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
     topicId: "tema-01",
     block: "Bloque 5 · Síntesis Directa: Metacolina y Betanecol",
     badge: "Ruta Sintética Directa de Betanecol",
-    question: "En la preparación sintética directa del betanecol a partir de 1-(trimetilamonio)propan-2-ol, ¿qué secuencia de reactivos introduce el grupo carbamato?",
-    questionSmiles: "NC(=O)OC(C)C[N+](C)(C)C",
+    question: "En la preparación sintética directa del betanecol a partir de 1-cloro-2-propanol, ¿qué secuencia de reactivos introduce el grupo carbamato?",
+    questionSmiles: "CC(O)CCl",
     options: [
       { text: "Reacción con fosgeno (COCl₂) para obtener el cloroformiato intermedio seguida de aminólisis directa con amoniaco gaseoso anhidro." },
       { text: "Calentamiento prolongado con urea en medio de ácido sulfúrico concentrado con eliminación irreversible de agua azeotrópica en reflujo." },
@@ -859,7 +860,7 @@ export const MODELO_A_TEST_QUESTIONS: TestQuestion[] = [
       { text: "Tratamiento con isocianato de metilo en presencia de piridina seca rindiendo directamente un derivado de N-metilcarbamato secundario." },
     ],
     correctIndex: 0,
-    explanation: "Respecto al betanecol, hemos propuesto en clase una ruta de dos etapas. Partimos del 1-(trimetilamonio)propan-2-ol, lo tratamos con fosgeno y obtenemos el cloroformiato; después añadimos amoníaco anhidro, que desplaza el cloruro y nos deja el carbamato primario. Hemos visto que el metilo en β quita casi toda la actividad nicotínica y que el carbamato aguanta la hidrólisis, así que el betanecol se toma por boca 3 o 4 veces al día.\n\nProponemos descartar la B porque la urea en ácido sulfúrico concentrado no carbamoila limpiamente este alcohol; la C porque el cloruro de acetilo y la transposición de Curtius no dan un carbamato sobre el oxígeno; y la D porque el isocianato de metilo daría un N-metilcarbamato, que no es el betanecol.",
+    explanation: "Respecto al betanecol, hemos propuesto en clase una ruta de dos etapas. Partimos del 1-cloro-2-propanol, lo tratamos con fosgeno y obtenemos el cloroformiato; después añadimos amoníaco anhidro, que desplaza el cloruro del cloroformiato y nos deja el carbamato primario. Solo al final la trimetilamina cuaterniza el cloro. Hemos visto que el metilo en β quita casi toda la actividad nicotínica y que el carbamato aguanta la hidrólisis, así que el betanecol se toma por boca 3 o 4 veces al día.\n\nProponemos descartar la B porque la urea en ácido sulfúrico concentrado no carbamoila limpiamente este alcohol; la C porque el cloruro de acetilo y la transposición de Curtius no dan un carbamato sobre el oxígeno; y la D porque el isocianato de metilo daría un N-metilcarbamato, que no es el betanecol.",
     difficulty: "Medio"
   }
 ];
@@ -1522,16 +1523,16 @@ export const RETROSINTESIS_TEST_QUESTIONS: TestQuestion[] = [
     topicId: "tema-01",
     block: "Bloque Retrosíntesis · Apertura Regioselectiva de Oxiranos",
     badge: "Retrosíntesis de Metacolina: Descon",
-    question: "En la desconexión retrosintética de la metacolina, ¿cuál es la ruta convergente óptima para acceder al aminoalcohol cuaternario intermedio evitando regioselectividades no deseadas?",
+    question: "En la desconexión retrosintética de la metacolina, ¿cuál es la ruta convergente óptima para acceder al haloalcohol intermedio evitando regioselectividades no deseadas?",
     questionSmiles: "CC(=O)OC(C)C[N+](C)(C)C",
     options: [
-      { text: "Desconexión del éster de acetilo a 1-(trimetilamonio)propan-2-ol, cuya retrosíntesis implica la apertura nucleófila regioselectiva de óxido de propileno con trimetilamina." },
+      { text: "Desconexión del éster de acetilo a 1-cloro-2-propanol, cuya retrosíntesis implica la apertura regioselectiva del óxido de propileno con ácido clorhídrico." },
       { text: "Desconexión del éster a colina cuaternaria sin sustituir, seguida de metilación del carbono beta mediante adición de yoduro de metilo en tetrahidrofurano anhidro a ebullición." },
       { text: "Desconexión C–C rindiendo 3-(trimetilamonio)propan-1-ol y condensación con anhídrido acético en diclorometano seco con piridina como catalizador nucleófilo básico suave." },
       { text: "Desconexión C–N rindiendo acetato de 1-cloropropan-2-ilo y sustitución con amoniaco gaseoso en medio alcohólico diluido para generar la amina primaria correspondiente libre." },
     ],
     correctIndex: 0,
-    explanation: "Sobre la metacolina, hemos comprobado en clase que basta quitar el acetilo para llegar al 1-(trimetilamonio)propan-2-ol, la beta-metilcolina. Ese aminoalcohol sale de abrir el óxido de propileno (C₃H₆O) con trimetilamina: el nitrógeno ataca por SN2 el CH₂ terminal, menos impedido, y el OH queda en el carbono secundario C2. La acetilación final con cloruro de acetilo nos da el fármaco, cuyo metilo en beta lo hace resistente a la butirilcolinesterasa.\n\nProponemos descartar la B porque no hay forma de metilar un C–H de la colina con yoduro de metilo. La C da el regioisómero lineal, con tres carbonos entre el N y el O. La D, con amoníaco, deja una amina primaria en lugar del amonio cuaternario.",
+    explanation: "Sobre la metacolina, hemos comprobado en clase que basta quitar el acetilo para llegar al 1-cloro-2-propanol. Ese haloalcohol sale de abrir el óxido de propileno (C₃H₆O) con ácido clorhídrico: el cloruro ataca el CH₂ terminal, menos impedido, y el OH queda en el carbono secundario C2. La acetilación con anhídrido acético nos da el acetato, y la trimetilamina desplaza el cloro al final para cerrar el amonio cuaternario de la metacolina.\n\nProponemos descartar la B porque no hay forma de metilar un C–H de la colina con yoduro de metilo. La C da el regioisómero lineal, con tres carbonos entre el N y el O. La D, con amoníaco, deja una amina primaria en lugar del amonio cuaternario.",
     difficulty: "Medio"
   },
   {
@@ -1680,7 +1681,7 @@ export const MODELO_E_TEST_QUESTIONS: TestQuestion[] = [
     topicId: "tema-01",
     block: "Bloque 3 · Estereoquímica y Eudismia",
     badge: "Eudismia Metacolina / Muscarina",
-    question: "La introducción de un centro estereogénico en el carbono beta de la acetilcolina origina los enantiómeros (S)-metacolina y (R)-metacolina. ¿Cuál es la razón fisicoquímica por la cual el eutómero (S) es aproximadamente 250 veces más potente sobre receptores muscarínicos que el distómero (R)?",
+    question: "La introducción de un centro estereogénico en el carbono beta de la acetilcolina origina los enantiómeros (S)-metacolina y (R)-metacolina. ¿Cuál es la razón fisicoquímica por la cual el eutómero (S) es más potente sobre receptores muscarínicos que el distómero (R)?",
     questionSmiles: "C[C@@H](C[N+](C)(C)C)OC(=O)C",
     options: [
       { text: "Porque el isómero (S) adopta exclusivamente una disposición antiperiplanar forzada que interacciona selectivamente con el canal nicotínico." },
@@ -1689,7 +1690,7 @@ export const MODELO_E_TEST_QUESTIONS: TestQuestion[] = [
       { text: "Porque el grupo metilo en configuración (S) establece un enlace covalente transitorio con la treonina presente en la entrada del receptor." },
     ],
     correctIndex: 2,
-    explanation: "En cuanto a la metacolina, hemos trabajado en clase el modelo de fijación multipunto del receptor muscarínico. El eutómero (S) coloca su metilo y su cabeza catiónica igual que la (+)-muscarina natural, de configuración (2S,4R,5S), y encaja sin choques estéricos; por eso rinde unas 250 veces más que el (R). La eudismia aquí es pura afinidad, no metabolismo.\n\nProponemos descartar la A porque la metacolina es selectiva muscarínica, no nicotínica, la B porque los dos enantiómeros se hidrolizan a velocidad parecida, y la D porque la unión al receptor es reversible, por fuerzas de Coulomb y puentes de hidrógeno, nunca covalente.",
+    explanation: "En cuanto a la metacolina, hemos trabajado en clase el modelo de fijación multipunto del receptor muscarínico. El eutómero (S) coloca su metilo y su cabeza catiónica igual que la (+)-muscarina natural, de configuración (2S,4R,5S), y encaja sin choques estéricos; por eso rinde mucho más que el (R). La eudismia aquí es pura afinidad, no metabolismo.\n\nProponemos descartar la A porque la metacolina es selectiva muscarínica, no nicotínica, la B porque los dos enantiómeros se hidrolizan a velocidad parecida, y la D porque la unión al receptor es reversible, por fuerzas de Coulomb y puentes de hidrógeno, nunca covalente.",
     difficulty: "Medio"
   },
   {
@@ -1730,19 +1731,20 @@ export const MODELO_E_TEST_QUESTIONS: TestQuestion[] = [
     id: "t01-e-06",
     topicId: "tema-01",
     block: "Bloque 6 · Síntesis Industrial Directa",
-    badge: "Síntesis Metacolina (Reducción/Ac2O)",
-    question: "En la preparación industrial de metacolina a partir de la bromación de acetona y posterior reacción con trimetilamina, se genera una cetona cuaternaria que debe ser transformada en el fármaco final. ¿Qué secuencia de reactivos completa la reducción y la funcionalización del grupo éster?",
-    questionSmiles: "CC(C[N+](C)(C)C)OC(=O)C",
+    badge: "Síntesis Metacolina (Acetilación/SN2)",
+    question: "En la preparación de metacolina a partir de 1-cloro-2-propanol, ¿qué secuencia de reactivos introduce el acetilo y completa el amonio cuaternario?",
+    questionSmiles: "CC(O)CCl",
     options: [
       { text: "Oxidación con permanganato potásico a carboxilato cuaternario y esterificación directa con metanol en reflujo con ácido sulfúrico." },
       { text: "Tratamiento con fosgeno gaseoso a baja temperatura y posterior desplazamiento nucleófilo con dimetilamina seca en etanol absoluto." },
       { text: "Hidrólisis alcalina con hidróxido sódico acuoso concentrado y posterior condensación deshidratante con cloruro de carbamoilo seco." },
-      { text: "Reducción de la cetona con borohidruro sódico al alcohol secundario y posterior acetilación con anhídrido acético anhidro." },
+      { text: "Acetilación del hidroxilo con anhídrido acético y posterior desplazamiento del cloro con trimetilamina en acetona." },
     ],
     correctIndex: 3,
-    explanation: "En cuanto a la síntesis de la metacolina, hemos visto en clase que de la cetona cuaternaria se llega al fármaco en dos pasos limpios. El borohidruro sódico reduce el carbonilo al alcohol secundario, el 1-(trimetilamonio)propan-2-ol, y el anhídrido acético lo acetila dando el éster acetato. Ese orden, reducir y luego esterificar, respeta la cabeza catiónica.\n\nProponemos descartar la A porque oxidar la cetona rompería el esqueleto, la B porque el fosgeno con aminas lleva a carbamatos como el betanecol, y la C porque la hidrólisis no reduce nada y el cloruro de carbamoilo daría betanecol, no metacolina.",
+    explanation: "En cuanto a la síntesis de la metacolina, hemos visto en clase que partimos del 1-cloro-2-propanol. El anhídrido acético acetila el OH y nos da el acetato de 1-cloro-2-propilo; después la trimetilamina desplaza el cloro por SN2 y cierra el amonio cuaternario: la metacolina. Ese orden, acilar primero y cuaternizar después, respeta la cabeza catiónica.\n\nProponemos descartar la A porque oxidar a carboxilato rompería la cadena, la B porque el fosgeno con dimetilamina daría un carbamato dimetilado y no un éster, y la C porque la hidrólisis alcalina y el cloruro de carbamoilo llevan a betanecol, no a metacolina.",
     difficulty: "Medio"
-  },
+  }
+,
   {
     id: "t01-e-07",
     topicId: "tema-01",
@@ -2664,8 +2666,8 @@ flashcards: [
         id: 'fc-01-02',
         topicId: 'tema-01',
         concept: 'Eudismia de la Metacolina ((S) vs (R))',
-        front: '¿Por qué el enantiómero (S)-metacolina es ~250 veces más potente sobre receptores muscarínicos que el distómero (R)?',
-        back: 'Respecto a la eudismia, la **(S)-metacolina** coloca sus grupos en el espacio igual que la **(+)-(2S,4R,5S)-muscarina** en su conformación activa. Por eso encaja en los tres puntos de fijación del receptor muscarínico sin choques estéricos y es unas 250 veces más potente que la (R), que no consigue ese ajuste.',
+        front: '¿Por qué el enantiómero (S)-metacolina es más potente sobre receptores muscarínicos que el distómero (R)?',
+        back: "En cuanto a la eudismia, hemos comprobado en clase que la (S)-metacolina coloca sus grupos en el espacio igual que la (+)-(2S,4R,5S)-muscarina en su conformación activa. Por eso encaja en los tres puntos de fijación del receptor muscarínico sin choques estéricos. La (R) no consigue ese ajuste y es bastante menos potente.",
         smiles: 'C[C@@H](C[N+](C)(C)C)OC(=O)C',
         difficulty: 'easy',
         category: 'Estereoquímica'
@@ -2733,11 +2735,8 @@ flashcards: [
         id: 'fc-01-08',
         topicId: 'tema-01',
         concept: 'Síntesis Industrial de Metacolina y Betanecol',
-        front: '¿Cómo se diferencian las síntesis industriales de Metacolina y Betanecol a partir del alcohol secundario común?',
-        back: 'En las dos síntesis partimos del mismo alcohol secundario, el **1-(trimetilamonio)propan-2-ol**, que sale de bromar la acetona, cuaternizar con trimetilamina y reducir con LiAlH₄. A partir de ahí se separan. Para la **metacolina** acilamos directamente con **anhídrido acético**. Para el **betanecol** tratamos primero con **fosgeno**, que da el cloroformiato, y después con **amoniaco**, que nos deja el carbamato.',
-        smiles: 'CC(C[N+](C)(C)C)OC(=O)C',
-        difficulty: 'medium',
-        imagePath: 'assets/tema-01/sintesis_metacolina_betanecol.png',
+        front: "¿Cómo se diferencian las síntesis de metacolina y betanecol a partir del mismo precursor, el 1-cloro-2-propanol?",
+        back: "En cuanto a la síntesis de metacolina y betanecol, hemos comprobado en clase que las dos parten del mismo 1-cloro-2-propanol. Lo que cambia es el reactivo que acila el hidroxilo: anhídrido acético para la metacolina, y fosgeno seguido de amoníaco para el betanecol, que lo convierte en carbamato.\n\nProponemos recordar que en las dos, al final, la trimetilamina desplaza el cloro y nos deja el amonio cuaternario. Es el orden que pedimos en el examen: primero el éster o el carbamato, y después la cuaternización.",
         category: 'Síntesis Orgánica'
       },
       {
@@ -2769,8 +2768,7 @@ flashcards: [
         back: "En cuanto a la fisostigmina, es un alcaloide natural con centros quirales (3aS, 8aR) que se oxida con facilidad a rubreserina, y su amina terciaria deja pasar una fracción neutra a través de la BHE, así que tiene toxicidad central.\n\nRespecto a la **neostigmina**, es una molécula más sencilla y aquiral, con un **amonio cuaternario** permanente. La **piridostigmina** lleva un **catión piridinio**, también permanente. Las dos están 100 % ionizadas a pH 7,4, no cruzan la BHE y su acción queda en la placa motora.\n\nEl dimetilcarbamato resiste además mejor la hidrólisis que el monometilcarbamato de la fisostigmina, así que la inhibición dura más.",
         smiles: "CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C",
         difficulty: 'medium',
-        category: "Farmacocinética",
-        ampliacion: true
+        category: "Farmacocinética"
       },
       {
         id: 'fc-01-12',
@@ -2801,8 +2799,7 @@ flashcards: [
         front: "¿Por qué la duración del atracurio no depende del hígado ni de la colinesterasa plasmática?",
         back: "En cuanto a la duración del atracurio, hemos comprobado en clase que es un bisbenzilisoquinolínico con dos amonios cuaternarios y dos ésteres. A pH 7,4 y 37 °C sufre una eliminación de Hofmann: el hidrógeno en β del amonio se pierde y se rompe la unión C–N, con formación de acrilato y laudanosina.\n\nComo el proceso depende del pH y de la temperatura, la duración no cambia con la función hepática ni renal. Por eso lo llamamos fármaco blando: lo destruye el medio y no una enzima concreta.",
         difficulty: 'hard',
-        category: "Antagonistas Nicotínicos",
-        ampliacion: true
+        category: "Antagonistas Nicotínicos"
       },
       {
         id: 'fc-01-15',
@@ -2812,8 +2809,7 @@ flashcards: [
         back: "En cuanto a la atropina, hemos comprobado en clase que la afinidad muscarínica depende del éster del ácido trópico con la tropina. El tropano aporta un nitrógeno básico que se protona y ocupa el sitio catiónico del receptor, mientras que la parte aromática bloquea el lugar del grupo éster de la acetilcolina. Son dos piezas que hay que retener juntas.\n\nRespecto a la homatropina, mantiene el tropano y cambia el ácido trópico por el ácido mandélico. La acción es más corta, y por eso la usamos en oftalmología para dilatar la pupila.",
         smiles: "CN1C2CCC1CC(C2)OC(=O)C(CO)c1ccccc1",
         difficulty: 'medium',
-        category: "Antagonistas Muscarínicos",
-        ampliacion: true
+        category: "Antagonistas Muscarínicos"
       },
       {
         id: 'fc-01-16',
@@ -2824,6 +2820,26 @@ flashcards: [
         difficulty: 'medium',
         category: "Mecanismo",
         ampliacion: true
+      },
+      {
+        id: 'fc-01-17',
+        topicId: 'tema-01',
+        concept: "Donepezilo: Inhibición No Covalente de la AChE",
+        front: "¿Por qué el donepezilo no carbamoila la serina de la AChE y cómo inhibe la enzima?",
+        back: "Respecto al donepezilo, hemos comprobado en clase que es una amina terciaria con regiones aromáticas lipófilas, así que alcanza el SNC. No transfiere ningún grupo a la serina, como sí hacen los carbamatos: ocupa la garganta del centro activo con interacciones iónicas, hidrófobas y aromáticas, y bloquea el acceso de la acetilcolina.\n\nLa tacrina, su antecedente, tenía un núcleo acridínico plano que daba toxicidad hepática. Proponemos el donepezilo porque evita ese núcleo y su perfil de seguridad es mejor.",
+        smiles: "COc1cc2c(cc1OC)C(=O)C(CC1CCN(Cc3ccccc3)CC1)C2",
+        difficulty: 'medium',
+        category: "Inhibidores AChE"
+      },
+      {
+        id: 'fc-01-18',
+        topicId: 'tema-01',
+        concept: "Pilocarpina: Agonista Natural y su Farmacóforo",
+        front: "¿Qué tienen en común la acetilcolina y la pilocarpina pese a tener esqueletos distintos?",
+        back: "En cuanto a la pilocarpina, hemos comprobado en clase que es un agonista muscarínico natural con un esqueleto distinto al de la acetilcolina: un imidazol protonable, una lactona y dos centros estereogénicos. Aun así reproduce la misma separación tridimensional entre el centro catiónico y los grupos polares.\n\nSu farmacóforo repite el tipo de interacciones: iónica con el sitio aniónico, enlace de hidrógeno con el oxígeno del anillo y dipolar con el carbonilo.",
+        smiles: "CC[C@@H]1C(=O)OC[C@@H]1Cc1cncn1C",
+        difficulty: 'medium',
+        category: "Agonistas Muscarínicos"
       }
     ]
   },
