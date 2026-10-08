@@ -883,7 +883,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   whiteSpace: 'nowrap',
                   flexShrink: 0
                 }}>
-                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (10P)' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : 'Modelo A Oficial'}
+                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (10P)' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : selectedModel.startsWith('t2-') ? getModelLabel(selectedModel, 'short') : 'Modelo A Oficial'}
                 </span>
               </div>
               <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: '2px 0 0 0', lineHeight: 1.3 }}>

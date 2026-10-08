@@ -475,13 +475,14 @@ export interface StudentQuestion {
  * v3.37.0 — Las ilustraciones de los Nobel llegan también a los enlaces ya publicados (el alumnado no las veía en Medicina y Física).
  * v3.38.0 — Se retira la música sintetizada de las historias sin sonido; quedan los efectos de brag.
  * v3.39.0 — Tema 2: 10 flashcards de autoevaluación (SAR, interacción con el receptor β2, síntesis de salbutamol y guanetidina, estereoquímica) con valoración fácil/difícil.
- * v3.39.1 — Las flashcards del Tema 2 que trae eexport const COURSE_BUILD_TIMESTAMP = '2026-10-07T21:59:00.000Z';a 1 tarjeta en vez de 10).
+ * v3.39.1 — Las flashcards del Tema 2 que trae el código mandan sobre las publicadas (antes se veía 1 tarjeta en vez de 10).
  * v3.40.0 — Tema 2: 6 flashcards nuevas sobre lo que más se repite en los exámenes (desarrollo de β-bloqueantes, practolol, fentermina, isoprenalina, imidazolinas y niveles de la sinapsis) y 4 completadas.
  * v3.41.0 — Flashcards de ampliación de temario: se marcan con su etiqueta y se pueden ocultar.
  * v3.42.0 — Reversos de las flashcards de los Temas 1 y 2 reescritos en la voz del profesor (certificados con Jev); la química no cambia.
+ * v3.43.0 — Tests del Tema 2 (Modelos 1, 2 y 3): la opción correcta ya no es la más larga, claves del Modelo 1 rebarajadas (ids -v2), justificaciones certificadas con Jev una a una y estructuras corregidas (salbutamol y dexanfetamina con su enantiómero, yohimbina, fenoxibenzamina, fentolamina, indacaterol).
  */
-export const COURSE_DATA_VERSION = '3.42.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-07T14:55:00.000Z';
+export const COURSE_DATA_VERSION = '3.43.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-07T23:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
