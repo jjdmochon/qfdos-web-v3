@@ -482,9 +482,10 @@ export interface StudentQuestion {
  * v3.43.0 — Tests del Tema 2 (Modelos 1, 2 y 3): la opción correcta ya no es la más larga, claves del Modelo 1 rebarajadas (ids -v2), justificaciones certificadas con Jev una a una y estructuras corregidas (salbutamol y dexanfetamina con su enantiómero, yohimbina, fenoxibenzamina, fentolamina, indacaterol).
  * v3.44.0 — Tests del Tema 1 (Modelos E, A, B, C, FIR y Retrosíntesis): justificaciones certificadas con Jev una a una, la opción correcta ya no es la más larga y estructuras corregidas (pilocarpina, donepezilo, galantamina, rivastigmina, tropicamida); claves sin cambios.
  * v3.45.0 — Tema 2, Modelo 1, pregunta 1: el orden α corregido según Ahlquist (noradrenalina ≥ adrenalina > isoprenalina).
+ * v3.46.0 — Tema 1: 6 flashcards de ampliación de temario (neostigmina y piridostigmina frente a fisostigmina, síntesis de neostigmina, gangliopléjicos, atracurio, atropina y homatropina, teoría de Beckett), revisadas con Jev.
  */
-export const COURSE_DATA_VERSION = '3.45.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-08T12:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.46.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-08T14:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -2759,6 +2760,70 @@ flashcards: [
         imagePath: 'assets/tema-01/image_47.png',
         difficulty: 'hard',
         category: 'Antagonistas Nicotínicos'
+      },
+      {
+        id: 'fc-01-11',
+        topicId: 'tema-01',
+        concept: "Neostigmina y Piridostigmina frente a Fisostigmina",
+        front: "¿Por qué la neostigmina y la piridostigmina sustituyen a la fisostigmina en el tratamiento de la miastenia gravis?",
+        back: "En cuanto a la fisostigmina, es un alcaloide natural con centros quirales (3aS, 8aR) que se oxida con facilidad a rubreserina, y su amina terciaria deja pasar una fracción neutra a través de la BHE, así que tiene toxicidad central.\n\nRespecto a la **neostigmina**, es una molécula más sencilla y aquiral, con un **amonio cuaternario** permanente. La **piridostigmina** lleva un **catión piridinio**, también permanente. Las dos están 100 % ionizadas a pH 7,4, no cruzan la BHE y su acción queda en la placa motora.\n\nEl dimetilcarbamato resiste además mejor la hidrólisis que el monometilcarbamato de la fisostigmina, así que la inhibición dura más.",
+        smiles: "CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C",
+        difficulty: 'medium',
+        category: "Farmacocinética",
+        ampliacion: true
+      },
+      {
+        id: 'fc-01-12',
+        topicId: 'tema-01',
+        concept: "Síntesis del Bromuro de Neostigmina",
+        front: "¿Cómo se obtiene el bromuro de neostigmina a partir del 3-dimetilaminofenol?",
+        back: "Respecto a la síntesis de la neostigmina, hemos visto en clase que partimos del **3-dimetilaminofenol** y lo acilamos con **cloruro de dimetilcarbamoilo** (Me₂N–COCl) en medio básico, en piridina o tolueno. Así formamos el **dimetilcarbamato** de fenilo.\n\nEl nitrógeno del carbamato tiene su par electrónico deslocalizado sobre el carbonilo, de modo que no reacciona con el metilo. Después tratamos con **bromuro de metilo** en acetona o acetato de etilo a temperatura ambiente: se cuaterniza solo la amina del anillo y obtenemos el bromuro de neostigmina.\n\nEs el orden que pedimos en el examen: primero el carbamato y después la cuaternización.",
+        smiles: "CN(C)C(=O)Oc1cccc(c1)[N+](C)(C)C",
+        difficulty: 'hard',
+        category: "Síntesis Orgánica",
+        ampliacion: true
+      },
+      {
+        id: 'fc-01-13',
+        topicId: 'tema-01',
+        concept: "Gangliopléjicos Bis-amonio y Acción Ganglionar",
+        front: "¿Por qué un bis-amonio como el hexametonio bloquea los ganglios autonómicos cuando la acetilcolina no sirve como fármaco?",
+        back: "En cuanto a los gangliopléjicos, la acetilcolina no vale como fármaco exógeno: la AChE la hidroliza en menos de un milisegundo y además activa todos los receptores colinérgicos a la vez, sin selectividad.\n\nEl **hexametonio** tiene dos amonios cuaternarios separados por una cadena de **seis metilenos**. Esa distancia ocupa los sitios nicotínicos ganglionares sin ser sustrato de la colinesterasa, así que bloquea la transmisión en el ganglio.\n\nComo los amonios se absorben mal por vía oral, la distancia entre las dos cargas es el parámetro que ajustamos para la actividad.",
+        smiles: "C[N+](C)(C)CCCCCC[N+](C)(C)C",
+        difficulty: 'medium',
+        category: "Antagonistas Nicotínicos",
+        ampliacion: true
+      },
+      {
+        id: 'fc-01-14',
+        topicId: 'tema-01',
+        concept: "Atracurio: Fármaco Blando y Eliminación de Hofmann",
+        front: "¿Por qué la duración del atracurio no depende del hígado ni de la colinesterasa plasmática?",
+        back: "En cuanto a la duración del atracurio, hemos comprobado en clase que es un bisbenzilisoquinolínico con dos amonios cuaternarios y dos ésteres. A pH 7,4 y 37 °C sufre una eliminación de Hofmann: el hidrógeno en β del amonio se pierde y se rompe la unión C–N, con formación de acrilato y laudanosina.\n\nComo el proceso depende del pH y de la temperatura, la duración no cambia con la función hepática ni renal. Por eso lo llamamos fármaco blando: lo destruye el medio y no una enzima concreta.",
+        difficulty: 'hard',
+        category: "Antagonistas Nicotínicos",
+        ampliacion: true
+      },
+      {
+        id: 'fc-01-15',
+        topicId: 'tema-01',
+        concept: "Atropina: el Tropano y la Homatropina",
+        front: "¿Qué estructura convierte a la atropina en antagonista muscarínico y qué cambia en la homatropina para acortar su acción?",
+        back: "En cuanto a la atropina, hemos comprobado en clase que la afinidad muscarínica depende del éster del ácido trópico con la tropina. El tropano aporta un nitrógeno básico que se protona y ocupa el sitio catiónico del receptor, mientras que la parte aromática bloquea el lugar del grupo éster de la acetilcolina. Son dos piezas que hay que retener juntas.\n\nRespecto a la homatropina, mantiene el tropano y cambia el ácido trópico por el ácido mandélico. La acción es más corta, y por eso la usamos en oftalmología para dilatar la pupila.",
+        smiles: "CN1C2CCC1CC(C2)OC(=O)C(CO)c1ccccc1",
+        difficulty: 'medium',
+        category: "Antagonistas Muscarínicos",
+        ampliacion: true
+      },
+      {
+        id: 'fc-01-16',
+        topicId: 'tema-01',
+        concept: "Teoría de Beckett y la Ineficacia de la Acetilcolina",
+        front: "¿Por qué la acetilcolina no se usa como fármaco y qué modelo explica cómo se une el sustrato al receptor?",
+        back: "En cuanto a la acetilcolina, hemos visto en clase que la AChE la hidroliza en menos de un milisegundo y que activa todos los receptores colinérgicos a la vez. Como fármaco no tiene selectividad ni duración.\n\nPara explicar cómo se une el sustrato, Beckett propuso el modelo de los tres puntos: un punto aniónico para el amonio, un punto para el oxígeno del éster y un tercer punto para el grupo alquilo. Los análogos de la colina nos permiten comprobarlo con la regla de Ing y la eudismia.",
+        difficulty: 'medium',
+        category: "Mecanismo",
+        ampliacion: true
       }
     ]
   },
