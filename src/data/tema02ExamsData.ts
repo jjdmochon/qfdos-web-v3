@@ -158,13 +158,13 @@ export const TEMA2_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     question: "La estructura mostrada corresponde a la dexanfetamina (dextroanfetamina), el enantiómero dextrorrotatorio (+) y eutómero psicoestimulante de la anfetamina. Sobre su carbono quiral alfa, asigne la configuración absoluta según las reglas CIP:",
     questionSmiles: "C[C@H](N)Cc1ccccc1",
     options: [
-      { text: "-NH₂ > -CH₂C₆H₅ > -CH₃ > -H; con el H hacia atrás, 1→2→3 gira en sentido horario: (R)." },
+      { text: "-NH₂ > -CH₂C₆H₅ > -CH₃ > -H; con el H hacia delante, 1→2→3 gira en sentido horario: (R)." },
       { text: "-CH₂C₆H₅ > -NH₂ > -CH₃ > -H, porque el bencilo pesa más que el grupo amino: configuración (R)." },
       { text: "No hay estereocentro: el bencilo y el metilo son los dos cadenas hidrocarbonadas y se igualan." },
-      { text: "-NH₂ > -CH₂C₆H₅ > -CH₃ > -H; con el H hacia atrás, 1→2→3 gira en sentido antihorario: (S)." },
+      { text: "-NH₂ > -CH₂C₆H₅ > -CH₃ > -H; con el H delante, el giro horario se invierte: (S)." },
     ],
     correctIndex: 3,
-    explanation: "Respecto al carbono α de la dexanfetamina, hemos trabajado este caso en clase junto al del salbutamol. El -NH₂ es el 1 (N, Z = 7). Entre los dos carbonos, el del bencilo lleva (C, H, H) y el del metilo (H, H, H), así que el bencilo es el 2, el metilo el 3 y el H el 4. Con el H atrás, 1→2→3 gira en sentido antihorario y obtenemos la (S)-(+)-anfetamina, el eutómero estimulante.\n\nDescartamos la A porque da la (R), que es la levanfetamina, varias veces menos activa en el SNC; la B porque decide por peso molecular en lugar de número atómico; y la C porque el carbono lleva cuatro sustituyentes distintos.",
+    explanation: "Respecto al carbono α de la dexanfetamina, hemos trabajado este caso en clase junto al del salbutamol. El -NH₂ es el 1 (N, Z = 7). Entre los dos carbonos, el del bencilo lleva (C, H, H) y el del metilo (H, H, H), así que el bencilo es el 2, el metilo el 3 y el H el 4. En el dibujo el metilo va hacia atrás y el H queda hacia delante: el giro 1→2→3 se ve en sentido horario, pero como miramos con el H hacia nosotros, la configuración real es (S), la (S)-(+)-anfetamina, el eutómero estimulante.\n\nDescartamos la A porque da la (R), que es la levanfetamina, varias veces menos activa en el SNC; la B porque decide por peso molecular en lugar de número atómico; y la C porque el carbono lleva cuatro sustituyentes distintos.",
     difficulty: 'Medio'
   },
   {
