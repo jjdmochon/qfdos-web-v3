@@ -490,9 +490,10 @@ export interface StudentQuestion {
  * v3.50.0 — Tema 1: baraja colinérgica ampliada a 20 cartas con estado regulatorio (vareniclina, fisostigmina, tacrina, ecotiopato y tubocurarina; filtro, reparto, anverso y reverso).
  * v3.50.1 — Cartas: la barra de reparto y el filtro por estado regulatorio ocultan los estados sin cartas.
  * v3.51.0 — Tema 3: 20 flashcards (15 de los apuntes y 5 de ampliación sacadas de exámenes de otros profesores: decanoato de haloperidol, domperidona, síntesis de carbidopa, pargilina y metirosina/HVA); el test sigue sin publicarse.
+ * v3.51.1 — Tema 3: 21.ª flashcard de ampliación, el ejercicio de diseño de un fármaco neuroléptico y antiparkinsoniano a la vez (butirofenona + éter bencidrílico).
  */
-export const COURSE_DATA_VERSION = '3.51.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-14T23:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.51.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-15T09:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

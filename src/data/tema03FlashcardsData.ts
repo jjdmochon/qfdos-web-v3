@@ -293,5 +293,20 @@ export const TEMA3_FLASHCARDS: Flashcard[] = [
     difficulty: 'easy',
     ampliacion: true,
     category: 'Biosíntesis y Metabolismo'
+  },
+  {
+    id: 'fc-03-21',
+    topicId: 'tema-03',
+    concept: 'Ejercicio: Neuroléptico y Antiparkinsoniano en una Misma Molécula',
+    front: 'Hay ejercicios que preguntan por una molécula con actividad neuroléptica (antagonista D2) y antiparkinsoniana a la vez. ¿Por qué parecen incompatibles y cómo se diseña?',
+    back: 'Sobre el conflicto de partida, el neuroléptico bloquea D2 también en la vía **nigroestriada**, rompe el equilibrio dopamina/acetilcolina a favor de la acetilcolina y provoca los **síntomas extrapiramidales**: un parkinsonismo yatrógeno. Si para corregirlo subimos la dopamina, el fármaco trabaja contra sí mismo, porque el agonismo D2 reactiva la psicosis. La salida no está en el eje dopaminérgico, sino en el **otro brazo del equilibrio**: la vía **anticolinérgica central**, que no toca D2. Descartamos así todas las estrategias dopaminérgicas (L-DOPA, agonistas, iMAO-B, iCOMT, amantadina).\n\nLa molécula que buscamos, entonces, es un **antagonista D2 que además sea antimuscarínico central**. Integramos dos farmacóforos del tema: la cadena **4-fluorobutirofenónica** del haloperidol (bloqueo D2, por el puente salino de la amina con el Asp114) y el **éter bencidrílico** de la benztropina (bloqueo M1), colgado de la piperidina. El componente anticolinérgico **atenúa los efectos extrapiramidales** del propio bloqueo D2, igual que ocurre de forma natural en la **tioridazina** y la **clozapina**. Una alternativa válida parte de la benztropina y le añade el flúor en para del benzoílo para reforzar el perfil D2.',
+    structures: [
+      { name: 'Haloperidol', smiles: 'O=C(CCCN1CCC(O)(c2ccc(Cl)cc2)CC1)c1ccc(F)cc1', badge: 'Farmacóforo D2' },
+      { name: 'Benztropina', smiles: 'CN1C2CCC1CC(OC(c1ccccc1)c1ccccc1)C2', badge: 'Farmacóforo M1' },
+      { name: 'Híbrido propuesto', smiles: 'O=C(CCCN1CCCC(OC(c2ccccc2)c2ccccc2)C1)c1ccc(F)cc1', badge: 'D2 + M1' }
+    ],
+    difficulty: 'hard',
+    ampliacion: true,
+    category: 'Ejercicio de Integración'
   }
 ];
