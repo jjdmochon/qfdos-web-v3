@@ -891,3 +891,51 @@
 
 /* Letras griegas en rótulos en mayúsculas: α y β no deben convertirse en Α y Β */
 .qf-griega { text-transform: none; }
+
+
+/* ==========================================================================
+   ESTADO REGULATORIO (barajas con `estados`, desde el Tema 3)
+   ========================================================================== */
+.qf-estados { display: flex; flex-direction: column; gap: 10px; }
+.qf-estados-barra { display: flex; height: 8px; border-radius: 4px; overflow: hidden; max-width: 640px; background: rgba(30, 58, 138, 0.08); }
+.qf-estados-barra span { display: block; height: 100%; }
+.qf-filtro-estado i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--qf-st); flex-shrink: 0; }
+.qf-filtro-estado.active { background: var(--qf-st); border-color: var(--qf-st); color: #0b1b3f; }
+.qf-filtro-estado.active i { background: #0b1b3f; }
+
+.qf-carta-item[data-estado] .qf-cara--frente { padding-top: 0; border-top-color: var(--qf-st); }
+.qf-estado-franja {
+  position: relative; z-index: 2;
+  margin: 0 -16px 12px; padding: 6px 16px;
+  background: var(--qf-st); color: #0b1b3f;
+  font-family: var(--font-mono, 'Roboto Mono', monospace);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.qf-estado-franja small { font-size: 9.5px; font-weight: 600; letter-spacing: 0.02em; text-transform: none; opacity: 0.85; text-align: right; }
+
+.qf-carta-item[data-estado="retirado"] .qf-estructura,
+.qf-carta-item[data-estado="descatalogado"] .qf-estructura,
+.qf-carta-item[data-estado="nunca"] .qf-estructura {
+  background: repeating-linear-gradient(135deg, rgba(30, 58, 138, 0.03) 0 8px, rgba(30, 58, 138, 0.07) 8px 16px);
+}
+.qf-estado-sello {
+  position: absolute; right: 6px; bottom: 6px;
+  font-family: var(--font-mono, 'Roboto Mono', monospace); font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+  color: #0b1b3f; background: var(--qf-st); border-radius: 3px; padding: 2px 6px;
+  transform: rotate(-6deg); box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+}
+
+.qf-estado-dorso {
+  background: color-mix(in srgb, var(--qf-st) 18%, transparent);
+  border-left: 3px solid var(--qf-st);
+  border-radius: 4px; padding: 8px 10px; margin: 0 0 10px;
+}
+.qf-estado-dorso h3 { margin-top: 0; }
+.qf-estado-dorso p { margin: 0; }
+
+.qf-deck--theme-dark .qf-carta-item[data-estado="retirado"] .qf-estructura,
+.qf-deck--theme-dark .qf-carta-item[data-estado="descatalogado"] .qf-estructura,
+.qf-deck--theme-dark .qf-carta-item[data-estado="nunca"] .qf-estructura {
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 8px, rgba(255, 255, 255, 0.09) 8px 16px);
+}

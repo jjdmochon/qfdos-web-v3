@@ -485,9 +485,10 @@ export interface StudentQuestion {
  * v3.46.0 — Tema 1: 6 flashcards de ampliación de temario (neostigmina y piridostigmina frente a fisostigmina, síntesis de neostigmina, gangliopléjicos, atracurio, atropina y homatropina, teoría de Beckett), revisadas con Jev.
  * v3.47.0 — Tema 1 según los apuntes: precursor común de metacolina y betanecol 1-cloro-2-propanol (antes, la ruta de la acetona), sin cifras de eudismia no verificadas, tarjetas de neostigmina/atracurio/atropina como contenido principal y nuevas tarjetas de donepezilo y pilocarpina.
  * v3.47.1 — Tema 2, Modelo 1, pregunta 9: la descripción del H de la opción correcta coincide con el dibujo (el H queda hacia delante).
+ * v3.48.0 — Tema 3: baraja dopaminérgica ampliada a 27 cartas con estado regulatorio (filtro, reparto, anverso y reverso).
  */
-export const COURSE_DATA_VERSION = '3.47.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-09T09:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.48.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-14T11:10:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

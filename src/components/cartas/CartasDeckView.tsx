@@ -44,16 +44,37 @@ export interface FarmacoCarta {
   indicacion: string;
   diseno: string;
   examen: string;
+  /** Situación de mercado: clave de `estados` en la baraja (en uso, retirado, nunca comercializado...). */
+  estado?: string;
+  /** Rótulo breve que acompaña al estado en la franja del anverso. */
+  estadoCorto?: string;
+  /** Detalle regulatorio (agencia, fecha y motivo) que se muestra al dorso. */
+  regulatorio?: string;
 }
 
 export type TemaCartas = 1 | 2 | 3;
+
+export interface EstadoRegulatorio {
+  etiqueta: string;
+  color: string;
+}
 
 interface BarajaTema {
   tema: number;
   titulo: string;
   grupos: Record<string, string>;
+  /** Opcional: si la baraja lo define, las cartas muestran su estado regulatorio y se puede filtrar por él. */
+  estados?: Record<string, EstadoRegulatorio>;
   farmacos: FarmacoCarta[];
 }
+
+/** Sello sobre la estructura para los fármacos que no están en el mercado o volvieron con restricciones. */
+const SELLO_ESTADO: Record<string, string> = {
+  retirado: 'RETIRADO',
+  descatalogado: 'DESCATALOGADO',
+  nunca: 'NO COMERCIAL.',
+  reintroducido: 'REINTRODUCIDO',
+};
 
 /** Barajas disponibles. Para añadir un tema: JSON en src/data, SVG en public/cartas/estructuras y una entrada aquí. */
 export const BARAJAS: Record<TemaCartas, BarajaTema & { familia: string }> = {
@@ -88,6 +109,8 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
 }) => {
   const baraja = BARAJAS[tema] ?? BARAJAS[1];
   const [activeGroup, setActiveGroup] = useState<string>('todos');
+  const [activeEstado, setActiveEstado] = useState<string>('todos');
+  const estados = baraja.estados;
   const [searchTerm, setSearchTerm] = useState('');
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -100,6 +123,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
   // Al cambiar de baraja se reinician filtro, búsqueda y cartas volteadas
   useEffect(() => {
     setActiveGroup('todos');
+    setActiveEstado('todos');
     setSearchTerm('');
     setFlippedCards({});
   }, [tema]);
@@ -119,6 +143,16 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
     return counts;
   }, [farmacos, baraja]);
 
+  const estadosConteo = useMemo(() => {
+    const counts: Record<string, number> = {};
+    if (!estados) return counts;
+    Object.keys(estados).forEach(k => { counts[k] = 0; });
+    farmacos.forEach(f => {
+      if (f.estado && counts[f.estado] !== undefined) counts[f.estado]++;
+    });
+    return counts;
+  }, [farmacos, estados]);
+
   // Fármacos filtrados
   const filteredFarmacos = useMemo(() => {
     const term = searchTerm.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -126,6 +160,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
     return farmacos.filter(f => {
       const matchGrupo = activeGroup === 'todos' || f.grupo === activeGroup;
       if (!matchGrupo) return false;
+      if (activeEstado !== 'todos' && f.estado !== activeEstado) return false;
 
       if (!term) return true;
 
@@ -136,10 +171,11 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
       const acc = (f.accion || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const dis = (f.diseno || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const s = (f.smiles || '').toLowerCase();
+      const reg = (f.regulatorio || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-      return n.includes(term) || r.includes(term) || c.includes(term) || ind.includes(term) || acc.includes(term) || dis.includes(term) || s.includes(term);
+      return n.includes(term) || r.includes(term) || c.includes(term) || ind.includes(term) || acc.includes(term) || dis.includes(term) || s.includes(term) || reg.includes(term);
     });
-  }, [farmacos, activeGroup, searchTerm]);
+  }, [farmacos, activeGroup, activeEstado, searchTerm]);
 
   // Manejo de giro individual
   const toggleFlip = useCallback((id: string, e?: React.MouseEvent) => {
@@ -231,6 +267,41 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
         </div>
       </div>
 
+      {/* Estado regulatorio: reparto y filtro (solo en barajas que lo definen) */}
+      {estados && (
+        <div className="qf-estados">
+          <div className="qf-estados-barra" role="img" aria-label="Reparto de la baraja por estado regulatorio">
+            {Object.entries(estados).map(([k, e]) => (
+              <span
+                key={k}
+                style={{ width: `${(estadosConteo[k] / Math.max(farmacos.length, 1)) * 100}%`, background: e.color }}
+                title={`${e.etiqueta}: ${estadosConteo[k]}`}
+              />
+            ))}
+          </div>
+          <div className="qf-deck-filters" role="group" aria-label="Filtrar por estado regulatorio">
+            <button
+              type="button"
+              className={`qf-filtro-btn ${activeEstado === 'todos' ? 'active' : ''}`}
+              onClick={() => setActiveEstado('todos')}
+            >
+              Todos los estados <span className="qf-filtro-count">{farmacos.length}</span>
+            </button>
+            {Object.entries(estados).map(([k, e]) => (
+              <button
+                key={k}
+                type="button"
+                className={`qf-filtro-btn qf-filtro-estado ${activeEstado === k ? 'active' : ''}`}
+                style={{ ['--qf-st' as string]: e.color } as React.CSSProperties}
+                onClick={() => setActiveEstado(k)}
+              >
+                <i aria-hidden="true" /> {e.etiqueta} <span className="qf-filtro-count">{estadosConteo[k] ?? 0}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Barra de Herramientas: Filtros + Búsqueda + Giro */}
       <div className="qf-deck-toolbar">
         {/* Filtros de grupo */}
@@ -293,7 +364,9 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
       {filteredFarmacos.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'var(--surface-alt)', borderRadius: 'var(--radius-lg)' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
-            No se encontraron cartas que coincidan con el filtro &quot;{searchTerm}&quot;.
+            {searchTerm
+              ? <>No se encontraron cartas que coincidan con el filtro &quot;{searchTerm}&quot;.</>
+              : <>Ninguna carta combina ese estado y esa clase.</>}
           </p>
         </div>
       ) : (
@@ -301,12 +374,16 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
           {filteredFarmacos.map(f => {
             const isFlipped = !!flippedCards[f.id];
             const imgSrc = `${cleanBase}cartas/${f.estructura}`;
+            const est = estados && f.estado ? estados[f.estado] : undefined;
+            const sello = f.estado ? SELLO_ESTADO[f.estado] : undefined;
 
             return (
               <div
                 key={f.id}
                 className={`qf-carta-item ${isFlipped ? 'is-flipped' : ''}`}
                 data-grupo={f.grupo}
+                data-estado={f.estado}
+                style={est ? ({ ['--qf-st' as string]: est.color } as React.CSSProperties) : undefined}
                 onClick={(e) => toggleFlip(f.id, e)}
                 role="button"
                 tabIndex={0}
@@ -317,7 +394,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                   }
                 }}
                 aria-pressed={isFlipped}
-                aria-label={`Carta de ${f.nombre}, pulsar para ver reverso con acción y farmacóforo`}
+                aria-label={`Carta de ${f.nombre}${est ? `, ${est.etiqueta}` : ''}, pulsar para ver reverso con acción y farmacóforo`}
               >
                 <div className="qf-carta-inner">
                   {/* ANVERSO */}
@@ -337,6 +414,14 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                       </defs>
                       <rect width="240" height="340" fill={`url(#qf-hex-${f.id})`} />
                     </svg>
+
+                    {/* Franja de estado regulatorio */}
+                    {est && (
+                      <div className="qf-estado-franja">
+                        <span>{est.etiqueta}</span>
+                        {f.estadoCorto && <small>{f.estadoCorto}</small>}
+                      </div>
+                    )}
 
                     {/* Cabecera: Relevancia, Rol y Badge con sello oficial QFDOS */}
                     <div className="qf-cabecera">
@@ -376,6 +461,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                           }
                         }}
                       />
+                      {sello && <span className="qf-estado-sello">{sello}</span>}
                     </div>
 
                     {/* Nombre y Clase Farmacológica */}
@@ -454,6 +540,13 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                           {copiedId === f.id ? <Check size={12} color="#0d9488" /> : <Copy size={12} />}
                         </button>
                       </div>
+
+                      {est && f.regulatorio && (
+                        <div className="qf-estado-dorso">
+                          <h3>{est.etiqueta}</h3>
+                          <p>{f.regulatorio}</p>
+                        </div>
+                      )}
 
                       <h3>Acción Farmacológica</h3>
                       <p>{f.accion}</p>
