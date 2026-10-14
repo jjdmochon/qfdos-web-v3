@@ -284,9 +284,10 @@ export const App: React.FC = () => {
         localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
       }
     }
-    // Auto-heal Tema 2 para garantizar que el test esté habilitado con los 3 modelos oficiales y publicado
-    const t2 = normalized.find(t => t.id === 'tema-02');
-    const base2 = INITIAL_TOPICS.find(t => t.id === 'tema-02');
+    // Auto-heal Temas 2 y 3 para garantizar que el test esté habilitado con los 3 modelos oficiales y publicado
+    for (const idTema of ['tema-02', 'tema-03']) {
+    const t2 = normalized.find(t => t.id === idTema);
+    const base2 = INITIAL_TOPICS.find(t => t.id === idTema);
     if (t2 && base2) {
       let modified2 = false;
       if (!t2.testQuestions || t2.testQuestions.length !== 15 || t2.testDisponible !== true || t2.status !== 'Publicado') {
@@ -298,6 +299,7 @@ export const App: React.FC = () => {
       if (modified2) {
         localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
       }
+    }
     }
     return normalized;
   });
@@ -345,8 +347,8 @@ export const App: React.FC = () => {
   const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
   const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
   const [isCartasModalOpen, setIsCartasModalOpen] = useState(false);
-  const [cartasTema, setCartasTema] = useState<1 | 2>(1);
-  const abrirCartas = (tema: 1 | 2 = 1) => { setCartasTema(tema); setIsCartasModalOpen(true); };
+  const [cartasTema, setCartasTema] = useState<1 | 2 | 3>(1);
+  const abrirCartas = (tema: 1 | 2 | 3 = 1) => { setCartasTema(tema); setIsCartasModalOpen(true); };
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
 
   const handleOpenAdmet = (drug: MoleculeDrug) => {
@@ -400,7 +402,7 @@ export const App: React.FC = () => {
                 geminiNotebookUrl: localTopic.geminiNotebookUrl || rt.geminiNotebookUrl,
                 spotifyPodcastUrl: localTopic.spotifyPodcastUrl || rt.spotifyPodcastUrl,
                 attachments: (localTopic.attachments && localTopic.attachments.length > 0) ? localTopic.attachments : rt.attachments,
-                testDisponible: (localTopic.id === 'tema-01' || localTopic.id === 'tema-02') ? true : (localTopic.testDisponible ?? rt.testDisponible),
+                testDisponible: (localTopic.id === 'tema-01' || localTopic.id === 'tema-02' || localTopic.id === 'tema-03') ? true : (localTopic.testDisponible ?? rt.testDisponible),
                 testQuestions: (localTopic.testQuestions && localTopic.testQuestions.length >= (rt.testQuestions?.length || 0)) ? localTopic.testQuestions : rt.testQuestions,
               };
             });
@@ -455,6 +457,8 @@ export const App: React.FC = () => {
         abrirCartas(1);
       } else if (raw === 'cartas-tema-02') {
         abrirCartas(2);
+      } else if (raw === 'cartas-tema-03') {
+        abrirCartas(3);
       } else {
         setIsCartasModalOpen(false);
       }
@@ -592,7 +596,7 @@ export const App: React.FC = () => {
             }}
             onOpenQuiz={t => { if (testHabilitado(t)) setSelectedQuizTopic(t); }}
             onOpenFlashcards={t => { if (flashcardsHabilitadas(t)) setSelectedFlashcardsTopic(t); }}
-            onOpenCartas={(tema?: 1 | 2) => abrirCartas(tema ?? 1)}
+            onOpenCartas={(tema?: 1 | 2 | 3) => abrirCartas(tema ?? 1)}
             onEditTopic={handleOpenAdminCmsForTopic}
             onOpenAdminCms={() => handleOpenAdminCmsForTopic()}
           />

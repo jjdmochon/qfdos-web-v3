@@ -27,7 +27,7 @@ interface TemasSectionProps {
   onSelectTopic: (topic: QfdosTopic, tab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas') => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
-  onOpenCartas?: (tema?: 1 | 2) => void;
+  onOpenCartas?: (tema?: 1 | 2 | 3) => void;
   onEditTopic?: (topicId: string) => void;
   onOpenAdminCms?: () => void;
 }
@@ -472,7 +472,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         }}
                         title="Realizar autoevaluación tipo test"
                       >
-                        <HelpCircle size={13} /> {topic.id === 'tema-01' || topic.id === 'tema-02' ? 'Test (MODELOS)' : `Test (${topic.testQuestions ? topic.testQuestions.length : 0})`}
+                        <HelpCircle size={13} /> {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 'Test (MODELOS)' : `Test (${topic.testQuestions ? topic.testQuestions.length : 0})`}
                       </button>
                     )}
 
@@ -500,11 +500,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                 )}
 
-                {/* Fila 3: Baraja Coleccionable (Temas 01 y 02) */}
-                {(topic.id === 'tema-01' || topic.id === 'tema-02') && onOpenCartas && (
+                {/* Fila 3: Baraja Coleccionable (Temas 01, 02 y 03) */}
+                {(topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03') && onOpenCartas && (
                   <div style={{ display: 'flex', gap: '6px', width: '100%', marginTop: '2px' }}>
                     <button
-                      onClick={() => onOpenCartas(topic.id === 'tema-02' ? 2 : 1)}
+                      onClick={() => onOpenCartas(topic.id === 'tema-03' ? 3 : topic.id === 'tema-02' ? 2 : 1)}
                       className="btn btn-sm"
                       style={{ 
                         flex: 1, 
@@ -522,11 +522,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         gap: '6px',
                         whiteSpace: 'nowrap'
                       }}
-                      title={topic.id === 'tema-02' ? 'Baraja Coleccionable de Fármacos Adrenérgicos · 25 cartas' : 'Baraja Coleccionable de Fármacos Colinérgicos · 20 cartas'}
+                      title={topic.id === 'tema-03' ? 'Baraja Coleccionable de Fármacos Dopaminérgicos · 27 cartas' : topic.id === 'tema-02' ? 'Baraja Coleccionable de Fármacos Adrenérgicos · 25 cartas' : 'Baraja Coleccionable de Fármacos Colinérgicos · 20 cartas'}
                     >
                       <Layers size={13} color="var(--teal)" /> Cartas Fármacos
                       <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', fontWeight: 800 }}>
-                        {topic.id === 'tema-02' ? 25 : 20} Cartas
+                        {topic.id === 'tema-03' ? 27 : topic.id === 'tema-02' ? 25 : 20} Cartas
                       </span>
                     </button>
                   </div>

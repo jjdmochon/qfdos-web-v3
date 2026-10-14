@@ -13,7 +13,10 @@ import {
   MODELO_C_TEST_QUESTIONS,
   TEMA2_MODELO_1_TEST_QUESTIONS,
   TEMA2_MODELO_2_TEST_QUESTIONS,
-  TEMA2_MODELO_3_TEST_QUESTIONS
+  TEMA2_MODELO_3_TEST_QUESTIONS,
+  TEMA3_MODELO_1_TEST_QUESTIONS,
+  TEMA3_MODELO_2_TEST_QUESTIONS,
+  TEMA3_MODELO_3_TEST_QUESTIONS
 } from '../data/qfdosData';
 import {
   submitAttemptToGoogleSheets,
@@ -74,7 +77,27 @@ interface QuizModalProps {
 
 export type QuizModelType = 
   | 'modelo-e' | 'modelo-fir' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis'
-  | 't2-modelo-1' | 't2-modelo-2' | 't2-modelo-3';
+  | 't2-modelo-1' | 't2-modelo-2' | 't2-modelo-3'
+  | 't3-modelo-1' | 't3-modelo-2' | 't3-modelo-3';
+
+/** Modelos del Tema 3 que ve el alumnado en el selector (tarjetas generadas desde esta lista). */
+const MODELOS_TEMA3: { id: QuizModelType; n: number; titulo: string; etiqueta: string; resumen: string; color: string; fondo: string; tinta: string }[] = [
+  {
+    id: 't3-modelo-1', n: 1, titulo: 'Dopamina, profármacos y síntesis de neurolépticos', etiqueta: 'Consensuado · Calibrado JEV',
+    resumen: 'Apomorfina, levodopa e inhibidores periféricos, biosíntesis de la dopamina, retención por carga, MAO-B y COMT, SAR de fenotiazinas y difenilbutilpiperidinas y síntesis de clorprotixeno, haloperidol y trifluperidol.',
+    color: 'var(--navy)', fondo: 'rgba(30, 58, 138, 0.05)', tinta: 'var(--navy-ink)'
+  },
+  {
+    id: 't3-modelo-2', n: 2, titulo: 'Agonistas, moduladores enzimáticos y síntesis', etiqueta: 'Consolidado · Calibrado JEV',
+    resumen: 'Estrategias frente al Parkinson, apomorfina, profármaco doble y retención por carga, SAR de fenotiazinas, isomería E/Z del clorprotixeno, ruta del haloperidol y del trifluperidol y antipsicóticos de segunda generación.',
+    color: 'var(--teal)', fondo: 'rgba(13, 148, 136, 0.05)', tinta: 'var(--teal-ink)'
+  },
+  {
+    id: 't3-modelo-3', n: 3, titulo: 'Estereoquímica, retención en SNC y SAR de antipsicóticos', etiqueta: 'Consolidado · Calibrado JEV',
+    resumen: 'Estereoquímica y biosíntesis de la levodopa, depósito de flufenazina, doble profármaco de Bodor, SAR de fenotiazinas y butirofenonas (cloro, carga permanente, pimozida, droperidol) y ruta del trifluperidol.',
+    color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
+  }
+];
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -85,12 +108,14 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Model Selection State
   const [selectedModel, setSelectedModel] = useState<QuizModelType>(
-    topic.id === 'tema-02' ? 't2-modelo-1' : 'modelo-e'
+    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : 'modelo-e'
   );
 
   useEffect(() => {
     if (topic.id === 'tema-02') {
       setSelectedModel('t2-modelo-1');
+    } else if (topic.id === 'tema-03') {
+      setSelectedModel('t3-modelo-1');
     } else if (topic.id === 'tema-01') {
       setSelectedModel('modelo-e');
     }
@@ -124,6 +149,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (selectedModel === 't2-modelo-2') return TEMA2_MODELO_2_TEST_QUESTIONS;
       if (selectedModel === 't2-modelo-3') return TEMA2_MODELO_3_TEST_QUESTIONS;
       return TEMA2_MODELO_1_TEST_QUESTIONS;
+    }
+    if (topic.id === 'tema-03') {
+      if (selectedModel === 't3-modelo-2') return TEMA3_MODELO_2_TEST_QUESTIONS;
+      if (selectedModel === 't3-modelo-3') return TEMA3_MODELO_3_TEST_QUESTIONS;
+      return TEMA3_MODELO_1_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
   }, [topic, selectedModel, isProfesor]);
@@ -345,6 +375,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   }, [evaluationMode, user, isProfesor]);
 
   const getModelLabel = (model: QuizModelType, variant: 'badge' | 'full' | 'short' = 'badge'): string => {
+    const t3 = MODELOS_TEMA3.find(m => m.id === model);
+    if (t3) {
+      if (variant === 'full') return `Modelo ${t3.n}: ${t3.titulo} (15P)`;
+      if (variant === 'short') return `Modelo ${t3.n}`;
+      return `Modelo ${t3.n} (${t3.titulo})`;
+    }
     if (model === 't2-modelo-1') {
       if (variant === 'full') return 'Modelo 1: Clasificación Ahlquist, Síntesis Fries, Farmacóforo β₂, CIP y Eudismia (15P)';
       if (variant === 'short') return 'Modelo 1';
@@ -398,6 +434,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       case 't2-modelo-1': return 'var(--navy)';
       case 't2-modelo-2': return 'var(--teal)';
       case 't2-modelo-3': return '#8b5cf6';
+      case 't3-modelo-1': return 'var(--navy)';
+      case 't3-modelo-2': return 'var(--teal)';
+      case 't3-modelo-3': return '#8b5cf6';
       case 'modelo-e': return 'var(--navy)';
       case 'modelo-fir': return 'var(--teal)';
       case 'modelo-b': return '#8b5cf6';
@@ -416,6 +455,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (selectedModel !== 't2-modelo-1' && selectedModel !== 't2-modelo-2' && selectedModel !== 't2-modelo-3') {
         setSelectedModel('t2-modelo-1');
       }
+    } else if (topic.id === 'tema-03') {
+      if (!MODELOS_TEMA3.some(m => m.id === selectedModel)) setSelectedModel('t3-modelo-1');
     } else {
       if (selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
         setSelectedModel('modelo-e');
@@ -443,6 +484,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       }
 
       const m = (r.modelName || '').toLowerCase();
+      const t3 = MODELOS_TEMA3.find(x => x.id === model);
+      if (t3) return m.includes(`modelo ${t3.n}`) || m.includes(`modelo-${t3.n}`);
       if (model === 't2-modelo-1') {
         return m.includes('modelo 1') || m.includes('modelo-1') || (m.includes('adrenérgico') && m.includes('1'));
       }
@@ -883,7 +926,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   whiteSpace: 'nowrap',
                   flexShrink: 0
                 }}>
-                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (10P)' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : selectedModel.startsWith('t2-') ? getModelLabel(selectedModel, 'short') : 'Modelo A Oficial'}
+                  {selectedModel === 'modelo-e' ? 'Modelo E Oficial 26/27' : selectedModel === 'modelo-fir' ? 'Modelo FIR Oficial (10P)' : selectedModel === 'modelo-b' ? 'Modelo B Oficial' : selectedModel === 'modelo-c' ? 'Modelo C Oficial' : selectedModel === 'retrosintesis' ? 'Modelo Retrosíntesis' : (selectedModel.startsWith('t2-') || selectedModel.startsWith('t3-')) ? getModelLabel(selectedModel, 'short') : 'Modelo A Oficial'}
                 </span>
               </div>
               <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: '2px 0 0 0', lineHeight: 1.3 }}>
@@ -1131,7 +1174,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                       <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                        {topic.id === 'tema-01' || topic.id === 'tema-02' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
+                        {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
                       </label>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
@@ -1532,6 +1575,67 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     )}
 
+                    {topic.id === 'tema-03' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
+                        {MODELOS_TEMA3.map(mod => {
+                          const st = getModelStats(mod.id);
+                          const activo = selectedModel === mod.id;
+                          return (
+                            <div
+                              key={mod.id}
+                              onClick={() => setSelectedModel(mod.id)} {...pulsable(() => setSelectedModel(mod.id))}
+                              style={{
+                                padding: '14px 16px',
+                                borderRadius: 'var(--radius-lg)',
+                                border: activo ? `2.5px solid ${mod.color}` : '1.5px solid var(--border-color)',
+                                background: activo ? mod.fondo : 'var(--surface)',
+                                boxShadow: activo ? '0 3px 12px rgba(30, 58, 138, 0.12)' : 'none',
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                transition: 'all 0.2s ease',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                                  <div>
+                                    <span style={{ fontSize: '0.66rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: mod.tinta }}>
+                                      {mod.etiqueta}
+                                    </span>
+                                    <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: mod.tinta, margin: '2px 0 0 0' }}>
+                                      Modelo {mod.n} (15 Preguntas)
+                                    </h4>
+                                  </div>
+                                  {st.completed ? (
+                                    <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: '#059669', color: '#fff', fontWeight: 700 }}>
+                                      ✓ Realizado · {st.bestScore}/10
+                                    </span>
+                                  ) : (
+                                    <span className="qfdos-badge" style={{ fontSize: '0.68rem', background: 'var(--surface-alt)', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                      No realizado
+                                    </span>
+                                  )}
+                                </div>
+                                <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 10px 0', lineHeight: 1.45 }}>
+                                  {mod.resumen}
+                                </p>
+                              </div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '6px' }}>
+                                <span>
+                                  {st.completed ? `${st.count} intento(s) registrado(s) · Repetible` : 'Sin intentos registrados'}
+                                </span>
+                                <strong style={{ color: activo ? mod.tinta : 'var(--text-muted)' }}>
+                                  {activo ? '● Seleccionado' : `Elegir Modelo ${mod.n}`}
+                                </strong>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
                     {/* SECCIÓN BONUS: Claves Farmacoquímicas Avanzadas del FIR (Solo al elegir Modelo FIR) */}
                     {selectedModel === 'modelo-fir' && (
                       <div style={{
@@ -1785,7 +1889,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <strong>
                           {getModelLabel(selectedModel, 'badge')}:
                         </strong>{' '}
-                        {selectedModel === 't2-modelo-1'
+                        {MODELOS_TEMA3.some(m => m.id === selectedModel)
+                          ? `15 preguntas calibradas JEV: ${MODELOS_TEMA3.find(m => m.id === selectedModel)!.resumen}`
+                          : selectedModel === 't2-modelo-1'
                           ? '15 preguntas calibradas Modelo B: clasificación de Ahlquist, transposición de Fries, farmacóforo β₂ en salbutamol, isoetarina vs COMT, puente oximetilénico, estereoquímica CIP y eudismia.'
                           : selectedModel === 't2-modelo-2'
                           ? '15 preguntas calibradas JEV System-1: bloqueantes α y β, farmacóforo de ariloxipropanolaminas, cardioselectividad β₁, alquilación irreversible vía ion aziridinio (fenoxibenzamina) y estereoquímica CIP.'
@@ -2023,6 +2129,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   {currentQ.questionSmiles && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                       <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} />
+                    </div>
+                  )}
+
+                  {/* Estructuras de referencia del enunciado, con su nombre */}
+                  {currentQ.questionStructures && currentQ.questionStructures.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '1rem' }}>
+                      {currentQ.questionStructures.map(ref => (
+                        <figure key={ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                          <Chem2DDrawer smiles={ref.smiles} width={220} height={120} />
+                          <figcaption style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
+                        </figure>
+                      ))}
                     </div>
                   )}
 

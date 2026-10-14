@@ -50,7 +50,7 @@ export function limpiarCacheRemota(): void {
  * atrapado en una versión obsoleta de la hoja remota o enlaces caídos.
  */
 /** Temas que no llevan test: se vacía aunque el contenido publicado o la copia local lo traiga. */
-const TEMAS_SIN_TEST = new Set(['tema-03']);
+const TEMAS_SIN_TEST = new Set<string>();
 
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
@@ -86,16 +86,16 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       };
     }
 
-    // Tema 3: publicado con flashcards pero todavia sin test. El estado y los
+    // Tema 3: publicado con flashcards y test (3 modelos). El estado y los
     // enlaces oficiales los manda el codigo, para que una hoja remota antigua no
-    // lo devuelva a "Proximamente" ni borre los PDF.
+    // lo devuelva a "Proximamente", no apague el test ni borre los PDF.
     if (t.id === 'tema-03') {
       return {
         ...base,
         ...t,
         status: 'Publicado' as const,
-        testDisponible: false,
-        testQuestions: [],
+        testDisponible: true,
+        testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
         slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
         slidesPdfName: t.slidesPdfName || base.slidesPdfName,
         notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),

@@ -32,6 +32,8 @@ export interface TestQuestion {
   block?: string;
   question: string;
   questionSmiles?: string;
+  /** Estructuras de referencia del enunciado, con su nombre (reactivos, sustratos) */
+  questionStructures?: { name: string; smiles: string }[];
   options: (string | TestQuestionOption)[];
   correctIndex: number;
   explanation: string;
@@ -194,7 +196,7 @@ export interface QfdosTopic {
 
 /** ¿Se puede abrir el test de este tema? */
 export function testHabilitado(t: QfdosTopic): boolean {
-  if (t.id === 'tema-01' || t.id === 'tema-02') return true;
+  if (t.id === 'tema-01' || t.id === 'tema-02' || t.id === 'tema-03') return true;
   return t.testDisponible !== false && (t.testQuestions?.length ?? 0) > 0;
 }
 
@@ -494,9 +496,10 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.53.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-15T13:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.54.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-15T15:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -524,9 +527,22 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tema02-tests-recursos'];
+export const AVISOS_A_OFRECER = ['ann-tema03-tests-recursos', 'ann-tema02-tests-recursos'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-tema03-tests-recursos',
+    title: '📝 Tema 3 · Sistema Dopaminérgico: tipo test, flashcards y cartas ya disponibles',
+    content: 'Respecto al Tema 3, ya tenemos publicados los tres modelos de examen tipo test (15 preguntas cada uno, 45 en total). Los abrís desde el botón de test de la tarjeta del Tema 03, en el temario. Recorremos la levodopa y sus inhibidores periféricos, la apomorfina, los profármacos de depósito, la SAR de fenotiazinas y butirofenonas y la síntesis del haloperidol, del clorprotixeno y del trifluperidol. En varias preguntas os toca reconocer la estructura correcta o leer un esquema de reacción. En la misma tarjeta están las 21 flashcards de estudio, y en Cartas de los temas, la baraja dopaminérgica con los 27 fármacos del tema. En las Historias de la portada dejamos el cartel, el clip y un avance del vídeo resumen. Mi consejo: ved primero el resumen, repasad las flashcards y después id a por los tests.',
+    date: '15 Octubre 2026',
+    priority: 'alta',
+    imageUrl: 'historias/tema-03-brag.jpg',
+    imageCaption: 'El cerebro tiene puerta. La química, la llave.',
+    linkUrl: '#/cartas-tema-03',
+    linkLabel: 'Abrir las cartas del Tema 3',
+    enHistorias: true,
+    temaId: 'tema-03'
+  },
   {
     id: 'ann-tema02-tests-recursos',
     title: '📝 Tema 2 · Sistema Adrenérgico: ya están disponibles los tipo test y el resto de recursos',
@@ -2077,6 +2093,8 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
 
 export * from './tema02ExamsData';
 import { TEMA2_MODELO_1_TEST_QUESTIONS } from './tema02ExamsData';
+export * from './tema03ExamsData';
+import { TEMA3_MODELO_1_TEST_QUESTIONS } from './tema03ExamsData';
 import { TEMA3_FLASHCARDS } from './tema03FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
@@ -3771,6 +3789,8 @@ flashcards: [
     pdbTargetId: '6CM4',
     targetName: 'Receptor Dopaminérgico D2 Humano unido a Risperidona',
     status: 'Publicado',
+    // Test oficial: 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3)
+    testDisponible: true,
     slidesPdfUrl: 'https://drive.google.com/file/d/1yaHjyaBjp8jZyGCkLwRRaUF74u-SV-mh/view?usp=drive_link',
     slidesPdfName: 'Tema 03: Diapositivas Oficiales Sistema Dopaminérgico.pdf',
     notesPdfUrl: 'https://drive.google.com/file/d/14LlZYrGssk1amM86xHQsOCdetEOQx14t/view?usp=drive_link',
@@ -4317,7 +4337,7 @@ flashcards: [
         soloDocente: true
       }
     ],
-    testQuestions: [],
+    testQuestions: TEMA3_MODELO_1_TEST_QUESTIONS,
     // 15 flashcards de los apuntes + 5 de ampliación sacadas de exámenes de otros profesores
     flashcardsDisponibles: true,
     flashcards: TEMA3_FLASHCARDS
