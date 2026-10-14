@@ -316,7 +316,7 @@
 
 /* ========== Reset ========== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 100%; scroll-behavior: smooth; }
+html { font-size: 100%; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   font-family: var(--font-primary);
   background-color: var(--neutral-bg);
@@ -2446,10 +2446,13 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   transition: transform 480ms var(--ease-out);
 }
 .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+.flashcard.flipped .flashcard-front, .flashcard:not(.flipped) .flashcard-back { visibility: hidden; }
 .flashcard-front, .flashcard-back {
   position: absolute;
   inset: 0;
+  transition: visibility 0s linear 240ms;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   display: flex;
@@ -3494,7 +3497,9 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
    (una tabla, un bloque de código, una imagen) para que la página entera se
    pueda arrastrar de lado. Se corta aquí de raíz: quien necesite desbordar
    lo hace dentro de su propio contenedor con scroll. */
-html, body { overflow-x: hidden; max-width: 100%; }
+/* clip, no hidden: hidden convierte html y body en contenedores de scroll y en Android
+   estorba al desplazamiento lateral de las filas que sí deben moverse */
+html, body { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
 
 @media (max-width: 940px) {
   /* Las rejillas de dos columnas del panel pasan a una sola en móvil */

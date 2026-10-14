@@ -431,13 +431,13 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
   }, [siguiente, anterior]);
 
   // Gestos sobre las zonas táctiles: toque = navegar, mantener = pausa, deslizar abajo = cerrar
-  const gesto = useRef<{ t: number; y: number; timer: number; held: boolean } | null>(null);
+  const gesto = useRef<{ t: number; x: number; y: number; timer: number; held: boolean } | null>(null);
   const alPulsar = (e: React.PointerEvent) => {
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
     const timer = window.setTimeout(() => {
       if (gesto.current) { gesto.current.held = true; setHeld(true); }
     }, 220);
-    gesto.current = { t: performance.now(), y: e.clientY, timer, held: false };
+    gesto.current = { t: performance.now(), x: e.clientX, y: e.clientY, timer, held: false };
   };
   const alSoltar = (e: React.PointerEvent, accion: () => void) => {
     const s = gesto.current;
@@ -445,7 +445,14 @@ const Visor: React.FC<VisorProps> = ({ grupos, inicio, onClose, onVista }) => {
     if (!s) return;
     window.clearTimeout(s.timer);
     setHeld(false);
-    if (e.clientY - s.y > 90) { onClose(); return; }
+    const dx = e.clientX - s.x, dy = e.clientY - s.y;
+    if (dy > 90 && dy > Math.abs(dx)) { onClose(); return; }
+    // Deslizar a los lados cambia de grupo, como en Instagram
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) { if (g < grupos.length - 1) { setG(g + 1); setI(0); } else onClose(); }
+      else if (g > 0) { setG(g - 1); setI(0); }
+      return;
+    }
     if (!s.held) accion();
   };
   const alCancelar = () => {
@@ -684,6 +691,36 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
     return () => window.removeEventListener(EVENTO_VISTAS, releer);
   }, []);
 
+  // Fila de círculos: en un móvil vertical no caben todos y el scroll lateral no se
+  // adivina, así que se muestran flechas mientras quede algo a un lado
+  const filaRef = useRef<HTMLDivElement | null>(null);
+  const [desborde, setDesborde] = useState({ izq: false, der: false });
+  const medirFila = useCallback(() => {
+    const el = filaRef.current;
+    if (!el) return;
+    const izq = el.scrollLeft > 4;
+    const der = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setDesborde(d => (d.izq === izq && d.der === der ? d : { izq, der }));
+  }, []);
+  useEffect(() => {
+    const el = filaRef.current;
+    if (!el) return;
+    medirFila();
+    el.addEventListener('scroll', medirFila, { passive: true });
+    window.addEventListener('resize', medirFila);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(medirFila) : null;
+    ro?.observe(el);
+    return () => {
+      el.removeEventListener('scroll', medirFila);
+      window.removeEventListener('resize', medirFila);
+      ro?.disconnect();
+    };
+  }, [medirFila, grupos.length]);
+  const desplazarFila = (dir: 1 | -1) => {
+    const el = filaRef.current;
+    if (el) el.scrollBy({ left: dir * Math.max(160, el.clientWidth * 0.7), behavior: reduceMotion() ? 'auto' : 'smooth' });
+  };
+
   if (grupos.length === 0) return null;
 
   const actual = planas[banda % planas.length];
@@ -707,7 +744,13 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
       </div>
 
       {/* Círculos */}
-      <div className="hist-circulos" role="list">
+      <div className={`hist-fila${desborde.izq ? ' hay-izq' : ''}${desborde.der ? ' hay-der' : ''}`}>
+      {desborde.izq && (
+        <button type="button" className="hist-flecha izq" onClick={() => desplazarFila(-1)} aria-label="Ver historias anteriores">
+          <ChevronLeft size={20} />
+        </button>
+      )}
+      <div className="hist-circulos" role="list" ref={filaRef}>
         {grupos.map((gr, g) => {
           const todasVistas = gr.historias.every(h => vistas.has(h.id));
           const portada = gr.portada;
@@ -731,6 +774,12 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
             </button>
           );
         })}
+      </div>
+      {desborde.der && (
+        <button type="button" className="hist-flecha der" onClick={() => desplazarFila(1)} aria-label="Ver más historias">
+          <ChevronRight size={20} />
+        </button>
+      )}
       </div>
       </>)}
 

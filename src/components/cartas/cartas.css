@@ -238,6 +238,7 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: var(--radius-lg, 12px);
 }
@@ -272,7 +273,15 @@
   color: #0f172a;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 220ms ease, border-color 220ms ease;
+  /* La visibilidad cambia a mitad del giro (450 ms / 2): Safari en iPad no
+     siempre respeta backface-visibility cuando la cara tiene capas propias
+     (sombra, scroll interno) y pintaba el anverso girado, como en un espejo */
+  transform: rotateY(0deg);
+  transition: box-shadow 220ms ease, border-color 220ms ease, visibility 0s linear 225ms;
+}
+.qf-carta-item.is-flipped .qf-cara--frente,
+.qf-carta-item:not(.is-flipped) .qf-cara--dorso {
+  visibility: hidden;
 }
 
 .qf-carta-item:hover .qf-cara {
