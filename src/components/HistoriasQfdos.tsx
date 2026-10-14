@@ -268,9 +268,11 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   const verTodas: Accion[] = cb.onAbrirHerramientas
     ? [{ label: 'Ver todas las herramientas', icono: 'tema', alPulsar: () => cb.onAbrirHerramientas?.() }]
     : [];
-  const herramienta = (id: string, titulo: string, texto: string, acciones: Accion[]): Historia => ({
+  // Ilustraciones 9:16 propias (RDKit) en /historias; la de la PDB es la imagen oficial de RCSB
+  const herramienta = (id: string, titulo: string, texto: string, acciones: Accion[], credito?: string): Historia => ({
     id: `herramientas-${id}`, grupo: 'herramientas', fondo: 'recursos', etiqueta: 'Herramientas',
-    titulo, texto, acciones: acciones.slice(0, 2), duracionMs: Math.max(9000, duracionPorTexto(texto))
+    titulo, texto, imagen: resolver(`historias/herramientas-${id}.jpg`), ajuste: 'cubrir', credito,
+    acciones: acciones.slice(0, 2), duracionMs: Math.max(9000, duracionPorTexto(texto))
   });
   grupos.push({
     id: 'herramientas',
@@ -287,7 +289,8 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
         [{ label: 'Buscar en PubChem', icono: 'enlace', href: url('PubChem') }, { label: 'Buscar en DrugBank', icono: 'enlace', href: url('DrugBank') }]),
       herramienta('pdb', 'El fármaco dentro de su diana',
         'En el caso de la PDB, vemos el fármaco dentro de su diana: estructuras tridimensionales de proteínas resueltas por rayos X, RMN y criomicroscopía electrónica, como la 6CM4, el receptor D2 unido a risperidona que estudiamos en el Tema 3.',
-        [{ label: 'Ver la 6CM4 en la PDB', icono: 'enlace', href: 'https://www.rcsb.org/structure/6CM4' }, ...verTodas])
+        [{ label: 'Ver la 6CM4 en la PDB', icono: 'enlace', href: 'https://www.rcsb.org/structure/6CM4' }, ...verTodas],
+        'Imagen de la 6CM4: RCSB PDB')
     ]
   });
   return grupos.filter(g => g.historias.length > 0);
