@@ -16,6 +16,21 @@ const base = process.env.PAGES_BASE || '/';
 
 const DIA = 24 * 3600;
 
+/** Hora de la compilación: va al bundle (__BUILD_TIME__) y a version.json */
+const BUILD_TIME = new Date().toISOString();
+
+/**
+ * Publica version.json junto al index. Las pestañas abiertas lo consultan
+ * (sin caché) y, si la compilación publicada no es la suya, recargan
+ * (ver PwaUpdatePrompt). No entra en la precaché del service worker.
+ */
+const versionJson = {
+  name: 'qfdos-version-json',
+  generateBundle(this: { emitFile: (f: { type: 'asset'; fileName: string; source: string }) => void }) {
+    this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ build: BUILD_TIME }) });
+  }
+};
+
 /**
  * PWA: instalable y usable sin conexión.
  *
@@ -52,9 +67,9 @@ const pwa = VitePWA({
     globPatterns: ['**/*.{js,css,html,ico,woff2}', 'icons/*.png', '*.webp'],
     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
     cleanupOutdatedCaches: true,
-    // La versión nueva se activa sola en cuanto se descarga: la siguiente carga ya
-    // usa el código nuevo. No se fuerza ninguna recarga (registerType 'prompt'), así
-    // que quien está haciendo un test o una entrega no pierde lo que lleva escrito.
+    // La versión nueva se activa sola en cuanto se descarga. La recarga de las
+    // pestañas abiertas la fuerza PwaUpdatePrompt (version.json), esperando a que
+    // se entregue el examen que esté en curso.
     skipWaiting: true,
     clientsClaim: true,
     navigateFallbackDenylist: [/\.[a-z0-9]{2,5}$/i],
@@ -118,8 +133,8 @@ const pwa = VitePWA({
 export default defineConfig({
   base,
   // Hora real de la compilación: se muestra en el pie para saber qué versión se está ejecutando
-  define: { __BUILD_TIME__: JSON.stringify(new Date().toISOString()) },
-  plugins: [react(), pwa],
+  define: { __BUILD_TIME__: JSON.stringify(BUILD_TIME) },
+  plugins: [react(), pwa, versionJson],
   css: {
     postcss: {
       plugins: []
