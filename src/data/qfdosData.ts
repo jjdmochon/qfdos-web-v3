@@ -496,10 +496,11 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.54.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-15T15:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.54.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-15T16:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -538,8 +539,8 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
     priority: 'alta',
     imageUrl: 'historias/tema-03-brag.jpg',
     imageCaption: 'El cerebro tiene puerta. La química, la llave.',
-    linkUrl: '#/cartas-tema-03',
-    linkLabel: 'Abrir las cartas del Tema 3',
+    linkUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
+    linkLabel: 'Ver el vídeo resumen en Spotify',
     enHistorias: true,
     temaId: 'tema-03'
   },
@@ -3796,7 +3797,8 @@ flashcards: [
     notesPdfUrl: 'https://drive.google.com/file/d/14LlZYrGssk1amM86xHQsOCdetEOQx14t/view?usp=drive_link',
     notesPdfName: 'Tema 03: Apuntes Magistrales Fármacos Dopaminérgicos.pdf',
     geminiNotebookUrl: '',
-    spotifyPodcastUrl: '',
+    spotifyPodcastUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
+    videoPodcastUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
     drugs: [
       {
         name: 'Epinina (N-metildopamina)',

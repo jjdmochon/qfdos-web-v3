@@ -100,6 +100,8 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
         slidesPdfName: t.slidesPdfName || base.slidesPdfName,
         notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
         notesPdfName: t.notesPdfName || base.notesPdfName,
+        spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
+        videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
         flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
         flashcardsDisponibles: base.flashcardsDisponibles,
       };
