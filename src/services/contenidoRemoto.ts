@@ -86,6 +86,20 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       };
     }
 
+    // Tema 3: publicado con flashcards pero todavia sin test. El estado lo manda
+    // el codigo, para que una hoja remota antigua no lo devuelva a "Proximamente".
+    if (t.id === 'tema-03') {
+      return {
+        ...base,
+        ...t,
+        status: 'Publicado' as const,
+        testDisponible: false,
+        testQuestions: [],
+        flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
+        flashcardsDisponibles: base.flashcardsDisponibles,
+      };
+    }
+
     return {
       ...base,
       ...t,
