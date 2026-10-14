@@ -522,11 +522,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         gap: '6px',
                         whiteSpace: 'nowrap'
                       }}
-                      title={topic.id === 'tema-02' ? 'Baraja Coleccionable de Fármacos Adrenérgicos · 25 cartas' : 'Baraja Coleccionable de Fármacos Colinérgicos · 15 cartas'}
+                      title={topic.id === 'tema-02' ? 'Baraja Coleccionable de Fármacos Adrenérgicos · 25 cartas' : 'Baraja Coleccionable de Fármacos Colinérgicos · 20 cartas'}
                     >
                       <Layers size={13} color="var(--teal)" /> Cartas Fármacos
                       <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', fontWeight: 800 }}>
-                        {topic.id === 'tema-02' ? 25 : 15} Cartas
+                        {topic.id === 'tema-02' ? 25 : 20} Cartas
                       </span>
                     </button>
                   </div>

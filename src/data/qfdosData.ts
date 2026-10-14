@@ -487,9 +487,10 @@ export interface StudentQuestion {
  * v3.47.1 — Tema 2, Modelo 1, pregunta 9: la descripción del H de la opción correcta coincide con el dibujo (el H queda hacia delante).
  * v3.48.0 — Tema 3: baraja dopaminérgica ampliada a 27 cartas con estado regulatorio (filtro, reparto, anverso y reverso).
  * v3.49.0 — Tema 2: baraja adrenérgica ampliada a 25 cartas con estado regulatorio (DCI, pronetalol, isoetarina, tolazolina y terbutalina; filtro, reparto, anverso y reverso).
+ * v3.50.0 — Tema 1: baraja colinérgica ampliada a 20 cartas con estado regulatorio (vareniclina, fisostigmina, tacrina, ecotiopato y tubocurarina; filtro, reparto, anverso y reverso).
  */
-export const COURSE_DATA_VERSION = '3.49.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-14T18:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.50.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-14T20:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
