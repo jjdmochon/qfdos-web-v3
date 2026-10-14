@@ -489,9 +489,10 @@ export interface StudentQuestion {
  * v3.49.0 — Tema 2: baraja adrenérgica ampliada a 25 cartas con estado regulatorio (DCI, pronetalol, isoetarina, tolazolina y terbutalina; filtro, reparto, anverso y reverso).
  * v3.50.0 — Tema 1: baraja colinérgica ampliada a 20 cartas con estado regulatorio (vareniclina, fisostigmina, tacrina, ecotiopato y tubocurarina; filtro, reparto, anverso y reverso).
  * v3.50.1 — Cartas: la barra de reparto y el filtro por estado regulatorio ocultan los estados sin cartas.
+ * v3.51.0 — Tema 3: 20 flashcards (15 de los apuntes y 5 de ampliación sacadas de exámenes de otros profesores: decanoato de haloperidol, domperidona, síntesis de carbidopa, pargilina y metirosina/HVA); el test sigue sin publicarse.
  */
-export const COURSE_DATA_VERSION = '3.50.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-14T21:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.51.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-14T23:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -2072,6 +2073,7 @@ export const MODELO_FIR_TEST_QUESTIONS: TestQuestion[] = [
 
 export * from './tema02ExamsData';
 import { TEMA2_MODELO_1_TEST_QUESTIONS } from './tema02ExamsData';
+import { TEMA3_FLASHCARDS } from './tema03FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
@@ -4312,7 +4314,9 @@ flashcards: [
       }
     ],
     testQuestions: [],
-    flashcards: []
+    // 15 flashcards de los apuntes + 5 de ampliación sacadas de exámenes de otros profesores
+    flashcardsDisponibles: true,
+    flashcards: TEMA3_FLASHCARDS
   },
   {
     id: 'tema-04',
