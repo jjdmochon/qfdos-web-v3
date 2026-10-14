@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { QfdosResourceLink, RESOURCE_CATEGORIES } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
+import { HerramientasEstructuras } from './HerramientasEstructuras';
 import {
   ExternalLink, Search, Clock, Star, Link2, Settings, Compass
 } from 'lucide-react';
@@ -117,6 +118,8 @@ export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
           </button>
         )}
       </div>
+
+      <HerramientasEstructuras />
 
       {/* Controles */}
       <div className="resource-controls">

@@ -493,9 +493,10 @@ export interface StudentQuestion {
  * v3.51.1 — Tema 3: 21.ª flashcard de ampliación, el ejercicio de diseño de un fármaco neuroléptico y antiparkinsoniano a la vez (butirofenona + éter bencidrílico).
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
+ * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
  */
-export const COURSE_DATA_VERSION = '3.52.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-15T12:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.53.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-15T13:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
