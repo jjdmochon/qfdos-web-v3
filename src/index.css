@@ -4216,3 +4216,25 @@ body:has(.mobile-tabbar) .aviso-cookies { bottom: calc(76px + env(safe-area-inse
   font-size: 0.95rem; font-weight: 700; color: var(--text-title);
   margin-bottom: 0.75rem;
 }
+
+/* Mapa del curso en la tarjeta «Presentación del Curso» (MapaCursoTarjeta.tsx) */
+.mapa-curso {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  padding: 6px;
+  background: var(--mol-canvas-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.mapa-curso-nodo polygon { stroke-width: 1.6; stroke-linejoin: round; }
+.mapa-curso-nodo text { font-family: var(--font-technical, ui-monospace, monospace); font-size: 11.5px; font-weight: 700; }
+.mapa-curso-nodo.inicio polygon { fill: var(--navy); stroke: var(--navy); }
+.mapa-curso-nodo.inicio text { fill: #ffffff; }
+.mapa-curso-nodo.publicado polygon { fill: var(--teal); stroke: var(--teal); }
+.mapa-curso-nodo.publicado text { fill: #ffffff; }
+.mapa-curso-nodo.pendiente polygon { fill: transparent; stroke: var(--text-muted); stroke-opacity: 0.55; }
+.mapa-curso-nodo.pendiente text { fill: var(--text-muted); }
+.mapa-curso-pie { font-size: 0.74rem; font-weight: 700; color: var(--text-title); margin-top: 2px; text-align: center; }

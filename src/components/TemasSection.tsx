@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QfdosTopic, testHabilitado, flashcardsHabilitadas, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { MapaCursoTarjeta } from './MapaCursoTarjeta';
 import { useAuth } from '../context/AuthContext';
 import { 
   BookOpen, 
@@ -349,6 +350,13 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     </span>
                   ))}
                 </div>
+
+                {/* Presentación del curso: sin fármaco, lleva el mapa de los temas */}
+                {topic.id === 'tema-00' && (
+                  <div style={{ margin: '8px 0 12px', display: 'flex', justifyContent: 'center' }}>
+                    <MapaCursoTarjeta topics={topics} />
+                  </div>
+                )}
 
                 {/* Estructura 2D del fármaco destacado (por defecto, el primero) */}
                 {moleculaDeTarjeta(topic) && (
