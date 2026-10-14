@@ -539,8 +539,8 @@ export const App: React.FC = () => {
         onOpenCartas={() => setIsCartasModalOpen(true)}
       />
 
-      {/* Historias (círculos): debajo del menú y por encima de la portada, como en Instagram */}
-      {activeTab === 'hub' && (
+      {/* Historias (círculos): debajo del menú, por encima de la portada del hub y del temario */}
+      {(activeTab === 'hub' || activeTab === 'temas') && (
         <div className="container hist-portada">
           <HistoriasQfdos
             partes="circulos"
