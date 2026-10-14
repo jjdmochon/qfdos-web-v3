@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom';
 import {
   Headphones, X, Pause, Play, Volume2, VolumeX, Link2, FolderOpen, GraduationCap, Bell,
-  ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles, Image as ImagenIcono
+  ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles, Image as ImagenIcono, PenTool
 } from 'lucide-react';
 import { CourseAttachment, QfdosAnnouncement, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
 import { avisosRecientesPrimero } from '../utils/avisos';
 import { efectoHistoria, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
+import { EDITORES, BASES_DE_DATOS } from './HerramientasEstructuras';
 
 // ==========================================================================
 // Historias QFDOS
@@ -120,6 +121,8 @@ interface Callbacks {
   onAbrirTema?: (topic: QfdosTopic) => void;
   /** Abre la ficha del enlace en la sección Enlaces de interés (resumen completo para el curso) */
   onAbrirEnlace?: (link: QfdosResourceLink) => void;
+  /** Abre la sección Enlaces de interés, donde están las herramientas de estructuras */
+  onAbrirHerramientas?: () => void;
 }
 
 function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[], announcements: QfdosAnnouncement[], cb: Callbacks): Grupo[] {
@@ -258,6 +261,35 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   if (recursos.length) {
     grupos.push({ id: 'recursos', nombre: 'Noticias', portada: resolver('icons/icon-192.png'), historias: recursos });
   }
+
+  // --- Herramientas: editores de estructuras de código abierto y bases de datos ---
+  // Texto certificado con Jev (slop 0,06; voz 0,30) el 2026-10-15
+  const url = (nombre: string) => [...EDITORES, ...BASES_DE_DATOS].find(h => h.nombre.startsWith(nombre))?.url ?? '';
+  const verTodas: Accion[] = cb.onAbrirHerramientas
+    ? [{ label: 'Ver todas las herramientas', icono: 'tema', alPulsar: () => cb.onAbrirHerramientas?.() }]
+    : [];
+  const herramienta = (id: string, titulo: string, texto: string, acciones: Accion[]): Historia => ({
+    id: `herramientas-${id}`, grupo: 'herramientas', fondo: 'recursos', etiqueta: 'Herramientas',
+    titulo, texto, acciones: acciones.slice(0, 2), duracionMs: Math.max(9000, duracionPorTexto(texto))
+  });
+  grupos.push({
+    id: 'herramientas',
+    nombre: 'Herramientas',
+    historias: [
+      herramienta('reshiki', 'Dibujar estructuras con software libre',
+        'En cuanto a dibujar estructuras, tenemos ReShiki, gratuito y de código abierto. Dibujamos la molécula y el programa nos devuelve su nombre químico y una predicción de su espectro de RMN. Lo instalamos en Windows, macOS o Linux, funciona sin conexión y exporta las figuras en SVG, PDF y PNG.',
+        [{ label: 'Descargar ReShiki', icono: 'enlace', href: url('ReShiki') }, ...verTodas]),
+      herramienta('navegador', 'Nombre IUPAC y RMN sin instalar nada',
+        'Respecto a trabajar sin instalar nada, MolView es también de código abierto y funciona en el navegador. Dibujamos la estructura, consultamos su nombre IUPAC, vemos el espectro de RMN predicho y la giramos en 3D. Para un ejercicio rápido desde el móvil, MolDraw nos da el SMILES y la imagen sin crear cuenta.',
+        [{ label: 'Abrir MolView', icono: 'enlace', href: url('MolView') }, { label: 'Abrir MolDraw', icono: 'enlace', href: url('MolDraw') }]),
+      herramienta('pubchem-drugbank', 'Comprobar lo que hemos dibujado',
+        'Sobre comprobar lo que hemos dibujado, en PubChem buscamos el compuesto y confirmamos su nombre IUPAC, su SMILES y sus propiedades entre más de 100 millones de moléculas. DrugBank nos lleva del fármaco a su farmacología: mecanismo, dianas, metabolismo e interacciones.',
+        [{ label: 'Buscar en PubChem', icono: 'enlace', href: url('PubChem') }, { label: 'Buscar en DrugBank', icono: 'enlace', href: url('DrugBank') }]),
+      herramienta('pdb', 'El fármaco dentro de su diana',
+        'En el caso de la PDB, vemos el fármaco dentro de su diana: estructuras tridimensionales de proteínas resueltas por rayos X, RMN y criomicroscopía electrónica, como la 6CM4, el receptor D2 unido a risperidona que estudiamos en el Tema 3.',
+        [{ label: 'Ver la 6CM4 en la PDB', icono: 'enlace', href: 'https://www.rcsb.org/structure/6CM4' }, ...verTodas])
+    ]
+  });
   return grupos.filter(g => g.historias.length > 0);
 }
 
@@ -267,7 +299,7 @@ const IconoAccion: React.FC<{ tipo: Accion['icono'] }> = ({ tipo }) =>
   tipo === 'tema' ? <GraduationCap size={15} /> : <ExternalLink size={15} />;
 
 const IconoGrupo: React.FC<{ id: GrupoId; size: number }> = ({ id, size }) =>
-  id === 'recursos' ? <FolderOpen size={size} /> : id === 'avisos' ? <Bell size={size} /> : <GraduationCap size={size} />;
+  id === 'recursos' ? <FolderOpen size={size} /> : id === 'avisos' ? <Bell size={size} /> : id === 'herramientas' ? <PenTool size={size} /> : <GraduationCap size={size} />;
 
 // --------------------------------------------------------------------------
 // Visor a pantalla completa
@@ -598,7 +630,7 @@ interface HistoriasQfdosProps extends Callbacks {
 /** Aviso entre instancias (círculos y banda) de que se ha visto una historia */
 const EVENTO_VISTAS = 'qfdos-historias-vistas';
 
-export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema, onAbrirEnlace, partes = 'todo' }) => {
+export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resourceLinks, announcements = [], onAbrirReproductor, onAbrirTema, onAbrirEnlace, onAbrirHerramientas, partes = 'todo' }) => {
   // Los medios locales que aún no se han subido (vídeos de /historias) se comprueban una vez
   const [ausentes, setAusentes] = useState<Set<string>>(new Set());
   useEffect(() => {
@@ -618,10 +650,10 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
   }, []);
 
   const grupos = useMemo(
-    () => construirGrupos(topics, resourceLinks, announcements, { onAbrirReproductor, onAbrirTema, onAbrirEnlace })
+    () => construirGrupos(topics, resourceLinks, announcements, { onAbrirReproductor, onAbrirTema, onAbrirEnlace, onAbrirHerramientas })
       .map(g => ({ ...g, historias: g.historias.filter(h => !h.requiere || !ausentes.has(h.requiere)) }))
       .filter(g => g.historias.length > 0),
-    [topics, resourceLinks, announcements, onAbrirReproductor, onAbrirTema, onAbrirEnlace, ausentes]
+    [topics, resourceLinks, announcements, onAbrirReproductor, onAbrirTema, onAbrirEnlace, onAbrirHerramientas, ausentes]
   );
   const [vistas, setVistas] = useState<Set<string>>(leerVistas);
   const [abierto, setAbierto] = useState<{ g: number; i: number } | null>(null);
@@ -688,7 +720,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
               aria-label={`${gr.nombre}: ${gr.historias.length} historia${gr.historias.length === 1 ? '' : 's'}${pendientes ? `, ${pendientes} sin ver` : ''}`}
             >
               <span className="hist-anillo">
-                <span className={`hist-foto${gr.id === 'recursos' ? ' recursos' : ''}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
+                <span className={`hist-foto${gr.id === 'recursos' ? ' recursos' : gr.id === 'herramientas' ? ' herramientas' : ''}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
                   {!portada && <IconoGrupo id={gr.id} size={26} />}
                 </span>
               </span>

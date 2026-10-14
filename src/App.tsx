@@ -550,6 +550,7 @@ export const App: React.FC = () => {
             onAbrirReproductor={att => setSelectedSpotifyAttachment(att)}
             onAbrirTema={topic => { setSelectedTopicDetail(topic); navigateTo('temas', topic.id); }}
             onAbrirEnlace={link => navigateTo('enlaces', link.id)}
+            onAbrirHerramientas={() => navigateTo('enlaces')}
           />
         </div>
       )}

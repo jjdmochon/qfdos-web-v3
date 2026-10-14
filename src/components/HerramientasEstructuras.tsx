@@ -12,7 +12,7 @@ interface Herramienta {
   descripcion: string;
 }
 
-const EDITORES: Herramienta[] = [
+export const EDITORES: Herramienta[] = [
   {
     nombre: 'ReShiki',
     url: 'https://github.com/Ameyanagi/reshiki',
@@ -36,7 +36,7 @@ const EDITORES: Herramienta[] = [
   }
 ];
 
-const BASES_DE_DATOS: Herramienta[] = [
+export const BASES_DE_DATOS: Herramienta[] = [
   {
     nombre: 'Protein Data Bank (RCSB PDB)',
     url: 'https://www.rcsb.org/',

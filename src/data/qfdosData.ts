@@ -496,6 +496,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.58.0 — Historias: grupo «Herramientas» con los editores de estructuras de código abierto (nombre IUPAC y RMN) y PubChem, DrugBank y PDB.
  * v3.57.0 — Novedades del curso: el aviso del Tema 3 llega al alumnado sin publicarlo a mano, el del Tema 1 entra en las Historias y cada novedad de tema reproduce su clip.
  * v3.56.0 — Tarjeta «Presentación del Curso» con el mapa del curso (hexágonos 00–10, publicados en teal).
  * v3.55.0 — Recarga obligatoria cuando hay una versión nueva publicada (version.json), salvo con un examen en curso, que recarga al entregarlo.
@@ -503,8 +504,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.57.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-15T20:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.58.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-15T21:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

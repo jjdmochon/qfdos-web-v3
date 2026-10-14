@@ -331,6 +331,7 @@
 }
 .hist-foto { background-color: var(--navy-dark); }
 .hist-foto.recursos { background-color: #fff; background-size: contain; background-repeat: no-repeat; }
+.hist-foto.herramientas { background: linear-gradient(150deg, var(--navy) 0%, var(--teal) 100%); }
 .hist-etiqueta { font-size: 0.74rem; font-weight: 600; color: var(--text-main); max-width: 88px; text-align: center; line-height: 1.2; }
 .hist-circulo.vista .hist-etiqueta { color: var(--text-muted); font-weight: 500; }
 
