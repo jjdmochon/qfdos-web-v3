@@ -86,8 +86,9 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       };
     }
 
-    // Tema 3: publicado con flashcards pero todavia sin test. El estado lo manda
-    // el codigo, para que una hoja remota antigua no lo devuelva a "Proximamente".
+    // Tema 3: publicado con flashcards pero todavia sin test. El estado y los
+    // enlaces oficiales los manda el codigo, para que una hoja remota antigua no
+    // lo devuelva a "Proximamente" ni borre los PDF.
     if (t.id === 'tema-03') {
       return {
         ...base,
@@ -95,6 +96,10 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
         status: 'Publicado' as const,
         testDisponible: false,
         testQuestions: [],
+        slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
+        slidesPdfName: t.slidesPdfName || base.slidesPdfName,
+        notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
+        notesPdfName: t.notesPdfName || base.notesPdfName,
         flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
         flashcardsDisponibles: base.flashcardsDisponibles,
       };
