@@ -153,6 +153,12 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
     return counts;
   }, [farmacos, estados]);
 
+  // Solo los estados con alguna carta: la barra y el filtro no muestran categorías vacías
+  const estadosVisibles = useMemo(
+    () => (estados ? Object.entries(estados).filter(([k]) => estadosConteo[k] > 0) : []),
+    [estados, estadosConteo]
+  );
+
   // Fármacos filtrados
   const filteredFarmacos = useMemo(() => {
     const term = searchTerm.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -271,7 +277,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
       {estados && (
         <div className="qf-estados">
           <div className="qf-estados-barra" role="img" aria-label="Reparto de la baraja por estado regulatorio">
-            {Object.entries(estados).map(([k, e]) => (
+            {estadosVisibles.map(([k, e]) => (
               <span
                 key={k}
                 style={{ width: `${(estadosConteo[k] / Math.max(farmacos.length, 1)) * 100}%`, background: e.color }}
@@ -287,7 +293,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
             >
               Todos los estados <span className="qf-filtro-count">{farmacos.length}</span>
             </button>
-            {Object.entries(estados).map(([k, e]) => (
+            {estadosVisibles.map(([k, e]) => (
               <button
                 key={k}
                 type="button"
