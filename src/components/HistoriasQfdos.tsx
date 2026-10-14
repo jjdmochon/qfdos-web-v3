@@ -133,12 +133,17 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     if (tema && cb.onAbrirTema) acciones.push({ label: `Ir al ${tema.number}`, icono: 'tema', alPulsar: () => cb.onAbrirTema?.(tema) });
     if (a.pdfUrl) acciones.push({ label: a.pdfName || 'Abrir el PDF', icono: 'pdf', href: resolver(a.pdfUrl) });
     if (a.linkUrl) acciones.push({ label: a.linkLabel || 'Más información', icono: 'enlace', href: resolver(a.linkUrl) });
+    // Novedad de un tema con clip: se reproduce el clip, con el cartel como póster
+    const medios = a.temaId ? MEDIOS_TEMA[a.temaId] : undefined;
+    const clip = medios?.clip;
+    const cartel = a.imageUrl ? resolver(a.imageUrl) : medios?.imagen ? resolver(medios.imagen) : undefined;
     return {
       id: `aviso-${a.id}`, grupo: 'avisos', fondo: 'marca', etiqueta: 'Novedad',
       titulo: a.title, texto: recortar(a.content, 330), fecha: a.date,
-      imagen: a.imageUrl ? resolver(a.imageUrl) : undefined,
+      imagen: cartel,
+      ...(clip ? { video: resolver(clip), ajuste: 'cubrir' as const } : {}),
       acciones: acciones.slice(0, 2),
-      duracionMs: Math.max(9000, duracionPorTexto(a.content))
+      duracionMs: Math.max(clip ? 12000 : 9000, duracionPorTexto(a.content))
     };
   });
   if (novedades.length) {

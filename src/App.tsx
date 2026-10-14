@@ -48,7 +48,7 @@ import { CartasDocenteModal } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
-import { conAvisosNuevos, conEnlacesNuevos, conMediosDelCodigo, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
+import { conAvisosDelCodigo, conEnlacesNuevos, conMediosDelCodigo, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -305,7 +305,7 @@ export const App: React.FC = () => {
   });
 
   const [announcements, setAnnouncements] = useState<QfdosAnnouncement[]>(() =>
-    contenidoEnCache()?.announcements ?? loadCached('qfdos_v3_announcements', INITIAL_ANNOUNCEMENTS)
+    conAvisosDelCodigo(contenidoEnCache()?.announcements ?? loadCached('qfdos_v3_announcements', INITIAL_ANNOUNCEMENTS), INITIAL_ANNOUNCEMENTS, AVISOS_A_OFRECER, false)
   );
 
   const [glossary, setGlossary] = useState<QfdosGlossaryTerm[]>(() =>
@@ -412,7 +412,7 @@ export const App: React.FC = () => {
       }
       if (Array.isArray(remoto.announcements)) {
         // Igual que los enlaces: al profesorado se le ofrecen los avisos nuevos del código para publicarlos
-        setAnnouncements(isProfesor ? conAvisosNuevos(remoto.announcements, INITIAL_ANNOUNCEMENTS, AVISOS_A_OFRECER) : remoto.announcements);
+        setAnnouncements(conAvisosDelCodigo(remoto.announcements, INITIAL_ANNOUNCEMENTS, AVISOS_A_OFRECER, isProfesor));
       }
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
       if (Array.isArray(remoto.resourceLinks)) {

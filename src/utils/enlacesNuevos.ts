@@ -86,3 +86,39 @@ export function conMediosDelCodigo(enlaces: QfdosResourceLink[], iniciales: Qfdo
   });
   return cambiado ? res : enlaces;
 }
+
+/**
+ * Avisos que ve cada cual.
+ *
+ * El alumnado solo recibía los avisos publicados desde el CMS, así que un
+ * aviso nuevo del código (AVISOS_A_OFRECER) no le llegaba hasta que el
+ * profesor lo publicaba a mano: el del Tema 3 nunca salió en las Historias.
+ * Ahora los avisos de AVISOS_A_OFRECER llegan a todo el mundo mientras sigan
+ * en esa lista (para retirarlos, se quitan de ella). Además, si el código
+ * marca un aviso para las Historias (enHistorias y temaId) y la copia
+ * publicada no lo lleva, se completa con esas marcas.
+ */
+export function conAvisosDelCodigo(
+  publicados: QfdosAnnouncement[],
+  iniciales: QfdosAnnouncement[],
+  idsAOfrecer: string[],
+  esProfesor: boolean
+): QfdosAnnouncement[] {
+  let base: QfdosAnnouncement[];
+  if (esProfesor) {
+    base = conAvisosNuevos(publicados, iniciales, idsAOfrecer);
+  } else {
+    const presentes = new Set(publicados.map(a => a.id));
+    const faltan = iniciales.filter(a => idsAOfrecer.includes(a.id) && !presentes.has(a.id));
+    base = faltan.length ? [...faltan, ...publicados] : publicados;
+  }
+  const porId = new Map(iniciales.map(a => [a.id, a]));
+  let cambiado = false;
+  const res = base.map(a => {
+    const c = porId.get(a.id);
+    if (!c?.enHistorias || a.enHistorias) return a;
+    cambiado = true;
+    return { ...a, enHistorias: true, temaId: a.temaId ?? c.temaId, imageUrl: a.imageUrl ?? c.imageUrl };
+  });
+  return cambiado ? res : base;
+}
