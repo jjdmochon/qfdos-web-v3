@@ -206,8 +206,9 @@ El manifiesto del proyecto de Codigo.gs está en `google-apps-script/appsscript.
 sin el permiso `script.external_request`, `iniciarSesion` no puede verificar el
 token con Google.
 
-**Orden de despliegue** tras cambiar los scripts: nueva implementación de los
-dos scripts y, justo después, compilar y publicar `docs/`. Cada mitad sola deja
+**Orden de despliegue** tras cambiar los scripts: nueva *versión* de la
+implementación existente de los dos scripts (Gestionar implementaciones →
+Editar → Nueva versión; una implementación nueva cambiaría la URL /exec) y, justo después, compilar y publicar `docs/`. Cada mitad sola deja
 de funcionar con la otra. Al actualizar, todo el mundo tiene que volver a
 iniciar sesión una vez.
 

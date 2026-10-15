@@ -72,7 +72,8 @@ export const PanelClavesCorreccion: React.FC<{ topics: QfdosTopic[] }> = ({ topi
           <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
           <span>
             El script de Calificaciones es una versión anterior: con la corrección obligatoria, los tests sin claves se
-            rechazan y no se recorrigen. Publica una implementación nueva de <code>Calificaciones.gs</code>.
+            rechazan y no se recorrigen. Actualiza <code>Calificaciones.gs</code> en su proyecto y publícalo en Gestionar
+            implementaciones → Editar → Nueva versión (no como implementación nueva: cambiaría la URL).
           </span>
         </div>
       )}

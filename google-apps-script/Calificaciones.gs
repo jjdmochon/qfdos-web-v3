@@ -22,11 +22,19 @@
  *
  * Despliegue
  * ----------
- * Implementar > Nueva implementación > Aplicación web
+ * Este script va vinculado a la hoja de calificaciones (Extensiones → Apps
+ * Script desde la propia hoja). No se crea otro proyecto: se sustituye el
+ * código del que ya existe, que conserva sus propiedades.
+ *
+ * Primera vez: Implementar > Nueva implementación > Aplicación web
  *   Ejecutar como:      Yo
  *   Quién tiene acceso: Cualquier usuario
- * Guardar no basta: hay que crear una implementación nueva para que el cambio
- * salga a la URL /exec.
+ *
+ * Al cambiar el código: Implementar > Gestionar implementaciones > ✏️ Editar
+ *   > Versión: «Nueva versión» > Implementar. Así la URL /exec no cambia.
+ *   Una «Nueva implementación» genera OTRA URL, y la web (que lleva la URL
+ *   fija en googleSheetsService.ts) seguiría enviando a la antigua.
+ * Guardar no basta: sin versión nueva, /exec sigue sirviendo el código viejo.
  */
 
 var NOMBRE_HOJA = 'Respuestas_QFDOS';
