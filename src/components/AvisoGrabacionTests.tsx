@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { CheckCircle2, X } from 'lucide-react';
+import { CORREO_PROFESOR } from '../data/actualizacionesData';
 
 const CLAVE = 'qfdos_aviso_grabacion_tests_2026_10';
 /** A partir de esta fecha el aviso deja de mostrarse solo; queda en el tablón. */
 const HASTA = new Date('2026-11-01T00:00:00+01:00').getTime();
-export const CORREO_CONTACTO = 'juandiaz@go.ugr.es';
+const CORREO_CONTACTO = CORREO_PROFESOR;
+const FECHA = '15/10/2026';
 
 /**
  * Aviso al entrar: el fallo que impedía grabar algunas notas de los tests está
@@ -27,7 +29,7 @@ export const AvisoGrabacionTests: React.FC = () => {
       <div className="entrega-aviso entrega-aviso--ok" role="status" style={{ fontSize: '0.86rem', padding: '10px 12px' }}>
         <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: 2 }} />
         <span style={{ flex: 1 }}>
-          <strong>Las notas de los tests ya se graban.</strong> Hemos solucionado el problema que impedía registrar
+          <strong>{FECHA} · Las notas de los tests ya se graban.</strong> Hemos solucionado el problema que impedía registrar
           algunas notas de los tests de los Temas 2 y 3. Si alguno no se te grabó, recarga la página (Ctrl+F5 en el
           ordenador; en el móvil, cierra y vuelve a abrir la web) y repite el test. Si aun así no se graba, escríbeme a{' '}
           <a href={`mailto:${CORREO_CONTACTO}?subject=${encodeURIComponent('QFDOS · No se graba la nota del test')}`}>
