@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom';
 import {
   Headphones, X, Pause, Play, Volume2, VolumeX, Link2, FolderOpen, GraduationCap, Bell,
-  ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles, Image as ImagenIcono, PenTool
+  ChevronLeft, ChevronRight, ExternalLink, FileText, Video, Sparkles, Image as ImagenIcono, PenTool, RefreshCw
 } from 'lucide-react';
 import { CourseAttachment, QfdosAnnouncement, QfdosResourceLink, QfdosTopic } from '../data/qfdosData';
 import { avisosRecientesPrimero } from '../utils/avisos';
 import { efectoHistoria, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
 import { EDITORES, BASES_DE_DATOS } from './HerramientasEstructuras';
+import { ACTUALIZACIONES } from '../data/actualizacionesData';
 
 // ==========================================================================
 // Historias QFDOS
@@ -151,6 +152,17 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   });
   if (novedades.length) {
     grupos.push({ id: 'avisos', nombre: 'Novedades del curso', portada: novedades.find(n => n.imagen)?.imagen, historias: novedades });
+  }
+
+  // --- Actualizaciones de la plataforma: arreglos y mejoras, la más reciente primero ---
+  const actualizaciones: Historia[] = ACTUALIZACIONES.map(a => ({
+    id: a.id, grupo: 'actualizaciones', fondo: 'marca' as const, etiqueta: `Actualización · ${a.version}`,
+    titulo: a.titulo, texto: a.texto, fecha: a.fecha,
+    acciones: a.enlace ? [{ label: a.enlace.label, icono: 'enlace' as const, href: a.enlace.href }] : [],
+    duracionMs: Math.max(9000, duracionPorTexto(a.texto))
+  }));
+  if (actualizaciones.length) {
+    grupos.push({ id: 'actualizaciones', nombre: 'Actualizaciones', historias: actualizaciones });
   }
 
   // --- Un grupo por tema: cartel, clip, píldora de audio y vídeo podcast ---
@@ -302,7 +314,8 @@ const IconoAccion: React.FC<{ tipo: Accion['icono'] }> = ({ tipo }) =>
   tipo === 'tema' ? <GraduationCap size={15} /> : <ExternalLink size={15} />;
 
 const IconoGrupo: React.FC<{ id: GrupoId; size: number }> = ({ id, size }) =>
-  id === 'recursos' ? <FolderOpen size={size} /> : id === 'avisos' ? <Bell size={size} /> : id === 'herramientas' ? <PenTool size={size} /> : <GraduationCap size={size} />;
+  id === 'recursos' ? <FolderOpen size={size} /> : id === 'avisos' ? <Bell size={size} /> : id === 'herramientas' ? <PenTool size={size} /> :
+  id === 'actualizaciones' ? <RefreshCw size={size} /> : <GraduationCap size={size} />;
 
 // --------------------------------------------------------------------------
 // Visor a pantalla completa
@@ -766,7 +779,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
               aria-label={`${gr.nombre}: ${gr.historias.length} historia${gr.historias.length === 1 ? '' : 's'}${pendientes ? `, ${pendientes} sin ver` : ''}`}
             >
               <span className="hist-anillo">
-                <span className={`hist-foto${gr.id === 'recursos' ? ' recursos' : gr.id === 'herramientas' ? ' herramientas' : ''}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
+                <span className={`hist-foto${gr.id === 'recursos' ? ' recursos' : gr.id === 'herramientas' ? ' herramientas' : gr.id === 'actualizaciones' ? ' actualizaciones' : ''}`} style={portada ? { backgroundImage: `url("${portada}")` } : undefined}>
                   {!portada && <IconoGrupo id={gr.id} size={26} />}
                 </span>
               </span>

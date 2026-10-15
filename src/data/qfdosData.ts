@@ -503,6 +503,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.61.0 — Historias: grupo «Actualizaciones» con los arreglos y mejoras de la plataforma (notas de los tests, cola de envíos, móvil y recarga automática); la franja verde del aviso lleva la fecha.
  * v3.60.2 — Aviso al entrar y en el tablón: el problema al grabar las notas de los tests está solucionado; recargar y, si no, escribir a juandiaz@go.ugr.es.
  * v3.60.1 — Tests: ninguna nota se pierde. Sin claves publicadas el intento se anota como pendiente y se recorrige al publicarlas; los envíos fallidos quedan en cola y se reenvían solos sin duplicarse; el servidor ya no devuelve error con toda la clase entregando a la vez.
  * v3.60.0 — Tema 4: los 71 compuestos (QFDOS-170 a 240) en Fármacos & Quimioinformática, con fórmula, descriptores RDKit y notas docentes; la tarjeta del tema dibuja el sumatriptán.
@@ -517,7 +518,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.60.2';
+export const COURSE_DATA_VERSION = '3.61.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-16T01:00:00.000Z';
 
 export const QFDOS_INFO = {
