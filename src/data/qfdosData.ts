@@ -503,6 +503,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.60.2 — Aviso al entrar y en el tablón: el problema al grabar las notas de los tests está solucionado; recargar y, si no, escribir a juandiaz@go.ugr.es.
  * v3.60.1 — Tests: ninguna nota se pierde. Sin claves publicadas el intento se anota como pendiente y se recorrige al publicarlas; los envíos fallidos quedan en cola y se reenvían solos sin duplicarse; el servidor ya no devuelve error con toda la clase entregando a la vez.
  * v3.60.0 — Tema 4: los 71 compuestos (QFDOS-170 a 240) en Fármacos & Quimioinformática, con fórmula, descriptores RDKit y notas docentes; la tarjeta del tema dibuja el sumatriptán.
  * v3.59.0 — Tema 4: estructuras QFDOS-170 a 240 (Excel, propiedades, maestro y generador) como adjuntos solo para el profesorado.
@@ -516,7 +517,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.60.1';
+export const COURSE_DATA_VERSION = '3.60.2';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-16T01:00:00.000Z';
 
 export const QFDOS_INFO = {
@@ -545,9 +546,18 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-tests-grabacion-solucionado',
+    title: '✅ Tests tipo test: solucionado el problema al grabar las notas',
+    content: 'Hemos solucionado el problema que impedía registrar algunas notas de los tests de los Temas 2 y 3. Si alguno no se te grabó, recarga la página (Ctrl+F5 en el ordenador; en el móvil, cierra y vuelve a abrir la web) y repite el test. A partir de ahora, si un envío falla, la nota queda guardada en tu navegador y se envía sola en cuanto hay conexión. Si aun así no se graba, escríbeme a juandiaz@go.ugr.es indicando el tema, el modelo y el mensaje que te aparece al terminar.',
+    date: '15 Octubre 2026',
+    priority: 'alta',
+    linkUrl: 'mailto:juandiaz@go.ugr.es?subject=QFDOS%20%C2%B7%20No%20se%20graba%20la%20nota%20del%20test',
+    linkLabel: 'Escribir a juandiaz@go.ugr.es'
+  },
   {
     id: 'ann-tema03-tests-recursos',
     title: '📝 Tema 3 · Sistema Dopaminérgico: tipo test, flashcards y cartas ya disponibles',

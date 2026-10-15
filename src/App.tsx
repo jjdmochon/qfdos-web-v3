@@ -47,6 +47,7 @@ import { AdminCmsModal } from './components/AdminCmsModal';
 import { Model3DViewerModal } from './components/Model3DViewerModal';
 import { CartasDocenteModal } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
+import { AvisoGrabacionTests } from './components/AvisoGrabacionTests';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
 import { conAvisosDelCodigo, conEnlacesNuevos, conMediosDelCodigo, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
@@ -553,6 +554,8 @@ export const App: React.FC = () => {
         onOpenAdminCms={() => setIsAdminCmsOpen(true)}
         onOpenCartas={() => setIsCartasModalOpen(true)}
       />
+
+      <AvisoGrabacionTests />
 
       {/* Historias (círculos): debajo del menú, por encima de la portada del hub y del temario */}
       {(activeTab === 'hub' || activeTab === 'temas') && (
