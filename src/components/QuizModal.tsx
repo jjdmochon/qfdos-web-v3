@@ -27,6 +27,7 @@ import {
   misCalificaciones,
   esIntentoDeTest
 } from '../services/googleSheetsService';
+import { encolarIntento, anotarResultado, intentosPendientes, reenviarPendientes } from '../services/intentosPendientes';
 import { useAuth } from '../context/AuthContext';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
@@ -198,8 +199,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const alTerminarEnvio = (res: GoogleSheetsSubmissionResult) => {
     setSheetSubmitStatus(res.status);
     setMensajeRechazo(res.status === 'rechazado' ? res.message : '');
-    const c = res.correccionServidor;
     const intento = ultimoIntentoRef.current;
+    if (intento) anotarResultado(intento.id, res);
+    if (res.verificacionPendiente) {
+      setAvisoCorreccion('Nota registrada. Las claves de este test aún no están publicadas: el servidor la verificará en cuanto el profesorado las publique.');
+    }
+    const c = res.correccionServidor;
     if (!c || !intento || (c.score === intento.score && c.correctCount === intento.correctCount)) return;
     const corregido = { ...intento, score: c.score, correctCount: c.correctCount, totalQuestions: c.totalQuestions };
     ultimoIntentoRef.current = corregido;
@@ -346,15 +351,45 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     }
 
     setEstadoHistorial('cargando');
+    // Primero se envía lo que esté en cola, para que el historial ya lo traiga
+    await reenviarPendientes();
     const remotos = await misCalificaciones(correo);
 
     if (remotos === null) {
-      setRecords(locales);
+      const enCola = intentosPendientes(correo).filter(p => !locales.some(l => l.id === p.id));
+      setRecords([...enCola, ...locales]);
       setEstadoHistorial('sin_conexion');
       return;
     }
 
-    setRecords(fusionar(remotos, locales));
+    // Intentos de este navegador que no constan en la hoja: antes fusionar los
+    // borraba del historial local y la nota se perdía. Ahora pasan a la cola.
+    const yaEnHoja = (l: QuizRegistrationRecord) => remotos.some(r =>
+      (r.idIntento && r.idIntento === l.id) ||
+      (r.topicId === l.topicId && (
+        (r.timestamp && l.timestamp && r.timestamp.trim() === l.timestamp.trim()) ||
+        (parseTimestampMinutes(r.timestamp) > 0 && Math.abs(parseTimestampMinutes(r.timestamp) - parseTimestampMinutes(l.timestamp)) <= 2)
+      ))
+    );
+    const huerfanos = locales.filter(l =>
+      l.id.startsWith('rec_') && esIntentoDeTest(l) &&
+      (l.answersDetail ?? []).some(a => a.questionId) &&
+      (l.studentEmail || '').toLowerCase().trim() === correo.toLowerCase() &&
+      !yaEnHoja(l)
+    );
+    if (huerfanos.length) {
+      huerfanos.forEach(h => encolarIntento(h, correo));
+      if (await reenviarPendientes()) {
+        const otraVez = await misCalificaciones(correo);
+        if (otraVez) remotos.splice(0, remotos.length, ...otraVez);
+      }
+    }
+
+    const fusionados = fusionar(remotos, locales);
+    const enCola = intentosPendientes(correo).filter(p =>
+      !fusionados.some(r => (r.idIntento && r.idIntento === p.id) || sonMismoIntento(r, p))
+    );
+    setRecords([...enCola, ...fusionados]);
     setEstadoHistorial('sincronizado');
   };
 
@@ -682,6 +717,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (onAttemptCompleted) {
         onAttemptCompleted(finalAttempt);
       }
+
+      // En cola antes de enviar: si el envío falla o se cierra la pestaña, se reenvía solo
+      encolarIntento(finalAttempt, user?.email);
 
       // Enviar de forma asíncrona a Google Sheets
       ultimoIntentoRef.current = finalAttempt;
@@ -2366,7 +2404,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           {sheetSubmitStatus === 'sent_unconfirmed' && (
                             <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--semantic-warn-bg)', border: '1px solid var(--accent-amber)', color: 'var(--text-main)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                               <AlertCircle size={15} color="var(--accent-amber)" />
-                              <span><strong>Enviado sin confirmar.</strong> No se ha podido releer la hoja para comprobarlo; el intento queda también en este navegador. Si tu sesión ha caducado, vuelve a entrar y pulsa Reintentar.</span>
+                              <span><strong>Enviado sin confirmar.</strong> No se ha podido releer la hoja para comprobarlo. El intento queda en cola y se reenviará solo, sin duplicarse.</span>
                               <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar</button>
                             </div>
                           )}
@@ -2377,7 +2415,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           )}
                           {sheetSubmitStatus === 'sesion_invalida' && (
                             <div className="status-msg status-msg--bad" role="alert" style={{ justifyContent: 'center' }}>
-                              <AlertCircle size={15} /> <span>Tu sesión ha caducado: el intento está guardado en este navegador. Cierra sesión, vuelve a entrar y pulsa Reintentar.</span>
+                              <AlertCircle size={15} /> <span>Tu sesión ha caducado: el intento queda en cola en este navegador. Cierra sesión y vuelve a entrar; se enviará solo.</span>
                               <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar envío</button>
                             </div>
                           )}
@@ -2394,7 +2432,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           )}
                           {sheetSubmitStatus === 'network_error' && (
                             <div style={{ padding: '8px 12px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', color: 'var(--bad-ink)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                              <AlertCircle size={15} color="#ef4444" /> <span>Guardado localmente (sin conexión con Google Sheets).</span>
+                              <AlertCircle size={15} color="#ef4444" /> <span>Sin conexión con la hoja oficial. El intento queda en cola y se enviará solo al recuperar la conexión o al volver a abrir la plataforma.</span>
                               <button type="button" className="btn btn-xs btn-outline" onClick={reenviarAHoja}>Reintentar envío</button>
                             </div>
                           )}
@@ -2750,13 +2788,23 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   {rec.evaluationMode === 'docente_sesion' ? 'Sesión Docente' : 'Alumno'}
                                 </span>
                                 {rec.modelName && (
-                                  <span className="qfdos-badge" style={{ 
+                                  <span className="qfdos-badge" style={{
                                     fontSize: '0.64rem',
                                     background: rec.modelName.includes('Modelo E') ? 'rgba(30, 58, 138, 0.12)' : rec.modelName.includes('Modelo B') ? '#f5f3ff' : rec.modelName.includes('Retrosíntesis') ? 'rgba(20, 184, 166, 0.12)' : rec.modelName.includes('Modelo C') ? '#fff7ed' : 'rgba(59, 130, 246, 0.12)',
                                     color: rec.modelName.includes('Modelo E') ? 'var(--navy-ink)' : rec.modelName.includes('Modelo B') ? '#7c3aed' : rec.modelName.includes('Retrosíntesis') ? 'var(--teal-ink)' : rec.modelName.includes('Modelo C') ? '#c2410c' : '#2563eb',
                                     border: `1px solid ${rec.modelName.includes('Modelo E') ? 'var(--navy)' : rec.modelName.includes('Modelo B') ? '#8b5cf6' : rec.modelName.includes('Retrosíntesis') ? '#14b8a6' : rec.modelName.includes('Modelo C') ? '#ea580c' : '#93c5fd'}`
                                   }}>
-                                    {rec.modelName.includes('Modelo E') ? 'Modelo E' : rec.modelName.includes('Modelo B') ? 'Modelo B' : rec.modelName.includes('Modelo C') ? 'Modelo C' : rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : 'Modelo A'}
+                                    {rec.modelName.includes('Modelo E') ? 'Modelo E' : rec.modelName.includes('Modelo B') ? 'Modelo B' : rec.modelName.includes('Modelo C') ? 'Modelo C' : rec.modelName.includes('Retrosíntesis') ? 'Retrosíntesis' : /^Modelo \w+/.exec(rec.modelName)?.[0] ?? 'Modelo A'}
+                                  </span>
+                                )}
+                                {rec.pendienteRegistro && (
+                                  <span className="qfdos-badge badge-amber" style={{ fontSize: '0.64rem' }} title="Aún no consta en la hoja oficial; se reenvía solo">
+                                    Pendiente de registrar
+                                  </span>
+                                )}
+                                {rec.verificacionPendiente && (
+                                  <span className="qfdos-badge badge-amber" style={{ fontSize: '0.64rem' }} title="Registrada; el servidor la corrige al publicar las claves">
+                                    Nota por verificar
                                   </span>
                                 )}
                               </div>

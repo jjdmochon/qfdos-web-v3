@@ -180,6 +180,13 @@ Quién es cada cual lo decide Apps Script:
      el alumnado solo puede registrar tests corregidos en el servidor. Límite:
      las preguntas viajan con su solución (se enseña la explicación al
      responder), así que esto impide falsificar la nota, no conocerla de antemano.
+   - **Ninguna nota se pierde**: un test cuyas claves aún no están publicadas
+     se anota como `pendiente (faltan claves)` con sus respuestas (columna
+     «Respuestas») y se recorrige solo al publicar las claves. Cada intento
+     lleva su id (columna «Id intento»), y el navegador guarda en cola los que
+     no llegan (sin red, sesión caducada, servidor saturado) y los reenvía al
+     abrir la plataforma, al recuperar la conexión y cada 10 minutos; el
+     servidor no anota dos veces el mismo id.
 
 **Propiedades de Apps Script** (⚙️ → Propiedades de la secuencia de comandos):
 
@@ -192,7 +199,7 @@ Quién es cada cual lo decide Apps Script:
 | `EVALUACION_HOJA_ID` | Opcional (por defecto, la hoja de evaluación actual) | — |
 | `MATERIALES_CARPETA_ID` | Se rellena sola al crear la carpeta de materiales; se puede fijar a mano | — |
 | `CALIFICACIONES_HOJA_ID` | Opcional (por defecto, la hoja de calificaciones actual; la lee el seguimiento) | — |
-| `EXIGIR_CORRECCION_SERVIDOR` (`1`) | — | Opcional: rechaza los tests del alumnado que el servidor no pueda corregir |
+| `EXIGIR_CORRECCION_SERVIDOR` (`1`) | — | Opcional: rechaza los tests del alumnado que el servidor no pueda corregir (los que solo esperan sus claves se anotan como pendientes) |
 | `NOTAS_CUADERNO_PUBLICAS` | La gestiona el botón del panel del cuaderno | — |
 
 El manifiesto del proyecto de Codigo.gs está en `google-apps-script/appsscript.json`:

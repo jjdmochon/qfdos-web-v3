@@ -21,6 +21,15 @@ export interface EstadoClaves {
   claves: number;
   actualizadoEn: string;
   exigir: boolean;
+  /** Intentos anotados sin claves, a la espera de recorregirse (null: script anterior) */
+  pendientes: number | null;
+}
+
+export interface ResultadoPublicacion {
+  claves: number;
+  /** Intentos pendientes que se han corregido con estas claves (null: script anterior) */
+  recorregidos: number | null;
+  pendientes: number | null;
 }
 
 export type ResultadoClaves<T> = { ok: true; datos: T } | { ok: false; error: string };
@@ -90,16 +99,23 @@ export function estadoClaves(): Promise<ResultadoClaves<EstadoClaves>> {
   return llamar('estadoClaves', c => {
     // Un script anterior contesta ok a cualquier acción, sin `claves`
     if (typeof c.claves !== 'number') throw new Error('antiguo');
-    return { claves: c.claves, actualizadoEn: String(c.actualizadoEn ?? ''), exigir: c.exigir === true };
+    return {
+      claves: c.claves, actualizadoEn: String(c.actualizadoEn ?? ''), exigir: c.exigir === true,
+      pendientes: typeof c.pendientes === 'number' ? c.pendientes : null
+    };
   });
 }
 
-export function publicarClaves(claves: Record<string, number>): Promise<ResultadoClaves<number>> {
+export function publicarClaves(claves: Record<string, number>): Promise<ResultadoClaves<ResultadoPublicacion>> {
   return llamar(
     'publicar_claves',
     c => {
       if (typeof c.claves !== 'number') throw new Error('antiguo');
-      return c.claves;
+      return {
+        claves: c.claves,
+        recorregidos: typeof c.recorregidos === 'number' ? c.recorregidos : null,
+        pendientes: typeof c.pendientes === 'number' ? c.pendientes : null
+      };
     },
     { claves }
   );

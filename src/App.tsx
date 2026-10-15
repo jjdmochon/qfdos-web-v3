@@ -17,6 +17,7 @@ import {
 import { useAuth } from './context/AuthContext';
 import { descargarContenido, contenidoEnCache, normalizarTemas } from './services/contenidoRemoto';
 import { limpiarDudasLocales, cargarDudas } from './services/dudas';
+import { reenviarPendientes } from './services/intentosPendientes';
 import { ExternalLink } from 'lucide-react';
 
 import { LoginPage } from './components/LoginPage';
@@ -342,6 +343,20 @@ export const App: React.FC = () => {
     const id = window.setInterval(refrescarDudas, 5 * 60 * 1000);
     return () => window.clearInterval(id);
   }, [refrescarDudas, isProfesor]);
+
+  // Tests que no llegaron a la hoja: se reenvían al entrar y al recuperar la red
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const reenviar = () => { reenviarPendientes().catch(() => undefined); };
+    const inicial = window.setTimeout(reenviar, 4000);
+    const periodico = window.setInterval(reenviar, 10 * 60 * 1000);
+    window.addEventListener('online', reenviar);
+    return () => {
+      window.clearTimeout(inicial);
+      window.clearInterval(periodico);
+      window.removeEventListener('online', reenviar);
+    };
+  }, [isAuthenticated]);
   const [isAdminCmsOpen, setIsAdminCmsOpen] = useState(false);
   const [cmsInitialTab, setCmsInitialTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'seguimiento' | 'apikey'>('modules');
   const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
