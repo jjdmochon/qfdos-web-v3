@@ -130,7 +130,18 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   const portadaPodcast = resolver('assets/Podcast/qfdos-podcast-portada-vertical.png');
   const grupos: Grupo[] = [];
 
-  // --- Novedades: avisos marcados para las Historias, siempre los primeros ---
+  // --- Actualizaciones de la plataforma: el primer círculo; la más reciente primero ---
+  const actualizaciones: Historia[] = ACTUALIZACIONES.map(a => ({
+    id: a.id, grupo: 'actualizaciones', fondo: 'marca' as const, etiqueta: `Actualización · ${a.version}`,
+    titulo: a.titulo, texto: a.texto, fecha: a.fecha,
+    acciones: a.enlace ? [{ label: a.enlace.label, icono: 'enlace' as const, href: a.enlace.href }] : [],
+    duracionMs: Math.max(9000, duracionPorTexto(a.texto))
+  }));
+  if (actualizaciones.length) {
+    grupos.push({ id: 'actualizaciones', nombre: 'Actualizaciones de la plataforma', historias: actualizaciones });
+  }
+
+  // --- Novedades: avisos marcados para las Historias, justo después de las actualizaciones ---
   const novedades: Historia[] = avisosRecientesPrimero(announcements.filter(a => a.enHistorias)).map((a): Historia => {
     const tema = a.temaId ? topics.find(t => t.id === a.temaId) : undefined;
     const acciones: Accion[] = [];
@@ -152,17 +163,6 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   });
   if (novedades.length) {
     grupos.push({ id: 'avisos', nombre: 'Novedades del curso', portada: novedades.find(n => n.imagen)?.imagen, historias: novedades });
-  }
-
-  // --- Actualizaciones de la plataforma: arreglos y mejoras, la más reciente primero ---
-  const actualizaciones: Historia[] = ACTUALIZACIONES.map(a => ({
-    id: a.id, grupo: 'actualizaciones', fondo: 'marca' as const, etiqueta: `Actualización · ${a.version}`,
-    titulo: a.titulo, texto: a.texto, fecha: a.fecha,
-    acciones: a.enlace ? [{ label: a.enlace.label, icono: 'enlace' as const, href: a.enlace.href }] : [],
-    duracionMs: Math.max(9000, duracionPorTexto(a.texto))
-  }));
-  if (actualizaciones.length) {
-    grupos.push({ id: 'actualizaciones', nombre: 'Actualizaciones', historias: actualizaciones });
   }
 
   // --- Un grupo por tema: cartel, clip, píldora de audio y vídeo podcast ---
@@ -289,6 +289,8 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   grupos.push({
     id: 'herramientas',
     nombre: 'Herramientas',
+    // Dopamina dibujada con RDKit sobre el degradado de la marca
+    portada: resolver('historias/herramientas-portada.jpg'),
     historias: [
       herramienta('reshiki', 'Dibujar estructuras con software libre',
         'En cuanto a dibujar estructuras, tenemos ReShiki, gratuito y de código abierto. Dibujamos la molécula y el programa nos devuelve su nombre químico y una predicción de su espectro de RMN. Lo instalamos en Windows, macOS o Linux, funciona sin conexión y exporta las figuras en SVG, PDF y PNG.',
@@ -783,7 +785,7 @@ export const HistoriasQfdos: React.FC<HistoriasQfdosProps> = ({ topics, resource
                   {!portada && <IconoGrupo id={gr.id} size={26} />}
                 </span>
               </span>
-              <span className="hist-etiqueta">{gr.nombre}</span>
+              <span className={`hist-etiqueta${gr.nombre.split(' ').some(p => p.length > 12) ? ' larga' : ''}`}>{gr.nombre}</span>
             </button>
           );
         })}
