@@ -77,7 +77,8 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       return {
         ...base,
         ...t,
-        status: 'Publicado' as const,
+        // «En Revisión» lo decide el profesorado y se respeta; cualquier otro estado vuelve a «Publicado»
+        status: t.status === 'En Revisión' ? 'En Revisión' as const : 'Publicado' as const,
         testDisponible: true,
         testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
         // Como en el resto de temas: si el código trae flashcards, mandan sobre las publicadas
@@ -88,12 +89,14 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
 
     // Tema 3: publicado con flashcards y test (3 modelos). El estado y los
     // enlaces oficiales los manda el codigo, para que una hoja remota antigua no
-    // lo devuelva a "Proximamente", no apague el test ni borre los PDF.
+    // lo devuelva a "Proximamente", no apague el test ni borre los PDF. Solo se
+    // respeta "En Revision", que oculta test y flashcards al alumnado.
     if (t.id === 'tema-03') {
       return {
         ...base,
         ...t,
-        status: 'Publicado' as const,
+        // «En Revisión» lo decide el profesorado y se respeta; cualquier otro estado vuelve a «Publicado»
+        status: t.status === 'En Revisión' ? 'En Revisión' as const : 'Publicado' as const,
         testDisponible: true,
         testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
         slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),

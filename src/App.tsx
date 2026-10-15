@@ -45,7 +45,8 @@ import { ExamGeneratorModal } from './components/ExamGeneratorModal';
 import { FirSimulatorModal } from './components/FirSimulatorModal';
 import { AdminCmsModal } from './components/AdminCmsModal';
 import { Model3DViewerModal } from './components/Model3DViewerModal';
-import { CartasDocenteModal } from './components/cartas';
+import { CartasDocenteModal, BARAJAS } from './components/cartas';
+import type { TemaCartas } from './components/cartas';
 import { LimiteDeError } from './components/LimiteDeError';
 import { AvisoGrabacionTests } from './components/AvisoGrabacionTests';
 import { hayModalAbierto } from './services/modalA11y';
@@ -286,16 +287,16 @@ export const App: React.FC = () => {
         localStorage.setItem('qfdos_v3_topics', JSON.stringify(normalized));
       }
     }
-    // Auto-heal Temas 2 y 3 para garantizar que el test esté habilitado con los 3 modelos oficiales y publicado
+    // Auto-heal Temas 2 y 3 para garantizar que el test esté habilitado con los 3 modelos oficiales.
+    // El estado (Publicado / En Revisión) no se toca: lo decide el profesorado.
     for (const idTema of ['tema-02', 'tema-03']) {
     const t2 = normalized.find(t => t.id === idTema);
     const base2 = INITIAL_TOPICS.find(t => t.id === idTema);
     if (t2 && base2) {
       let modified2 = false;
-      if (!t2.testQuestions || t2.testQuestions.length !== 15 || t2.testDisponible !== true || t2.status !== 'Publicado') {
+      if (!t2.testQuestions || t2.testQuestions.length !== 15 || t2.testDisponible !== true) {
         t2.testQuestions = base2.testQuestions;
         t2.testDisponible = true;
-        t2.status = 'Publicado';
         modified2 = true;
       }
       if (modified2) {
@@ -363,8 +364,12 @@ export const App: React.FC = () => {
   const [cmsInitialEditingTopicId, setCmsInitialEditingTopicId] = useState<string | undefined>(undefined);
   const [isDirect3DModalOpen, setIsDirect3DModalOpen] = useState(false);
   const [isCartasModalOpen, setIsCartasModalOpen] = useState(false);
-  const [cartasTema, setCartasTema] = useState<1 | 2 | 3>(1);
-  const abrirCartas = (tema: 1 | 2 | 3 = 1) => { setCartasTema(tema); setIsCartasModalOpen(true); };
+  const [cartasTema, setCartasTema] = useState<TemaCartas>(1);
+  const abrirCartas = (tema: TemaCartas = 1) => { setCartasTema(tema); setIsCartasModalOpen(true); };
+  // Barajas que ve el alumnado: las de temas publicados o en revisión, nunca las de «Próximamente»
+  const barajasVisibles = (Object.keys(BARAJAS).map(Number) as TemaCartas[]).filter(n =>
+    isProfesor || topics.find(t => t.id === `tema-${String(n).padStart(2, '0')}`)?.status !== 'Próximamente'
+  );
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
 
   const handleOpenAdmet = (drug: MoleculeDrug) => {
@@ -475,6 +480,8 @@ export const App: React.FC = () => {
         abrirCartas(2);
       } else if (raw === 'cartas-tema-03') {
         abrirCartas(3);
+      } else if (raw === 'cartas-tema-04') {
+        abrirCartas(4);
       } else {
         setIsCartasModalOpen(false);
       }
@@ -613,9 +620,9 @@ export const App: React.FC = () => {
               setSelectedTopicDetail(topic); 
               navigateTo('temas', topic.id); 
             }}
-            onOpenQuiz={t => { if (testHabilitado(t)) setSelectedQuizTopic(t); }}
-            onOpenFlashcards={t => { if (flashcardsHabilitadas(t)) setSelectedFlashcardsTopic(t); }}
-            onOpenCartas={(tema?: 1 | 2 | 3) => abrirCartas(tema ?? 1)}
+            onOpenQuiz={t => { if (testHabilitado(t, isProfesor)) setSelectedQuizTopic(t); }}
+            onOpenFlashcards={t => { if (flashcardsHabilitadas(t, isProfesor)) setSelectedFlashcardsTopic(t); }}
+            onOpenCartas={(tema?: TemaCartas) => abrirCartas(tema ?? 1)}
             onEditTopic={handleOpenAdminCmsForTopic}
             onOpenAdminCms={() => handleOpenAdminCmsForTopic()}
           />
@@ -661,8 +668,8 @@ export const App: React.FC = () => {
             setSelectedTopicDetail(updatedTopic);
           }}
           onEditTopicInCms={handleOpenAdminCmsForTopic}
-          onOpenQuiz={t => { if (!testHabilitado(t)) return; setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
-          onOpenFlashcards={t => { if (!flashcardsHabilitadas(t)) return; setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
+          onOpenQuiz={t => { if (!testHabilitado(t, isProfesor)) return; setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
+          onOpenFlashcards={t => { if (!flashcardsHabilitadas(t, isProfesor)) return; setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
           onOpenAdmet={handleOpenAdmet}
         />
@@ -754,7 +761,8 @@ export const App: React.FC = () => {
       {/* Baraja Coleccionable de Cartas: accesible a todos */}
       {isCartasModalOpen && (
         <CartasDocenteModal
-          temaInicial={cartasTema}
+          temaInicial={barajasVisibles.includes(cartasTema) ? cartasTema : barajasVisibles[0] ?? 1}
+          temasDisponibles={barajasVisibles}
           onClose={() => {
             setIsCartasModalOpen(false);
             if (window.location.hash.includes('cartas')) {

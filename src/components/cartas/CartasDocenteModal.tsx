@@ -9,12 +9,15 @@ interface CartasDocenteModalProps {
   onOpenAdmet?: (drug: MoleculeDrug) => void;
   /** Baraja con la que se abre el modal; se puede cambiar desde la cabecera. */
   temaInicial?: TemaCartas;
+  /** Barajas que se pueden elegir; por defecto, todas. */
+  temasDisponibles?: TemaCartas[];
 }
 
 export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
   onClose,
   onOpenAdmet,
-  temaInicial = 1
+  temaInicial = 1,
+  temasDisponibles
 }) => {
   const { isProfesor } = useAuth();
   const [tema, setTema] = useState<TemaCartas>(temaInicial);
@@ -110,7 +113,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {/* Selector de baraja por tema */}
             <div role="tablist" aria-label="Elegir baraja por tema" style={{ display: 'flex', gap: 4 }}>
-              {(Object.keys(BARAJAS).map(Number) as TemaCartas[]).map(t => (
+              {(temasDisponibles ?? (Object.keys(BARAJAS).map(Number) as TemaCartas[])).map(t => (
                 <button
                   key={t}
                   type="button"

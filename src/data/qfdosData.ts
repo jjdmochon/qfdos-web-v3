@@ -201,14 +201,25 @@ export interface QfdosTopic {
   flashcardsDisponibles?: boolean;
 }
 
+/**
+ * Un tema «En Revisión» se abre al alumnado solo con sus enlaces (apuntes,
+ * diapositivas, podcast, materiales) y su baraja de cartas: ni test, ni
+ * flashcards, ni las pestañas de trabajo. El profesorado lo sigue viendo todo.
+ */
+export function enRevisionParaAlumnado(t: QfdosTopic, esDocente = false): boolean {
+  return t.status === 'En Revisión' && !esDocente;
+}
+
 /** ¿Se puede abrir el test de este tema? */
-export function testHabilitado(t: QfdosTopic): boolean {
+export function testHabilitado(t: QfdosTopic, esDocente = false): boolean {
+  if (enRevisionParaAlumnado(t, esDocente)) return false;
   if (t.id === 'tema-01' || t.id === 'tema-02' || t.id === 'tema-03') return true;
   return t.testDisponible !== false && (t.testQuestions?.length ?? 0) > 0;
 }
 
 /** ¿Se pueden abrir las flashcards de este tema? */
-export function flashcardsHabilitadas(t: QfdosTopic): boolean {
+export function flashcardsHabilitadas(t: QfdosTopic, esDocente = false): boolean {
+  if (enRevisionParaAlumnado(t, esDocente)) return false;
   return t.flashcardsDisponibles !== false && (t.flashcards?.length ?? 0) > 0;
 }
 
@@ -503,6 +514,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.62.0 — Temas «En Revisión»: el alumnado solo ve los enlaces y la baraja de cartas (sin test, flashcards ni pestañas de trabajo). Baraja serotoninérgica del Tema 4 con 33 cartas y estado regulatorio.
  * v3.61.1 — Historias: «Actualizaciones de la plataforma» pasa a ser el primer círculo; portada química (dopamina) para Herramientas; mismas etiquetas para vistas y sin ver; en el móvil la fila desliza hasta el final (antes se cortaba en el Tema 02).
  * v3.61.0 — Historias: grupo «Actualizaciones» con los arreglos y mejoras de la plataforma (notas de los tests, cola de envíos, móvil y recarga automática); la franja verde del aviso lleva la fecha.
  * v3.60.2 — Aviso al entrar y en el tablón: el problema al grabar las notas de los tests está solucionado; recargar y, si no, escribir a juandiaz@go.ugr.es.
@@ -519,8 +531,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.61.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-16T01:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.62.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-16T02:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

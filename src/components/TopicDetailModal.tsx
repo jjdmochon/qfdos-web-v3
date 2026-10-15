@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { QfdosTopic, CourseAttachment, MoleculeDrug, testHabilitado, flashcardsHabilitadas } from '../data/qfdosData';
+import { QfdosTopic, CourseAttachment, MoleculeDrug, testHabilitado, flashcardsHabilitadas, enRevisionParaAlumnado } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { renderMoleculeSvg } from '../services/rdkitService';
 import { useAuth } from '../context/AuthContext';
@@ -249,6 +249,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     );
   }
 
+  // «En Revisión»: el alumnado ve los enlaces del tema y la baraja de cartas, nada más
+  const soloEnlacesYCartas = enRevisionParaAlumnado(topic, isProfesor);
+  const enRevision = topic.status === 'En Revisión';
+  const pestanaVisible = !soloEnlacesYCartas || activeTab === 'sar' || activeTab === 'cartas';
+
   /**
    * Abre el reproductor en la pestaña pedida. La píldora de audio y el vídeo
    * podcast de Spotify son materiales distintos: cada uno tiene su botón.
@@ -337,11 +342,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           <div className="tabs-container" style={{ margin: 0 }} role="tablist" aria-label="Secciones del tema">
             <button
               onClick={() => setActiveTab('sar')}
-              className={`tab-btn ${activeTab === 'sar' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'sar'}
+              className={`tab-btn ${activeTab === 'sar' || !pestanaVisible ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'sar' || !pestanaVisible}
             >
               <BookOpen size={14} /> Contenido & Guía Docente
             </button>
-            {topic.drugs && topic.drugs.length > 0 && (
+            {!soloEnlacesYCartas && topic.drugs && topic.drugs.length > 0 && (
               <button
                 onClick={() => setActiveTab('drugs')}
                 className={`tab-btn ${activeTab === 'drugs' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'drugs'}
@@ -349,7 +354,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 <Layers size={14} /> Fármacos & Quimioinformática ({drugSearchTerm.trim() ? `${filteredDrugs.length}/${topic.drugs.length}` : topic.drugs.length})
               </button>
             )}
-            {topic.id === 'tema-01' && (
+            {!soloEnlacesYCartas && topic.id === 'tema-01' && (
               <button
                 onClick={() => setActiveTab('retrosintesis')}
                 className={`tab-btn ${activeTab === 'retrosintesis' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'retrosintesis'}
@@ -395,8 +400,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         {/* Modal Body */}
         <div className="modal-body tab-panel-enter" key={activeTab} role="tabpanel" style={{ padding: '1.5rem 1.75rem' }}>
           
+          {soloEnlacesYCartas && (
+            <div className="status-msg status-msg--info" role="status" style={{ marginBottom: '1rem' }}>
+              Tema en revisión: de momento tienes los enlaces del tema y su baraja de cartas. El test y las flashcards se abrirán cuando se publique.
+            </div>
+          )}
+          {isProfesor && enRevision && (
+            <div className="status-msg status-msg--warn" role="status" style={{ marginBottom: '1rem' }}>
+              Tema en revisión: el alumnado solo ve los enlaces y las cartas. El test, las flashcards y las pestañas de fármacos y retrosíntesis le quedan ocultos.
+            </div>
+          )}
+
           {/* TAB 1: Contenido & Guía Docente */}
-          {activeTab === 'sar' && (
+          {(activeTab === 'sar' || !pestanaVisible) && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
               {/* Description */}
@@ -792,7 +808,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       )}
 
                       {/* 5. Examen Oficial del Tema (Modelo A en modo examen + Google Sheets) */}
-                      {topic.id !== 'tema-00' && testHabilitado(topic) && (
+                      {topic.id !== 'tema-00' && testHabilitado(topic, isProfesor) && (
                         <div className="qfdos-card card-amber resource-card is-active">
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -835,7 +851,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       )}
 
                       {/* 6. Flashcards Interactivas */}
-                      {topic.id !== 'tema-00' && flashcardsHabilitadas(topic) && (
+                      {topic.id !== 'tema-00' && flashcardsHabilitadas(topic, isProfesor) && (
                         <div className="qfdos-card card-teal resource-card is-active">
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -1401,7 +1417,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           )}
 
           {/* TAB 3: Fármacos Prototipo & SAR */}
-          {activeTab === 'drugs' && (
+          {activeTab === 'drugs' && pestanaVisible && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               
               {/* Barra de Búsqueda y Filtro de Fármacos dentro del Tema */}
@@ -1780,7 +1796,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           )}
 
           {/* TAB 4: Taller de Retrosíntesis & Desconexiones */}
-          {activeTab === 'retrosintesis' && (
+          {activeTab === 'retrosintesis' && pestanaVisible && (
             <RetrosintesisWorkshop isProfesor={isProfesor} />
           )}
 
@@ -1805,17 +1821,17 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           <div className="ficha-footer-acciones" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {topic.id !== 'tema-00' && (
               <>
-                {isProfesor && testHabilitado(topic) && (
+                {isProfesor && testHabilitado(topic, isProfesor) && (
                   <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
                     <HelpCircle size={14} /> {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
                   </button>
                 )}
-                {flashcardsHabilitadas(topic) && (
+                {flashcardsHabilitadas(topic, isProfesor) && (
                   <button onClick={() => onOpenFlashcards(topic)} className="btn btn-sm btn-secondary">
                     <Award size={14} /> Flashcards ({topic.flashcards?.length || 0})
                   </button>
                 )}
-                {topic.id === 'tema-01' && (
+                {topic.id === 'tema-01' && !soloEnlacesYCartas && (
                   <>
                     <button 
                       onClick={() => setActiveTab('retrosintesis')} 

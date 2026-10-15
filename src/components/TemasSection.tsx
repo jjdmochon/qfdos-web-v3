@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { QfdosTopic, testHabilitado, flashcardsHabilitadas, moleculaDeTarjeta } from '../data/qfdosData';
+import { QfdosTopic, testHabilitado, flashcardsHabilitadas, enRevisionParaAlumnado, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { MapaCursoTarjeta } from './MapaCursoTarjeta';
 import { useAuth } from '../context/AuthContext';
+import { BARAJAS, TemaCartas } from './cartas/CartasDeckView';
 import { 
   BookOpen, 
   Layers, 
@@ -28,7 +29,7 @@ interface TemasSectionProps {
   onSelectTopic: (topic: QfdosTopic, tab?: 'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas') => void;
   onOpenQuiz: (topic: QfdosTopic) => void;
   onOpenFlashcards: (topic: QfdosTopic) => void;
-  onOpenCartas?: (tema?: 1 | 2 | 3) => void;
+  onOpenCartas?: (tema?: TemaCartas) => void;
   onEditTopic?: (topicId: string) => void;
   onOpenAdminCms?: () => void;
 }
@@ -172,6 +173,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
           // por venir, pero sin acceso: el profesorado si entra, para prepararlo.
           const esProximamente = topic.status === 'Próximamente';
           const bloqueado = esProximamente && !isProfesor;
+          // En revisión el alumnado entra al tema, pero sin test ni flashcards
+          const test = testHabilitado(topic, isProfesor);
+          const flashcards = flashcardsHabilitadas(topic, isProfesor);
+          const nBaraja = Number(topic.id.replace('tema-', ''));
+          const baraja = nBaraja in BARAJAS ? BARAJAS[nBaraja as TemaCartas] : undefined;
 
           return (
             <div
@@ -222,7 +228,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       </a>
                     )}
                     <span
-                      className={`qfdos-badge ${esProximamente ? 'badge-muted' : 'badge-emerald'}`}
+                      className={`qfdos-badge ${esProximamente ? 'badge-muted' : topic.status === 'En Revisión' ? 'badge-amber' : 'badge-emerald'}`}
                       style={{ fontSize: '0.68rem' }}
                     >
                       {esProximamente && <Lock size={10} style={{ marginRight: 3 }} />}
@@ -316,7 +322,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       )}
                     </>
                   )}
-                  {topic.id === 'tema-02' && (
+                  {topic.id === 'tema-02' && test && (
                     <span 
                       style={{ 
                         fontSize: '0.66rem', 
@@ -417,7 +423,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     {bloqueado ? <><Lock size={12} /> No disponible</> : <>Guía & Materiales <ArrowRight size={12} /></>}
                   </button>
 
-                  {topic.id === 'tema-01' && (
+                  {topic.id === 'tema-01' && !enRevisionParaAlumnado(topic, isProfesor) && (
                     <button
                       onClick={() => onSelectTopic(topic, 'retrosintesis')}
                       className="btn btn-sm btn-outline"
@@ -429,8 +435,8 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   )}
                 </div>
 
-                {topic.id !== 'tema-00' && !isGeneral && !bloqueado && !testHabilitado(topic) && !flashcardsHabilitadas(topic) &&
-                  (topic.testDisponible === false || topic.flashcardsDisponibles === false) && (
+                {topic.id !== 'tema-00' && !isGeneral && !bloqueado && !test && !flashcards &&
+                  (topic.testDisponible === false || topic.flashcardsDisponibles === false || topic.status === 'En Revisión') && (
                   <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0 }}>
                     Test y flashcards: disponibles próximamente.
                   </p>
@@ -460,9 +466,9 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                 )}
                 {/* Fila 2: Herramientas de Estudio (Test y Flashcards) */}
-                {topic.id !== 'tema-00' && !bloqueado && (testHabilitado(topic) || flashcardsHabilitadas(topic)) && (
+                {topic.id !== 'tema-00' && !bloqueado && (test || flashcards) && (
                   <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                    {testHabilitado(topic) && (
+                    {test && (
                       <button
                         onClick={() => onOpenQuiz(topic)}
                         disabled={bloqueado}
@@ -484,7 +490,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       </button>
                     )}
 
-                    {flashcardsHabilitadas(topic) && (
+                    {flashcards && (
                       <button
                         onClick={() => onOpenFlashcards(topic)}
                         disabled={bloqueado}
@@ -508,11 +514,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                 )}
 
-                {/* Fila 3: Baraja Coleccionable (Temas 01, 02 y 03) */}
-                {(topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03') && onOpenCartas && (
+                {/* Fila 3: Baraja Coleccionable (temas con baraja; también en revisión) */}
+                {baraja && !bloqueado && onOpenCartas && (
                   <div style={{ display: 'flex', gap: '6px', width: '100%', marginTop: '2px' }}>
                     <button
-                      onClick={() => onOpenCartas(topic.id === 'tema-03' ? 3 : topic.id === 'tema-02' ? 2 : 1)}
+                      onClick={() => onOpenCartas(nBaraja as TemaCartas)}
                       className="btn btn-sm"
                       style={{ 
                         flex: 1, 
@@ -530,11 +536,11 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         gap: '6px',
                         whiteSpace: 'nowrap'
                       }}
-                      title={topic.id === 'tema-03' ? 'Baraja Coleccionable de Fármacos Dopaminérgicos · 27 cartas' : topic.id === 'tema-02' ? 'Baraja Coleccionable de Fármacos Adrenérgicos · 25 cartas' : 'Baraja Coleccionable de Fármacos Colinérgicos · 20 cartas'}
+                      title={`Baraja Coleccionable de Fármacos ${baraja.familia} · ${baraja.farmacos.length} cartas`}
                     >
                       <Layers size={13} color="var(--teal)" /> Cartas Fármacos
                       <span className="qfdos-badge badge-mint" style={{ fontSize: '0.58rem', padding: '1px 5px', fontWeight: 800 }}>
-                        {topic.id === 'tema-03' ? 27 : topic.id === 'tema-02' ? 25 : 20} Cartas
+                        {baraja.farmacos.length} Cartas
                       </span>
                     </button>
                   </div>
