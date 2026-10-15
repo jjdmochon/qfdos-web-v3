@@ -290,6 +290,10 @@
 .hist-seccion { margin-bottom: 1.75rem; }
 /* Historias en la cabecera del Hub, entre el menú y la portada */
 .hist-portada { padding-top: 1rem; padding-bottom: 0.25rem; }
+/* Es hijo de la columna flex de App con margin auto: sin ancho explícito tomaba
+   como mínimo la suma de los círculos (671 px en un móvil de 412) y la fila no
+   deslizaba; la página recortaba lo que pasaba de Tema 02 */
+.hist-portada { width: 100%; min-width: 0; box-sizing: border-box; }
 .hist-portada .hist-seccion { margin-bottom: 1rem; }
 .hist-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .hist-cabecera h3 { display: flex; align-items: center; gap: 7px; font-size: 1.05rem; font-weight: 600; color: var(--text-title); margin: 0; }
@@ -347,10 +351,12 @@
 }
 .hist-foto { background-color: var(--navy-dark); }
 .hist-foto.recursos { background-color: #fff; background-size: contain; background-repeat: no-repeat; }
-.hist-foto.herramientas { background: linear-gradient(150deg, var(--navy) 0%, var(--teal) 100%); }
+.hist-foto.herramientas { background-color: var(--navy-dark); }
 .hist-foto.actualizaciones { background: linear-gradient(150deg, var(--teal) 0%, var(--navy) 100%); }
-.hist-etiqueta { font-size: 0.74rem; font-weight: 600; color: var(--text-main); max-width: 88px; text-align: center; line-height: 1.2; }
-.hist-circulo.vista .hist-etiqueta { color: var(--text-muted); font-weight: 500; }
+/* Mismo peso y color en todas: lo que queda por ver ya lo marca el anillo de color */
+.hist-etiqueta { font-size: 0.74rem; font-weight: 500; color: var(--text-main); max-width: 92px; text-align: center; line-height: 1.2; }
+/* «Actualizaciones» no cabe en 92 px y se partía por la mitad de la palabra */
+.hist-etiqueta.larga { max-width: 118px; }
 
 /* Banda rotatoria */
 /* Altura fija: la banda mide lo mismo sea cual sea la historia (imagen, vídeo o solo texto) */
