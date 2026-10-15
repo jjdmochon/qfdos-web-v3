@@ -22,11 +22,19 @@
  *
  * Despliegue
  * ----------
- * Implementar > Nueva implementación > Aplicación web
+ * Este script va vinculado a la hoja de calificaciones (Extensiones → Apps
+ * Script desde la propia hoja). No se crea otro proyecto: se sustituye el
+ * código del que ya existe, que conserva sus propiedades.
+ *
+ * Primera vez: Implementar > Nueva implementación > Aplicación web
  *   Ejecutar como:      Yo
  *   Quién tiene acceso: Cualquier usuario
- * Guardar no basta: hay que crear una implementación nueva para que el cambio
- * salga a la URL /exec.
+ *
+ * Al cambiar el código: Implementar > Gestionar implementaciones > ✏️ Editar
+ *   > Versión: «Nueva versión» > Implementar. Así la URL /exec no cambia.
+ *   Una «Nueva implementación» genera OTRA URL, y la web (que lleva la URL
+ *   fija en googleSheetsService.ts) seguiría enviando a la antigua.
+ * Guardar no basta: sin versión nueva, /exec sigue sirviendo el código viejo.
  */
 
 var NOMBRE_HOJA = 'Respuestas_QFDOS';
@@ -46,8 +54,15 @@ var CABECERAS = [
   'Evaluador',
   'Detalle de Respuestas',
   'Cuenta verificada',
-  'Corrección'
+  'Corrección',
+  'Id intento',
+  'Respuestas'
 ];
+
+// Posición (desde 0) de las columnas que se consultan por número
+var COL_CORRECCION = 14;
+var COL_ID_INTENTO = 15;
+var COL_RESPUESTAS = 16;
 
 /* ------------------------------------------------------------------ */
 /* Sesión (misma lógica y mismo secreto que en Codigo.gs)              */
@@ -103,7 +118,7 @@ function hoja_() {
       .setFontColor('#ffffff');
     sheet.setFrozenRows(1);
   } else if (sheet.getLastColumn() < CABECERAS.length) {
-    // Hojas creadas antes de añadir «Cuenta verificada»
+    // Hojas creadas antes de añadir «Cuenta verificada», «Id intento» o «Respuestas»
     sheet.getRange(1, 1, 1, CABECERAS.length).setValues([CABECERAS]).setFontWeight('bold');
   }
   return sheet;
@@ -154,7 +169,10 @@ function misCalificaciones_(email) {
       totalQuestions: Number(f[9]) || 0,
       evaluationMode: String(f[10] || ''),
       evaluator: String(f[11] || ''),
-      answersDetail: detalle
+      answersDetail: detalle,
+      // Con esto el navegador sabe que su intento en cola ya consta
+      idIntento: String(f[COL_ID_INTENTO] || ''),
+      verificacionPendiente: /^pendiente/.test(String(f[COL_CORRECCION] || ''))
     });
   }
 
@@ -177,7 +195,7 @@ function doGet(e) {
     if (sp.r !== 'profesor') return json_({ ok: false, error: 'Sólo el profesorado.' });
     return json_(estadoClaves_());
   }
-  return json_({ ok: true, servicio: 'QFDOS · Calificaciones', version: 2, acciones: ['misCalificaciones', 'estadoClaves', 'publicar_claves', 'record_quiz_attempt'] });
+  return json_({ ok: true, servicio: 'QFDOS · Calificaciones', version: 3, acciones: ['misCalificaciones', 'estadoClaves', 'publicar_claves', 'record_quiz_attempt'] });
 }
 
 /**
@@ -216,10 +234,19 @@ function modoPermitido_(pedido, esProfesor) {
  * falsificar la nota sin haber respondido, no sabérsela de antemano.
  *
  * Despliegue gradual con la propiedad EXIGIR_CORRECCION_SERVIDOR:
- *   ausente / distinta de '1' → si el intento no se puede corregir (clave
- *     sin publicar, navegador antiguo) se acepta como antes y la columna
- *     «Corrección» dice «cliente (sin verificar)».
+ *   ausente / distinta de '1' → si el intento no se puede corregir (navegador
+ *     antiguo) se acepta como antes y la columna «Corrección» dice
+ *     «cliente (sin verificar)».
  *   '1' → el alumnado solo puede registrar intentos corregidos aquí.
+ *
+ * Claves sin publicar
+ * -------------------
+ * Antes, con la corrección obligatoria, un test cuyas claves aún no estaban
+ * publicadas se rechazaba y la nota se perdía: el alumno la veía en su
+ * navegador y, al sincronizar el historial, desaparecía. Ahora el intento se
+ * anota como «pendiente (faltan claves)» con sus respuestas (columna
+ * «Respuestas») y se recorrige solo al publicar las claves. Hasta entonces la
+ * nota que figura es la del navegador, marcada como pendiente.
  */
 var HOJA_CLAVES = '_Claves';
 var MAX_CLAVES = 5000;
@@ -260,8 +287,93 @@ function estadoClaves_() {
     var v = hoja.getRange(2, 3).getValue();
     cuando = (v instanceof Date) ? v.toISOString() : String(v || '');
   }
-  return { ok: true, claves: n, actualizadoEn: cuando, exigir: exigirCorreccion_() };
+  return { ok: true, claves: n, actualizadoEn: cuando, exigir: exigirCorreccion_(), pendientes: contarPendientes_() };
 }
+
+/** Intentos anotados a la espera de que se publiquen sus claves. */
+function contarPendientes_() {
+  var sheet = hoja_();
+  var ultima = sheet.getLastRow();
+  if (ultima < 2) return 0;
+  var n = 0;
+  sheet.getRange(2, COL_CORRECCION + 1, ultima - 1, 1).getValues().forEach(function (f) {
+    if (/^pendiente/.test(String(f[0] || ''))) n++;
+  });
+  return n;
+}
+
+/**
+ * Corrige los intentos «pendiente» con las claves recién publicadas. Los que
+ * siguen sin poder corregirse (pregunta que no está en las claves) se quedan
+ * como estaban. Se llama con el cerrojo ya tomado.
+ */
+function recorregirPendientes_() {
+  var sheet = hoja_();
+  var ultima = sheet.getLastRow();
+  if (ultima < 2) return { recorregidos: 0, pendientes: 0 };
+  var filas = sheet.getRange(2, 1, ultima - 1, CABECERAS.length).getValues();
+  var claves = leerClaves_();
+  var hechos = 0;
+  var quedan = 0;
+  for (var i = 0; i < filas.length; i++) {
+    var f = filas[i];
+    if (!/^pendiente/.test(String(f[COL_CORRECCION] || ''))) continue;
+    var respuestas = null;
+    try { respuestas = JSON.parse(f[COL_RESPUESTAS] || 'null'); } catch (err) { respuestas = null; }
+    var c = corregir_(respuestas, claves);
+    if (!c.ok) { quedan++; continue; }
+    var nota = Number((c.aciertos / c.total * 10).toFixed(1));
+    var detalle = [];
+    try { detalle = JSON.parse(f[12] || '[]'); } catch (err) { detalle = []; }
+    if (Array.isArray(detalle) && detalle.length === c.aciertosPorPregunta.length) {
+      detalle = detalle.map(function (d, j) {
+        var copia = (d && typeof d === 'object') ? d : {};
+        copia.isCorrect = c.aciertosPorPregunta[j];
+        return copia;
+      });
+    }
+    var fila = i + 2;
+    var navegador = f[7];
+    sheet.getRange(fila, 8, 1, 3).setValues([[nota, c.aciertos, c.total]]);
+    sheet.getRange(fila, 13).setValue(textoSeguro_(JSON.stringify(detalle)));
+    sheet.getRange(fila, COL_CORRECCION + 1).setValue(
+      'servidor (recorregido' + (Number(navegador) !== nota ? '; el navegador decía ' + navegador : '') + ')'
+    );
+    hechos++;
+  }
+  return { recorregidos: hechos, pendientes: quedan };
+}
+
+/** Fila (desde 2) donde ya consta este intento, o 0. Evita duplicar al reenviar. */
+function filaDeIntento_(sheet, idIntento) {
+  if (!idIntento) return 0;
+  var ultima = sheet.getLastRow();
+  if (ultima < 2) return 0;
+  var celda = sheet.getRange(2, COL_ID_INTENTO + 1, ultima - 1, 1)
+    .createTextFinder(idIntento).matchEntireCell(true).findNext();
+  return celda ? celda.getRow() : 0;
+}
+
+/** [{ id, opcion }] tal y como se guarda en «Respuestas», o '' si no vale. */
+function respuestasParaGuardar_(respuestas) {
+  if (!Array.isArray(respuestas) || !respuestas.length || respuestas.length > MAX_PREGUNTAS_INTENTO) return '';
+  return JSON.stringify(respuestas.map(function (r) {
+    r = r || {};
+    return { id: String(r.id === undefined || r.id === null ? '' : r.id).slice(0, 80), opcion: Number(r.opcion) };
+  }));
+}
+
+/**
+ * Cerrojo sin excepción: con toda la clase entregando a la vez, waitLock
+ * lanzaba «Lock timeout» y Apps Script devolvía una página de error en lugar
+ * de JSON; el navegador no sabía si la nota había entrado.
+ */
+function tomarCerrojo_() {
+  var lock = LockService.getScriptLock();
+  return lock.tryLock(25000) ? lock : null;
+}
+
+var OCUPADO = { ok: false, status: 'error', codigo: 'ocupado', error: 'El servidor está ocupado. Se reintentará en unos segundos.' };
 
 /** Sustituye todas las claves. Solo profesorado. */
 function publicarClaves_(s, data) {
@@ -283,13 +395,18 @@ function publicarClaves_(s, data) {
     }
     filas.push([ids[i], idx, ahora]);
   }
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  var lock = tomarCerrojo_();
+  if (!lock) return json_(OCUPADO);
   try {
     var hoja = hojaClaves_();
     if (hoja.getLastRow() > 1) hoja.getRange(2, 1, hoja.getLastRow() - 1, 3).clearContent();
     hoja.getRange(2, 1, filas.length, 3).setValues(filas);
-    return json_({ ok: true, claves: filas.length, actualizadoEn: ahora.toISOString() });
+    SpreadsheetApp.flush();
+    var r = recorregirPendientes_();
+    return json_({
+      ok: true, claves: filas.length, actualizadoEn: ahora.toISOString(),
+      recorregidos: r.recorregidos, pendientes: r.pendientes
+    });
   } finally {
     lock.releaseLock();
   }
@@ -300,10 +417,10 @@ function publicarClaves_(s, data) {
  *   { ok: true, aciertos, total, aciertosPorPregunta: [bool] }
  * o { ok: false, motivo: 'sin_respuestas' | 'respuestas_no_validas' | 'clave_desconocida' }.
  */
-function corregir_(respuestas) {
+function corregir_(respuestas, clavesYaLeidas) {
   if (!Array.isArray(respuestas) || !respuestas.length) return { ok: false, motivo: 'sin_respuestas' };
   if (respuestas.length > MAX_PREGUNTAS_INTENTO) return { ok: false, motivo: 'respuestas_no_validas' };
-  var claves = leerClaves_();
+  var claves = clavesYaLeidas || leerClaves_();
   var vistos = {};
   var aciertos = 0;
   var porPregunta = [];
@@ -325,8 +442,7 @@ function corregir_(respuestas) {
 
 var MENSAJES_CORRECCION = {
   sin_respuestas: 'Este intento no se puede corregir en el servidor. Recarga la página (Ctrl+F5) e inténtalo de nuevo.',
-  respuestas_no_validas: 'Las respuestas enviadas no son válidas. Recarga la página (Ctrl+F5) e inténtalo de nuevo.',
-  clave_desconocida: 'El profesorado todavía no ha publicado las claves de corrección de este test.'
+  respuestas_no_validas: 'Las respuestas enviadas no son válidas. Recarga la página (Ctrl+F5) e inténtalo de nuevo.'
 };
 
 function doPost(e) {
@@ -354,6 +470,7 @@ function doPost(e) {
   var total = Number(data.totalQuestions);
   var detalle = data.answersDetail || [];
   var correccion = '';
+  var idIntento = /^[\w.:\-]{1,80}$/.test(String(data.idIntento || '')) ? String(data.idIntento) : '';
 
   // Test (no autoevaluación de flashcards): la nota es la que sale de corregir aquí
   if (modo !== 'flashcards_autoevaluacion') {
@@ -373,11 +490,14 @@ function doPost(e) {
           return copia;
         });
       }
+    } else if (c.motivo === 'clave_desconocida') {
+      // Se anota y se recorrige al publicar las claves (ver recorregirPendientes_)
+      correccion = 'pendiente (faltan claves)';
     } else if (!esProfesor && exigirCorreccion_()) {
       return json_({
         ok: false,
         status: 'error',
-        codigo: c.motivo === 'clave_desconocida' ? 'claves_no_publicadas' : 'correccion_no_verificable',
+        codigo: 'correccion_no_verificable',
         error: MENSAJES_CORRECCION[c.motivo]
       });
     } else {
@@ -389,11 +509,23 @@ function doPost(e) {
     return json_({ ok: false, status: 'error', error: 'Calificación fuera de rango.' });
   }
 
-  var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  var lock = tomarCerrojo_();
+  if (!lock) return json_(OCUPADO);
 
   try {
     var sheet = hoja_();
+
+    // Reenvío de un intento que ya entró (respuesta perdida, cola del navegador)
+    var yaEsta = filaDeIntento_(sheet, idIntento);
+    if (yaEsta) {
+      var previa = sheet.getRange(yaEsta, 1, 1, CABECERAS.length).getValues()[0];
+      return json_({
+        ok: true, status: 'success', fila: yaEsta, duplicado: true,
+        correccion: String(previa[COL_CORRECCION] || ''),
+        score: Number(previa[7]) || 0, correctCount: Number(previa[8]) || 0, totalQuestions: Number(previa[9]) || 0
+      });
+    }
+
     sheet.appendRow([
       textoSeguro_(data.timestamp || new Date().toLocaleString('es-ES')),
       textoSeguro_(data.studentName || 'Anónimo'),
@@ -409,7 +541,9 @@ function doPost(e) {
       textoSeguro_(esProfesor ? (data.evaluator || '') : ''),
       textoSeguro_(JSON.stringify(detalle)),
       s.e,
-      correccion
+      correccion,
+      idIntento,
+      modo !== 'flashcards_autoevaluacion' ? respuestasParaGuardar_(data.respuestas) : ''
     ]);
 
     return json_({

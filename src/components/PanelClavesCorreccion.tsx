@@ -27,7 +27,12 @@ export const PanelClavesCorreccion: React.FC<{ topics: QfdosTopic[] }> = ({ topi
     setAviso('');
     const r = await publicarClaves(claves);
     if (r.ok) {
-      setAviso(`Publicadas ${r.datos} claves.`);
+      const { claves: n, recorregidos, pendientes } = r.datos;
+      setAviso(
+        `Publicadas ${n} claves.` +
+        (recorregidos ? ` Recorregidos ${recorregidos} intentos que esperaban sus claves.` : '') +
+        (pendientes ? ` ${pendientes} siguen pendientes (preguntas que ya no existen en la web).` : '')
+      );
       setError('');
       await cargar();
     } else {
@@ -53,14 +58,34 @@ export const PanelClavesCorreccion: React.FC<{ topics: QfdosTopic[] }> = ({ topi
         La nota que consta en la hoja la calcula el servidor con las respuestas marcadas, no la que envía el
         navegador. Publica las claves para activarlo y repítelo cuando añadas o cambies una pregunta.
         {estado?.exigir
-          ? ' Ahora mismo es obligatoria: un test sin claves publicadas no se puede registrar.'
+          ? ' Ahora mismo es obligatoria: el servidor solo acepta intentos que puede corregir.'
           : ' Mientras no sea obligatoria (propiedad EXIGIR_CORRECCION_SERVIDOR = 1), un intento que el servidor no pueda corregir se acepta y queda marcado como «cliente (sin verificar)».'}
+        {' Un test cuyas claves aún no están publicadas se anota como «pendiente» y se recorrige solo al publicarlas.'}
       </p>
       <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
         {estado
           ? <>En el servidor: <strong>{estado.claves}</strong> claves{cuando ? ` (publicadas el ${cuando})` : ''}. En la web: <strong>{enWeb}</strong> preguntas.</>
           : <>En la web: <strong>{enWeb}</strong> preguntas.</>}
       </div>
+      {estado?.pendientes === null && (
+        <div className="entrega-aviso entrega-aviso--warn">
+          <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+          <span>
+            El script de Calificaciones es una versión anterior: con la corrección obligatoria, los tests sin claves se
+            rechazan y no se recorrigen. Actualiza <code>Calificaciones.gs</code> en su proyecto y publícalo en Gestionar
+            implementaciones → Editar → Nueva versión (no como implementación nueva: cambiaría la URL).
+          </span>
+        </div>
+      )}
+      {!!estado?.pendientes && (
+        <div className="entrega-aviso entrega-aviso--warn">
+          <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+          <span>
+            {estado.pendientes} intento(s) anotados con la nota del navegador esperan sus claves. Publícalas y se
+            recorrigen solos.
+          </span>
+        </div>
+      )}
       {desactualizadas && (
         <div className="entrega-aviso entrega-aviso--warn">
           <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />

@@ -108,6 +108,12 @@ export interface QuizAttempt {
   totalQuestions: number;
   timestamp: string;
   answersDetail?: QuizAnswerDetail[];
+  /** Id del intento en el navegador, tal y como consta en la hoja («Id intento») */
+  idIntento?: string;
+  /** En la hoja, anotado sin claves publicadas: la nota aún no la ha verificado el servidor */
+  verificacionPendiente?: boolean;
+  /** Solo en este navegador: en cola para enviarse a la hoja */
+  pendienteRegistro?: boolean;
 }
 
 export type QuizRegistrationRecord = QuizAttempt;
@@ -497,6 +503,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.60.1 — Tests: ninguna nota se pierde. Sin claves publicadas el intento se anota como pendiente y se recorrige al publicarlas; los envíos fallidos quedan en cola y se reenvían solos sin duplicarse; el servidor ya no devuelve error con toda la clase entregando a la vez.
  * v3.60.0 — Tema 4: los 71 compuestos (QFDOS-170 a 240) en Fármacos & Quimioinformática, con fórmula, descriptores RDKit y notas docentes; la tarjeta del tema dibuja el sumatriptán.
  * v3.59.0 — Tema 4: estructuras QFDOS-170 a 240 (Excel, propiedades, maestro y generador) como adjuntos solo para el profesorado.
  * v3.58.2 — Móvil: reverso de cartas y flashcards sin efecto espejo en iPad, flechas y deslizamiento lateral en las Historias y sin autoajuste de texto en Android.
@@ -509,7 +516,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.60.0';
+export const COURSE_DATA_VERSION = '3.60.1';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-16T01:00:00.000Z';
 
 export const QFDOS_INFO = {

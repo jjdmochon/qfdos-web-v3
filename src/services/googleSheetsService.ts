@@ -60,7 +60,22 @@ export interface GoogleSheetsSubmissionResult {
   status: 'sent' | 'sent_unconfirmed' | 'no_url' | 'network_error' | 'sesion_invalida' | 'rechazado';
   /** Lo que el servidor anotó tras corregir; puede diferir de lo que calculó el navegador */
   correccionServidor?: { score: number; correctCount: number; totalQuestions: number };
+  /** Anotado sin claves publicadas: el servidor lo recorrige al publicarlas */
+  verificacionPendiente?: boolean;
+  /** Código de rechazo del servidor (p. ej. «correccion_no_verificable») */
+  codigo?: string;
 }
+
+/** AbortSignal.timeout no existe en Safari < 16: sin él, fetch ni salía. */
+function senalConLimite(ms: number): AbortSignal | undefined {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+  if (typeof AbortController === 'undefined') return undefined;
+  const c = new AbortController();
+  setTimeout(() => c.abort(), ms);
+  return c.signal;
+}
+
+const esperar = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 
 /**
  * Envía el registro del intento a Google Sheets vía POST (`text/plain`, sin
@@ -95,6 +110,8 @@ export async function submitAttemptToGoogleSheets(
     // El servidor toma de aquí el correo y el rol; studentEmail sólo cuenta
     // cuando quien envía es profesor
     sesion: tokenSesion(),
+    // Identifica el intento: reenviarlo (cola, respuesta perdida) no duplica la fila
+    idIntento: attempt.id,
     timestamp: attempt.timestamp,
     studentName: attempt.studentName,
     studentEmail: attempt.studentEmail,
@@ -128,35 +145,54 @@ export async function submitAttemptToGoogleSheets(
     // respuesta se puede leer. Si aun así el navegador la bloquea, la petición
     // YA ha llegado: no se reintenta (duplicaría la nota) y se relee abajo.
     let cuerpo: any = null;
-    try {
-      const resp = await fetch(url, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(20000)
-      });
-      cuerpo = await resp.json().catch(() => null);
-    } catch {
-      cuerpo = null;
+    // «ocupado»: el servidor no escribió nada (toda la clase entregando a la
+    // vez), así que repetir es seguro
+    for (let intento = 0; intento < 3; intento++) {
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          signal: senalConLimite(30000)
+        });
+        cuerpo = await resp.json().catch(() => null);
+      } catch {
+        cuerpo = null;
+      }
+      if (cuerpo?.codigo !== 'ocupado') break;
+      await esperar(2000 + Math.random() * 4000);
     }
 
     if (cuerpo?.ok) {
       const corregido = typeof cuerpo.score === 'number' && typeof cuerpo.correctCount === 'number' && typeof cuerpo.totalQuestions === 'number'
         ? { score: cuerpo.score, correctCount: cuerpo.correctCount, totalQuestions: cuerpo.totalQuestions }
         : undefined;
+      const pendiente = typeof cuerpo.correccion === 'string' && cuerpo.correccion.startsWith('pendiente');
       return {
         success: true,
         status: 'sent',
         message: `Calificación registrada en la hoja oficial${cuerpo.fila ? ` (fila ${cuerpo.fila})` : ''}.`,
-        correccionServidor: corregido
+        correccionServidor: pendiente ? undefined : corregido,
+        verificacionPendiente: pendiente
+      };
+    }
+    if (cuerpo?.codigo === 'ocupado') {
+      return {
+        success: false,
+        status: 'network_error',
+        codigo: 'ocupado',
+        message: 'El servidor está saturado. El intento queda en cola y se enviará solo en unos minutos.'
       };
     }
     if (cuerpo?.codigo === 'claves_no_publicadas' || cuerpo?.codigo === 'correccion_no_verificable') {
       return {
         success: false,
         status: 'rechazado',
-        message: `${cuerpo.error} El intento queda guardado en este navegador.`
+        codigo: cuerpo.codigo,
+        message: cuerpo.codigo === 'claves_no_publicadas'
+          ? `${cuerpo.error} El intento queda en cola y se enviará solo cuando estén publicadas.`
+          : `${cuerpo.error}`
       };
     }
     if (esSesionInvalida(cuerpo)) {
@@ -190,6 +226,7 @@ export async function submitAttemptToGoogleSheets(
 
     const tAttempt = parseMinutos(attempt.timestamp);
     const consta = registrados?.some(r => {
+      if (r.idIntento && r.idIntento === attempt.id) return true;
       if (r.topicId !== attempt.topicId) return false;
       if (r.timestamp === attempt.timestamp) return true;
       const tR = parseMinutos(r.timestamp);
@@ -340,6 +377,8 @@ interface FilaCalificacion {
   evaluationMode?: string;
   evaluator?: string;
   answersDetail?: unknown;
+  idIntento?: string;
+  verificacionPendiente?: boolean;
 }
 
 const enVuelo = new Map<string, Promise<QuizRegistrationRecord[] | null>>();
@@ -395,6 +434,8 @@ export async function misCalificaciones(email: string): Promise<QuizRegistration
         correctCount: Number(f.correctCount) || 0,
         totalQuestions: Number(f.totalQuestions) || 0,
         timestamp: f.timestamp || '',
+        idIntento: f.idIntento || undefined,
+        verificacionPendiente: f.verificacionPendiente === true || undefined,
         // El desglose pregunta a pregunta queda reservado al profesorado, así
         // que no se reconstruye aquí aunque la hoja lo guarde.
         answersDetail: []
