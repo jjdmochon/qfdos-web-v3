@@ -1,0 +1,549 @@
+{
+ "PLAZTCDQAHEYBI-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL47047",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "YBOZRPPSBVIHGJ-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1865386",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "ZYHQGITXIJDDKC-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL2131675",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "ZSMRRZONCYIFNB-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL63054",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "NYYRRBOMNHUCLB-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL449411",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "BCGWQEUPMDMJNV-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL11",
+    "IMIPRAMINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "ZPEIMTDSQAKGNT-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL71",
+    "CHLORPROMAZINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "HCYAFALTSJYZDH-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL72",
+    "DESIPRAMINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "YNZFUWZUGRBMHL-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL370753",
+    "OPIPRAMOL"
+   ]
+  ],
+  "conectividad": []
+ },
+ "KRMDCWKBEZIMAB-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL629",
+    "AMITRIPTYLINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "QRXWMOHMRWLFEY-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL64",
+    "ISONIAZID"
+   ]
+  ],
+  "conectividad": []
+ },
+ "NYMGNSNKLVNMIA-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL92401",
+    "IPRONIAZID"
+   ]
+  ],
+  "conectividad": []
+ },
+ "DPWPWRLQFGFJFI-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL673",
+    "PARGYLINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "BTFHLQRNAMSNLC-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL8706",
+    "CLORGILINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "YHXISWVBGDMDLQ-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL86304",
+    "MOCLOBEMIDE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "DZGWFCGJZKJUFP-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL11608",
+    "TYRAMINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "QIVBCDIJIAJPQS-VIFPVBQESA-N": {
+  "exacto": [
+   [
+    "CHEMBL54976",
+    "TRYPTOPHAN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "LDCYZAJDBXYCGN-VIFPVBQESA-N": {
+  "exacto": [
+   [
+    "CHEMBL350221",
+    "OXITRIPTAN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "QZAYGJVTTNCVMB-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL39",
+    "SEROTONIN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "DUUGKQCEGZLZNO-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL395915",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "MVAWJSIDNICKHF-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL33103",
+    "ACETYLSEROTONIN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "DRLFMBDRBRZALE-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL45",
+    "MELATONIN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "RTHCYVBBDHJXIQ-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL41",
+    "FLUOXETINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "WSEQXVZVJXJVFP-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL549",
+    "CITALOPRAM"
+   ]
+  ],
+  "conectividad": []
+ },
+ "WSEQXVZVJXJVFP-FQEVSTJZSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1508",
+    "ESCITALOPRAM"
+   ]
+  ],
+  "conectividad": []
+ },
+ "VGKDLMBJGBXTGI-SJCJKPOMSA-N": {
+  "exacto": [
+   [
+    "CHEMBL809",
+    "SERTRALINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "RHGUXDUPXYFCTE-ZWNOBZJWSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "VAYOSLLFUXYJDT-RDTXWAMCSA-N": {
+  "exacto": [
+   [
+    "CHEMBL263881",
+    "LYSERGIDE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "KPJZHOPZRAFDTN-ZRGWGRIASA-N": {
+  "exacto": [
+   [
+    "CHEMBL1065",
+    "METHYSERGIDE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "WKZLNEWVIAGNAW-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL18840",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "AWBUKJZJLOHYFJ-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "MURZXKIEJFJMPP-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "KQKPFRSPSRPDEB-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL128",
+    "SUMATRIPTAN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "ULSDMUVEXKOYBU-ZDUSSCGKSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1185",
+    "ZOLMITRIPTAN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "WKEMJKQOLOHJLZ-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1505",
+    "ALMOTRIPTAN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "XEDHVZKDSYZQBF-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL3039520",
+    "LASMIDITAN"
+   ]
+  ],
+  "conectividad": []
+ },
+ "HKOOXMFOFWEVGF-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL456807",
+    "PHENYLHYDRAZINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "CIWNHTXCBHTWRV-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "DZODFXKLAFRYEC-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "CGFGIKNLZTZJDE-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "JTJRIYPOLMYNBR-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "HYBOCMIZDNGJEY-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "ASXGJMSKWNBENU-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL56",
+    "8-OH-DPAT"
+   ]
+  ],
+  "conectividad": []
+ },
+ "QWCRAEMEVRGPNT-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL49",
+    "BUSPIRONE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "TZJUVVIWVWFLCD-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL8412",
+    "IPSAPIRONE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "MRBFGEHILMYPTF-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL724",
+    "2-PIPERAZIN-1-YL-PYRIMIDINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "ZPUCINDJVBIVPJ-LJISPDSOSA-N": {
+  "exacto": [
+   [
+    "CHEMBL370805",
+    "COCAINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "CYHOMWAPJJPNMW-JIGDXULJSA-N": {
+  "exacto": [],
+  "conectividad": [
+   [
+    "CHEMBL113555",
+    null
+   ],
+   [
+    "CHEMBL1235490",
+    "PSEUDOTROPINE"
+   ],
+   [
+    "CHEMBL1356617",
+    null
+   ]
+  ]
+ },
+ "ZNRGQMMCGHDTEI-ITGUQSILSA-N": {
+  "exacto": [
+   [
+    "CHEMBL56564",
+    "TROPISETRON"
+   ]
+  ],
+  "conectividad": []
+ },
+ "MFWNKCLOYSRHCJ-BTTYYORXSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1290003",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "FELGMEQIXOGIFQ-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL46",
+    "ONDANSETRON"
+   ]
+  ],
+  "conectividad": []
+ },
+ "CPZBLNMUGSZIPR-NVXWUHKLSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1189679",
+    "PALONOSETRON"
+   ]
+  ],
+  "conectividad": []
+ },
+ "TTWJBBZEZQICBI-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL86",
+    "METOCLOPRAMIDE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "HHJUJCWZKJMCLC-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "LXBGSDVWAMZHDD-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL293391",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "IOHPVZBSOKLVMN-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL5401203",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "BMVWCPGVLSILMU-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1905787",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "UDCDBLUACWWVLI-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "SNVTZAIYUGUKNI-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL1535826",
+    null
+   ]
+  ],
+  "conectividad": []
+ },
+ "MYGXGCCFTPKWIH-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "NPSCPXDYXVEYQW-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "JJCFRYNCJDLXIK-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL516",
+    "CYPROHEPTADINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "RWRDLPDLKQPQOW-UHFFFAOYSA-N": {
+  "exacto": [
+   [
+    "CHEMBL22830",
+    "PYRROLIDINE"
+   ]
+  ],
+  "conectividad": []
+ },
+ "CAXRPEAFHWDFTD-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "RCEYIHLMZBWOJK-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "VNSKHALYBQZMFW-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "UBRVXJWYHQYQQO-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "URINEQNRIFSXKT-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "DOQLCJMCQWQQHK-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "CLAABAHPEJOKHR-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ },
+ "XLDLLAFWGVDYHM-UHFFFAOYSA-N": {
+  "exacto": [],
+  "conectividad": []
+ }
+}

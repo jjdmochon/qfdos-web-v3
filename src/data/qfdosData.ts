@@ -496,6 +496,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.59.0 — Tema 4: estructuras QFDOS-170 a 240 (Excel, propiedades, maestro y generador) como adjuntos solo para el profesorado.
  * v3.58.2 — Móvil: reverso de cartas y flashcards sin efecto espejo en iPad, flechas y deslizamiento lateral en las Historias y sin autoajuste de texto en Android.
  * v3.58.1 — Historias «Herramientas»: una ilustración por pantalla (dopamina con su RMN, haloperidol con nombre IUPAC y SMILES, ficha de levodopa y la 6CM4 de RCSB PDB).
  * v3.58.0 — Historias: grupo «Herramientas» con los editores de estructuras de código abierto (nombre IUPAC y RMN) y PubChem, DrugBank y PDB.
@@ -506,8 +507,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.58.2';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-15T23:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.59.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-16T00:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -4412,7 +4413,45 @@ flashcards: [
         rotBonds: 1
       }
     ],
-    attachments: [],
+    // Estructuras del Tema 4 (QFDOS-170 a 240): de momento solo para el profesorado
+    attachments: [
+      {
+        id: 'att-t04-estructuras-xlsx',
+        title: 'Estructuras QFDOS del Tema 4 (Excel): 71 compuestos, QFDOS-170 a 240, con propiedades RDKit, verificación ChEMBL, estado regulatorio y estructuras embebidas',
+        type: 'data',
+        url: 'estructuras/tema4/estructuras_qfdos.xlsx',
+        size: '1,6 MB',
+        date: '14/10/2026',
+        soloDocente: true
+      },
+      {
+        id: 'att-t04-propiedades-csv',
+        title: 'Propiedades de las estructuras del Tema 4 (CSV): MW, logP, TPSA, CIP, InChIKey, Lipinski, QED y verificación ChEMBL',
+        type: 'data',
+        url: 'estructuras/tema4/propiedades_qfdos.csv',
+        size: '47 KB',
+        date: '14/10/2026',
+        soloDocente: true
+      },
+      {
+        id: 'att-t04-maestro-csv',
+        title: 'Maestro de estructuras del Tema 4 (CSV): SMILES neutro y a pH 7,4, CAS, ChEMBL, estado regulatorio y notas docentes',
+        type: 'data',
+        url: 'estructuras/tema4/estructuras_qfdos.csv',
+        size: '25 KB',
+        date: '14/10/2026',
+        soloDocente: true
+      },
+      {
+        id: 'att-t04-generador-estructuras',
+        title: 'Generador de estructuras del Tema 4 (RDKit · Python): regenera CSV, XLSX, imágenes y figuras QFDOS-170 a 240',
+        type: 'data',
+        url: 'estructuras/tema4/generar_tema4_completo.py',
+        size: '49 KB',
+        date: '14/10/2026',
+        soloDocente: true
+      }
+    ],
     testQuestions: [
       {
         id: 't04-q1',
