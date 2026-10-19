@@ -134,6 +134,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
   const actualizaciones: Historia[] = ACTUALIZACIONES.map(a => ({
     id: a.id, grupo: 'actualizaciones', fondo: 'marca' as const, etiqueta: `Actualización · ${a.version}`,
     titulo: a.titulo, texto: a.texto, fecha: a.fecha,
+    imagen: a.imagen ? resolver(a.imagen) : undefined, ajuste: 'cubrir' as const,
     acciones: a.enlace ? [{ label: a.enlace.label, icono: 'enlace' as const, href: a.enlace.href }] : [],
     duracionMs: Math.max(9000, duracionPorTexto(a.texto))
   }));
