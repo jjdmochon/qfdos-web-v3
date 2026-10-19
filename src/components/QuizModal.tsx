@@ -34,6 +34,7 @@ import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { pulsable } from '../utils/a11y';
 import { useProtegerSalida } from '../utils/proteccionSalida';
 import { OpinionDificultad } from './OpinionDificultad';
+import { RevisionRespuestas } from './RevisionRespuestas';
 import { 
   X, 
   HelpCircle, 
@@ -42,6 +43,7 @@ import {
   ArrowRight, 
   RotateCcw, 
   Award,
+  ListChecks,
   BookOpen,
   Maximize2,
   UserCheck,
@@ -189,6 +191,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const ultimoIntentoRef = React.useRef<QuizRegistrationRecord | null>(null);
   const [mensajeRechazo, setMensajeRechazo] = useState('');
   const [avisoCorreccion, setAvisoCorreccion] = useState('');
+  const [claveDistinta, setClaveDistinta] = useState(false);
 
   /**
    * Tras el envío: el servidor corrige por su cuenta y anota SU nota. Si
@@ -217,6 +220,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       // sin almacenamiento: el aviso de abajo sigue valiendo
     }
     setRecords(prev => prev.map(r => (r.id === intento.id ? corregido : r)));
+    setClaveDistinta(true);
     setAvisoCorreccion(`El servidor ha corregido tu intento: ${c.correctCount} de ${c.totalQuestions} aciertos (${c.score} / 10). Esa es la nota que consta.`);
   };
 
@@ -725,6 +729,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       ultimoIntentoRef.current = finalAttempt;
       setSheetSubmitStatus('sending');
       setAvisoCorreccion('');
+      setClaveDistinta(false);
       submitAttemptToGoogleSheets(finalAttempt)
         .then(alTerminarEnvio)
         .catch((err: any) => {
@@ -2166,7 +2171,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   {/* Optional SMILES Structure for Question */}
                   {currentQ.questionSmiles && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                      <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} />
+                      <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} stereoLabels={showExplanation} />
                     </div>
                   )}
 
@@ -2175,7 +2180,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '1rem' }}>
                       {currentQ.questionStructures.map(ref => (
                         <figure key={ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                          <Chem2DDrawer smiles={ref.smiles} width={220} height={120} />
+                          <Chem2DDrawer smiles={ref.smiles} width={220} height={120} stereoLabels={showExplanation} />
                           <figcaption style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
                         </figure>
                       ))}
@@ -2259,7 +2264,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   display: 'inline-flex',
                                   justifyContent: 'center'
                                 }}>
-                                  <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} />
+                                  <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} stereoLabels={showExplanation} />
                                 </div>
                               )}
                               {showExplanation && optRevealedName && (
@@ -2376,6 +2381,17 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <div style={{ marginTop: '8px', fontSize: '0.84rem', fontWeight: 700, color: isAprobado ? 'var(--secondary-dark)' : 'var(--accent-red)' }}>
                           {isAprobado ? '✓ APROBADO' : '✗ NO SUPERADO'} · {stats.correct} aciertos de {stats.total} preguntas
                         </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline"
+                          style={{ marginTop: '10px' }}
+                          onClick={() => {
+                            const sinMovimiento = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+                            document.getElementById('revision-respuestas')?.scrollIntoView({ behavior: sinMovimiento ? 'auto' : 'smooth', block: 'start' });
+                          }}
+                        >
+                          <ListChecks size={15} /> Revisar aciertos y fallos
+                        </button>
 
                         <hr style={{ margin: '12px 0', borderColor: 'var(--border-color)' }} />
 
@@ -2454,6 +2470,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     );
                   })()}
+
+                  {/* Aciertos, fallos y respuesta correcta: solo tras entregar */}
+                  <RevisionRespuestas questions={questions} answers={answers} claveDistinta={claveDistinta} />
 
                   {/* Acciones tras el examen */}
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -2945,7 +2964,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               </button>
               {isExamMode ? (
                 /* Modo examen: navegacion libre y entrega en cualquier momento */
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <div className="quiz-exam-nav" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => goToQuestion(currentIndex - 1)}
                     disabled={currentIndex === 0}
@@ -2962,7 +2981,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   </button>
                   <button
                     onClick={handleSubmitExam}
-                    className="btn btn-primary"
+                    className="btn btn-primary quiz-exam-submit"
                     style={{ fontWeight: 700, whiteSpace: 'nowrap' }}
                     title="Entrega el examen ahora; las preguntas sin responder puntuan como falladas"
                   >

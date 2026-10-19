@@ -13,6 +13,8 @@ interface Chem2DDrawerProps {
   highlightSmarts?: string;
   /** Oculta el marco y el fondo; útil dentro de tarjetas ya delimitadas */
   bare?: boolean;
+  /** Etiquetas R/S de RDKit; se apagan cuando la pregunta pide la configuración */
+  stereoLabels?: boolean;
 }
 
 /**
@@ -28,7 +30,8 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
   height = 150,
   className = '',
   highlightSmarts,
-  bare = false
+  bare = false,
+  stereoLabels = true
 }) => {
   const [svg, setSvg] = useState<string | null>(null);
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
@@ -59,8 +62,8 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
         const [left, right] = smiles.split(/>>|->|=>/).map(s => s.trim());
         const halfWidth = Math.floor((width - 46) / 2);
         const [a, b] = await Promise.all([
-          renderMoleculeSvg(left, { width: halfWidth, height, highlightSmarts, dark }),
-          renderMoleculeSvg(right, { width: halfWidth, height, highlightSmarts, dark })
+          renderMoleculeSvg(left, { width: halfWidth, height, highlightSmarts, dark, addStereoAnnotation: stereoLabels }),
+          renderMoleculeSvg(right, { width: halfWidth, height, highlightSmarts, dark, addStereoAnnotation: stereoLabels })
         ]);
         if (cancelled || !mounted.current) return;
         if (!a && !b) { setStatus('error'); return; }
@@ -69,7 +72,7 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
         return;
       }
 
-      const result = await renderMoleculeSvg(smiles, { width, height, highlightSmarts, dark });
+      const result = await renderMoleculeSvg(smiles, { width, height, highlightSmarts, dark, addStereoAnnotation: stereoLabels });
       if (cancelled || !mounted.current) return;
       if (!result) { setStatus('error'); return; }
       setSvg(result);
@@ -78,7 +81,7 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
 
     run();
     return () => { cancelled = true; };
-  }, [smiles, width, height, highlightSmarts, dark, intento]);
+  }, [smiles, width, height, highlightSmarts, dark, stereoLabels, intento]);
 
   const frameStyle: React.CSSProperties = bare
     ? { display: 'inline-flex', flexDirection: 'column', alignItems: 'center', maxWidth: '100%' }

@@ -4068,6 +4068,18 @@ html, body { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
     justify-content: center !important;
   }
 
+  /* Examen: «Anterior | Siguiente» en una fila y «Entregar» debajo, a todo
+     el ancho; los tres en una sola fila no caben y la entrega se cortaba */
+  .quiz-in-progress-footer .quiz-exam-nav {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quiz-in-progress-footer .quiz-exam-submit {
+    grid-column: 1 / -1;
+    min-height: var(--tap-min, 44px);
+  }
+
   .form-grid-2col {
     grid-template-columns: 1fr !important;
   }
