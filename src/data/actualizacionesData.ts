@@ -25,6 +25,20 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.63.0-revision-test',
+    version: 'v3.63.0',
+    fecha: '19 Octubre 2026',
+    titulo: 'Al entregar el test, revisa tus aciertos y fallos',
+    texto: 'Al terminar un test verás qué preguntas has acertado, cuáles has fallado o dejado en blanco y cuál era la respuesta correcta, con su estructura y la explicación. Pulsa «Revisar aciertos y fallos» en la ficha de la nota o toca el número de una pregunta para ir a ella. En modo examen la corrección solo aparece después de entregar.'
+  },
+  {
+    id: 'act-3.63.1-entregar-movil',
+    version: 'v3.63.1',
+    fecha: '19 Octubre 2026',
+    titulo: 'El botón «Entregar Examen» ya se ve entero en el móvil',
+    texto: 'En el móvil, «Anterior» y «Siguiente» quedan en una fila y «Entregar Examen» va debajo, a todo el ancho, con el número de preguntas respondidas a la vista.'
+  },
+  {
     id: 'act-3.60.1-notas-tests',
     version: 'v3.60.1',
     fecha: '15 Octubre 2026',

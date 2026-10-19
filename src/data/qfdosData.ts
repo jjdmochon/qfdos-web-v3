@@ -514,6 +514,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.63.2 — Historias: dos actualizaciones de la plataforma, la revisión de aciertos y fallos al entregar el test y el botón «Entregar Examen» en el móvil.
  * v3.63.1 — Móvil: en el pie del examen, «Anterior | Siguiente» en una fila y «Entregar Examen» debajo a todo el ancho (antes se cortaba).
  * v3.63.0 — Tests: al entregar, el alumnado revisa qué preguntas ha acertado y cuáles ha fallado, con el enunciado ilustrado, la respuesta correcta y la explicación (en modo examen, solo tras la entrega). Las estructuras de la pregunta ya no muestran las etiquetas R/S hasta corregirla.
  * v3.62.0 — Temas «En Revisión»: el alumnado solo ve los enlaces y la baraja de cartas (sin test, flashcards ni pestañas de trabajo). Baraja serotoninérgica del Tema 4 con 33 cartas y estado regulatorio.
@@ -533,7 +534,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.63.1';
+export const COURSE_DATA_VERSION = '3.63.2';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-19T02:00:00.000Z';
 
 export const QFDOS_INFO = {
