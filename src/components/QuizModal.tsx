@@ -2964,7 +2964,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               </button>
               {isExamMode ? (
                 /* Modo examen: navegacion libre y entrega en cualquier momento */
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <div className="quiz-exam-nav" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => goToQuestion(currentIndex - 1)}
                     disabled={currentIndex === 0}
@@ -2981,7 +2981,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   </button>
                   <button
                     onClick={handleSubmitExam}
-                    className="btn btn-primary"
+                    className="btn btn-primary quiz-exam-submit"
                     style={{ fontWeight: 700, whiteSpace: 'nowrap' }}
                     title="Entrega el examen ahora; las preguntas sin responder puntuan como falladas"
                   >
