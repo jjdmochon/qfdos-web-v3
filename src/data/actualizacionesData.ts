@@ -12,6 +12,8 @@ export interface ActualizacionPlataforma {
   fecha: string;
   titulo: string;
   texto: string;
+  /** Captura a 1080×1920 bajo public/ (p. ej. historias/…jpg) */
+  imagen?: string;
   /** Botón opcional de la historia */
   enlace?: { label: string; href: string };
 }
@@ -29,7 +31,8 @@ export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
     version: 'v3.63.0',
     fecha: '19 Octubre 2026',
     titulo: 'Al entregar el test, revisa tus aciertos y fallos',
-    texto: 'Al terminar un test verás qué preguntas has acertado, cuáles has fallado o dejado en blanco y cuál era la respuesta correcta, con su estructura y la explicación. Pulsa «Revisar aciertos y fallos» en la ficha de la nota o toca el número de una pregunta para ir a ella. En modo examen la corrección solo aparece después de entregar.'
+    texto: 'Al entregar verás qué preguntas has acertado, cuáles has fallado o dejado en blanco y la respuesta correcta, con su explicación. Puedes repetir el test cuantas veces quieras: es una herramienta para preparar el examen.',
+    imagen: 'historias/actualizacion-revision-test.jpg'
   },
   {
     id: 'act-3.63.1-entregar-movil',
