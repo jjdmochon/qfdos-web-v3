@@ -34,6 +34,7 @@ import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { pulsable } from '../utils/a11y';
 import { useProtegerSalida } from '../utils/proteccionSalida';
 import { OpinionDificultad } from './OpinionDificultad';
+import { RevisionRespuestas } from './RevisionRespuestas';
 import { 
   X, 
   HelpCircle, 
@@ -2454,6 +2455,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     );
                   })()}
+
+                  {/* Aciertos, fallos y respuesta correcta: solo tras entregar */}
+                  <RevisionRespuestas questions={questions} answers={answers} />
 
                   {/* Acciones tras el examen */}
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
