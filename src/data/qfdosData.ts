@@ -514,7 +514,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
- * v3.63.0 — Tests: al entregar, el alumnado revisa qué preguntas ha acertado y cuáles ha fallado, con la respuesta correcta y la explicación (en modo examen, solo tras la entrega).
+ * v3.63.0 — Tests: al entregar, el alumnado revisa qué preguntas ha acertado y cuáles ha fallado, con el enunciado ilustrado, la respuesta correcta y la explicación (en modo examen, solo tras la entrega). Las estructuras de la pregunta ya no muestran las etiquetas R/S hasta corregirla.
  * v3.62.0 — Temas «En Revisión»: el alumnado solo ve los enlaces y la baraja de cartas (sin test, flashcards ni pestañas de trabajo). Baraja serotoninérgica del Tema 4 con 33 cartas y estado regulatorio.
  * v3.61.1 — Historias: «Actualizaciones de la plataforma» pasa a ser el primer círculo; portada química (dopamina) para Herramientas; mismas etiquetas para vistas y sin ver; en el móvil la fila desliza hasta el final (antes se cortaba en el Tema 02).
  * v3.61.0 — Historias: grupo «Actualizaciones» con los arreglos y mejoras de la plataforma (notas de los tests, cola de envíos, móvil y recarga automática); la franja verde del aviso lleva la fecha.

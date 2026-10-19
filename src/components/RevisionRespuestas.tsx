@@ -24,7 +24,6 @@ const Enunciado: React.FC<{ q: TestQuestion }> = ({ q }) => {
         <img
           src={rutaImagen(q.imagePath)}
           alt={`Figura del enunciado: ${q.question}`}
-          loading="lazy"
           style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px' }}
         />
       )}

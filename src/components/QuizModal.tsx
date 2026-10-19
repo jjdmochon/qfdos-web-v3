@@ -2171,7 +2171,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   {/* Optional SMILES Structure for Question */}
                   {currentQ.questionSmiles && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                      <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} />
+                      <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} stereoLabels={showExplanation} />
                     </div>
                   )}
 
@@ -2180,7 +2180,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '1rem' }}>
                       {currentQ.questionStructures.map(ref => (
                         <figure key={ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                          <Chem2DDrawer smiles={ref.smiles} width={220} height={120} />
+                          <Chem2DDrawer smiles={ref.smiles} width={220} height={120} stereoLabels={showExplanation} />
                           <figcaption style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
                         </figure>
                       ))}
@@ -2264,7 +2264,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   display: 'inline-flex',
                                   justifyContent: 'center'
                                 }}>
-                                  <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} />
+                                  <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} stereoLabels={showExplanation} />
                                 </div>
                               )}
                               {showExplanation && optRevealedName && (
