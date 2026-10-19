@@ -43,6 +43,7 @@ import {
   ArrowRight, 
   RotateCcw, 
   Award,
+  ListChecks,
   BookOpen,
   Maximize2,
   UserCheck,
@@ -190,6 +191,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const ultimoIntentoRef = React.useRef<QuizRegistrationRecord | null>(null);
   const [mensajeRechazo, setMensajeRechazo] = useState('');
   const [avisoCorreccion, setAvisoCorreccion] = useState('');
+  const [claveDistinta, setClaveDistinta] = useState(false);
 
   /**
    * Tras el envío: el servidor corrige por su cuenta y anota SU nota. Si
@@ -218,6 +220,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       // sin almacenamiento: el aviso de abajo sigue valiendo
     }
     setRecords(prev => prev.map(r => (r.id === intento.id ? corregido : r)));
+    setClaveDistinta(true);
     setAvisoCorreccion(`El servidor ha corregido tu intento: ${c.correctCount} de ${c.totalQuestions} aciertos (${c.score} / 10). Esa es la nota que consta.`);
   };
 
@@ -726,6 +729,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       ultimoIntentoRef.current = finalAttempt;
       setSheetSubmitStatus('sending');
       setAvisoCorreccion('');
+      setClaveDistinta(false);
       submitAttemptToGoogleSheets(finalAttempt)
         .then(alTerminarEnvio)
         .catch((err: any) => {
@@ -2377,6 +2381,17 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                         <div style={{ marginTop: '8px', fontSize: '0.84rem', fontWeight: 700, color: isAprobado ? 'var(--secondary-dark)' : 'var(--accent-red)' }}>
                           {isAprobado ? '✓ APROBADO' : '✗ NO SUPERADO'} · {stats.correct} aciertos de {stats.total} preguntas
                         </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline"
+                          style={{ marginTop: '10px' }}
+                          onClick={() => {
+                            const sinMovimiento = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+                            document.getElementById('revision-respuestas')?.scrollIntoView({ behavior: sinMovimiento ? 'auto' : 'smooth', block: 'start' });
+                          }}
+                        >
+                          <ListChecks size={15} /> Revisar aciertos y fallos
+                        </button>
 
                         <hr style={{ margin: '12px 0', borderColor: 'var(--border-color)' }} />
 
@@ -2457,7 +2472,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   })()}
 
                   {/* Aciertos, fallos y respuesta correcta: solo tras entregar */}
-                  <RevisionRespuestas questions={questions} answers={answers} />
+                  <RevisionRespuestas questions={questions} answers={answers} claveDistinta={claveDistinta} />
 
                   {/* Acciones tras el examen */}
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
