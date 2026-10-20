@@ -452,8 +452,9 @@ export const LAB_REACTION_STEPS: LabReactionStep[] = [
       'La mezcla del Paso 1 se transfiere al embudo de decantación y se extrae con 3 porciones de 15 mL de diclorometano (DCM).',
       'Se reúnen las fases orgánicas inferiores (DCM, d=1,33 g/mL) y se secan sobre sulfato de sodio anhidro durante 15 minutos.',
       'Se filtra la fase orgánica por gravedad y se evapora el disolvente en el rotavapor a presión reducida.',
-      'Al residuo aceitoso de oxirano se le añaden 6,0 mL de isopropilamina y se calienta a reflujo suave (35-40 °C) durante 1 hora.',
-      'Se evapora el exceso de isopropilamina, se disuelve en 20 mL de DCM y se extrae con HCl 2 N (el propranolol se protona y pasa al agua).',
+      'Al residuo aceitoso de oxirano (I) obtenido tras el rotavapor se le añaden 20 mL de etanol para disolverlo.',
+      'A la disolución etanólica se le añaden 6,0 mL de isopropilamina y se calienta a reflujo suave (35-40 °C) durante 1 hora.',
+      'Se evaporan en el rotavapor el etanol y el exceso de isopropilamina, el residuo se disuelve en 20 mL de DCM y se extrae con HCl 2 N (el propranolol se protona y pasa al agua).',
       'Se separa la fase acuosa ácida, se enfría en baño de hielo y se basifica con NaOH 5 N hasta pH > 10, precipitando el Propranolol base en forma de agujas blancas.',
       'Se filtra por Büchner a vacío, se lava con agua fría y se seca al vacío.'
     ],
