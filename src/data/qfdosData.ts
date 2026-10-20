@@ -514,6 +514,7 @@ export interface StudentQuestion {
  * v3.52.0 — Tema 3 publicado: estado 'Publicado' y 21 flashcards accesibles para el alumnado; el test sigue sin publicarse.
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
+ * v3.64.0 — Tests: cada intento anota en la hoja la versión de la web que lo envía (columna «Versión web»), para detectar navegadores con una copia antigua de la plataforma.
  * v3.63.3 — Historias: la actualización de la revisión del test lleva una captura real de lo que ve el alumnado al entregar y aclara que el test se puede repetir para preparar el examen.
  * v3.63.2 — Historias: dos actualizaciones de la plataforma, la revisión de aciertos y fallos al entregar el test y el botón «Entregar Examen» en el móvil.
  * v3.63.1 — Móvil: en el pie del examen, «Anterior | Siguiente» en una fila y «Entregar Examen» debajo a todo el ancho (antes se cortaba).
@@ -535,7 +536,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.63.3';
+export const COURSE_DATA_VERSION = '3.64.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-19T02:00:00.000Z';
 
 export const QFDOS_INFO = {

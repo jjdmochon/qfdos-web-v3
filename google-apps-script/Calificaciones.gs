@@ -56,13 +56,15 @@ var CABECERAS = [
   'Cuenta verificada',
   'Corrección',
   'Id intento',
-  'Respuestas'
+  'Respuestas',
+  'Versión web'
 ];
 
 // Posición (desde 0) de las columnas que se consultan por número
 var COL_CORRECCION = 14;
 var COL_ID_INTENTO = 15;
 var COL_RESPUESTAS = 16;
+var COL_VERSION_WEB = 17;
 
 /* ------------------------------------------------------------------ */
 /* Sesión (misma lógica y mismo secreto que en Codigo.gs)              */
@@ -118,7 +120,7 @@ function hoja_() {
       .setFontColor('#ffffff');
     sheet.setFrozenRows(1);
   } else if (sheet.getLastColumn() < CABECERAS.length) {
-    // Hojas creadas antes de añadir «Cuenta verificada», «Id intento» o «Respuestas»
+    // Hojas creadas antes de añadir «Cuenta verificada», «Id intento», «Respuestas» o «Versión web»
     sheet.getRange(1, 1, 1, CABECERAS.length).setValues([CABECERAS]).setFontWeight('bold');
   }
   return sheet;
@@ -471,6 +473,8 @@ function doPost(e) {
   var detalle = data.answersDetail || [];
   var correccion = '';
   var idIntento = /^[\w.:\-]{1,80}$/.test(String(data.idIntento || '')) ? String(data.idIntento) : '';
+  // Versión de la web que envía el intento (vacía: anterior a la v3.64.0)
+  var versionWeb = /^v?[\d.]{1,20}$/.test(String(data.versionWeb || '')) ? String(data.versionWeb) : '';
 
   // Test (no autoevaluación de flashcards): la nota es la que sale de corregir aquí
   if (modo !== 'flashcards_autoevaluacion') {
@@ -543,7 +547,8 @@ function doPost(e) {
       s.e,
       correccion,
       idIntento,
-      modo !== 'flashcards_autoevaluacion' ? respuestasParaGuardar_(data.respuestas) : ''
+      modo !== 'flashcards_autoevaluacion' ? respuestasParaGuardar_(data.respuestas) : '',
+      versionWeb
     ]);
 
     return json_({

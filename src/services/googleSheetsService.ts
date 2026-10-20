@@ -4,7 +4,7 @@
  * en una hoja de cálculo de Google Sheets oficial para evaluación continua.
  */
 
-import { QuizRegistrationRecord } from '../data/qfdosData';
+import { QuizRegistrationRecord, COURSE_DATA_VERSION } from '../data/qfdosData';
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 import calificacionesGs from '../../google-apps-script/Calificaciones.gs?raw';
 
@@ -112,6 +112,8 @@ export async function submitAttemptToGoogleSheets(
     sesion: tokenSesion(),
     // Identifica el intento: reenviarlo (cola, respuesta perdida) no duplica la fila
     idIntento: attempt.id,
+    // Columna «Versión web»: delata navegadores con una copia antigua de la plataforma
+    versionWeb: `v${COURSE_DATA_VERSION}`,
     timestamp: attempt.timestamp,
     studentName: attempt.studentName,
     studentEmail: attempt.studentEmail,
