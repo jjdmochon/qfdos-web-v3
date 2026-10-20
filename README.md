@@ -187,6 +187,9 @@ Quién es cada cual lo decide Apps Script:
      no llegan (sin red, sesión caducada, servidor saturado) y los reenvía al
      abrir la plataforma, al recuperar la conexión y cada 10 minutos; el
      servidor no anota dos veces el mismo id.
+   - **Versión web**: cada intento anota la versión de la plataforma que lo
+     envió (p. ej. `v3.64.0`). Vacía junto con un «Id intento» vacío
+     significa que el navegador tenía una copia anterior a la v3.60.1.
 
 **Propiedades de Apps Script** (⚙️ → Propiedades de la secuencia de comandos):
 
