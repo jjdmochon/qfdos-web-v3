@@ -3,6 +3,7 @@ import rawTema01 from '../../data/farmacosTema01.json';
 import rawTema02 from '../../data/farmacosTema02.json';
 import rawTema03 from '../../data/farmacosTema03.json';
 import rawTema04 from '../../data/farmacosTema04.json';
+import rawTema05 from '../../data/farmacosTema05.json';
 import { MoleculeDrug } from '../../data/qfdosData';
 import './cartas.css';
 import {
@@ -53,7 +54,7 @@ export interface FarmacoCarta {
   regulatorio?: string;
 }
 
-export type TemaCartas = 1 | 2 | 3 | 4;
+export type TemaCartas = 1 | 2 | 3 | 4 | 5;
 
 export interface EstadoRegulatorio {
   etiqueta: string;
@@ -84,6 +85,7 @@ export const BARAJAS: Record<TemaCartas, BarajaTema & { familia: string }> = {
   2: { ...(rawTema02 as unknown as BarajaTema), familia: 'Adrenérgicos' },
   3: { ...(rawTema03 as unknown as BarajaTema), familia: 'Dopaminérgicos' },
   4: { ...(rawTema04 as unknown as BarajaTema), familia: 'Serotoninérgicos' },
+  5: { ...(rawTema05 as unknown as BarajaTema), familia: 'GABAérgicos' },
 };
 
 export interface CartasDeckViewProps {
