@@ -107,11 +107,11 @@ export const REACTIVOS = {
   },
   amoniaco: {
     id: 'amoniaco',
-    nombre: 'Amoníaco (solución acuosa concentrada)',
+    nombre: 'Amoníaco (solución acuosa al 35 %)',
     smiles: 'N',
     formula: 'NH₃',
     pm: 17.03,
-    densidad: 0.9,
+    densidad: 0.89,
     cas: '1336-21-6',
     pubchemCid: 222,
     peligros: ['Corrosivo', 'Tóxico por inhalación', 'Manipular en vitrina'],
@@ -269,12 +269,12 @@ export const LAB_REAGENTS = {
   },
   amoniaco_conc: {
     id: 'amoniaco_conc',
-    name: 'Amoníaco acuoso concentrado (28-30%)',
+    name: 'Amoníaco acuoso concentrado (35%)',
     smiles: 'N',
     formula: 'NH3',
     mw: 17.03,
-    density: 0.90,
-    purityDefault: 28.0,
+    density: 0.89,
+    purityDefault: 35.0,
     role: 'Donador de nitrógeno para dihidropiridina',
     dangerWarnings: ['Corrosivo', 'Desprende gas amoníaco'],
     safetyAlert: 'Desprende gas NH3 muy irritante. Pipetear en vitrina.',
@@ -490,12 +490,12 @@ export const LAB_REACTION_STEPS: LabReactionStep[] = [
     reactants: [
       { reagent: LAB_REAGENTS.benzaldehido, amount: '2,55 mL (25,0 mmol, d=1,04 g/mL)', stoichiometry: 1, roleNotes: 'Aldehído aromático sustrato', amountPrescribed: '2,55 mL (25,0 mmol, d=1,04 g/mL)', role: 'Aldehído aromático' },
       { reagent: LAB_REAGENTS.metil_acetoacetato, amount: '5,40 mL (50,0 mmol, d=1,08 g/mL)', stoichiometry: 2, roleNotes: 'β-cetoéster (2 equivalentes estequiométricos)', amountPrescribed: '5,40 mL (50,0 mmol, d=1,08 g/mL)', role: 'β-cetoéster (2 eq)' },
-      { reagent: LAB_REAGENTS.amoniaco_conc, amount: '4,50 mL', stoichiometry: 2.5, roleNotes: 'Donador de nitrógeno y medio básico', amountPrescribed: '4,50 mL', role: 'Donador de nitrógeno' }
+      { reagent: LAB_REAGENTS.amoniaco_conc, amount: '3,20 mL (35 %, d=0,89 g/mL; en exceso)', stoichiometry: 2.34, roleNotes: 'Donador de nitrógeno y medio básico (en exceso)', amountPrescribed: '3,20 mL (35 %, d=0,89 g/mL; en exceso)', role: 'Donador de nitrógeno (exceso)' }
     ],
     procedureSteps: [
-      'En un matraz esférico de 100 mL se mezclan 2,55 mL de benzaldehído y 5,40 mL de acetoacetato de metilo en 10 mL de etanol.',
-      'Se añaden 4,5 mL de amoníaco concentrado y el núcleo magnético de agitación.',
-      'Se conecta el refrigerante y se mantiene la mezcla a ebullición suave (reflujo) durante 2 horas.',
+      'En un matraz esférico de 100 mL se introducen sucesivamente 2,55 mL de benzaldehído (0,025 mol, d = 1,04 g/mL), 5,40 mL de acetoacetato de metilo (0,05 mol, d = 1,08 g/mL) y 3,2 mL de NH₃ al 35 % (d = 0,89 g/mL; se añade en exceso).',
+      'A la mezcla de reacción se le agregan 20 mL de etanol del 95 %.',
+      'Se conecta el refrigerante y se calienta a reflujo en la manta calefactora (posición 1) durante 2 horas.',
       'Se deja enfriar el matraz a temperatura ambiente y posteriormente se sumerge en baño de agua-hielo durante 20 minutos hasta cristalización completa.',
       'Se filtra a vacío el precipitado amarillo en un embudo Büchner con Kitasato.',
       'Se lava el sólido con 5 mL de etanol frío y se recristaliza en etanol caliente.',
@@ -504,6 +504,7 @@ export const LAB_REACTION_STEPS: LabReactionStep[] = [
     equipmentNeeded: [
       'Matraz esférico de 100 mL',
       'Refrigerante de reflujo',
+      'Manta calefactora (posición 1)',
       'Embudo Büchner con Kitasato y trompa de vacío',
       'Aparato de punto de fusión Büchi'
     ],
@@ -968,7 +969,7 @@ export const REACTIVOS_PRECAUCIONES: ReagentSafetyCaution[] = [
     actionRequired: 'Pesar rápidamente en pesasustancias por ser higroscópico. Usar gafas de protección integral.'
   },
   {
-    reagent: 'Amoníaco Acuoso (NH₃ 25-30%)',
+    reagent: 'Amoníaco Acuoso (NH₃ 35%)',
     dangerType: 'corrosive',
     dangerLabel: 'Corrosivo y Peligroso para el Medio Ambiente',
     description: 'Gas amoníaco desprendido muy picante y lacrimógeno.',
