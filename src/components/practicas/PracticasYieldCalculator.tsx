@@ -319,7 +319,7 @@ export const PracticasYieldCalculator: React.FC = () => {
         student2: { nombre: '', dni: '', email: '' },
         step1: { mass1Naftol: 3.00, volEpiclorhidrina: 2.70, massNaOH: 1.20, massProductCrude: 0, yieldPercentage: 0, aspect: 'Aceite ámbar', observations: '' },
         step2: { massOxirane: 0, volIsopropilamina: 6.00, massProductBase: 0, yieldStage: 0, yieldAccumulated: 0, meltingPointObserved: '', meltingPointReference: '94 - 96 °C', tlcRf: 'Rf = 0.42', observations: '' },
-        step3: { compoundType: 'DHPP', amountAldehyde: '2.55 mL Benzaldehído', volMethylAcetoacetate: 5.40, volNH3Conc: 4.50, massProduct: 0, yieldPercentage: 0, meltingPointObserved: '', meltingPointReference: '194 - 196 °C', crystalHabit: 'Agujas prismáticas amarillas', observations: '' },
+        step3: { compoundType: 'DHPP', amountAldehyde: '2.55 mL Benzaldehído', volMethylAcetoacetate: 5.40, volNH3Conc: 3.20, massProduct: 0, yieldPercentage: 0, meltingPointObserved: '', meltingPointReference: '194 - 196 °C', crystalHabit: 'Agujas prismáticas amarillas', observations: '' },
         cuestiones: { q1_dcm_density: '', q2_nmr_c4_proton: '', q3_reflux_safety: '' },
         status: 'Borrador'
       };
