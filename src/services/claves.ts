@@ -14,6 +14,7 @@ import {
 } from '../data/qfdosData';
 import { TEMA2_MODELO_1_TEST_QUESTIONS, TEMA2_MODELO_2_TEST_QUESTIONS, TEMA2_MODELO_3_TEST_QUESTIONS } from '../data/tema02ExamsData';
 import { TEMA3_MODELO_1_TEST_QUESTIONS, TEMA3_MODELO_2_TEST_QUESTIONS, TEMA3_MODELO_3_TEST_QUESTIONS } from '../data/tema03ExamsData';
+import { TEMA4_MODELO_1_TEST_QUESTIONS, TEMA4_MODELO_2_TEST_QUESTIONS, TEMA4_MODELO_3_TEST_QUESTIONS } from '../data/tema04ExamsData';
 import { getGoogleSheetsUrl } from './googleSheetsService';
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 
@@ -49,6 +50,7 @@ export function construirClaves(topics: QfdosTopic[]): { claves: Record<string, 
     MODELO_E_TEST_QUESTIONS, MODELO_FIR_TEST_QUESTIONS, RETROSINTESIS_TEST_QUESTIONS,
     TEMA2_MODELO_1_TEST_QUESTIONS, TEMA2_MODELO_2_TEST_QUESTIONS, TEMA2_MODELO_3_TEST_QUESTIONS,
     TEMA3_MODELO_1_TEST_QUESTIONS, TEMA3_MODELO_2_TEST_QUESTIONS, TEMA3_MODELO_3_TEST_QUESTIONS,
+    TEMA4_MODELO_1_TEST_QUESTIONS, TEMA4_MODELO_2_TEST_QUESTIONS, TEMA4_MODELO_3_TEST_QUESTIONS,
     ...topics.map(t => t.testQuestions ?? [])
   ];
   const claves: Record<string, number> = {};

@@ -2148,6 +2148,9 @@ import { TEMA2_MODELO_1_TEST_QUESTIONS } from './tema02ExamsData';
 export * from './tema03ExamsData';
 import { TEMA3_MODELO_1_TEST_QUESTIONS } from './tema03ExamsData';
 import { TEMA3_FLASHCARDS } from './tema03FlashcardsData';
+export * from './tema04ExamsData';
+import { TEMA4_MODELO_1_TEST_QUESTIONS } from './tema04ExamsData';
+import { TEMA4_FLASHCARDS } from './tema04FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
@@ -5313,36 +5316,8 @@ flashcards: [
         soloDocente: true
       }
     ],
-    testQuestions: [
-      {
-        id: 't04-q1',
-        topicId: 'tema-04',
-        block: 'SAR Triptanes',
-        question: '¿Qué modificación química en posición 5 del anillo indólico de la serotonina permitió el desarrollo del sumatriptán con selectividad vasoconstrictora craneal 5-HT1B/1D?',
-        questionSmiles: 'CNS(=O)(=O)CC1=CC2=C(C=C1)NC=C2CCN(C)C',
-        options: [
-          'La sustitución del grupo 5-hidroxilo por una sulfonamida aromática (-CH2-SO2-NHMe).',
-          'La alquilación del nitrógeno indólico con un grupo bencilo voluminoso.',
-          'La reducción completa del anillo indol a indolilamina.',
-          'La fluoración en posición 2 del anillo de benceno.'
-        ],
-        correctIndex: 0,
-        explanation: 'La introducción del grupo N-metilmetanosulfonamidoetilo en C5 y dimetilaminoetilo en C3 confirió selectividad estricta para los receptores vasculares craneales 5-HT1B/1D evitando la activación de receptores cardíacos 5-HT2B.',
-        difficulty: 'Avanzado'
-      }
-    ],
-    flashcards: [
-      {
-        id: 'fc-04-1',
-        topicId: 'tema-04',
-        concept: 'Transportador SERT vs. Receptores 5-HT',
-        front: '¿Cuál es la diferencia farmacológica fundamental entre la acción de la fluoxetina (ISRS) y el sumatriptán?',
-        back: 'La fluoxetina es un inhibidor alostérico del transportador de recaptación SERT (aumentando serotonina en la biofase sináptica), mientras que el sumatriptán es un agonista directo ortostérico de los receptores metabotrópicos 5-HT1B/1D.',
-        smiles: 'CNCCC(c1ccccc1)Oc2ccc(C(F)(F)F)cc2',
-        difficulty: 'medium',
-        category: 'Mecanismo de Acción'
-      }
-    ]
+    testQuestions: TEMA4_MODELO_1_TEST_QUESTIONS,
+    flashcards: TEMA4_FLASHCARDS
   },
   {
     id: 'tema-05',
