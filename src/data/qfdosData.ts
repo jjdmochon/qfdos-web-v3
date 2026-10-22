@@ -515,6 +515,7 @@ export interface StudentQuestion {
  * v3.52.1 — Tema 3: enlaces oficiales a las diapositivas y los apuntes en PDF (Drive). Podcast y NotebookLM aún sin publicar.
  * v3.53.0 — Enlaces: nueva sección de herramientas para dibujar estructuras (ReShiki, MolDraw, MolView) y bases de datos (PDB, PubChem, DrugBank), revisada con Jev.
  * v3.66.0 — Tema 4 (solo perfil docente): tres modelos de examen de 15 preguntas y 15 flashcards, consolidados con los apuntes publicados y las tres clases. El tema sigue en «Próximamente».
+ * v3.66.1 — Tema 4: las flashcards marcan lo que va más allá de la presentación solo como «Ampliación», sin citar otros exámenes.
  * v3.65.0 — Tema 5: baraja GABAérgica con 35 cartas (aminoácidos y PLP, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos) y estado regulatorio a 21-oct-2026.
  * v3.64.2 — Prácticas, Paso 3 (Hantzsch, DHPP): 3,2 mL de NH₃ al 35 % (d = 0,89 g/mL, en exceso) en lugar de 4,5 mL, los reactivos se introducen sucesivamente y después se añaden 20 mL de etanol del 95 %; reflujo 2 h en manta calefactora (posición 1). Fichas del amoníaco y valores por defecto del informe al 35 % y 3,20 mL.
  * v3.64.1 — Prácticas, Paso 2: el oxirano (I) se disuelve en 20 mL de etanol tras el rotavapor y antes de añadir la isopropilamina y se calienta a reflujo sin indicar temperatura (no hay termómetro); el etanol se evapora junto con el exceso de amina.
@@ -540,7 +541,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.66.0';
+export const COURSE_DATA_VERSION = '3.66.1';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
