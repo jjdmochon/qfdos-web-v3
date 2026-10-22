@@ -109,18 +109,18 @@ const MODELOS_TEMA3: { id: QuizModelType; n: number; titulo: string; etiqueta: s
 /** Modelos del Tema 4 (solo los ve el profesorado mientras el tema siga en «Próximamente»). */
 const MODELOS_TEMA4: typeof MODELOS_TEMA3 = [
   {
-    id: 't4-modelo-1', n: 1, titulo: 'Receptores, ISRS, tricíclicos, imipramina y metabolismo de la serotonina', etiqueta: 'Consolidado con los apuntes',
-    resumen: 'Escitalopram y sertralina, de la clorpromazina a la imipramina, síntesis de la imipramina, mecanismo de Fischer, biosíntesis de la serotonina, MAO y melatonina, y la excepción ionotrópica 5-HT3.',
+    id: 't4-modelo-1', n: 1, titulo: 'ISRS, tricíclicos y síntesis de la imipramina', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Fluoxetina, citalopram y sertralina cis, de la clorpromazina a la imipramina y la desipramina, síntesis de la imipramina, numeración del indol, serotonina, MAO, melatonina y la excepción ionotrópica 5-HT3.',
     color: 'var(--navy)', fondo: 'rgba(30, 58, 138, 0.05)', tinta: 'var(--navy-ink)'
   },
   {
-    id: 't4-modelo-2', n: 2, titulo: 'IMAO, triptanes, síntesis de Fischer y sumatriptán', etiqueta: 'Consolidado con los apuntes',
-    resumen: 'Generaciones de IMAO, SAR del sumatriptán, lipofilia de los triptanes, síntesis de Fischer y del sumatriptán, aminación reductora, MAO-A y MAO-B, efecto queso y mecanismo de los triptanes.',
+    id: 't4-modelo-2', n: 2, titulo: 'IMAO, triptanes y síntesis de Fischer', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'RIMA e IMAO irreversibles, pargilina y moclobemida, SAR del sumatriptán y zolmitriptán, ergolinas, síntesis de Fischer (directa e inversa), arilhidrazinas, reducción del nitrilo, MAO-A y MAO-B, efecto queso y propargilaminas.',
     color: 'var(--teal)', fondo: 'rgba(13, 148, 136, 0.05)', tinta: 'var(--teal-ink)'
   },
   {
-    id: 't4-modelo-3', n: 3, titulo: 'Azapironas, setrones, ejercicios 4.4 y 4.7 y reconocimiento estructural', etiqueta: 'Consolidado con los apuntes',
-    resumen: 'Buspirona, 8-OH-DPAT, setrones, numeración del indol, síntesis de la ciproheptadina y del almotriptán, iproniazida y antagonismo 5-HT3.',
+    id: 't4-modelo-3', n: 3, titulo: 'Azapironas, setrones, ciproheptadina y almotriptán', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Buspirona y 1-PP, setrones (de la cocaína al granisetrón y el ondansetrón), síntesis de la ciproheptadina y del almotriptán, aminación reductora, amitriptilina, triptanes y lasmiditán.',
     color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
   }
 ];
