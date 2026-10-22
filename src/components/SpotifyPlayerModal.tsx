@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { CourseAttachment } from '../data/qfdosData';
+import { fuenteAudio, idDeDrive, vistaPreviaDrive } from '../utils/audioReproducible';
 import {
   X,
   Radio,
@@ -26,12 +27,16 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
   if (!attachment) return null;
 
   // Determine available media sources
-  const audioSource = attachment.audioUrl || (
+  const audioOriginal = attachment.audioUrl || (
     attachment.type === 'audio' ||
     (attachment.url && (attachment.url.endsWith('.mp3') || attachment.url.endsWith('.wav') || attachment.url.includes('audio/')))
       ? attachment.url
       : undefined
   );
+  // Un enlace de Drive (lo que deja la subida desde «Gestionar curso») no es un MP3: se traduce a la descarga directa
+  const audioSource = fuenteAudio(audioOriginal);
+  const idDrive = idDeDrive(audioOriginal);
+  const nombreDescarga = `QFDOS_${(attachment.cabecera || attachment.title || 'podcast').replace(/[^\p{L}\p{N}]+/gu, '_').replace(/^_|_$/g, '')}.mp3`;
 
   const spotifySource = attachment.spotifyUri || (
     attachment.type === 'spotify' ||
@@ -54,6 +59,8 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  /** El navegador no pudo cargar el audio: se ofrece el visor de Drive o el enlace */
+  const [errorAudio, setErrorAudio] = useState(false);
 
   // Synchronize audio playback rate
   useEffect(() => {
@@ -239,7 +246,29 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
                   if (audioRef.current) setDuration(audioRef.current.duration);
                 }}
                 onEnded={() => setIsPlaying(false)}
+                onError={() => { setErrorAudio(true); setIsPlaying(false); }}
               />
+
+              {errorAudio && (
+                <div className="entrega-aviso entrega-aviso--warn" role="status" style={{ flexDirection: 'column', gap: '8px' }}>
+                  <span>
+                    {idDrive
+                      ? 'El reproductor de la web no ha podido cargar este audio de Drive. Puedes escucharlo aquí, en el reproductor de Drive:'
+                      : 'El reproductor de la web no ha podido cargar este audio.'}
+                  </span>
+                  {idDrive && (
+                    <iframe
+                      src={vistaPreviaDrive(idDrive)}
+                      title={`Audio: ${attachment.cabecera || attachment.title}`}
+                      style={{ width: '100%', height: '90px', border: 0, borderRadius: '8px', background: 'var(--surface)' }}
+                      allow="autoplay"
+                    />
+                  )}
+                  <a href={idDrive ? `https://drive.google.com/file/d/${idDrive}/view` : audioOriginal} target="_blank" rel="noopener noreferrer">
+                    Abrir el audio en una pestaña nueva
+                  </a>
+                </div>
+              )}
 
               {/* Episode Info Banner */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -259,14 +288,18 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
                 </div>
                 <div>
                   <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: 'var(--text-title)' }}>
-                    Tema 01: Sistema Colinérgico
+                    {attachment.cabecera || attachment.title}
                   </h4>
-                  <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Transmisión colinérgica, inhibidores de AChE, organofosforados y oximas reactivadoras (2-PAM)
-                  </p>
+                  {attachment.descripcion && (
+                    <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      {attachment.descripcion}
+                    </p>
+                  )}
                 </div>
               </div>
 
+              {/* Sin audio cargado, los controles no harían nada: solo queda el visor de Drive */}
+              {!errorAudio && (<>
               {/* Progress Slider & Times */}
               <div>
                 <input
@@ -393,7 +426,7 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
 
                   <a
                     href={audioSource}
-                    download="QFDOS_Tema01_Podcast_Colinergicos.mp3"
+                    download={nombreDescarga}
                     className="btn btn-sm btn-outline"
                     style={{ fontSize: '0.72rem', fontWeight: 600, padding: '4px 8px', gap: '4px', marginLeft: '6px' }}
                     title="Descargar audio para escuchar sin conexión"
@@ -403,21 +436,25 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
                 </div>
               </div>
 
-              {/* Synopsis Callout */}
-              <div style={{
-                background: 'var(--surface-card, #ffffff)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '8px',
-                padding: '10px 14px',
-                fontSize: '0.78rem',
-                color: 'var(--text-main)',
-                lineHeight: 1.5
-              }}>
-                <div style={{ fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
-                  💡 Contenidos clave del episodio:
+              </>)}
+
+              {/* Contenidos clave del tema del episodio */}
+              {!!attachment.contenidosClave?.length && (
+                <div style={{
+                  background: 'var(--surface-card, #ffffff)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '0.78rem',
+                  color: 'var(--text-main)',
+                  lineHeight: 1.5
+                }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text-title)', marginBottom: '4px' }}>
+                    💡 Contenidos clave del episodio:
+                  </div>
+                  {attachment.contenidosClave.join(' · ')}
                 </div>
-                Estudio del catión cuaternario en ACh (regla de los 5 átomos de Ing), agonistas directos (Metacolina, Betanecol), carbamatos pseudoirreversibles (Neostigmina, Rivastigmina), inhibidores para Alzheimer (Donepezilo) y rescate enzimático frente a organofosforados con Pralidoxima (2-PAM).
-              </div>
+              )}
             </div>
           )}
 

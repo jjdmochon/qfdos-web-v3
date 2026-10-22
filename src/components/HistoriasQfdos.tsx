@@ -9,6 +9,7 @@ import { avisosRecientesPrimero } from '../utils/avisos';
 import { efectoHistoria, leerSilencio, guardarSilencio } from '../services/musicaHistorias';
 import { EDITORES, BASES_DE_DATOS } from './HerramientasEstructuras';
 import { ACTUALIZACIONES } from '../data/actualizacionesData';
+import { fuenteAudio } from '../utils/audioReproducible';
 
 // ==========================================================================
 // Historias QFDOS
@@ -198,14 +199,17 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
               audioUrl: audio,
               spotifyUri: t.spotifyPodcastUrl,
               date: 'Curso 2026/2027',
-              isPodcastVideo: !!t.videoPodcastUrl
+              isPodcastVideo: !!t.videoPodcastUrl,
+              cabecera: `${t.number}: ${t.title}`,
+              descripcion: t.subtitle,
+              contenidosClave: t.keyConcepts
             })
           }]
         : [];
       historias.push({
         id: `podcast-audio-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Píldora de audio',
         titulo: `${t.number} · ${t.title}`, texto: t.audioPodcastName || t.subtitle,
-        imagen: portadaPodcast, audio: resolver(audio), maxSegundos: SEGUNDOS_PODCAST,
+        imagen: portadaPodcast, audio: fuenteAudio(audio), maxSegundos: SEGUNDOS_PODCAST,
         acciones: reproductor, duracionMs: SEGUNDOS_PODCAST * 1000
       });
     }

@@ -268,7 +268,10 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
         audioUrl: topic.audioPodcastUrl,
         spotifyUri: topic.spotifyPodcastUrl,
         date: 'Curso 2026/2027',
-        isPodcastVideo: !!topic.videoPodcastUrl
+        isPodcastVideo: !!topic.videoPodcastUrl,
+        cabecera: `${topic.number}: ${topic.title}`,
+        descripcion: topic.subtitle,
+        contenidosClave: topic.keyConcepts
       });
     }
   };

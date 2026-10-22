@@ -27,6 +27,13 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.68.0-pildoras-audio',
+    version: 'v3.68.0',
+    fecha: '22 Octubre 2026',
+    titulo: 'Las píldoras de audio, cada una con su tema',
+    texto: 'Respecto al reproductor de las píldoras de audio, ahora muestra el título y los contenidos clave del tema que estás escuchando; antes salían siempre los del Tema 1. Además reproduce los audios que publicamos desde Drive, como el del Tema 4. Si tu navegador no puede, te ofrece el reproductor de Drive en la misma ventana.'
+  },
+  {
     id: 'act-3.63.0-revision-test',
     version: 'v3.63.0',
     fecha: '19 Octubre 2026',
