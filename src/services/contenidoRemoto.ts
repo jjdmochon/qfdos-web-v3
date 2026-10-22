@@ -52,6 +52,13 @@ export function limpiarCacheRemota(): void {
 /** Temas que no llevan test: se vacía aunque el contenido publicado o la copia local lo traiga. */
 const TEMAS_SIN_TEST = new Set<string>();
 
+/**
+ * Temas cuyo test lo manda el código: las preguntas publicadas en la hoja o
+ * guardadas en el navegador no valen. Así una versión anterior de los modelos
+ * no se cuela en el panel de claves con el mismo identificador y otra solución.
+ */
+const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04']);
+
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
   const mapped = topics.map(t => {
@@ -125,6 +132,8 @@ export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
       attachments: (t.attachments && t.attachments.length > 0) ? t.attachments : (base.attachments || []),
       testQuestions: TEMAS_SIN_TEST.has(t.id)
         ? []
+        : TEMAS_TEST_DEL_CODIGO.has(t.id)
+        ? (base.testQuestions || [])
         : (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
       flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
       drugs: (Array.isArray(t.drugs) && t.drugs.length >= (base.drugs?.length || 0)) ? t.drugs : (base.drugs || []),
