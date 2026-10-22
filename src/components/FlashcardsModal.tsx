@@ -124,6 +124,11 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const safeIndex = currentIndex >= displayCards.length ? 0 : currentIndex;
   const currentCard = displayCards[safeIndex] || allCards[0];
 
+  /** Párrafo de ampliación dentro del reverso («**Ampliación:** …»): va resaltado. */
+  const esParrafoAmpliacion = (para: string) => /^\s*\*\*Ampliación:\*\*/.test(para);
+  const tieneAmpliacionInline = (c?: { back?: string }) =>
+    !!c?.back && c.back.split(/\n\n+/).some(esParrafoAmpliacion);
+
   const renderFormattedText = (text: string) => {
     if (!text) return null;
     const paragraphs = text.split(/\n\n+/);
@@ -132,8 +137,19 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', width: '100%' }}>
         {paragraphs.map((para, pIdx) => {
           const lines = para.split('\n');
+          const esAmpliacion = esParrafoAmpliacion(para);
           return (
-            <div key={pIdx} style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.55 }}>
+            <div
+              key={pIdx}
+              style={{
+                fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.55,
+                ...(esAmpliacion ? {
+                  background: 'var(--warn-bg)', border: '1px solid var(--warn-border)',
+                  borderLeft: '4px solid var(--accent-amber)', borderRadius: 'var(--radius-md)',
+                  padding: '8px 12px'
+                } : {})
+              }}
+            >
               {lines.map((line, lIdx) => {
                 const trimmed = line.trim();
                 const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-');
@@ -153,7 +169,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     {parts.map((part, partIdx) => {
                       if (part.startsWith('**') && part.endsWith('**')) {
                         return (
-                          <strong key={partIdx} style={{ color: 'var(--navy-ink)', fontWeight: 700 }}>
+                          <strong key={partIdx} style={{ color: esAmpliacion && part === '**Ampliación:**' ? 'var(--warn-ink)' : 'var(--navy-ink)', fontWeight: 700 }}>
                             {part.slice(2, -2)}
                           </strong>
                         );
@@ -414,7 +430,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                               {c.category}
                             </span>
                           )}
-                          {c.ampliacion && (
+                          {(c.ampliacion || tieneAmpliacionInline(c)) && (
                             <span className="qfdos-badge badge-amber" style={{ fontSize: '0.65rem' }}>
                               Ampliación
                             </span>
@@ -535,7 +551,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                       {currentCard.category}
                     </span>
                   )}
-                  {currentCard.ampliacion && (
+                  {(currentCard.ampliacion || tieneAmpliacionInline(currentCard)) && (
                     <span className="qfdos-badge badge-amber" style={{ fontSize: '0.72rem' }} title="Ampliación de temario">
                       Ampliación
                     </span>
@@ -607,9 +623,9 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     <h4 style={{ fontSize: '1.18rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.55 }}>
                       {currentCard.front}
                     </h4>
-                    {currentCard.ampliacion && (
+                    {(currentCard.ampliacion || tieneAmpliacionInline(currentCard)) && (
                       <p style={{ fontSize: '0.8rem', color: 'var(--warn-ink)', fontWeight: 600, marginTop: '0.9rem' }}>
-                        Ampliación de temario.
+                        {currentCard.ampliacion ? 'Ampliación de temario.' : 'Incluye un apartado de ampliación de temario.'}
                       </p>
                     )}
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem' }}>
