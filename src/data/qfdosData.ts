@@ -15,6 +15,12 @@ export interface CourseAttachment {
   date: string;
   spotifyUri?: string;
   isPodcastVideo?: boolean;
+  /** Reproductor: título del episodio (p. ej. «Tema 04: Sistema Serotoninérgico») */
+  cabecera?: string;
+  /** Reproductor: línea bajo el título */
+  descripcion?: string;
+  /** Reproductor: «Contenidos clave del episodio» */
+  contenidosClave?: string[];
   /** Solo lo ve el profesorado (el alumnado no lo ve aunque el tema esté publicado) */
   soloDocente?: boolean;
 }
@@ -519,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.68.0 — Píldoras de audio: el reproductor muestra el título, la descripción y los contenidos clave del tema que se escucha (antes, siempre los del Tema 1), y reproduce los audios subidos a Drive desde «Gestionar curso»; si el navegador no puede, ofrece el reproductor de Drive.
  * v3.67.3 — Flashcards: los párrafos «Ampliación:» se resaltan en ámbar, y la tarjeta lo avisa en el anverso, la cabecera y la lista (Tema 4).
  * v3.65.0 — Tema 5: baraja GABAérgica con 35 cartas (aminoácidos y PLP, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos) y estado regulatorio a 21-oct-2026.
  * v3.64.2 — Prácticas, Paso 3 (Hantzsch, DHPP): 3,2 mL de NH₃ al 35 % (d = 0,89 g/mL, en exceso) en lugar de 4,5 mL, los reactivos se introducen sucesivamente y después se añaden 20 mL de etanol del 95 %; reflujo 2 h en manta calefactora (posición 1). Fichas del amoníaco y valores por defecto del informe al 35 % y 3,20 mL.
@@ -545,7 +552,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.67.3';
+export const COURSE_DATA_VERSION = '3.68.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
