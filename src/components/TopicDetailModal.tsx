@@ -255,7 +255,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   const pestanaVisible = !soloEnlacesYCartas || activeTab === 'sar' || activeTab === 'cartas';
 
   /**
-   * Abre el reproductor en la pestaña pedida. La píldora de audio y el vídeo
+   * Abre el reproductor en la pestaña pedida. El podcast de audio y el vídeo
    * podcast de Spotify son materiales distintos: cada uno tiene su botón.
    */
   const handlePlayPodcast = (pestana: 'audio' | 'spotify') => {
@@ -712,7 +712,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         )}
                       </div>
 
-                      {/* 4. Podcast & Píldora de Audio (Omitido en Presentación del Curso) */}
+                      {/* 4. Podcast de audio y vídeo (Omitido en Presentación del Curso) */}
                       {topic.id !== 'tema-00' && (
                         <div className={`qfdos-card card-spotify resource-card ${hasPodcast ? 'is-active' : 'is-inactive'}`}>
                           <div>
@@ -731,7 +731,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                   <Radio size={17} color={hasPodcast ? '#1db954' : 'var(--text-muted)'} />
                                 </div>
                                 <strong style={{ fontSize: '0.88rem', color: hasPodcast ? 'var(--text-title)' : 'var(--text-muted)' }}>
-                                  4. Podcast & Píldora de Audio
+                                  4. Podcast de Audio y Vídeo
                                 </strong>
                               </div>
                               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
@@ -748,7 +748,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               </div>
                             </div>
                             <p style={{ fontSize: '0.78rem', color: hasPodcast ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              {hasAudio && hasSpotify ? 'Píldora sonora para escuchar en la web y vídeo podcast del episodio en Spotify.' : hasAudio ? 'Píldora sonora oficial con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
+                              {hasAudio && hasSpotify ? 'Podcast de audio para escuchar en la web y vídeo podcast del episodio en Spotify.' : hasAudio ? 'Podcast de audio oficial con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
                             </p>
                           </div>
                           {hasPodcast ? (
@@ -768,7 +768,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                     boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
                                   }}
                                 >
-                                  <Headphones size={13} /> Escuchar Píldora de Audio
+                                  <Headphones size={13} /> Escuchar Podcast de Audio
                                 </button>
                               )}
                               {hasSpotify && (

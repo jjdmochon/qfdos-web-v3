@@ -173,7 +173,7 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
                 gap: '6px'
               }}
             >
-              <Headphones size={15} /> Píldora de Audio Web (MP3)
+              <Headphones size={15} /> Podcast de Audio (MP3)
             </button>
             <button
               onClick={() => setActiveMediaTab('spotify')}
@@ -216,7 +216,7 @@ export const SpotifyPlayerModal: React.FC<SpotifyPlayerModalProps> = ({
               }}
             >
               {activeMediaTab === 'audio' ? <Headphones size={12} /> : <Radio size={12} />}
-              {activeMediaTab === 'audio' ? 'Píldora Docente de Audio · Streaming Directo' : 'Episodio Oficial de Vídeo · Spotify'}
+              {activeMediaTab === 'audio' ? 'Podcast de Audio · Streaming Directo' : 'Episodio Oficial de Vídeo · Spotify'}
             </span>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
               Facultad de Farmacia · UGR

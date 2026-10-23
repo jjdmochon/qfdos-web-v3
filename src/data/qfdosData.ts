@@ -525,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.68.3 — «Píldora de audio» pasa a llamarse «Podcast de audio» en toda la plataforma (ficha del tema, reproductor, Historias, avisos y Gestión docente); el nombre del audio guardado en la web manda sobre el publicado.
  * v3.68.2 — Tema 4: Historias con el cartel y el clip vertical de brag y el vídeo podcast (30 s); episodio de Spotify enlazado.
  * v3.68.1 — Tema 4: la píldora de audio (8 min 46 s) va dentro de la web (audio/podcast_serotoninergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar sin sesión de Google.
  * v3.68.0 — Píldoras de audio: el reproductor muestra el título, la descripción y los contenidos clave del tema que se escucha (antes, siempre los del Tema 1), y reproduce los audios subidos a Drive desde «Gestionar curso»; si el navegador no puede, ofrece el reproductor de Drive.
@@ -554,7 +555,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.68.2';
+export const COURSE_DATA_VERSION = '3.68.3';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -611,13 +612,13 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-tema02-tests-recursos',
     title: '📝 Tema 2 · Sistema Adrenérgico: ya están disponibles los tipo test y el resto de recursos',
-    content: 'Ya podéis hacer los tres modelos de examen tipo test del Tema 2 (45 preguntas en total, 15 por modelo) desde el botón de test de la tarjeta del Tema 02 en el temario. Además tenéis la píldora de audio del tema (6 min y medio), el vídeo resumen en Spotify y, en las Historias de la portada, el cartel y el clip del tema. Os recomendamos escuchar el audio y ver el resumen antes de enfrentaros a los tests.',
+    content: 'Ya podéis hacer los tres modelos de examen tipo test del Tema 2 (45 preguntas en total, 15 por modelo) desde el botón de test de la tarjeta del Tema 02 en el temario. Además tenéis el podcast de audio del tema (6 min y medio), el vídeo resumen en Spotify y, en las Historias de la portada, el cartel y el clip del tema. Os recomendamos escuchar el audio y ver el resumen antes de enfrentaros a los tests.',
     date: '6 Octubre 2026',
     priority: 'normal',
     imageUrl: 'historias/tema-02-brag.jpg',
     imageCaption: 'Noradrenalina, (R): la molécula de la lucha o la huida',
     audioUrl: 'audio/podcast_adrenergicos.mp3',
-    audioName: 'Píldora Docente 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
+    audioName: 'Podcast de Audio 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
     linkUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
     linkLabel: 'Ver el vídeo resumen en Spotify',
     enHistorias: true,
@@ -625,12 +626,12 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   },
   {
     id: 'ann-podcast-t01',
-    title: '🎙️ Nueva Píldora de Audio del Tema 1: Sistema Colinérgico (MP3 & Spotify)',
+    title: '🎙️ Nuevo Podcast de Audio del Tema 1: Sistema Colinérgico (MP3 & Spotify)',
     content: 'Publicado el episodio de audio docente para el repaso autónomo de la transmisión colinérgica, inhibidores de AChE (Donepezilo, Rivastigmina) y rescate enzimático frente a organofosforados con Pralidoxima (2-PAM). Puedes escucharlo directamente aquí o descargarlo en MP3.',
     date: '28 Septiembre 2026',
     priority: 'alta',
     audioUrl: 'audio/podcast_colinergicos.mp3',
-    audioName: 'Píldora Docente 01: Acetilcolina y Fármacos Colinérgicos (6 min)',
+    audioName: 'Podcast de Audio 01: Acetilcolina y Fármacos Colinérgicos (6 min)',
     linkUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2',
     linkLabel: 'Escuchar en Spotify',
     enHistorias: true,
@@ -2229,7 +2230,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     spotifyPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
     videoPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
     audioPodcastUrl: 'audio/podcast_colinergicos.mp3',
-    audioPodcastName: 'Píldora Docente 01: Acetilcolina y Fármacos Colinérgicos (Audio MP3 · 6 min)',
+    audioPodcastName: 'Podcast de Audio 01: Acetilcolina y Fármacos Colinérgicos (Audio MP3 · 6 min)',
     drugs: [
       {
         name: 'Acetilcolina',
@@ -2716,7 +2717,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     attachments: [
       {
         id: 'att-t01-podcast-audio',
-        title: 'Píldora Docente de Audio 01: Transmisión y Fármacos Colinérgicos (Audio MP3 · 6 min)',
+        title: 'Podcast de Audio 01: Transmisión y Fármacos Colinérgicos (Audio MP3 · 6 min)',
         type: 'audio',
         url: 'audio/podcast_colinergicos.mp3',
         size: '4.3 MB',
@@ -2971,7 +2972,7 @@ flashcards: [
     spotifyPodcastUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
     videoPodcastUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
     audioPodcastUrl: 'audio/podcast_adrenergicos.mp3',
-    audioPodcastName: 'Píldora Docente 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
+    audioPodcastName: 'Podcast de Audio 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
     drugs: [
       {
         name: 'L-Tirosina',
@@ -4438,7 +4439,7 @@ flashcards: [
     spotifyPodcastUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
     videoPodcastUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
     audioPodcastUrl: 'audio/podcast_serotoninergicos.mp3',
-    audioPodcastName: 'Píldora Docente 04: Serotonina y Sistema Serotoninérgico (Audio MP3 · 9 min)',
+    audioPodcastName: 'Podcast de Audio 04: Serotonina y Sistema Serotoninérgico (Audio MP3 · 9 min)',
     // 71 compuestos del Tema 4 (QFDOS-170 a 240), generados desde public/estructuras/tema4/propiedades_qfdos.csv
     drugs: [
       {

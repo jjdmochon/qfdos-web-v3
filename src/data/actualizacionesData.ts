@@ -30,8 +30,8 @@ export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
     id: 'act-3.68.0-pildoras-audio',
     version: 'v3.68.0',
     fecha: '22 Octubre 2026',
-    titulo: 'Las píldoras de audio, cada una con su tema',
-    texto: 'Respecto al reproductor de las píldoras de audio, ahora muestra el título y los contenidos clave del tema que estás escuchando; antes salían siempre los del Tema 1. Además ya puedes escuchar la píldora del Tema 4, de casi nueve minutos, directamente en la web.'
+    titulo: 'Los podcasts de audio, cada uno con su tema',
+    texto: 'Respecto al reproductor de los podcasts de audio, ahora muestra el título y los contenidos clave del tema que estás escuchando; antes salían siempre los del Tema 1. Además ya puedes escuchar el podcast de audio del Tema 4, de casi nueve minutos, directamente en la web.'
   },
   {
     id: 'act-3.63.0-revision-test',
