@@ -59,94 +59,108 @@ const TEMAS_SIN_TEST = new Set<string>();
  */
 const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04']);
 
+/**
+ * Píldora de audio: si el código trae el MP3 dentro de la web (audio/…), manda
+ * sobre lo publicado. Un enlace de Drive no se puede reproducir de forma
+ * fiable en el reproductor de la web (exige sesión de Google o cookies de
+ * terceros), así que el fichero local gana aunque se haya publicado otro.
+ */
+function conAudioDelCodigo(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
+  const local = base.audioPodcastUrl?.trim();
+  if (!local || /^https?:/i.test(local) || t.audioPodcastUrl === local) return t;
+  return { ...t, audioPodcastUrl: local, audioPodcastName: base.audioPodcastName || t.audioPodcastName };
+}
+
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
   const mapped = topics.map(t => {
     const base = INITIAL_TOPICS.find(item => item.id === t.id);
-    if (!base) return t;
-
-    if (t.id === 'tema-00') {
-      return {
-        ...base,
-        slidesPdfUrl: typeof t.slidesPdfUrl === 'string' && t.slidesPdfUrl.startsWith('http') ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
-        slidesPdfName: t.slidesPdfName || base.slidesPdfName,
-        notesPdfUrl: typeof t.notesPdfUrl === 'string' && t.notesPdfUrl.startsWith('http') ? t.notesPdfUrl : (base.notesPdfUrl || ''),
-        notesPdfName: t.notesPdfName || base.notesPdfName,
-        geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
-        spotifyPodcastUrl: undefined,
-        videoPodcastUrl: undefined,
-        testQuestions: [],
-        flashcards: []
-      };
-    }
-
-    if (t.id === 'tema-02') {
-      return {
-        ...base,
-        ...t,
-        // «En Revisión» lo decide el profesorado y se respeta; cualquier otro estado vuelve a «Publicado»
-        status: t.status === 'En Revisión' ? 'En Revisión' as const : 'Publicado' as const,
-        testDisponible: true,
-        testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
-        // Como en el resto de temas: si el código trae flashcards, mandan sobre las publicadas
-        flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
-        flashcardsDisponibles: base.flashcardsDisponibles,
-      };
-    }
-
-    // Tema 3: publicado con flashcards y test (3 modelos). El estado y los
-    // enlaces oficiales los manda el codigo, para que una hoja remota antigua no
-    // lo devuelva a "Proximamente", no apague el test ni borre los PDF. Solo se
-    // respeta "En Revision", que oculta test y flashcards al alumnado.
-    if (t.id === 'tema-03') {
-      return {
-        ...base,
-        ...t,
-        // «En Revisión» lo decide el profesorado y se respeta; cualquier otro estado vuelve a «Publicado»
-        status: t.status === 'En Revisión' ? 'En Revisión' as const : 'Publicado' as const,
-        testDisponible: true,
-        testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
-        slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
-        slidesPdfName: t.slidesPdfName || base.slidesPdfName,
-        notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
-        notesPdfName: t.notesPdfName || base.notesPdfName,
-        spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
-        videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
-        flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
-        flashcardsDisponibles: base.flashcardsDisponibles,
-      };
-    }
-
-    return {
-      ...base,
-      ...t,
-      notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
-      notesPdfName: t.notesPdfName || base.notesPdfName,
-      slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
-      slidesPdfName: t.slidesPdfName || base.slidesPdfName,
-      geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
-      spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
-      videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
-      audioPodcastUrl: t.audioPodcastUrl || base.audioPodcastUrl || '',
-      audioPodcastName: t.audioPodcastName || base.audioPodcastName || '',
-      attachments: (t.attachments && t.attachments.length > 0) ? t.attachments : (base.attachments || []),
-      testQuestions: TEMAS_SIN_TEST.has(t.id)
-        ? []
-        : TEMAS_TEST_DEL_CODIGO.has(t.id)
-        ? (base.testQuestions || [])
-        : (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
-      flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
-      drugs: (Array.isArray(t.drugs) && t.drugs.length >= (base.drugs?.length || 0)) ? t.drugs : (base.drugs || []),
-      // Habilitar test y flashcards se decide en el código, no en lo publicado
-      testDisponible: base.testDisponible,
-      flashcardsDisponibles: base.flashcardsDisponibles,
-    };
+    return base ? conAudioDelCodigo(normalizarTema(t, base), base) : t;
   });
 
   // Asegurar que temas introducidos en INITIAL_TOPICS (ej: tema-varios) no queden fuera si la caché es anterior
   const mappedIds = new Set(mapped.map(t => t.id));
   const missingBaseTopics = INITIAL_TOPICS.filter(bt => !mappedIds.has(bt.id));
   return [...mapped, ...missingBaseTopics];
+}
+
+function normalizarTema(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
+  if (t.id === 'tema-00') {
+    return {
+      ...base,
+      slidesPdfUrl: typeof t.slidesPdfUrl === 'string' && t.slidesPdfUrl.startsWith('http') ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
+      slidesPdfName: t.slidesPdfName || base.slidesPdfName,
+      notesPdfUrl: typeof t.notesPdfUrl === 'string' && t.notesPdfUrl.startsWith('http') ? t.notesPdfUrl : (base.notesPdfUrl || ''),
+      notesPdfName: t.notesPdfName || base.notesPdfName,
+      geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
+      spotifyPodcastUrl: undefined,
+      videoPodcastUrl: undefined,
+      testQuestions: [],
+      flashcards: []
+    };
+  }
+
+  if (t.id === 'tema-02') {
+    return {
+      ...base,
+      ...t,
+      // «En Revisión» lo decide el profesorado y se respeta; cualquier otro estado vuelve a «Publicado»
+      status: t.status === 'En Revisión' ? 'En Revisión' as const : 'Publicado' as const,
+      testDisponible: true,
+      testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
+      // Como en el resto de temas: si el código trae flashcards, mandan sobre las publicadas
+      flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
+      flashcardsDisponibles: base.flashcardsDisponibles,
+    };
+  }
+
+  // Tema 3: publicado con flashcards y test (3 modelos). El estado y los
+  // enlaces oficiales los manda el codigo, para que una hoja remota antigua no
+  // lo devuelva a "Proximamente", no apague el test ni borre los PDF. Solo se
+  // respeta "En Revision", que oculta test y flashcards al alumnado.
+  if (t.id === 'tema-03') {
+    return {
+      ...base,
+      ...t,
+      // «En Revisión» lo decide el profesorado y se respeta; cualquier otro estado vuelve a «Publicado»
+      status: t.status === 'En Revisión' ? 'En Revisión' as const : 'Publicado' as const,
+      testDisponible: true,
+      testQuestions: (Array.isArray(t.testQuestions) && t.testQuestions.length >= 15) ? t.testQuestions : (base.testQuestions || []),
+      slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
+      slidesPdfName: t.slidesPdfName || base.slidesPdfName,
+      notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
+      notesPdfName: t.notesPdfName || base.notesPdfName,
+      spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
+      videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
+      flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
+      flashcardsDisponibles: base.flashcardsDisponibles,
+    };
+  }
+
+  return {
+    ...base,
+    ...t,
+    notesPdfUrl: (t.notesPdfUrl && t.notesPdfUrl.startsWith('http')) ? t.notesPdfUrl : (base.notesPdfUrl || ''),
+    notesPdfName: t.notesPdfName || base.notesPdfName,
+    slidesPdfUrl: (t.slidesPdfUrl && t.slidesPdfUrl.startsWith('http')) ? t.slidesPdfUrl : (base.slidesPdfUrl || ''),
+    slidesPdfName: t.slidesPdfName || base.slidesPdfName,
+    geminiNotebookUrl: (t.geminiNotebookUrl && t.geminiNotebookUrl.startsWith('http')) ? t.geminiNotebookUrl : (base.geminiNotebookUrl || ''),
+    spotifyPodcastUrl: (t.spotifyPodcastUrl && t.spotifyPodcastUrl.startsWith('http')) ? t.spotifyPodcastUrl : (base.spotifyPodcastUrl || ''),
+    videoPodcastUrl: (t.videoPodcastUrl && t.videoPodcastUrl.startsWith('http')) ? t.videoPodcastUrl : (base.videoPodcastUrl || ''),
+    audioPodcastUrl: t.audioPodcastUrl || base.audioPodcastUrl || '',
+    audioPodcastName: t.audioPodcastName || base.audioPodcastName || '',
+    attachments: (t.attachments && t.attachments.length > 0) ? t.attachments : (base.attachments || []),
+    testQuestions: TEMAS_SIN_TEST.has(t.id)
+      ? []
+      : TEMAS_TEST_DEL_CODIGO.has(t.id)
+      ? (base.testQuestions || [])
+      : (Array.isArray(t.testQuestions) && t.testQuestions.length >= (base.testQuestions?.length || 0)) ? t.testQuestions : (base.testQuestions || []),
+    flashcards: (base.flashcards && base.flashcards.length > 0) ? base.flashcards : (t.flashcards || []),
+    drugs: (Array.isArray(t.drugs) && t.drugs.length >= (base.drugs?.length || 0)) ? t.drugs : (base.drugs || []),
+    // Habilitar test y flashcards se decide en el código, no en lo publicado
+    testDisponible: base.testDisponible,
+    flashcardsDisponibles: base.flashcardsDisponibles,
+  };
 }
 
 /**

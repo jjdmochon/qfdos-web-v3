@@ -748,7 +748,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               </div>
                             </div>
                             <p style={{ fontSize: '0.78rem', color: hasPodcast ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
-                              {hasAudio && hasSpotify ? 'Píldora sonora (6 min) para escuchar en la web y vídeo podcast del episodio en Spotify.' : hasAudio ? 'Píldora sonora oficial (6 min) con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
+                              {hasAudio && hasSpotify ? 'Píldora sonora para escuchar en la web y vídeo podcast del episodio en Spotify.' : hasAudio ? 'Píldora sonora oficial con análisis de farmacóforos y mecanismos.' : 'Episodio de audio/vídeo oficial con explicaciones del profesor.'}
                             </p>
                           </div>
                           {hasPodcast ? (
