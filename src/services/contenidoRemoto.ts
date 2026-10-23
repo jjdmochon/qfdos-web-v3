@@ -60,15 +60,18 @@ const TEMAS_SIN_TEST = new Set<string>();
 const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04']);
 
 /**
- * Píldora de audio: si el código trae el MP3 dentro de la web (audio/…), manda
- * sobre lo publicado. Un enlace de Drive no se puede reproducir de forma
+ * Podcast de audio: si el código trae el MP3 dentro de la web (audio/…), el
+ * fichero y su nombre mandan sobre lo publicado. Un enlace de Drive no se puede reproducir de forma
  * fiable en el reproductor de la web (exige sesión de Google o cookies de
  * terceros), así que el fichero local gana aunque se haya publicado otro.
  */
 function conAudioDelCodigo(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
   const local = base.audioPodcastUrl?.trim();
-  if (!local || /^https?:/i.test(local) || t.audioPodcastUrl === local) return t;
-  return { ...t, audioPodcastUrl: local, audioPodcastName: base.audioPodcastName || t.audioPodcastName };
+  if (!local || /^https?:/i.test(local)) return t;
+  // El nombre va con el fichero: lo publicado puede llevar uno antiguo («Píldora Docente…»)
+  const nombre = base.audioPodcastName || t.audioPodcastName;
+  if (t.audioPodcastUrl === local && t.audioPodcastName === nombre) return t;
+  return { ...t, audioPodcastUrl: local, audioPodcastName: nombre };
 }
 
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
