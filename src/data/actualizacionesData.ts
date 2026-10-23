@@ -31,7 +31,7 @@ export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
     version: 'v3.68.0',
     fecha: '22 Octubre 2026',
     titulo: 'Los podcasts de audio, cada uno con su tema',
-    texto: 'Respecto al reproductor de los podcasts de audio, ahora muestra el título y los contenidos clave del tema que estás escuchando; antes salían siempre los del Tema 1. Además ya puedes escuchar el podcast de audio del Tema 4, de casi nueve minutos, directamente en la web.'
+    texto: 'Respecto al reproductor de los podcasts de audio, ahora muestra el título y los contenidos clave del tema que estás escuchando; antes salían siempre los del Tema 1. Además ya puedes escuchar directamente en la web los podcasts de audio de los Temas 3 y 4, de unos nueve minutos cada uno.'
   },
   {
     id: 'act-3.63.0-revision-test',

@@ -525,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.68.5 — Tema 3: el podcast de audio (9 min 17 s) va dentro de la web (audio/podcast_dopaminergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar.
  * v3.68.4 — Novedades del curso: aviso del Tema 4 con todo el material (3 modelos de test, 15 flashcards, podcast de audio, baraja de 33 cartas y vídeo resumen), en el tablón y como primera historia, con su cartel y su clip.
  * v3.68.3 — «Píldora de audio» pasa a llamarse «Podcast de audio» en toda la plataforma (ficha del tema, reproductor, Historias, avisos y Gestión docente); el nombre del audio guardado en la web manda sobre el publicado.
  * v3.68.2 — Tema 4: Historias con el cartel y el clip vertical de brag y el vídeo podcast (30 s); episodio de Spotify enlazado.
@@ -556,7 +557,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.68.4';
+export const COURSE_DATA_VERSION = '3.68.5';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -3882,6 +3883,8 @@ flashcards: [
     notesPdfName: 'Tema 03: Apuntes Magistrales Fármacos Dopaminérgicos.pdf',
     geminiNotebookUrl: '',
     spotifyPodcastUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
+    audioPodcastUrl: 'audio/podcast_dopaminergicos.mp3',
+    audioPodcastName: 'Podcast de Audio 03: Dopamina y Sistema Dopaminérgico (Audio MP3 · 9 min)',
     videoPodcastUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
     drugs: [
       {
