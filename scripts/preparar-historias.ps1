@@ -1,5 +1,5 @@
 <#
-    preparar-historias.ps1 — Prepara los vídeos de las Historias (Tema 1 por defecto; -Tema 2 para el Tema 2).
+    preparar-historias.ps1 — Prepara los vídeos de las Historias (Tema 1 por defecto; -Tema 2 o -Tema 4 para esos temas).
 
     Copia desde las carpetas de Drive los dos vídeos que usan las Historias y los
     deja en public\historias con el tamaño adecuado para la web:
@@ -21,7 +21,8 @@
 #>
 
 param(
-    [string]$Drive = 'I:\Mi unidad\Classroom\2627 QFDOS E\Temas 2627'
+    [int]$Tema = 1,
+    [string]$Drive = 'K:\Mi unidad\Classroom\2627 QFDOS E\1. Temas 2627'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -66,7 +67,22 @@ if ($Tema -eq 2) {
     return
 }
 
-if ($Tema -ne 1) { throw 'Tema no soportado: usa 1 o 2.' }
+# --- Tema 4: vídeo resumen (Video Resumen) + clip y cartel verticales de brag ---
+if ($Tema -eq 4) {
+    $resumen4 = Get-ChildItem -LiteralPath (Join-Path $Drive 'Presentaciones Finales\Video Resumen') -Filter 'Video_Resumen_QFDOS_Tema_4*.mp4' | Select-Object -First 1
+    $clip4 = Join-Path $Drive 'brag\Tema 4\brag-output\qfdos_tema4_brag_vertical.mp4'
+    $cartel4 = Join-Path $Drive 'brag\Tema 4\brag-output\qfdos_tema4_brag_vertical.jpg'
+    if (-not $resumen4) { throw "No encuentro el vídeo resumen del Tema 4 en '$Drive\Presentaciones Finales\Video Resumen'." }
+    foreach ($f in @($clip4, $cartel4)) { if (-not (Test-Path -LiteralPath $f)) { throw "No encuentro: $f" } }
+    Write-Host 'Preparando Historias del Tema 4...' -ForegroundColor Cyan
+    Copy-Item -LiteralPath $cartel4 (Join-Path $destino 'tema-04-brag.jpg') -Force
+    Convertir $resumen4.FullName (Join-Path $destino 'tema-04-video-podcast.mp4') @('-t', '30', '-vf', 'scale=min(1280\,iw):-2')
+    Convertir $clip4 (Join-Path $destino 'tema-04-clip.mp4') @('-vf', 'scale=720:-2')
+    Write-Host 'Listo. Sube public/historias con git (add, commit y push).' -ForegroundColor Cyan
+    return
+}
+
+if ($Tema -ne 1) { throw 'Tema no soportado: usa 1, 2 o 4.' }
 Write-Host 'Preparando vídeos de las Historias...' -ForegroundColor Cyan
 # Vídeo podcast: 30 s, ancho máximo 1280 (suele ser apaisado)
 Convertir $videoPodcast.FullName (Join-Path $destino 'tema-01-video-podcast.mp4') @('-t', '30', '-vf', 'scale=min(1280\,iw):-2')

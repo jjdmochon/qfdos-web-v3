@@ -89,6 +89,11 @@ const MEDIOS_TEMA: Record<string, { videoPodcast?: string; clip?: string; imagen
     videoPodcast: 'historias/tema-03-video-podcast.mp4',
     clip: 'historias/tema-03-clip.mp4',
     imagen: 'historias/tema-03-brag.jpg'
+  },
+  'tema-04': {
+    videoPodcast: 'historias/tema-04-video-podcast.mp4',
+    clip: 'historias/tema-04-clip.mp4',
+    imagen: 'historias/tema-04-brag.jpg'
   }
 };
 
