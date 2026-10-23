@@ -525,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.68.2 — Tema 4: Historias con el cartel y el clip vertical de brag y el vídeo podcast (30 s); episodio de Spotify enlazado.
  * v3.68.1 — Tema 4: la píldora de audio (8 min 46 s) va dentro de la web (audio/podcast_serotoninergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar sin sesión de Google.
  * v3.68.0 — Píldoras de audio: el reproductor muestra el título, la descripción y los contenidos clave del tema que se escucha (antes, siempre los del Tema 1), y reproduce los audios subidos a Drive desde «Gestionar curso»; si el navegador no puede, ofrece el reproductor de Drive.
  * v3.67.3 — Flashcards: los párrafos «Ampliación:» se resaltan en ámbar, y la tarjeta lo avisa en el anverso, la cabecera y la lista (Tema 4).
@@ -553,7 +554,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.68.1';
+export const COURSE_DATA_VERSION = '3.68.2';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -4434,7 +4435,8 @@ flashcards: [
     notesPdfUrl: '',
     notesPdfName: 'Tema 04: Apuntes Magistrales de Triptanes e ISRS.pdf',
     geminiNotebookUrl: '',
-    spotifyPodcastUrl: '',
+    spotifyPodcastUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
+    videoPodcastUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
     audioPodcastUrl: 'audio/podcast_serotoninergicos.mp3',
     audioPodcastName: 'Píldora Docente 04: Serotonina y Sistema Serotoninérgico (Audio MP3 · 9 min)',
     // 71 compuestos del Tema 4 (QFDOS-170 a 240), generados desde public/estructuras/tema4/propiedades_qfdos.csv
