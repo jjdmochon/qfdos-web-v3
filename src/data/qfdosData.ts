@@ -525,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.68.4 — Novedades del curso: aviso del Tema 4 con todo el material (3 modelos de test, 15 flashcards, podcast de audio, baraja de 33 cartas y vídeo resumen), en el tablón y como primera historia, con su cartel y su clip.
  * v3.68.3 — «Píldora de audio» pasa a llamarse «Podcast de audio» en toda la plataforma (ficha del tema, reproductor, Historias, avisos y Gestión docente); el nombre del audio guardado en la web manda sobre el publicado.
  * v3.68.2 — Tema 4: Historias con el cartel y el clip vertical de brag y el vídeo podcast (30 s); episodio de Spotify enlazado.
  * v3.68.1 — Tema 4: la píldora de audio (8 min 46 s) va dentro de la web (audio/podcast_serotoninergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar sin sesión de Google.
@@ -555,7 +556,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.68.3';
+export const COURSE_DATA_VERSION = '3.68.4';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -584,7 +585,7 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
@@ -595,6 +596,19 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
     priority: 'alta',
     linkUrl: 'mailto:juandiaz@go.ugr.es?subject=QFDOS%20%C2%B7%20No%20se%20graba%20la%20nota%20del%20test',
     linkLabel: 'Escribir a juandiaz@go.ugr.es'
+  },
+  {
+    id: 'ann-tema04-material-completo',
+    title: '📝 Tema 4 · Sistema Serotoninérgico: ya está disponible todo el material',
+    content: 'Respecto al Tema 4, ya tenéis todo el material publicado. Los tres modelos de examen tipo test (15 preguntas cada uno, 45 en total) se abren desde el botón de test de la tarjeta del Tema 04, en el temario: ISRS, tricíclicos y síntesis de la imipramina; IMAO, triptanes y síntesis de indoles de Fischer; y azapironas, setrones, ciproheptadina y almotriptán. En la misma tarjeta están las 15 flashcards de estudio, con los párrafos de ampliación resaltados, y el podcast de audio del tema (casi nueve minutos). En Cartas de los temas, la baraja serotoninérgica con 33 fármacos. En las Historias de la portada dejamos el cartel, el clip y un avance del vídeo resumen, que tenéis completo en Spotify. Mi consejo: escuchad el podcast, repasad las flashcards y después id a por los tests.',
+    date: '23 Octubre 2026',
+    priority: 'alta',
+    imageUrl: 'historias/tema-04-brag.jpg',
+    imageCaption: 'Cuatro cambios. Un triptán.',
+    linkUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
+    linkLabel: 'Ver el vídeo resumen en Spotify',
+    enHistorias: true,
+    temaId: 'tema-04'
   },
   {
     id: 'ann-tema03-tests-recursos',
