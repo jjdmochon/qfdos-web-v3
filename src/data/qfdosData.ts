@@ -525,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.69.0 — Temas «En Revisión» (Tema 5): el alumnado solo ve los materiales ya subidos, sin los huecos «Próximamente disponible», ni en la ficha ni en la tarjeta del temario; si aún no hay ninguno, un aviso lo explica. El Tema 5 pasa a «En Revisión» con su baraja de 35 cartas; su pregunta y su flashcard de relleno quedan apagadas hasta tener los modelos.
  * v3.68.5 — Tema 3: el podcast de audio (9 min 17 s) va dentro de la web (audio/podcast_dopaminergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar.
  * v3.68.4 — Novedades del curso: aviso del Tema 4 con todo el material (3 modelos de test, 15 flashcards, podcast de audio, baraja de 33 cartas y vídeo resumen), en el tablón y como primera historia, con su cartel y su clip.
  * v3.68.3 — «Píldora de audio» pasa a llamarse «Podcast de audio» en toda la plataforma (ficha del tema, reproductor, Historias, avisos y Gestión docente); el nombre del audio guardado en la web manda sobre el publicado.
@@ -557,7 +558,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.68.5';
+export const COURSE_DATA_VERSION = '3.69.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -5372,7 +5373,8 @@ flashcards: [
     slideCount: 50,
     pdbTargetId: '6HUP',
     targetName: 'Receptor GABAA Humano unido a Diazepam y GABA',
-    status: 'Próximamente',
+    // En revisión: el alumnado ve los materiales que se van subiendo y la baraja; test y flashcards, no
+    status: 'En Revisión',
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 05: Diapositivas Oficiales Sistema GABAérgico.pdf',
     notesPdfUrl: '',
@@ -5416,6 +5418,9 @@ flashcards: [
       }
     ],
     attachments: [],
+    // El test y las flashcards de abajo son de relleno: no se ofrecen hasta tener los modelos del tema
+    testDisponible: false,
+    flashcardsDisponibles: false,
     testQuestions: [
       {
         id: 't05-q1',

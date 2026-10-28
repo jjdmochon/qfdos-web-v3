@@ -249,10 +249,12 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
     );
   }
 
-  // «En Revisión»: el alumnado ve los enlaces del tema y la baraja de cartas, nada más
+  // «En Revisión»: el alumnado ve los materiales ya subidos y la baraja de cartas, nada más
   const soloEnlacesYCartas = enRevisionParaAlumnado(topic, isProfesor);
   const enRevision = topic.status === 'En Revisión';
   const pestanaVisible = !soloEnlacesYCartas || activeTab === 'sar' || activeTab === 'cartas';
+  // En revisión faltan tarjetas, así que no se numeran (no saldría «2.» sin «1.»)
+  const orden = (n: number) => (soloEnlacesYCartas ? '' : `${n}. `);
 
   /**
    * Abre el reproductor en la pestaña pedida. El podcast de audio y el vídeo
@@ -405,12 +407,12 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
           
           {soloEnlacesYCartas && (
             <div className="status-msg status-msg--info" role="status" style={{ marginBottom: '1rem' }}>
-              Tema en revisión: de momento tienes los enlaces del tema y su baraja de cartas. El test y las flashcards se abrirán cuando se publique.
+              Tema en revisión: aquí tienes los materiales publicados hasta ahora y la baraja de cartas; el resto irá apareciendo según se suba. El test y las flashcards se abrirán cuando se publique el tema.
             </div>
           )}
           {isProfesor && enRevision && (
             <div className="status-msg status-msg--warn" role="status" style={{ marginBottom: '1rem' }}>
-              Tema en revisión: el alumnado solo ve los enlaces y las cartas. El test, las flashcards y las pestañas de fármacos y retrosíntesis le quedan ocultos.
+              Tema en revisión: el alumnado solo ve los materiales que ya has subido (sin los huecos «Próximamente disponible»), los documentos no reservados al profesorado y las cartas. El test, las flashcards y las pestañas de fármacos y retrosíntesis le quedan ocultos.
             </div>
           )}
 
@@ -432,7 +434,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                   <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-title)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Sparkles size={16} color="var(--teal-ink)" /> Suite Completa de Recursos para el Alumno
+                    <Sparkles size={16} color="var(--teal-ink)" /> {soloEnlacesYCartas ? 'Materiales publicados' : 'Suite Completa de Recursos para el Alumno'}
                   </h4>
                   {isProfesor && onUpdateTopic && (
                     <button
@@ -556,10 +558,19 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                   const hasSpotify = !!(topic.spotifyPodcastUrl && topic.spotifyPodcastUrl.startsWith('http'));
                   const hasPodcast = hasAudio || hasSpotify;
 
+                  if (soloEnlacesYCartas && !hasNotes && !hasSlides && !hasNotebook && !hasPodcast) {
+                    return (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                        Aún no hay materiales de este tema. Los apuntes, las diapositivas y el podcast aparecerán aquí según se vayan subiendo.
+                      </p>
+                    );
+                  }
+
                   return (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '14px' }}>
                       
                       {/* 1. Apuntes PDF */}
+                      {(!soloEnlacesYCartas || hasNotes) && (
                       <div className={`qfdos-card card-teal resource-card ${hasNotes ? 'is-active' : 'is-inactive'}`}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -577,7 +588,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 <FileText size={17} color={hasNotes ? 'var(--teal-ink)' : 'var(--text-muted)'} />
                               </div>
                               <strong style={{ fontSize: '0.88rem', color: hasNotes ? 'var(--text-title)' : 'var(--text-muted)' }}>
-                                1. Apuntes Oficiales (PDF)
+                                {orden(1)}Apuntes Oficiales (PDF)
                               </strong>
                             </div>
                             {hasNotes && (
@@ -606,8 +617,10 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           </span>
                         )}
                       </div>
+                      )}
 
                       {/* 2. Diapositivas PDF */}
+                      {(!soloEnlacesYCartas || hasSlides) && (
                       <div className={`qfdos-card card-navy resource-card ${hasSlides ? 'is-active' : 'is-inactive'}`}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -625,7 +638,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 <FileText size={17} color={hasSlides ? 'var(--navy-ink)' : 'var(--text-muted)'} />
                               </div>
                               <strong style={{ fontSize: '0.88rem', color: hasSlides ? 'var(--text-title)' : 'var(--text-muted)' }}>
-                                2. Diapositivas (PDF)
+                                {orden(2)}Diapositivas (PDF)
                               </strong>
                             </div>
                             {hasSlides && (
@@ -654,8 +667,10 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           </span>
                         )}
                       </div>
+                      )}
 
                       {/* 3. Gemini Notebook */}
+                      {(!soloEnlacesYCartas || hasNotebook) && (
                       <div className={`qfdos-card card-mint resource-card ${hasNotebook ? 'is-active' : 'is-inactive'}`}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -673,7 +688,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 <Sparkles size={17} color={hasNotebook ? 'var(--teal-ink)' : 'var(--text-muted)'} />
                               </div>
                               <strong style={{ fontSize: '0.88rem', color: hasNotebook ? 'var(--text-title)' : 'var(--text-muted)' }}>
-                                3. Gemini NotebookLM
+                                {orden(3)}Gemini NotebookLM
                               </strong>
                             </div>
                             {hasNotebook && (
@@ -711,9 +726,10 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           </span>
                         )}
                       </div>
+                      )}
 
                       {/* 4. Podcast de audio y vídeo (Omitido en Presentación del Curso) */}
-                      {topic.id !== 'tema-00' && (
+                      {topic.id !== 'tema-00' && (!soloEnlacesYCartas || hasPodcast) && (
                         <div className={`qfdos-card card-spotify resource-card ${hasPodcast ? 'is-active' : 'is-inactive'}`}>
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -731,7 +747,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                   <Radio size={17} color={hasPodcast ? '#1db954' : 'var(--text-muted)'} />
                                 </div>
                                 <strong style={{ fontSize: '0.88rem', color: hasPodcast ? 'var(--text-title)' : 'var(--text-muted)' }}>
-                                  4. Podcast de Audio y Vídeo
+                                  {orden(4)}Podcast de Audio y Vídeo
                                 </strong>
                               </div>
                               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>

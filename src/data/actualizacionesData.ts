@@ -27,6 +27,13 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.69.0-tema5-revision',
+    version: 'v3.69.0',
+    fecha: '28 Octubre 2026',
+    titulo: 'El Tema 5 ya está abierto, en revisión',
+    texto: 'Respecto al Tema 5 (Sistema GABAérgico), ya puedes entrar en él. Mientras está en revisión verás solo los materiales que ya se han subido, que irán apareciendo según estén listos, y la baraja de 35 cartas GABAérgicas. El test y las flashcards se abrirán cuando se publique el tema.'
+  },
+  {
     id: 'act-3.68.0-pildoras-audio',
     version: 'v3.68.0',
     fecha: '22 Octubre 2026',
