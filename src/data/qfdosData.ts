@@ -525,7 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
- * v3.69.1 — Tema 5: descripción y conceptos clave ajustados al temario real (aminoácidos y shunt del GABA, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos); sustituyen a la plantilla antigua aunque siga publicada en el CMS.
+ * v3.69.1 — Tema 5: subtítulo, descripción y conceptos clave ajustados al temario real (aminoácidos y shunt del GABA, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos); sustituyen a la plantilla antigua aunque siga publicada en el CMS.
  * v3.69.0 — Temas «En Revisión» (Tema 5): el alumnado solo ve los materiales ya subidos, sin los huecos «Próximamente disponible», ni en la ficha ni en la tarjeta del temario; si aún no hay ninguno, un aviso lo explica. El Tema 5 pasa a «En Revisión» con su baraja de 35 cartas; su pregunta y su flashcard de relleno quedan apagadas hasta tener los modelos.
  * v3.68.5 — Tema 3: el podcast de audio (9 min 17 s) va dentro de la web (audio/podcast_dopaminergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar.
  * v3.68.4 — Novedades del curso: aviso del Tema 4 con todo el material (3 modelos de test, 15 flashcards, podcast de audio, baraja de 33 cartas y vídeo resumen), en el tablón y como primera historia, con su cartel y su clip.
@@ -5361,7 +5361,7 @@ flashcards: [
     id: 'tema-05',
     number: 'Tema 05',
     title: 'Sistema GABAérgico',
-    subtitle: 'Moduladores Alostéricos Positivos de GABAA: Benzodiazepinas, Barbitúricos y Fármacos Z',
+    subtitle: 'GABA y Glicina: Benzodiazepinas, Neuroesteroides, Fármacos Z y Barbitúricos',
     description: 'Aminoácidos como neurotransmisores (glutamato, GABA y glicina) y el metabolismo del GABA dependiente del PLP (GAD y GABA-AT), diana de la vigabatrina. Receptor GABA-A, canal de Cl⁻ pentamérico con tres sitios moduladores: benzodiazepinas (interfaz α/γ2), neuroesteroides y barbitúricos. SAR, síntesis y metabolismo de las 1,4-benzodiazepinas, de la ruta de Sternbach a los anillos fusionados (triazolam, midazolam), y el antagonista flumazenilo. Neuroesteroides orales (ganaxolona, zuranolona), fármacos Z (zolpidem, zopiclona) y barbitúricos (SAR de C5, tiopental).',
     keyConcepts: [
       'Shunt del GABA: GAD, GABA-AT y SSADH, con el fosfato de piridoxal (PLP) como cofactor',

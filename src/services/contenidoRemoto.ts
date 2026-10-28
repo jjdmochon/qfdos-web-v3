@@ -79,8 +79,9 @@ function conAudioDelCodigo(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
  * lleva, gana el texto del código; si el profesor los ha editado en el CMS,
  * se respeta su versión.
  */
-const PLANTILLAS_ANTIGUAS: Record<string, { description: string; primerConcepto: string }> = {
+const PLANTILLAS_ANTIGUAS: Record<string, { subtitle: string; description: string; primerConcepto: string }> = {
   'tema-05': {
+    subtitle: 'Moduladores Alostéricos Positivos de GABAA: Benzodiazepinas, Barbitúricos y Fármacos Z',
     description: 'Estructura pentamérica del complejo receptor ionotrópico GABAA (canal de Cl-). Sitio de unión de GABA vs. sitios alostéricos moduladores. SAR de las 1,4-benzodiazepinas (Diazepam, Lorazepam, Alprazolam) y su farmacóforo. Hipnóticos no benzodiazepínicos o "Fármacos Z" selectivos de la subunidad alfa-1 (Zolpidem, Zopiclona). Antagonista específico del sitio benzodiazepínico (Flumazenil) para revertir sedación y sobredosis.',
     primerConcepto: 'Subunidades del receptor GABAA (2α, 2β, 1γ) y poro de Cloro'
   }
@@ -89,11 +90,13 @@ const PLANTILLAS_ANTIGUAS: Record<string, { description: string; primerConcepto:
 function conTextoDelCodigo(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
   const plantilla = PLANTILLAS_ANTIGUAS[t.id];
   if (!plantilla) return t;
+  const subtituloAntiguo = !t.subtitle || t.subtitle === plantilla.subtitle;
   const descripcionAntigua = !t.description || t.description === plantilla.description;
   const conceptosAntiguos = !t.keyConcepts?.length || t.keyConcepts[0] === plantilla.primerConcepto;
-  if (!descripcionAntigua && !conceptosAntiguos) return t;
+  if (!subtituloAntiguo && !descripcionAntigua && !conceptosAntiguos) return t;
   return {
     ...t,
+    subtitle: subtituloAntiguo ? base.subtitle : t.subtitle,
     description: descripcionAntigua ? base.description : t.description,
     keyConcepts: conceptosAntiguos ? base.keyConcepts : t.keyConcepts,
   };
