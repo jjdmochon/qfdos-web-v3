@@ -525,6 +525,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.69.1 — Tema 5: subtítulo, descripción y conceptos clave ajustados al temario real (aminoácidos y shunt del GABA, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos); sustituyen a la plantilla antigua aunque siga publicada en el CMS.
  * v3.69.0 — Temas «En Revisión» (Tema 5): el alumnado solo ve los materiales ya subidos, sin los huecos «Próximamente disponible», ni en la ficha ni en la tarjeta del temario; si aún no hay ninguno, un aviso lo explica. El Tema 5 pasa a «En Revisión» con su baraja de 35 cartas; su pregunta y su flashcard de relleno quedan apagadas hasta tener los modelos.
  * v3.68.5 — Tema 3: el podcast de audio (9 min 17 s) va dentro de la web (audio/podcast_dopaminergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar.
  * v3.68.4 — Novedades del curso: aviso del Tema 4 con todo el material (3 modelos de test, 15 flashcards, podcast de audio, baraja de 33 cartas y vídeo resumen), en el tablón y como primera historia, con su cartel y su clip.
@@ -558,7 +559,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.69.0';
+export const COURSE_DATA_VERSION = '3.69.1';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -5360,15 +5361,17 @@ flashcards: [
     id: 'tema-05',
     number: 'Tema 05',
     title: 'Sistema GABAérgico',
-    subtitle: 'Moduladores Alostéricos Positivos de GABAA: Benzodiazepinas, Barbitúricos y Fármacos Z',
-    description: 'Estructura pentamérica del complejo receptor ionotrópico GABAA (canal de Cl-). Sitio de unión de GABA vs. sitios alostéricos moduladores. SAR de las 1,4-benzodiazepinas (Diazepam, Lorazepam, Alprazolam) y su farmacóforo. Hipnóticos no benzodiazepínicos o "Fármacos Z" selectivos de la subunidad alfa-1 (Zolpidem, Zopiclona). Antagonista específico del sitio benzodiazepínico (Flumazenil) para revertir sedación y sobredosis.',
+    subtitle: 'GABA y Glicina: Benzodiazepinas, Neuroesteroides, Fármacos Z y Barbitúricos',
+    description: 'Aminoácidos como neurotransmisores (glutamato, GABA y glicina) y el metabolismo del GABA dependiente del PLP (GAD y GABA-AT), diana de la vigabatrina. Receptor GABA-A, canal de Cl⁻ pentamérico con tres sitios moduladores: benzodiazepinas (interfaz α/γ2), neuroesteroides y barbitúricos. SAR, síntesis y metabolismo de las 1,4-benzodiazepinas, de la ruta de Sternbach a los anillos fusionados (triazolam, midazolam), y el antagonista flumazenilo. Neuroesteroides orales (ganaxolona, zuranolona), fármacos Z (zolpidem, zopiclona) y barbitúricos (SAR de C5, tiopental).',
     keyConcepts: [
-      'Subunidades del receptor GABAA (2α, 2β, 1γ) y poro de Cloro',
-      'Modulación alostérica positiva (aumento de frecuencia de apertura vs. tiempo)',
-      'SAR de 1,4-benzodiazepinas: sustituyentes en C7 (electronegativo), C5 (fenilo) y anillo A/B/C',
-      'Profármacos y metabolitos activos de vida media larga (Nordiazepam, Oxazepam)',
-      'Fármacos Z (Zolpidem) y selectividad hipnótica α1',
-      'Flumazenil como modulador neutro / antagonista competitivo del sitio BZD'
+      'Shunt del GABA: GAD, GABA-AT y SSADH, con el fosfato de piridoxal (PLP) como cofactor',
+      'Vigabatrina, inhibidor suicida de la GABA-AT, y valproato',
+      'SAR de las 1,4-benzodiazepinas: atrayente en C7, 5-fenilo con 2′-halógeno y lactama en C2',
+      'Metabolitos activos y profármacos: nordazepam, oxazepam, clorazepato y prazepam',
+      'Anillos fusionados (triazolam, alprazolam, midazolam) y flumazenilo, antagonista del sitio BZD',
+      'Neuroesteroides: alopregnanolona y su paso a la vía oral (ganaxolona, zuranolona) con un 3β-metilo que impide oxidar el 3α-OH',
+      'Fármacos Z (zolpidem, zopiclona): preferencia α1 e hipnosis',
+      'Barbitúricos: 5,5-disustitución y acidez, SAR de C5 y tiopental de acción ultracorta por redistribución'
     ],
     slideCount: 50,
     pdbTargetId: '6HUP',
