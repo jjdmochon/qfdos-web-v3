@@ -27,6 +27,13 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.70.3-enlaces-nuevos-arriba',
+    version: 'v3.70.3',
+    fecha: '29 Octubre 2026',
+    titulo: 'Los enlaces nuevos, arriba en Enlaces de interés',
+    texto: 'En cuanto a la sección Enlaces de interés, los enlaces añadidos en las dos últimas semanas aparecen ahora los primeros, igual que en el Hub y en las Historias. Antes algunos quedaban al final de la lista.'
+  },
+  {
     id: 'act-3.70.0-gemini-exploracion',
     version: 'v3.70.0',
     fecha: '29 Octubre 2026',
