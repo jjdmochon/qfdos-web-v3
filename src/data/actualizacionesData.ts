@@ -27,6 +27,14 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.70.0-gemini-exploracion',
+    version: 'v3.70.0',
+    fecha: '29 Octubre 2026',
+    titulo: 'Nueva exploración inmersiva con Gemini en Enlaces',
+    texto: 'En cuanto a los Enlaces de interés, hemos añadido una exploración inmersiva preparada con Gemini para repasar el contenido de forma interactiva. La encontrarás destacada al principio de la sección.',
+    enlace: { label: 'Abrir la exploración', href: 'https://gemini.google.com/immersive-explorations/cd2bffbf-6342-5d3c-b010-9ad5672cda84' }
+  },
+  {
     id: 'act-3.69.0-tema5-revision',
     version: 'v3.69.0',
     fecha: '28 Octubre 2026',
