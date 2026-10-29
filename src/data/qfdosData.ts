@@ -280,6 +280,17 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-gemini-exploracion-inmersiva',
+    title: 'Exploración inmersiva con Gemini',
+    url: 'https://gemini.google.com/immersive-explorations/cd2bffbf-6342-5d3c-b010-9ad5672cda84',
+    summary:
+      'Una exploración interactiva preparada con Gemini para recorrer el contenido paso a paso, con explicaciones y visualizaciones que podéis ir abriendo a vuestro ritmo. Usadla como repaso guiado junto a los apuntes, no como sustituto: contrastad cada estructura y cada mecanismo con lo que vemos en clase.',
+    category: 'Divulgación',
+    source: 'Google Gemini',
+    featured: true,
+    addedAt: '2026-10-29'
+  },
+  {
     id: 'link-nobel-quimica-2026',
     title: 'Nobel de Química 2026: Kagan y Soai, efectos no lineales y autocatálisis en síntesis asimétrica',
     url: 'https://www.nobelprize.org/prizes/chemistry/2026/press-release/',
@@ -525,6 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.70.0 — Enlaces de interés: exploración inmersiva de Gemini, destacada.
  * v3.69.1 — Tema 5: subtítulo, descripción y conceptos clave ajustados al temario real (aminoácidos y shunt del GABA, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos); sustituyen a la plantilla antigua aunque siga publicada en el CMS.
  * v3.69.0 — Temas «En Revisión» (Tema 5): el alumnado solo ve los materiales ya subidos, sin los huecos «Próximamente disponible», ni en la ficha ni en la tarjeta del temario; si aún no hay ninguno, un aviso lo explica. El Tema 5 pasa a «En Revisión» con su baraja de 35 cartas; su pregunta y su flashcard de relleno quedan apagadas hasta tener los modelos.
  * v3.68.5 — Tema 3: el podcast de audio (9 min 17 s) va dentro de la web (audio/podcast_dopaminergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar.
@@ -559,7 +571,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.69.1';
+export const COURSE_DATA_VERSION = '3.70.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
