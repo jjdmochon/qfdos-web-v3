@@ -536,6 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.70.3 — Enlaces de interés: los añadidos en las dos últimas semanas encabezan la sección, como en el Hub y las Historias (un enlace nuevo publicado desde el CMS sin destacar quedaba al final).
  * v3.70.2 — Avisos: turnos del examen parcial del 19 de noviembre (formulario de preferencia) y examen de la convocatoria especial del 10 de noviembre, en el tablón y en las Historias.
  * v3.70.1 — Enlace de Gemini: título y resumen definitivos (galería de exploraciones inmersivas, The Discovery of Penicillin).
  * v3.70.0 — Enlaces de interés: exploración inmersiva de Gemini, destacada.
@@ -573,7 +574,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.70.2';
+export const COURSE_DATA_VERSION = '3.70.3';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
