@@ -536,6 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.70.2 — Avisos: turnos del examen parcial del 19 de noviembre (formulario de preferencia) y examen de la convocatoria especial del 10 de noviembre, en el tablón y en las Historias.
  * v3.70.1 — Enlace de Gemini: título y resumen definitivos (galería de exploraciones inmersivas, The Discovery of Penicillin).
  * v3.70.0 — Enlaces de interés: exploración inmersiva de Gemini, destacada.
  * v3.69.1 — Tema 5: subtítulo, descripción y conceptos clave ajustados al temario real (aminoácidos y shunt del GABA, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos); sustituyen a la plantilla antigua aunque siga publicada en el CMS.
@@ -572,7 +573,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.70.1';
+export const COURSE_DATA_VERSION = '3.70.2';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -601,9 +602,27 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-parcial-19-nov-turnos',
+    title: '📅 Examen parcial del 19 de noviembre: preferencias de turno',
+    content: 'El examen parcial de Química Farmacéutica II del jueves 19 de noviembre se realizará en dos turnos, ambos en el Aula 7-8: de 12.30 a 13.30 h y de 14.30 a 15.30 h. Para organizar el grupo en dos turnos, tenéis que completar el formulario indicando vuestra preferencia de horario. La preferencia no supone una asignación definitiva de turno.',
+    date: '29 Octubre 2026',
+    priority: 'alta',
+    linkUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdXL-E8Xx5T7t3RL_rj4kkxQTP8iCVny0Utic9slmUrNYdHaw/viewform?usp=publish-editor',
+    linkLabel: 'Indicar mi preferencia de turno',
+    enHistorias: true
+  },
+  {
+    id: 'ann-convocatoria-especial-10-nov',
+    title: '📅 Convocatoria especial: examen el 10 de noviembre',
+    content: 'El examen de Química Farmacéutica II de la convocatoria especial será el martes 10 de noviembre, de 14.30 a 16.30 h, en el Aula 10a.',
+    date: '29 Octubre 2026',
+    priority: 'alta',
+    enHistorias: true
+  },
   {
     id: 'ann-tests-grabacion-solucionado',
     title: '✅ Tests tipo test: solucionado el problema al grabar las notas',
