@@ -27,11 +27,11 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
-    id: 'act-3.72.0-tema5-podcast',
-    version: 'v3.72.0',
+    id: 'act-3.72.1-tema5-historias',
+    version: 'v3.72.1',
     fecha: '31 Octubre 2026',
     titulo: 'El Tema 5, en las Historias y con su podcast',
-    texto: 'En cuanto al Tema 5, ya tiene su círculo en las Historias, con el cartel, el clip y un avance del podcast de audio, que se escucha entero en la web desde la tarjeta del tema. El vídeo resumen está en Spotify.'
+    texto: 'En cuanto al Tema 5, ya tiene su círculo en las Historias, con el cartel, el clip y un avance de 30 segundos del podcast y del vídeo resumen. El podcast completo lo escucháis en la web, desde la tarjeta del tema; el vídeo, en Spotify.'
   },
   {
     id: 'act-3.70.3-enlaces-nuevos-arriba',
