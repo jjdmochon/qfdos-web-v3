@@ -57,7 +57,7 @@ const TEMAS_SIN_TEST = new Set<string>();
  * guardadas en el navegador no valen. Así una versión anterior de los modelos
  * no se cuela en el panel de claves con el mismo identificador y otra solución.
  */
-const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04']);
+const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04', 'tema-05']);
 
 /**
  * Podcast de audio: si el código trae el MP3 dentro de la web (audio/…), el

@@ -2217,6 +2217,8 @@ import { TEMA3_FLASHCARDS } from './tema03FlashcardsData';
 export * from './tema04ExamsData';
 import { TEMA4_MODELO_1_TEST_QUESTIONS } from './tema04ExamsData';
 import { TEMA4_FLASHCARDS } from './tema04FlashcardsData';
+export * from './tema05ExamsData';
+import { TEMA5_MODELO_1_TEST_QUESTIONS } from './tema05ExamsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
@@ -5454,26 +5456,11 @@ flashcards: [
       }
     ],
     attachments: [],
-    // El test y las flashcards de abajo son de relleno: no se ofrecen hasta tener los modelos del tema
-    testDisponible: false,
+    // Los tres modelos del Tema 5 están listos; con el tema en revisión solo los abre el profesorado.
+    // Las flashcards de abajo siguen siendo de relleno.
+    testDisponible: true,
     flashcardsDisponibles: false,
-    testQuestions: [
-      {
-        id: 't05-q1',
-        topicId: 'tema-05',
-        block: 'SAR Benzodiazepinas',
-        question: '¿Qué requerimiento electrónico en la posición 7 del anillo A de las 1,4-benzodiazepinas es imprescindible para mantener la alta afinidad por el receptor GABAA?',
-        options: [
-          'Un grupo electrodador voluminoso como un tert-butilo.',
-          'Un sustituyente fuertemente atractor de electrones como un halógeno (-Cl, -Br) o un grupo nitro (-NO2).',
-          'La hidroxilación libre en posición 7.',
-          'La eliminación completa del anillo aromático A.'
-        ],
-        correctIndex: 1,
-        explanation: 'La densidad electrónica del anillo A debe ser baja; un sustituyente atractor de electrones en posición 7 (ej. cloro en diazepam o nitro en clonazepam) polariza la estructura facilitando la interacción de dipolo con el receptor.',
-        difficulty: 'Medio'
-      }
-    ],
+    testQuestions: TEMA5_MODELO_1_TEST_QUESTIONS,
     flashcards: [
       {
         id: 'fc-05-1',
