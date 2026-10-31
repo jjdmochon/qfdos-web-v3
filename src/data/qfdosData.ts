@@ -536,6 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.71.0 — Tema 5 (solo perfil docente mientras siga «En Revisión»): tres modelos de examen de 15 preguntas y 31 flashcards (24 de los apuntes publicados y 7 de ampliación de temario), consolidados con los apuntes del tema.
  * v3.70.3 — Enlaces de interés: los añadidos en las dos últimas semanas encabezan la sección, como en el Hub y las Historias (un enlace nuevo publicado desde el CMS sin destacar quedaba al final).
  * v3.70.2 — Avisos: turnos del examen parcial del 19 de noviembre (formulario de preferencia) y examen de la convocatoria especial del 10 de noviembre, en el tablón y en las Historias.
  * v3.70.1 — Enlace de Gemini: título y resumen definitivos (galería de exploraciones inmersivas, The Discovery of Penicillin).
@@ -574,8 +575,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.70.3';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
+export const COURSE_DATA_VERSION = '3.71.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-10-31T12:00:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -2219,6 +2220,7 @@ import { TEMA4_MODELO_1_TEST_QUESTIONS } from './tema04ExamsData';
 import { TEMA4_FLASHCARDS } from './tema04FlashcardsData';
 export * from './tema05ExamsData';
 import { TEMA5_MODELO_1_TEST_QUESTIONS } from './tema05ExamsData';
+import { TEMA5_FLASHCARDS } from './tema05FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
@@ -5456,23 +5458,11 @@ flashcards: [
       }
     ],
     attachments: [],
-    // Los tres modelos del Tema 5 están listos; con el tema en revisión solo los abre el profesorado.
-    // Las flashcards de abajo siguen siendo de relleno.
+    // Test y flashcards del Tema 5 listos; con el tema en revisión solo los abre el profesorado.
     testDisponible: true,
-    flashcardsDisponibles: false,
+    flashcardsDisponibles: true,
     testQuestions: TEMA5_MODELO_1_TEST_QUESTIONS,
-    flashcards: [
-      {
-        id: 'fc-05-1',
-        topicId: 'tema-05',
-        concept: 'Mecanismo de Flumazenil',
-        front: '¿Cuál es el mecanismo por el cual el flumazenil revierte la sedación por sobredosis de benzodiazepinas?',
-        back: 'El flumazenil es un antagonista competitivo neutro que ocupa con alta afinidad el mismo sitio alostérico que las benzodiazepinas en la interfaz α/γ de GABAA, desplazándolas sin alterar la frecuencia de apertura del canal de Cloro.',
-        smiles: 'CCOC(=O)C1=C2CN(C(=O)C3=C(N2C=N1)C=CC(=C3)F)C',
-        difficulty: 'medium',
-        category: 'Farmacología Molecular'
-      }
-    ]
+    flashcards: TEMA5_FLASHCARDS
   },
   {
     id: 'tema-06',
