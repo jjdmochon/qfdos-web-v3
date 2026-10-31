@@ -5420,7 +5420,8 @@ flashcards: [
     notesPdfUrl: '',
     notesPdfName: 'Tema 05: Apuntes Magistrales Benzodiazepinas y GABAA.pdf',
     geminiNotebookUrl: '',
-    spotifyPodcastUrl: '',
+    spotifyPodcastUrl: 'https://open.spotify.com/episode/5ABvgSKtoDcXNUdd3XUvBd?si=CZk5osD8SU-b4o72XBJ6rw',
+    videoPodcastUrl: 'https://open.spotify.com/episode/5ABvgSKtoDcXNUdd3XUvBd?si=CZk5osD8SU-b4o72XBJ6rw',
     drugs: [
       {
         name: 'Diazepam',
