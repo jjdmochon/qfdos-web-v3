@@ -172,7 +172,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     grupos.push({ id: 'avisos', nombre: 'Novedades del curso', portada: novedades.find(n => n.imagen)?.imagen, historias: novedades });
   }
 
-  // --- Un grupo por tema: cartel, clip, píldora de audio y vídeo podcast ---
+  // --- Un grupo por tema: cartel, clip, podcast de audio y vídeo podcast ---
   for (const t of topics) {
     const m = MEDIOS_TEMA[t.id];
     const audio = t.audioPodcastUrl?.trim();
@@ -194,7 +194,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     if (audio) {
       const reproductor: Accion[] = cb.onAbrirReproductor
         ? [{
-            label: 'Escuchar la píldora completa',
+            label: 'Escuchar el podcast completo',
             icono: 'audio',
             alPulsar: () => cb.onAbrirReproductor?.({
               id: `sp_${t.id}`,
@@ -212,7 +212,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
           }]
         : [];
       historias.push({
-        id: `podcast-audio-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Píldora de audio',
+        id: `podcast-audio-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Podcast de audio',
         titulo: `${t.number} · ${t.title}`, texto: t.audioPodcastName || t.subtitle,
         imagen: portadaPodcast, audio: fuenteAudio(audio), maxSegundos: SEGUNDOS_PODCAST,
         acciones: reproductor, duracionMs: SEGUNDOS_PODCAST * 1000

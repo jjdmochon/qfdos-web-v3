@@ -57,25 +57,56 @@ const TEMAS_SIN_TEST = new Set<string>();
  * guardadas en el navegador no valen. Así una versión anterior de los modelos
  * no se cuela en el panel de claves con el mismo identificador y otra solución.
  */
-const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04']);
+const TEMAS_TEST_DEL_CODIGO = new Set<string>(['tema-04', 'tema-05']);
 
 /**
- * Píldora de audio: si el código trae el MP3 dentro de la web (audio/…), manda
- * sobre lo publicado. Un enlace de Drive no se puede reproducir de forma
+ * Podcast de audio: si el código trae el MP3 dentro de la web (audio/…), el
+ * fichero y su nombre mandan sobre lo publicado. Un enlace de Drive no se puede reproducir de forma
  * fiable en el reproductor de la web (exige sesión de Google o cookies de
  * terceros), así que el fichero local gana aunque se haya publicado otro.
  */
 function conAudioDelCodigo(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
   const local = base.audioPodcastUrl?.trim();
-  if (!local || /^https?:/i.test(local) || t.audioPodcastUrl === local) return t;
-  return { ...t, audioPodcastUrl: local, audioPodcastName: base.audioPodcastName || t.audioPodcastName };
+  if (!local || /^https?:/i.test(local)) return t;
+  // El nombre va con el fichero: lo publicado puede llevar uno antiguo («Píldora Docente…»)
+  const nombre = base.audioPodcastName || t.audioPodcastName;
+  if (t.audioPodcastUrl === local && t.audioPodcastName === nombre) return t;
+  return { ...t, audioPodcastUrl: local, audioPodcastName: nombre };
+}
+
+/**
+ * Textos de plantilla que el código ya ha sustituido. Si lo publicado aún los
+ * lleva, gana el texto del código; si el profesor los ha editado en el CMS,
+ * se respeta su versión.
+ */
+const PLANTILLAS_ANTIGUAS: Record<string, { subtitle: string; description: string; primerConcepto: string }> = {
+  'tema-05': {
+    subtitle: 'Moduladores Alostéricos Positivos de GABAA: Benzodiazepinas, Barbitúricos y Fármacos Z',
+    description: 'Estructura pentamérica del complejo receptor ionotrópico GABAA (canal de Cl-). Sitio de unión de GABA vs. sitios alostéricos moduladores. SAR de las 1,4-benzodiazepinas (Diazepam, Lorazepam, Alprazolam) y su farmacóforo. Hipnóticos no benzodiazepínicos o "Fármacos Z" selectivos de la subunidad alfa-1 (Zolpidem, Zopiclona). Antagonista específico del sitio benzodiazepínico (Flumazenil) para revertir sedación y sobredosis.',
+    primerConcepto: 'Subunidades del receptor GABAA (2α, 2β, 1γ) y poro de Cloro'
+  }
+};
+
+function conTextoDelCodigo(t: QfdosTopic, base: QfdosTopic): QfdosTopic {
+  const plantilla = PLANTILLAS_ANTIGUAS[t.id];
+  if (!plantilla) return t;
+  const subtituloAntiguo = !t.subtitle || t.subtitle === plantilla.subtitle;
+  const descripcionAntigua = !t.description || t.description === plantilla.description;
+  const conceptosAntiguos = !t.keyConcepts?.length || t.keyConcepts[0] === plantilla.primerConcepto;
+  if (!subtituloAntiguo && !descripcionAntigua && !conceptosAntiguos) return t;
+  return {
+    ...t,
+    subtitle: subtituloAntiguo ? base.subtitle : t.subtitle,
+    description: descripcionAntigua ? base.description : t.description,
+    keyConcepts: conceptosAntiguos ? base.keyConcepts : t.keyConcepts,
+  };
 }
 
 export function normalizarTemas(topics: QfdosTopic[]): QfdosTopic[] {
   if (!Array.isArray(topics) || !topics.length) return INITIAL_TOPICS;
   const mapped = topics.map(t => {
     const base = INITIAL_TOPICS.find(item => item.id === t.id);
-    return base ? conAudioDelCodigo(normalizarTema(t, base), base) : t;
+    return base ? conTextoDelCodigo(conAudioDelCodigo(normalizarTema(t, base), base), base) : t;
   });
 
   // Asegurar que temas introducidos en INITIAL_TOPICS (ej: tema-varios) no queden fuera si la caché es anterior

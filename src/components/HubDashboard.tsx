@@ -280,7 +280,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-title)' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                          <Headphones size={13} color="#2563eb" /> {ann.audioName || 'Píldora Sonora / Audio'}
+                          <Headphones size={13} color="#2563eb" /> {ann.audioName || 'Podcast de Audio'}
                         </span>
                         <a href={ann.audioUrl} download className="btn btn-ghost btn-sm" style={{ padding: '2px 6px', fontSize: '0.68rem', gap: 4 }} title="Descargar audio">
                           <Download size={11} /> MP3

@@ -804,7 +804,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     Planificación Docente: Temas, Exámenes Oficiales y Trabajos
                   </h4>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    Gestiona títulos, apuntes oficiales, diapositivas, cuaderno Gemini Notebook y píldoras de audio de cada tema.
+                    Gestiona títulos, apuntes oficiales, diapositivas, cuaderno Gemini Notebook y podcasts de audio de cada tema.
                   </p>
                 </div>
                 {!isCreatingModule && !editingModuleId && (
@@ -953,7 +953,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                     <div style={{ background: 'var(--surface-alt)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                         <h5 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--teal-ink)', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
-                          <Upload size={16} /> Recursos Didácticos del Módulo (PDFs, Cuaderno IA, Píldoras de Audio y Spotify)
+                          <Upload size={16} /> Recursos Didácticos del Módulo (PDFs, Cuaderno IA, Podcasts de Audio y Spotify)
                         </h5>
                       </div>
                       
@@ -1023,7 +1023,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
                       </div>
 
-                      {/* 5. BLOQUE DESTACADO: PÍLDORA DE AUDIO / PODCAST NATIVO */}
+                      {/* 5. BLOQUE DESTACADO: PODCAST DE AUDIO NATIVO */}
                       <div style={{
                         marginTop: '12px',
                         padding: '10px 12px',
@@ -1033,7 +1033,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
                           <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '5px', margin: 0 }}>
-                            <Headphones size={15} color="#2563eb" /> 5. Píldora de Audio Web (Podcast MP3 / WAV integrable)
+                            <Headphones size={15} color="#2563eb" /> 5. Podcast de Audio Web (MP3 / WAV integrable)
                           </label>
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                             <button
@@ -1237,7 +1237,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                               📓 Gemini Notebook {topic.geminiNotebookUrl ? '✓' : '✗'}
                             </span>
                             <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.audioPodcastUrl ? 'rgba(37,99,235,0.15)' : 'var(--surface-alt)', color: topic.audioPodcastUrl ? '#2563eb' : 'var(--text-muted)', fontWeight: topic.audioPodcastUrl ? 700 : 400 }}>
-                              🎧 Píldora de Audio {topic.audioPodcastUrl ? '✓' : '✗'}
+                              🎧 Podcast de Audio {topic.audioPodcastUrl ? '✓' : '✗'}
                             </span>
                             <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '4px', background: topic.spotifyPodcastUrl ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: topic.spotifyPodcastUrl ? '#1db954' : 'var(--text-muted)' }}>
                               🎙️ Video Podcast {topic.spotifyPodcastUrl ? '✓' : '✗'}
@@ -1490,18 +1490,18 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
                         />
                       </div>
 
-                      {/* 3. PÍLDORA DE AUDIO */}
+                      {/* 3. PODCAST DE AUDIO */}
                       <div style={{ background: 'var(--surface-raised)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                           <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '4px', margin: 0 }}>
-                            <Headphones size={14} color="#2563eb" /> 3. Píldora de Audio (MP3 / Podcast)
+                            <Headphones size={14} color="#2563eb" /> 3. Podcast de Audio (MP3)
                           </label>
                           <div style={{ display: 'flex', gap: '4px' }}>
                             <button
                               type="button"
                               onClick={() => {
                                 setNewAnnAudioUrl('audio/podcast_colinergicos.mp3');
-                                setNewAnnAudioName('Píldora Docente: Colinérgicos (6 min)');
+                                setNewAnnAudioName('Podcast de Audio: Colinérgicos (6 min)');
                               }}
                               className="btn btn-sm btn-ghost"
                               style={{ fontSize: '0.66rem', padding: '1px 6px', color: '#2563eb' }}
@@ -1543,7 +1543,7 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
 
                         <input
                           type="text"
-                          placeholder="Título del audio (ej: Píldora Docente: Colinérgicos)"
+                          placeholder="Título del audio (ej: Podcast de Audio: Colinérgicos)"
                           value={newAnnAudioName}
                           onChange={e => setNewAnnAudioName(e.target.value)}
                           className="form-input"

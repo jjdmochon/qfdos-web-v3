@@ -20,6 +20,14 @@ function domainOf(url: string): string {
   }
 }
 
+/** Días durante los que un enlace recién añadido encabeza la sección. */
+const DIAS_NUEVO = 14;
+
+function esNuevo(l: QfdosResourceLink): boolean {
+  const t = Date.parse((l.addedAt ?? '').slice(0, 10));
+  return !Number.isNaN(t) && Date.now() - t < DIAS_NUEVO * 864e5;
+}
+
 const CATEGORY_ACCENT: Record<string, string> = {
   'Casos de éxito': 'var(--accent-emerald)',
   'Descubrimiento de fármacos': 'var(--teal)',
@@ -78,9 +86,13 @@ export const ResourceLinksSection: React.FC<ResourceLinksSectionProps> = ({
         (l.source ?? '').toLowerCase().includes(q) ||
         (l.relatedTopic ?? '').toLowerCase().includes(q)
       )
-      // Los destacados primero; dentro de cada grupo, lo más reciente arriba
+      // Lo recién añadido arriba, como en el Hub y las Historias (un enlace nuevo
+      // del CMS llega sin destacar y se perdía al final); después, los destacados;
+      // dentro de cada grupo, lo más reciente primero
       .sort((a, b) => {
-        if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
+        const na = esNuevo(a), nb = esNuevo(b);
+        if (na !== nb) return na ? -1 : 1;
+        if (!na && !!a.featured !== !!b.featured) return a.featured ? -1 : 1;
         return (b.addedAt ?? '').localeCompare(a.addedAt ?? '');
       });
   }, [links, query, category]);

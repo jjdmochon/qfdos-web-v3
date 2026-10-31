@@ -280,6 +280,17 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-gemini-exploracion-inmersiva',
+    title: 'Exploraciones inmersivas de Gemini (Google)',
+    url: 'https://gemini.google.com/immersive-explorations/cd2bffbf-6342-5d3c-b010-9ad5672cda84',
+    summary:
+      'Gemini (Google) ha abierto en fase beta una galería de exploraciones inmersivas: recorridos visuales e interactivos para profundizar en un tema a escalas muy distintas, desde los sistemas microscópicos hasta el espacio profundo. Los contenidos se organizan en cinco categorías: Nature, Space, How Things Work, Human Body e History. Para la asignatura recomendamos empezar por The Discovery of Penicillin (categoría Medicine), que recorre el descubrimiento de la penicilina e incluye una representación tridimensional de su estructura molecular. Es un buen caso para ver cómo una observación casual llega a convertirse en un fármaco. A tener en cuenta: la herramienta está en beta y su contenido y su disponibilidad pueden cambiar, necesitáis una cuenta de Google para entrar y buena parte del material está en inglés. Usadla como divulgación complementaria; la referencia siguen siendo la bibliografía y los apuntes de la asignatura.',
+    category: 'Divulgación',
+    source: 'Google Gemini',
+    featured: true,
+    addedAt: '2026-10-29'
+  },
+  {
     id: 'link-nobel-quimica-2026',
     title: 'Nobel de Química 2026: Kagan y Soai, efectos no lineales y autocatálisis en síntesis asimétrica',
     url: 'https://www.nobelprize.org/prizes/chemistry/2026/press-release/',
@@ -525,6 +536,15 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.70.3 — Enlaces de interés: los añadidos en las dos últimas semanas encabezan la sección, como en el Hub y las Historias (un enlace nuevo publicado desde el CMS sin destacar quedaba al final).
+ * v3.70.2 — Avisos: turnos del examen parcial del 19 de noviembre (formulario de preferencia) y examen de la convocatoria especial del 10 de noviembre, en el tablón y en las Historias.
+ * v3.70.1 — Enlace de Gemini: título y resumen definitivos (galería de exploraciones inmersivas, The Discovery of Penicillin).
+ * v3.70.0 — Enlaces de interés: exploración inmersiva de Gemini, destacada.
+ * v3.69.1 — Tema 5: subtítulo, descripción y conceptos clave ajustados al temario real (aminoácidos y shunt del GABA, vigabatrina y valproato, benzodiazepinas, anillos fusionados y flumazenilo, neuroesteroides, fármacos Z y barbitúricos); sustituyen a la plantilla antigua aunque siga publicada en el CMS.
+ * v3.69.0 — Temas «En Revisión» (Tema 5): el alumnado solo ve los materiales ya subidos, sin los huecos «Próximamente disponible», ni en la ficha ni en la tarjeta del temario; si aún no hay ninguno, un aviso lo explica. El Tema 5 pasa a «En Revisión» con su baraja de 35 cartas; su pregunta y su flashcard de relleno quedan apagadas hasta tener los modelos.
+ * v3.68.5 — Tema 3: el podcast de audio (9 min 17 s) va dentro de la web (audio/podcast_dopaminergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar.
+ * v3.68.4 — Novedades del curso: aviso del Tema 4 con todo el material (3 modelos de test, 15 flashcards, podcast de audio, baraja de 33 cartas y vídeo resumen), en el tablón y como primera historia, con su cartel y su clip.
+ * v3.68.3 — «Píldora de audio» pasa a llamarse «Podcast de audio» en toda la plataforma (ficha del tema, reproductor, Historias, avisos y Gestión docente); el nombre del audio guardado en la web manda sobre el publicado.
  * v3.68.2 — Tema 4: Historias con el cartel y el clip vertical de brag y el vídeo podcast (30 s); episodio de Spotify enlazado.
  * v3.68.1 — Tema 4: la píldora de audio (8 min 46 s) va dentro de la web (audio/podcast_serotoninergicos.mp3) y manda sobre el enlace de Drive publicado, que el reproductor no podía cargar sin sesión de Google.
  * v3.68.0 — Píldoras de audio: el reproductor muestra el título, la descripción y los contenidos clave del tema que se escucha (antes, siempre los del Tema 1), y reproduce los audios subidos a Drive desde «Gestionar curso»; si el navegador no puede, ofrece el reproductor de Drive.
@@ -554,7 +574,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.68.2';
+export const COURSE_DATA_VERSION = '3.70.3';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-22T01:45:00.000Z';
 
 export const QFDOS_INFO = {
@@ -583,9 +603,27 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-parcial-19-nov-turnos',
+    title: '📅 Examen parcial del 19 de noviembre: preferencias de turno',
+    content: 'El examen parcial de Química Farmacéutica II del jueves 19 de noviembre se realizará en dos turnos, ambos en el Aula 7-8: de 12.30 a 13.30 h y de 14.30 a 15.30 h. Para organizar el grupo en dos turnos, tenéis que completar el formulario indicando vuestra preferencia de horario. La preferencia no supone una asignación definitiva de turno.',
+    date: '29 Octubre 2026',
+    priority: 'alta',
+    linkUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdXL-E8Xx5T7t3RL_rj4kkxQTP8iCVny0Utic9slmUrNYdHaw/viewform?usp=publish-editor',
+    linkLabel: 'Indicar mi preferencia de turno',
+    enHistorias: true
+  },
+  {
+    id: 'ann-convocatoria-especial-10-nov',
+    title: '📅 Convocatoria especial: examen el 10 de noviembre',
+    content: 'El examen de Química Farmacéutica II de la convocatoria especial será el martes 10 de noviembre, de 14.30 a 16.30 h, en el Aula 10a.',
+    date: '29 Octubre 2026',
+    priority: 'alta',
+    enHistorias: true
+  },
   {
     id: 'ann-tests-grabacion-solucionado',
     title: '✅ Tests tipo test: solucionado el problema al grabar las notas',
@@ -594,6 +632,19 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
     priority: 'alta',
     linkUrl: 'mailto:juandiaz@go.ugr.es?subject=QFDOS%20%C2%B7%20No%20se%20graba%20la%20nota%20del%20test',
     linkLabel: 'Escribir a juandiaz@go.ugr.es'
+  },
+  {
+    id: 'ann-tema04-material-completo',
+    title: '📝 Tema 4 · Sistema Serotoninérgico: ya está disponible todo el material',
+    content: 'Respecto al Tema 4, ya tenéis todo el material publicado. Los tres modelos de examen tipo test (15 preguntas cada uno, 45 en total) se abren desde el botón de test de la tarjeta del Tema 04, en el temario: ISRS, tricíclicos y síntesis de la imipramina; IMAO, triptanes y síntesis de indoles de Fischer; y azapironas, setrones, ciproheptadina y almotriptán. En la misma tarjeta están las 15 flashcards de estudio, con los párrafos de ampliación resaltados, y el podcast de audio del tema (casi nueve minutos). En Cartas de los temas, la baraja serotoninérgica con 33 fármacos. En las Historias de la portada dejamos el cartel, el clip y un avance del vídeo resumen, que tenéis completo en Spotify. Mi consejo: escuchad el podcast, repasad las flashcards y después id a por los tests.',
+    date: '23 Octubre 2026',
+    priority: 'alta',
+    imageUrl: 'historias/tema-04-brag.jpg',
+    imageCaption: 'Cuatro cambios. Un triptán.',
+    linkUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
+    linkLabel: 'Ver el vídeo resumen en Spotify',
+    enHistorias: true,
+    temaId: 'tema-04'
   },
   {
     id: 'ann-tema03-tests-recursos',
@@ -611,13 +662,13 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-tema02-tests-recursos',
     title: '📝 Tema 2 · Sistema Adrenérgico: ya están disponibles los tipo test y el resto de recursos',
-    content: 'Ya podéis hacer los tres modelos de examen tipo test del Tema 2 (45 preguntas en total, 15 por modelo) desde el botón de test de la tarjeta del Tema 02 en el temario. Además tenéis la píldora de audio del tema (6 min y medio), el vídeo resumen en Spotify y, en las Historias de la portada, el cartel y el clip del tema. Os recomendamos escuchar el audio y ver el resumen antes de enfrentaros a los tests.',
+    content: 'Ya podéis hacer los tres modelos de examen tipo test del Tema 2 (45 preguntas en total, 15 por modelo) desde el botón de test de la tarjeta del Tema 02 en el temario. Además tenéis el podcast de audio del tema (6 min y medio), el vídeo resumen en Spotify y, en las Historias de la portada, el cartel y el clip del tema. Os recomendamos escuchar el audio y ver el resumen antes de enfrentaros a los tests.',
     date: '6 Octubre 2026',
     priority: 'normal',
     imageUrl: 'historias/tema-02-brag.jpg',
     imageCaption: 'Noradrenalina, (R): la molécula de la lucha o la huida',
     audioUrl: 'audio/podcast_adrenergicos.mp3',
-    audioName: 'Píldora Docente 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
+    audioName: 'Podcast de Audio 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
     linkUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
     linkLabel: 'Ver el vídeo resumen en Spotify',
     enHistorias: true,
@@ -625,12 +676,12 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   },
   {
     id: 'ann-podcast-t01',
-    title: '🎙️ Nueva Píldora de Audio del Tema 1: Sistema Colinérgico (MP3 & Spotify)',
+    title: '🎙️ Nuevo Podcast de Audio del Tema 1: Sistema Colinérgico (MP3 & Spotify)',
     content: 'Publicado el episodio de audio docente para el repaso autónomo de la transmisión colinérgica, inhibidores de AChE (Donepezilo, Rivastigmina) y rescate enzimático frente a organofosforados con Pralidoxima (2-PAM). Puedes escucharlo directamente aquí o descargarlo en MP3.',
     date: '28 Septiembre 2026',
     priority: 'alta',
     audioUrl: 'audio/podcast_colinergicos.mp3',
-    audioName: 'Píldora Docente 01: Acetilcolina y Fármacos Colinérgicos (6 min)',
+    audioName: 'Podcast de Audio 01: Acetilcolina y Fármacos Colinérgicos (6 min)',
     linkUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2',
     linkLabel: 'Escuchar en Spotify',
     enHistorias: true,
@@ -2231,7 +2282,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     spotifyPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
     videoPodcastUrl: 'https://open.spotify.com/episode/7wNxoaxVPBMS5HvdSByor2?si=I3iZ3wb2STmRUHVWvlAUKw',
     audioPodcastUrl: 'audio/podcast_colinergicos.mp3',
-    audioPodcastName: 'Píldora Docente 01: Acetilcolina y Fármacos Colinérgicos (Audio MP3 · 6 min)',
+    audioPodcastName: 'Podcast de Audio 01: Acetilcolina y Fármacos Colinérgicos (Audio MP3 · 6 min)',
     drugs: [
       {
         name: 'Acetilcolina',
@@ -2718,7 +2769,7 @@ export const INITIAL_TOPICS: QfdosTopic[] = [
     attachments: [
       {
         id: 'att-t01-podcast-audio',
-        title: 'Píldora Docente de Audio 01: Transmisión y Fármacos Colinérgicos (Audio MP3 · 6 min)',
+        title: 'Podcast de Audio 01: Transmisión y Fármacos Colinérgicos (Audio MP3 · 6 min)',
         type: 'audio',
         url: 'audio/podcast_colinergicos.mp3',
         size: '4.3 MB',
@@ -2973,7 +3024,7 @@ flashcards: [
     spotifyPodcastUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
     videoPodcastUrl: 'https://open.spotify.com/episode/4EcClAu7PKvIWraUM7Ohez?si=3f_LGqt5ReenndfcslT3KA',
     audioPodcastUrl: 'audio/podcast_adrenergicos.mp3',
-    audioPodcastName: 'Píldora Docente 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
+    audioPodcastName: 'Podcast de Audio 02: Noradrenalina y Sistema Adrenérgico (6,5 min)',
     drugs: [
       {
         name: 'L-Tirosina',
@@ -3869,6 +3920,8 @@ flashcards: [
     notesPdfName: 'Tema 03: Apuntes Magistrales Fármacos Dopaminérgicos.pdf',
     geminiNotebookUrl: '',
     spotifyPodcastUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
+    audioPodcastUrl: 'audio/podcast_dopaminergicos.mp3',
+    audioPodcastName: 'Podcast de Audio 03: Dopamina y Sistema Dopaminérgico (Audio MP3 · 9 min)',
     videoPodcastUrl: 'https://open.spotify.com/episode/02OsBEHJyoVwYOjbMXLW1r?si=oWHO5bn-TOmB7uMq_hbPBQ',
     drugs: [
       {
@@ -4440,7 +4493,7 @@ flashcards: [
     spotifyPodcastUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
     videoPodcastUrl: 'https://open.spotify.com/episode/5U9Qm71Ry3ERbu8Vl9hTh4?si=uBVreUMgQaSg1W_fzNXFRg',
     audioPodcastUrl: 'audio/podcast_serotoninergicos.mp3',
-    audioPodcastName: 'Píldora Docente 04: Serotonina y Sistema Serotoninérgico (Audio MP3 · 9 min)',
+    audioPodcastName: 'Podcast de Audio 04: Serotonina y Sistema Serotoninérgico (Audio MP3 · 9 min)',
     // 71 compuestos del Tema 4 (QFDOS-170 a 240), generados desde public/estructuras/tema4/propiedades_qfdos.csv
     drugs: [
       {
@@ -5343,20 +5396,23 @@ flashcards: [
     id: 'tema-05',
     number: 'Tema 05',
     title: 'Sistema GABAérgico',
-    subtitle: 'Moduladores Alostéricos Positivos de GABAA: Benzodiazepinas, Barbitúricos y Fármacos Z',
-    description: 'Estructura pentamérica del complejo receptor ionotrópico GABAA (canal de Cl-). Sitio de unión de GABA vs. sitios alostéricos moduladores. SAR de las 1,4-benzodiazepinas (Diazepam, Lorazepam, Alprazolam) y su farmacóforo. Hipnóticos no benzodiazepínicos o "Fármacos Z" selectivos de la subunidad alfa-1 (Zolpidem, Zopiclona). Antagonista específico del sitio benzodiazepínico (Flumazenil) para revertir sedación y sobredosis.',
+    subtitle: 'GABA y Glicina: Benzodiazepinas, Neuroesteroides, Fármacos Z y Barbitúricos',
+    description: 'Aminoácidos como neurotransmisores (glutamato, GABA y glicina) y el metabolismo del GABA dependiente del PLP (GAD y GABA-AT), diana de la vigabatrina. Receptor GABA-A, canal de Cl⁻ pentamérico con tres sitios moduladores: benzodiazepinas (interfaz α/γ2), neuroesteroides y barbitúricos. SAR, síntesis y metabolismo de las 1,4-benzodiazepinas, de la ruta de Sternbach a los anillos fusionados (triazolam, midazolam), y el antagonista flumazenilo. Neuroesteroides orales (ganaxolona, zuranolona), fármacos Z (zolpidem, zopiclona) y barbitúricos (SAR de C5, tiopental).',
     keyConcepts: [
-      'Subunidades del receptor GABAA (2α, 2β, 1γ) y poro de Cloro',
-      'Modulación alostérica positiva (aumento de frecuencia de apertura vs. tiempo)',
-      'SAR de 1,4-benzodiazepinas: sustituyentes en C7 (electronegativo), C5 (fenilo) y anillo A/B/C',
-      'Profármacos y metabolitos activos de vida media larga (Nordiazepam, Oxazepam)',
-      'Fármacos Z (Zolpidem) y selectividad hipnótica α1',
-      'Flumazenil como modulador neutro / antagonista competitivo del sitio BZD'
+      'Shunt del GABA: GAD, GABA-AT y SSADH, con el fosfato de piridoxal (PLP) como cofactor',
+      'Vigabatrina, inhibidor suicida de la GABA-AT, y valproato',
+      'SAR de las 1,4-benzodiazepinas: atrayente en C7, 5-fenilo con 2′-halógeno y lactama en C2',
+      'Metabolitos activos y profármacos: nordazepam, oxazepam, clorazepato y prazepam',
+      'Anillos fusionados (triazolam, alprazolam, midazolam) y flumazenilo, antagonista del sitio BZD',
+      'Neuroesteroides: alopregnanolona y su paso a la vía oral (ganaxolona, zuranolona) con un 3β-metilo que impide oxidar el 3α-OH',
+      'Fármacos Z (zolpidem, zopiclona): preferencia α1 e hipnosis',
+      'Barbitúricos: 5,5-disustitución y acidez, SAR de C5 y tiopental de acción ultracorta por redistribución'
     ],
     slideCount: 50,
     pdbTargetId: '6HUP',
     targetName: 'Receptor GABAA Humano unido a Diazepam y GABA',
-    status: 'Próximamente',
+    // En revisión: el alumnado ve los materiales que se van subiendo y la baraja; test y flashcards, no
+    status: 'En Revisión',
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 05: Diapositivas Oficiales Sistema GABAérgico.pdf',
     notesPdfUrl: '',
@@ -5400,6 +5456,10 @@ flashcards: [
       }
     ],
     attachments: [],
+    // Los tres modelos del Tema 5 están listos; con el tema en revisión solo los abre el profesorado.
+    // Las flashcards de abajo siguen siendo de relleno.
+    testDisponible: true,
+    flashcardsDisponibles: false,
     testQuestions: TEMA5_MODELO_1_TEST_QUESTIONS,
     flashcards: [
       {

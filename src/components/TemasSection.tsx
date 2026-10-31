@@ -176,6 +176,8 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
           // En revisión el alumnado entra al tema, pero sin test ni flashcards
           const test = testHabilitado(topic, isProfesor);
           const flashcards = flashcardsHabilitadas(topic, isProfesor);
+          // En revisión el alumnado solo ve los materiales que ya se han subido
+          const soloPublicados = enRevisionParaAlumnado(topic, isProfesor);
           const nBaraja = Number(topic.id.replace('tema-', ''));
           const baraja = nBaraja in BARAJAS ? BARAJAS[nBaraja as TemaCartas] : undefined;
 
@@ -265,18 +267,26 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
 
                 {/* 4 Materials Quick Indicators */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.slidesPdfUrl ? 'rgba(30,58,138,0.1)' : 'var(--surface-alt)', color: topic.slidesPdfUrl ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
-                    📑 Diapositivas {topic.slidesPdfUrl ? '✓' : ''}
-                  </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.notesPdfUrl ? 'rgba(13,148,136,0.1)' : 'var(--surface-alt)', color: topic.notesPdfUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
-                    📝 Apuntes {topic.notesPdfUrl ? '✓' : ''}
-                  </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
-                    📓 Notebook {topic.geminiNotebookUrl ? '✓' : ''}
-                  </span>
-                  <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
-                    🎙️ Podcast {(topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? '✓' : ''}
-                  </span>
+                  {(!soloPublicados || topic.slidesPdfUrl) && (
+                    <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.slidesPdfUrl ? 'rgba(30,58,138,0.1)' : 'var(--surface-alt)', color: topic.slidesPdfUrl ? 'var(--navy-ink)' : 'var(--text-muted)' }}>
+                      📑 Diapositivas {topic.slidesPdfUrl ? '✓' : ''}
+                    </span>
+                  )}
+                  {(!soloPublicados || topic.notesPdfUrl) && (
+                    <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.notesPdfUrl ? 'rgba(13,148,136,0.1)' : 'var(--surface-alt)', color: topic.notesPdfUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
+                      📝 Apuntes {topic.notesPdfUrl ? '✓' : ''}
+                    </span>
+                  )}
+                  {(!soloPublicados || topic.geminiNotebookUrl) && (
+                    <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: topic.geminiNotebookUrl ? 'rgba(45,212,191,0.15)' : 'var(--surface-alt)', color: topic.geminiNotebookUrl ? 'var(--teal-ink)' : 'var(--text-muted)' }}>
+                      📓 Notebook {topic.geminiNotebookUrl ? '✓' : ''}
+                    </span>
+                  )}
+                  {(!soloPublicados || (topic.spotifyPodcastUrl || topic.audioPodcastUrl)) && (
+                    <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
+                      🎙️ Podcast {(topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? '✓' : ''}
+                    </span>
+                  )}
                   {topic.id === 'tema-01' && (
                     <>
                       <span 
