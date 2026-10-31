@@ -536,7 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
- * v3.72.0 — Tema 5: lanzamiento en las Historias (cartel y clip vertical de brag), podcast de audio dentro de la web (audio/podcast_gabaergicos.mp3, 8 min 56 s), episodio de Spotify enlazado y aviso «Novedades del curso» con lo que ya ve el alumnado.
+ * v3.72.0 — Tema 5: lanzamiento en las Historias (cartel y clip vertical de brag), podcast de audio dentro de la web (audio/podcast_gabaergicos.mp3, 8 min 56 s), episodio de Spotify enlazado y aviso «Novedades del curso» con todo el material (tests, flashcards, podcast, vídeo y cartas). El botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1 a 4.
  * v3.71.0 — Tema 5 (solo perfil docente mientras siga «En Revisión»): tres modelos de examen de 15 preguntas y 31 flashcards (24 de los apuntes publicados y 7 de ampliación de temario), consolidados con los apuntes del tema.
  * v3.70.3 — Enlaces de interés: los añadidos en las dos últimas semanas encabezan la sección, como en el Hub y las Historias (un enlace nuevo publicado desde el CMS sin destacar quedaba al final).
  * v3.70.2 — Avisos: turnos del examen parcial del 19 de noviembre (formulario de preferencia) y examen de la convocatoria especial del 10 de noviembre, en el tablón y en las Historias.
@@ -610,8 +610,8 @@ export const AVISOS_A_OFRECER = ['ann-tema05-lanzamiento', 'ann-parcial-19-nov-t
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-tema05-lanzamiento',
-    title: '🎧 Tema 5 · Sistema GABAérgico: podcast, vídeo resumen y cartas',
-    content: 'Respecto al Tema 5, ya tenéis los primeros materiales. En la tarjeta del Tema 05, en el temario, está el podcast de audio del tema (casi nueve minutos): del shunt del GABA y la vigabatrina al receptor GABA-A, con las benzodiazepinas, los neuroesteroides, los fármacos Z y los barbitúricos. El vídeo resumen lo tenéis completo en Spotify. En Cartas de los temas, la baraja GABAérgica con 35 fármacos. En las Historias de la portada dejamos el cartel y el clip del tema. Mi consejo: escuchad el podcast con la baraja delante.',
+    title: '📝 Tema 5 · Sistema GABAérgico: ya está disponible todo el material',
+    content: 'Respecto al Tema 5, ya tenéis todo el material publicado. Los tres modelos de examen tipo test (15 preguntas cada uno, 45 en total) se abren desde el botón de test de la tarjeta del Tema 05, en el temario: glutamato, SAR de las benzodiazepinas, síntesis de Sternbach y barbitúricos; receptor GABA-A, numeración de la 1,4-benzodiazepina y síntesis del flurazepam; y valproato, flumazenilo, oxazepam y barbitúricos de acción ultracorta. En la misma tarjeta están las 31 flashcards de estudio, con los párrafos de ampliación resaltados, y el podcast de audio del tema (casi nueve minutos). En Cartas de los temas, la baraja GABAérgica con 35 fármacos. En las Historias de la portada dejamos el cartel y el clip; el vídeo resumen lo tenéis completo en Spotify. Mi consejo: escuchad el podcast, repasad las flashcards y después id a por los tests.',
     date: '31 Octubre 2026',
     priority: 'alta',
     imageUrl: 'historias/tema-05-brag.jpg',

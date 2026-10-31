@@ -1842,7 +1842,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
               <>
                 {isProfesor && testHabilitado(topic, isProfesor) && (
                   <button onClick={() => onOpenQuiz(topic)} className="btn btn-sm btn-primary">
-                    <HelpCircle size={14} /> {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
+                    <HelpCircle size={14} /> {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' ? 'Test (MODELOS)' : `Test (${topic.testQuestions?.length || 0})`}
                   </button>
                 )}
                 {flashcardsHabilitadas(topic, isProfesor) && (
