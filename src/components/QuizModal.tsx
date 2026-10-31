@@ -19,7 +19,10 @@ import {
   TEMA3_MODELO_3_TEST_QUESTIONS,
   TEMA4_MODELO_1_TEST_QUESTIONS,
   TEMA4_MODELO_2_TEST_QUESTIONS,
-  TEMA4_MODELO_3_TEST_QUESTIONS
+  TEMA4_MODELO_3_TEST_QUESTIONS,
+  TEMA5_MODELO_1_TEST_QUESTIONS,
+  TEMA5_MODELO_2_TEST_QUESTIONS,
+  TEMA5_MODELO_3_TEST_QUESTIONS
 } from '../data/qfdosData';
 import {
   submitAttemptToGoogleSheets,
@@ -85,7 +88,8 @@ export type QuizModelType =
   | 'modelo-e' | 'modelo-fir' | 'modelo-a' | 'modelo-b' | 'modelo-c' | 'retrosintesis'
   | 't2-modelo-1' | 't2-modelo-2' | 't2-modelo-3'
   | 't3-modelo-1' | 't3-modelo-2' | 't3-modelo-3'
-  | 't4-modelo-1' | 't4-modelo-2' | 't4-modelo-3';
+  | 't4-modelo-1' | 't4-modelo-2' | 't4-modelo-3'
+  | 't5-modelo-1' | 't5-modelo-2' | 't5-modelo-3';
 
 /** Modelos del Tema 3 que ve el alumnado en el selector (tarjetas generadas desde esta lista). */
 const MODELOS_TEMA3: { id: QuizModelType; n: number; titulo: string; etiqueta: string; resumen: string; color: string; fondo: string; tinta: string }[] = [
@@ -125,7 +129,26 @@ const MODELOS_TEMA4: typeof MODELOS_TEMA3 = [
   }
 ];
 
-const MODELOS_TEMAS_TEST = [...MODELOS_TEMA3, ...MODELOS_TEMA4];
+/** Modelos del Tema 5 (solo los ve el profesorado mientras el tema siga en «Próximamente»). */
+const MODELOS_TEMA5: typeof MODELOS_TEMA3 = [
+  {
+    id: 't5-modelo-1', n: 1, titulo: 'Glutamato, SAR de benzodiazepinas, Sternbach y barbitúricos', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Aminoácidos excitadores, GABA-AT y semialdehído succínico, PLP, sustituyentes en C7 y en el fenilo, pKa de los barbitúricos y tiopental, síntesis del diazepam, expansión de Sternbach, retrosíntesis de un barbitúrico, adición de Michael, Eschweiler–Clarke y clorazepato.',
+    color: 'var(--navy)', fondo: 'rgba(30, 58, 138, 0.05)', tinta: 'var(--navy-ink)'
+  },
+  {
+    id: 't5-modelo-2', n: 2, titulo: 'Receptor GABA-A, numeración, Sandberg y síntesis del flurazepam', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'GABA y BHE, vigabatrina, arquitectura del GABA-A, configuración de los L-aminoácidos, numeración de la 1,4-benzodiazepina, anillos fusionados en N1–C2, postulado de Sandberg, fármacos Z, demoxepam y nordazepam, flurazepam, malonato y fenobarbital, oxazepam y alopregnanolona.',
+    color: 'var(--teal)', fondo: 'rgba(13, 148, 136, 0.05)', tinta: 'var(--teal-ink)'
+  },
+  {
+    id: 't5-modelo-3', n: 3, titulo: 'Valproato, flumazenil, oxazepam y barbitúricos de acción ultracorta', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Valproato, transaminación, metabolismo del flurazepam, tiopental y barbitúricos N-alquilados, clordiazepóxido, posición 5, flumazenil, lipofilia y duración, ganaxolona, alquilación en N1, secobarbital, oxazepam, ciclación con urea y tiourea y agentes metilantes.',
+    color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
+  }
+];
+
+const MODELOS_TEMAS_TEST = [...MODELOS_TEMA3, ...MODELOS_TEMA4, ...MODELOS_TEMA5];
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -136,7 +159,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Model Selection State
   const [selectedModel, setSelectedModel] = useState<QuizModelType>(
-    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : topic.id === 'tema-04' ? 't4-modelo-1' : 'modelo-e'
+    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : topic.id === 'tema-04' ? 't4-modelo-1' : topic.id === 'tema-05' ? 't5-modelo-1' : 'modelo-e'
   );
 
   useEffect(() => {
@@ -146,6 +169,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       setSelectedModel('t3-modelo-1');
     } else if (topic.id === 'tema-04') {
       setSelectedModel('t4-modelo-1');
+    } else if (topic.id === 'tema-05') {
+      setSelectedModel('t5-modelo-1');
     } else if (topic.id === 'tema-01') {
       setSelectedModel('modelo-e');
     }
@@ -189,6 +214,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (selectedModel === 't4-modelo-2') return TEMA4_MODELO_2_TEST_QUESTIONS;
       if (selectedModel === 't4-modelo-3') return TEMA4_MODELO_3_TEST_QUESTIONS;
       return TEMA4_MODELO_1_TEST_QUESTIONS;
+    }
+    if (topic.id === 'tema-05') {
+      if (selectedModel === 't5-modelo-2') return TEMA5_MODELO_2_TEST_QUESTIONS;
+      if (selectedModel === 't5-modelo-3') return TEMA5_MODELO_3_TEST_QUESTIONS;
+      return TEMA5_MODELO_1_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
   }, [topic, selectedModel, isProfesor]);
@@ -511,6 +541,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       case 't4-modelo-1': return 'var(--navy)';
       case 't4-modelo-2': return 'var(--teal)';
       case 't4-modelo-3': return '#8b5cf6';
+      case 't5-modelo-1': return 'var(--navy)';
+      case 't5-modelo-2': return 'var(--teal)';
+      case 't5-modelo-3': return '#8b5cf6';
       case 'modelo-e': return 'var(--navy)';
       case 'modelo-fir': return 'var(--teal)';
       case 'modelo-b': return '#8b5cf6';
@@ -533,6 +566,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (!MODELOS_TEMA3.some(m => m.id === selectedModel)) setSelectedModel('t3-modelo-1');
     } else if (topic.id === 'tema-04') {
       if (!MODELOS_TEMA4.some(m => m.id === selectedModel)) setSelectedModel('t4-modelo-1');
+    } else if (topic.id === 'tema-05') {
+      if (!MODELOS_TEMA5.some(m => m.id === selectedModel)) setSelectedModel('t5-modelo-1');
     } else {
       if (selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
         setSelectedModel('modelo-e');
@@ -1254,7 +1289,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                       <label style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>
-                        {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
+                        {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' ? 'Selecciona el Modelo de Examen (Modelos Calibrados):' : 'Modelo de Evaluación:'}
                       </label>
                       <span className="qfdos-badge" style={{ 
                         fontSize: '0.68rem', 
@@ -1655,9 +1690,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     )}
 
-                    {(topic.id === 'tema-03' || topic.id === 'tema-04') && (
+                    {(topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05') && (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
-                        {(topic.id === 'tema-04' ? MODELOS_TEMA4 : MODELOS_TEMA3).map(mod => {
+                        {(topic.id === 'tema-05' ? MODELOS_TEMA5 : topic.id === 'tema-04' ? MODELOS_TEMA4 : MODELOS_TEMA3).map(mod => {
                           const st = getModelStats(mod.id);
                           const activo = selectedModel === mod.id;
                           return (
