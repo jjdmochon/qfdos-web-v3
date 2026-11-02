@@ -536,6 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.73.0 — Cartas: botón «Abrir la baraja pública» en el pie del visor, que abre el mismo tema en qfdos-cartas (acceso abierto, sin iniciar sesión). En móvil, la cabecera del visor pasa a dos líneas y las pestañas de los temas se desplazan en horizontal con la activa a la vista (antes se montaban y el botón de cerrar tapaba la última).
  * v3.72.1 — Tema 5: Historias con el avance del vídeo resumen (30 s, tema-05-video-podcast.mp4); el aviso de lanzamiento lo cita.
  * v3.72.0 — Tema 5: lanzamiento en las Historias (cartel y clip vertical de brag), podcast de audio dentro de la web (audio/podcast_gabaergicos.mp3, 8 min 56 s), episodio de Spotify enlazado y aviso «Novedades del curso» con todo el material (tests, flashcards, podcast, vídeo y cartas). El botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1 a 4.
  * v3.71.0 — Tema 5 (solo perfil docente mientras siga «En Revisión»): tres modelos de examen de 15 preguntas y 31 flashcards (24 de los apuntes publicados y 7 de ampliación de temario), consolidados con los apuntes del tema.
@@ -577,7 +578,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.72.1';
+export const COURSE_DATA_VERSION = '3.73.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-31T12:00:00.000Z';
 
 export const QFDOS_INFO = {
