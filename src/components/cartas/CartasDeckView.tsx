@@ -260,7 +260,7 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
               </p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div className="qf-deck-header-version" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span className="qfdos-badge badge-teal" style={{ fontSize: '0.72rem', padding: '4px 10px' }}>
               QFDOS v3.0 · Curso 2026/27
             </span>

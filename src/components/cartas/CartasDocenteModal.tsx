@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { MoleculeDrug } from '../../data/qfdosData';
 import { CartasDeckView, BARAJAS, TemaCartas } from './CartasDeckView';
-import { X, Layers, ShieldCheck } from 'lucide-react';
+import { X, Layers, ShieldCheck, ExternalLink } from 'lucide-react';
+
+/** Versión pública de las barajas (repositorio qfdos-cartas): se abre sin iniciar sesión y se puede compartir */
+const URL_CARTAS_PUBLICAS = 'https://jjdmochon.github.io/qfdos-cartas/';
 
 interface CartasDocenteModalProps {
   onClose: () => void;
@@ -22,6 +25,17 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
   const { isProfesor } = useAuth();
   const [tema, setTema] = useState<TemaCartas>(temaInicial);
   useEffect(() => { setTema(temaInicial); }, [temaInicial]);
+  // En móvil las pestañas se desplazan: la del tema abierto tiene que quedar a la vista
+  const pestanasRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const lista = pestanasRef.current;
+    const activa = lista?.querySelector<HTMLElement>('[aria-selected="true"]');
+    if (!lista || !activa) return;
+    const izq = activa.offsetLeft - lista.offsetLeft;
+    if (izq < lista.scrollLeft || izq + activa.offsetWidth > lista.scrollLeft + lista.clientWidth) {
+      lista.scrollLeft = izq - (lista.clientWidth - activa.offsetWidth) / 2;
+    }
+  }, [tema]);
   const baraja = BARAJAS[tema];
   const nCartas = baraja.farmacos.length;
 
@@ -42,7 +56,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-container"
+        className="modal-container qf-modal-cartas"
         style={{
           maxWidth: '1280px',
           width: '95vw',
@@ -62,11 +76,14 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 10,
             background: 'var(--surface)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: '1 1 320px' }}>
             <div
+              className="qf-modal-logo"
               style={{
                 width: 42,
                 height: 42,
@@ -104,15 +121,15 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
                   Colección Oficial · {nCartas} Cartas
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+              <p className="qf-modal-desc" style={{ margin: 0, fontSize: '0.76rem', color: 'var(--text-muted)' }}>
                 {nCartas} Cartas Coleccionables · {baraja.titulo} · Escala comparativa de afinidad e índices SAR
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {/* Selector de baraja por tema */}
-            <div role="tablist" aria-label="Elegir baraja por tema" style={{ display: 'flex', gap: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, maxWidth: '100%', marginLeft: 'auto' }}>
+            {/* Selector de baraja por tema: en pantallas estrechas se desplaza en horizontal */}
+            <div ref={pestanasRef} role="tablist" aria-label="Elegir baraja por tema" style={{ display: 'flex', gap: 4, minWidth: 0, overflowX: 'auto', flexWrap: 'nowrap', paddingBottom: 2 }}>
               {(temasDisponibles ?? (Object.keys(BARAJAS).map(Number) as TemaCartas[])).map(t => (
                 <button
                   key={t}
@@ -121,7 +138,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
                   aria-selected={tema === t}
                   onClick={() => setTema(t)}
                   className={`btn btn-sm ${tema === t ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ padding: '5px 12px', fontWeight: 800, fontSize: '0.74rem' }}
+                  style={{ padding: '5px 12px', fontWeight: 800, fontSize: '0.74rem', whiteSpace: 'nowrap', flexShrink: 0 }}
                   title={`Baraja del Tema ${t} · ${BARAJAS[t].familia} (${BARAJAS[t].farmacos.length} cartas)`}
                 >
                   Tema {t} · {BARAJAS[t].familia}
@@ -132,7 +149,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
               onClick={onClose}
               className="btn btn-sm btn-ghost-clean"
               title="Cerrar ventana (Esc)"
-              style={{ padding: '6px', borderRadius: '50%' }}
+              style={{ padding: '6px', borderRadius: '50%', flexShrink: 0 }}
             >
               <X size={20} />
             </button>
@@ -160,15 +177,29 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 8,
             background: 'var(--surface)'
           }}
         >
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+          <div className="qf-modal-pie-texto" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
             Química Farmacéutica II (Grupo E) · Curso 2026/2027 · Universidad de Granada
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-primary" style={{ padding: '6px 16px' }}>
-            Cerrar Baraja
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <a
+              href={`${URL_CARTAS_PUBLICAS}#tema-${String(tema).padStart(2, '0')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-outline"
+              style={{ padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              title="Versión de acceso abierto: se abre sin iniciar sesión y se puede compartir"
+            >
+              <ExternalLink size={14} /> Abrir la baraja pública
+            </a>
+            <button onClick={onClose} className="btn btn-sm btn-primary" style={{ padding: '6px 16px' }}>
+              Cerrar Baraja
+            </button>
+          </div>
         </div>
       </div>
     </div>
