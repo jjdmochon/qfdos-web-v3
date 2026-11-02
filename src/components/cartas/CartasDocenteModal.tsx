@@ -56,7 +56,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-container"
+        className="modal-container qf-modal-cartas"
         style={{
           maxWidth: '1280px',
           width: '95vw',
@@ -83,6 +83,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: '1 1 320px' }}>
             <div
+              className="qf-modal-logo"
               style={{
                 width: 42,
                 height: 42,
@@ -120,7 +121,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
                   Colección Oficial · {nCartas} Cartas
                 </span>
               </div>
-              <p style={{ margin: 0, fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+              <p className="qf-modal-desc" style={{ margin: 0, fontSize: '0.76rem', color: 'var(--text-muted)' }}>
                 {nCartas} Cartas Coleccionables · {baraja.titulo} · Escala comparativa de afinidad e índices SAR
               </p>
             </div>
@@ -181,7 +182,7 @@ export const CartasDocenteModal: React.FC<CartasDocenteModalProps> = ({
             background: 'var(--surface)'
           }}
         >
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+          <div className="qf-modal-pie-texto" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
             Química Farmacéutica II (Grupo E) · Curso 2026/2027 · Universidad de Granada
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>

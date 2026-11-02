@@ -27,6 +27,13 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.73.0-cartas-movil',
+    version: 'v3.73.0',
+    fecha: '2 Noviembre 2026',
+    titulo: 'El visor de cartas, a medida del móvil',
+    texto: 'En cuanto al visor de cartas en el móvil, hemos compactado la cabecera, los filtros y el pie para que cada carta quepa entera en la pantalla, también al darle la vuelta. Los filtros de estado y de familia ocupan ahora una sola fila que se desplaza con el dedo.'
+  },
+  {
     id: 'act-3.73.0-baraja-publica',
     version: 'v3.73.0',
     fecha: '2 Noviembre 2026',

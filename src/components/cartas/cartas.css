@@ -948,3 +948,66 @@
 .qf-deck--theme-dark .qf-carta-item[data-estado="nunca"] .qf-estructura {
   background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 8px, rgba(255, 255, 255, 0.09) 8px 16px);
 }
+
+
+/* ==========================================================================
+   MÓVIL (≤ 580 px): con cinco temas, más estados y más familias, la cabecera,
+   los filtros y el pie dejaban la primera carta a más de un metro de scroll y
+   el pie tapaba los botones del reverso. Aquí todo se compacta para que una
+   carta entera quepa en pantalla.
+   ========================================================================== */
+@media (max-width: 580px) {
+  /* Visor (CartasDocenteModal): cabecera y pie de una línea */
+  .qf-modal-cartas { max-height: 94dvh !important; width: 96vw !important; }
+  .qf-modal-cartas .qf-modal-desc,
+  .qf-modal-cartas .qf-modal-pie-texto { display: none !important; }
+  .qf-modal-cartas .modal-header { padding: 10px 12px !important; gap: 8px !important; }
+  .qf-modal-cartas .modal-header h3 { font-size: 0.95rem !important; }
+  .qf-modal-cartas .modal-body { padding: 12px !important; }
+  .qf-modal-cartas .modal-footer { padding: 8px 12px !important; justify-content: flex-end !important; }
+
+  /* Cartel de la baraja: solo el título */
+  .qf-deck-container { gap: 12px; }
+  .qf-deck-header-banner { padding: 10px 12px; gap: 8px; }
+  .qf-deck-header-icon { width: 34px; height: 34px; }
+  .qf-deck-header-titles h2 { font-size: 0.98rem; margin: 0; }
+  .qf-deck-header-titles p,
+  .qf-deck-badge-docente,
+  .qf-deck-header-version { display: none !important; }
+  .qf-deck-nota { font-size: 0.74rem; padding: 8px 10px; }
+
+  /* Filtros: una fila que se desplaza en horizontal en lugar de una columna de botones */
+  .qf-deck-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .qf-deck-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+    max-width: 100%;
+  }
+  .qf-filtro-btn { flex-shrink: 0; white-space: nowrap; font-size: 11px; padding: 5px 10px; }
+  .qf-deck-actions { justify-content: space-between; }
+  .qf-search-input-wrap { flex: 1 1 140px; min-width: 0; }
+
+  /* Cartas: una por fila y con la altura justa para verse enteras bajo la cabecera */
+  .qf-cartas-grid { grid-template-columns: 1fr; justify-items: center; }
+  .qf-carta-item { width: 100%; max-width: max(240px, min(100%, calc((100dvh - 265px) * 5 / 7.85))); }
+}
+
+/* Pantallas muy estrechas (iPhone SE de 320 px): carta y pie aún más compactos */
+@media (max-width: 360px) {
+  .qf-carta-item { max-width: max(200px, min(100%, calc((100dvh - 250px) * 5 / 7.85))); }
+  .qf-modal-cartas .modal-header { padding: 8px 10px !important; }
+  .qf-modal-cartas .qf-modal-logo { display: none !important; }
+  .qf-modal-cartas .modal-footer .btn { font-size: 0.72rem !important; padding: 6px 9px !important; }
+  .qf-modal-cartas .modal-footer .btn svg { display: none; }
+}
+
+/* Cartas de menos de ~270 px de ancho: el sello QFDOS no cabe junto a las etiquetas */
+@media (max-width: 400px) {
+  .qf-card-brand-stamp { display: none !important; }
+  .qf-dorso-header { flex-wrap: wrap; }
+  .qf-cabecera-der { min-width: 0; }
+  .qf-badge { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
