@@ -97,7 +97,7 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 11,
+        version: 12,
         acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'evaluacionEspecial', 'publicarNotasEspecial', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
@@ -688,6 +688,7 @@ function evaluacionEspecial(p) {
 
   var c = columnasPorNombre_(datos[0], {
     correo: ['correo', 'email', 'correo electronico'],
+    nombre: ['nombre', 'estudiante', 'alumno', 'apellidos y nombre'],
     modelo: ['modelo'],
     aciertos: ['aciertos'],
     errores: ['errores'],
@@ -702,29 +703,68 @@ function evaluacionEspecial(p) {
   var filas = datos.slice(1).filter(function (f) {
     return f.some(function (v) { return String(v).trim() !== ''; });
   });
-
-  if (esProfesor) {
-    var sinCorreo = filas.filter(function (f) { return String(f[c.correo]).trim().indexOf('@') === -1; }).length;
-    return json({ ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [], total: filas.length, sinCorreo: sinCorreo });
-  }
-
-  var mia = null;
-  for (var i = 0; i < filas.length; i++) {
-    if (String(filas[i][c.correo]).trim().toLowerCase() === s.e) { mia = filas[i]; break; }
-  }
-  if (!mia) return json({ ok: true, publicadas: true, fila: null, detalle: [] });
-
-  var modelo = String(mia[c.modelo]).trim().toUpperCase();
-  var respuestas = String(mia[c.respuestas]).replace(/\s+/g, '');
-  var fila = {
-    modelo: modelo,
-    aciertos: c.aciertos === -1 ? 0 : numeroOCero_(mia[c.aciertos]),
-    errores: c.errores === -1 ? 0 : numeroOCero_(mia[c.errores]),
-    blancos: c.blancos === -1 ? 0 : numeroOCero_(mia[c.blancos]),
-    nota: numeroOCero_(mia[c.nota])
+  var cadena = function (v) { return v === undefined || v === null ? '' : String(v); };
+  var tieneExamen = function (f) { return String(f[c.modelo]).trim() !== ''; };
+  var correoDe = function (f) { return String(f[c.correo]).trim().toLowerCase(); };
+  var nombreDe = function (f) { return c.nombre === -1 ? '' : cadena(f[c.nombre]).trim(); };
+  var resumenDe = function (f) {
+    return {
+      modelo: String(f[c.modelo]).trim().toUpperCase(),
+      aciertos: c.aciertos === -1 ? 0 : numeroOCero_(f[c.aciertos]),
+      errores: c.errores === -1 ? 0 : numeroOCero_(f[c.errores]),
+      blancos: c.blancos === -1 ? 0 : numeroOCero_(f[c.blancos]),
+      nota: numeroOCero_(f[c.nota])
+    };
+  };
+  var detalleDe = function (f) {
+    return detalleEspecial_(ss, String(f[c.modelo]).trim().toUpperCase(), String(f[c.respuestas]).replace(/\s+/g, ''));
   };
 
-  // Claves y justificaciones: solo las del modelo de este alumno
+  if (esProfesor) {
+    var conExamen = filas.filter(tieneExamen);
+    var sinCorreo = conExamen.filter(function (f) { return correoDe(f).indexOf('@') === -1; }).length;
+    var pedido = String(p.correo || '').trim().toLowerCase();
+    if (pedido) {
+      // Vista de un alumno concreto, tal como la vería con su cuenta
+      var elegida = null;
+      for (var k = 0; k < conExamen.length; k++) {
+        if (correoDe(conExamen[k]) === pedido) { elegida = conExamen[k]; break; }
+      }
+      if (!elegida) return json({ ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [] });
+      var dp = detalleDe(elegida);
+      if (dp.error) return json({ ok: false, error: dp.error });
+      return json({ ok: true, publicadas: publicadas, profesor: true, nombre: nombreDe(elegida), fila: resumenDe(elegida), detalle: dp.detalle });
+    }
+    var alumnos = filas.map(function (f) {
+      var con = tieneExamen(f);
+      var r = con ? resumenDe(f) : null;
+      return {
+        correo: correoDe(f),
+        nombre: nombreDe(f),
+        modelo: r ? r.modelo : '',
+        aciertos: r ? r.aciertos : 0,
+        errores: r ? r.errores : 0,
+        blancos: r ? r.blancos : 0,
+        nota: r ? r.nota : 0,
+        conExamen: con
+      };
+    });
+    return json({ ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [], total: conExamen.length, sinExamen: filas.length - conExamen.length, sinCorreo: sinCorreo, alumnos: alumnos });
+  }
+
+  // Alumno: solo su fila, y solo si tiene examen corregido
+  var mia = null;
+  for (var i = 0; i < filas.length; i++) {
+    if (correoDe(filas[i]) === s.e && tieneExamen(filas[i])) { mia = filas[i]; break; }
+  }
+  if (!mia) return json({ ok: true, publicadas: true, fila: null, detalle: [] });
+  var dm = detalleDe(mia);
+  if (dm.error) return json({ ok: false, error: dm.error });
+  return json({ ok: true, publicadas: true, fila: resumenDe(mia), detalle: dm.detalle });
+}
+
+/** Claves y justificaciones del modelo indicado, con el estado de cada pregunta según las respuestas del alumno. */
+function detalleEspecial_(ss, modelo, respuestas) {
   var detalle = [];
   var hc = ss.getSheetByName(HOJA_CLAVES_ESPECIAL);
   if (hc && hc.getLastRow() > 1) {
@@ -739,7 +779,7 @@ function evaluacionEspecial(p) {
       justificacion: ['justificacion']
     });
     if (k.modelo === -1 || k.n === -1 || k.clave === -1) {
-      return json({ ok: false, error: 'La pestaña «' + HOJA_CLAVES_ESPECIAL + '» necesita las columnas modelo, n y clave.' });
+      return { error: 'La pestaña «' + HOJA_CLAVES_ESPECIAL + '» necesita las columnas modelo, n y clave.', detalle: [] };
     }
     var cadena = function (v) { return v === undefined || v === null ? '' : String(v); };
     for (var r = 1; r < kd.length; r++) {
@@ -762,7 +802,7 @@ function evaluacionEspecial(p) {
     }
     detalle.sort(function (a, b) { return a.n - b.n; });
   }
-  return json({ ok: true, publicadas: true, fila: fila, detalle: detalle });
+  return { error: '', detalle: detalle };
 }
 
 /** Publica u oculta la convocatoria especial para el alumnado. Solo profesorado. */

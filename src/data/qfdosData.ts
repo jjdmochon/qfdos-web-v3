@@ -536,6 +536,7 @@ export interface StudentQuestion {
  * v3.67.0 — Tema 4 (solo perfil docente): tres modelos de examen revisados con más estructuras en enunciados y opciones (sertralina cis sin R/S, fluoxetina, citalopram, Grignard, 1-PP, lasmiditán, zolmitriptán) y títulos de los modelos actualizados.
  * v3.67.1 — Tema 4: el botón de test de la card pasa a «Test (MODELOS)», como en los Temas 1, 2 y 3.
  * v3.67.2 — Tema 4: el test lo manda el código y no la hoja publicada; el panel de claves deja de ver las preguntas antiguas del modelo 1 como conflicto.
+ * v3.75.0 — Evaluación: el profesorado ve la lista del alumnado de la convocatoria especial (nota, aciertos, errores y blancos) y abre la corrección de cualquier alumno tal como la ve con su cuenta. Las filas sin examen ya no muestran una tarjeta con nota 0 al alumno. Requiere desplegar Codigo.gs v12.
  * v3.74.0 — Evaluación: tarjeta «Convocatoria especial» con la nota y la corrección pregunta a pregunta (acierto, error, en blanco o marca doble, con la opción correcta y su justificación). Los resultados salen de la pestaña «Convocatoria Especial» de la hoja de evaluación y las claves de «_ClavesEspecial», a través de Codigo.gs v11 (acciones evaluacionEspecial y publicarNotasEspecial): el alumno recibe solo su fila y las claves de su modelo, y solo cuando el profesor pulsa «Publicar al alumnado».
  * v3.73.0 — Cartas: botón «Abrir la baraja pública» en el pie del visor, que abre el mismo tema en qfdos-cartas (acceso abierto, sin iniciar sesión). En móvil, la cabecera del visor pasa a dos líneas y las pestañas de los temas se desplazan en horizontal con la activa a la vista (antes se montaban y el botón de cerrar tapaba la última). Visor en móvil (≤ 580 px): cabecera y pie de una línea, cartel de la baraja compacto, filtros de estado y familia en una fila con desplazamiento horizontal y cartas dimensionadas para verse enteras, también el reverso (antes la primera carta quedaba a 1.100–1.700 px de scroll y el pie tapaba los botones del reverso).
  * v3.72.1 — Tema 5: Historias con el avance del vídeo resumen (30 s, tema-05-video-podcast.mp4); el aviso de lanzamiento lo cita.
@@ -579,7 +580,7 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.74.0';
+export const COURSE_DATA_VERSION = '3.75.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-10-31T12:00:00.000Z';
 
 export const QFDOS_INFO = {

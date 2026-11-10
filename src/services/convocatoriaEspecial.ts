@@ -51,18 +51,41 @@ export interface ConvocatoriaEspecial {
   detalle: PreguntaEspecial[];
   /** Solo en la vista del profesor */
   profesor?: boolean;
+  /** Hojas con examen corregido */
   total?: number;
+  /** Filas de la pestaña sin examen (alumnado que no se presentó) */
+  sinExamen?: number;
   sinCorreo?: number;
+  /** Lista del alumnado de la pestaña (solo profesorado) */
+  alumnos?: AlumnoEspecial[];
 }
 
-async function llamar<T>(accion: string, extraer: (c: Record<string, unknown>) => T, cuerpo?: unknown): Promise<Resultado<T>> {
+export interface AlumnoEspecial extends ResumenEspecial {
+  correo: string;
+  nombre: string;
+  conExamen: boolean;
+}
+
+/** Lo que vería un alumno con su cuenta; el profesorado lo pide por correo. */
+export interface VistaAlumnoEspecial {
+  nombre: string;
+  fila: ResumenEspecial | null;
+  detalle: PreguntaEspecial[];
+}
+
+async function llamar<T>(
+  accion: string,
+  extraer: (c: Record<string, unknown>) => T,
+  cuerpo?: unknown,
+  consulta = ''
+): Promise<Resultado<T>> {
   if (!WEBAPP_URL) return { ok: false, error: 'Falta configurar VITE_PRACTICAS_WEBAPP_URL.' };
   await renovarSiHaceFalta();
   const sesion = tokenSesion();
   if (!sesion) return { ok: false, error: SESION_CADUCADA };
   try {
     const resp = await fetch(
-      `${WEBAPP_URL}?accion=${accion}&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
+      `${WEBAPP_URL}?accion=${accion}&sesion=${encodeURIComponent(sesion)}${consulta}&t=${Date.now()}`,
       cuerpo === undefined
         ? { method: 'GET', redirect: 'follow' }
         : {
@@ -95,39 +118,75 @@ const numero = (v: unknown): number => {
 };
 const ESTADOS: EstadoPregunta[] = ['acierto', 'error', 'blanco', 'doble'];
 
+function convertirResumen(f: Record<string, unknown> | null | undefined): ResumenEspecial | null {
+  return f
+    ? {
+        modelo: texto(f.modelo),
+        aciertos: numero(f.aciertos),
+        errores: numero(f.errores),
+        blancos: numero(f.blancos),
+        nota: numero(f.nota)
+      }
+    : null;
+}
+
+function convertirDetalle(c: Record<string, unknown>): PreguntaEspecial[] {
+  const detalle = Array.isArray(c.detalle) ? (c.detalle as Record<string, unknown>[]) : [];
+  return detalle.map(d => ({
+    n: numero(d.n),
+    marcada: texto(d.marcada) || '-',
+    clave: texto(d.clave),
+    estado: (ESTADOS as string[]).includes(texto(d.estado)) ? (texto(d.estado) as EstadoPregunta) : 'error',
+    tema: texto(d.tema),
+    enunciado: texto(d.enunciado),
+    correcta: texto(d.correcta),
+    justificacion: texto(d.justificacion)
+  }));
+}
+
 /** Pide la convocatoria especial. El servidor decide qué corresponde a esta cuenta. */
 export function leerConvocatoriaEspecial(): Promise<Resultado<ConvocatoriaEspecial>> {
   return llamar('evaluacionEspecial', c => {
     // Un script anterior a la v11 no conoce la acción y contesta sin este campo
     if (typeof c.publicadas !== 'boolean') throw new Error(MENSAJE_SCRIPT_ANTIGUO);
-    const f = c.fila as Record<string, unknown> | null | undefined;
-    const detalle = Array.isArray(c.detalle) ? (c.detalle as Record<string, unknown>[]) : [];
+    const lista = Array.isArray(c.alumnos) ? (c.alumnos as Record<string, unknown>[]) : undefined;
     return {
       publicadas: c.publicadas,
-      fila: f
-        ? {
-            modelo: texto(f.modelo),
-            aciertos: numero(f.aciertos),
-            errores: numero(f.errores),
-            blancos: numero(f.blancos),
-            nota: numero(f.nota)
-          }
-        : null,
-      detalle: detalle.map(d => ({
-        n: numero(d.n),
-        marcada: texto(d.marcada) || '-',
-        clave: texto(d.clave),
-        estado: (ESTADOS as string[]).includes(texto(d.estado)) ? (texto(d.estado) as EstadoPregunta) : 'error',
-        tema: texto(d.tema),
-        enunciado: texto(d.enunciado),
-        correcta: texto(d.correcta),
-        justificacion: texto(d.justificacion)
-      })),
+      fila: convertirResumen(c.fila as Record<string, unknown> | null | undefined),
+      detalle: convertirDetalle(c),
       profesor: c.profesor === true,
       total: typeof c.total === 'number' ? c.total : undefined,
-      sinCorreo: typeof c.sinCorreo === 'number' ? c.sinCorreo : undefined
+      sinExamen: typeof c.sinExamen === 'number' ? c.sinExamen : undefined,
+      sinCorreo: typeof c.sinCorreo === 'number' ? c.sinCorreo : undefined,
+      alumnos: lista?.map(a => ({
+        modelo: texto(a.modelo),
+        aciertos: numero(a.aciertos),
+        errores: numero(a.errores),
+        blancos: numero(a.blancos),
+        nota: numero(a.nota),
+        correo: texto(a.correo),
+        nombre: texto(a.nombre),
+        conExamen: a.conExamen === true
+      }))
     };
   });
+}
+
+/** Solo profesorado: la corrección de un alumno, tal como la ve con su cuenta (script v12 o posterior). */
+export function leerAlumnoEspecial(correo: string): Promise<Resultado<VistaAlumnoEspecial>> {
+  return llamar(
+    'evaluacionEspecial',
+    c => {
+      if (c.profesor !== true) throw new Error(MENSAJE_SCRIPT_ANTIGUO);
+      return {
+        nombre: texto(c.nombre),
+        fila: convertirResumen(c.fila as Record<string, unknown> | null | undefined),
+        detalle: convertirDetalle(c)
+      };
+    },
+    undefined,
+    `&correo=${encodeURIComponent(correo)}`
+  );
 }
 
 /** Publica u oculta la convocatoria especial para el alumnado. Solo profesorado. */
