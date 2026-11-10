@@ -72,6 +72,9 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
   const mostradas = useMemo(() => (soloFalladas ? detalle.filter(p => p.estado !== 'acierto') : detalle), [detalle, soloFalladas]);
   const falladas = detalle.filter(p => p.estado !== 'acierto').length;
   const aprobado = fila.nota >= 5;
+  // El profesor puede ajustar la nota en la hoja; si no coincide con el cálculo directo, se dice
+  const directa = Math.round((Math.max(fila.aciertos - 0.25 * fila.errores, 0) / 60) * 1000) / 100;
+  const ajustada = Math.abs(fila.nota - directa) > 0.011;
   const casilla = (titulo: string, valor: React.ReactNode, color: string): React.ReactNode => (
     <div style={{ background: 'var(--surface-alt)', padding: '0.9rem 1rem', borderRadius: '8px', borderLeft: `3px solid ${color}` }}>
       <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>{titulo}</span>
@@ -96,9 +99,26 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
         {casilla('Errores', fila.errores, 'var(--bad-ink)')}
         {casilla('En blanco', fila.blancos, 'var(--text-muted)')}
       </div>
-      <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 1.25rem' }}>
+      <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
         Nota = (aciertos − 0,25 × errores) / 60 × 10. Cada error resta un cuarto de acierto y las preguntas en blanco no puntúan.
       </p>
+      {ajustada && (
+        <p
+          style={{
+            fontSize: '0.8rem',
+            margin: '0 0 1.25rem',
+            padding: '0.6rem 0.8rem',
+            background: 'var(--surface-alt)',
+            borderRadius: '8px',
+            borderLeft: '3px solid var(--teal)',
+            color: 'var(--text-main)'
+          }}
+        >
+          {docente ? 'Nota ajustada' : 'Tu nota se ha ajustado'}: el cálculo directo da <strong>{formatoNota(directa)}</strong> y la calificación
+          final es <strong>{formatoNota(fila.nota)}</strong>, por decisión del profesor.
+        </p>
+      )}
+      {!ajustada && <div style={{ marginBottom: '0.75rem' }} />}
 
       {detalle.length > 0 ? (
         <>
