@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StudentEvaluationProfile, INITIAL_STUDENT_EVALUATION_DATA, QFDOS_INFO } from '../data/qfdosData';
 import { useAuth } from '../context/AuthContext';
 import { leerEvaluacion, guardarEvaluacion } from '../services/contenidoRemoto';
+import { ConvocatoriaEspecialCard } from './ConvocatoriaEspecialCard';
 import { 
   GraduationCap, 
   Download, 
@@ -589,6 +590,9 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
           )}
         </div>
       )}
+
+      {/* Convocatoria especial: nota y corrección por pregunta (alumnado) o publicación (profesorado) */}
+      <ConvocatoriaEspecialCard />
 
       {/* Panel del Profesor: Listado Completo sincronizado con Google Sheets */}
       {isProfesor && (

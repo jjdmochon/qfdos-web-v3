@@ -74,6 +74,8 @@ function manejar(e) {
     if (accion === 'misEntregas')      return misEntregas(p);
     if (accion === 'evaluacion')       return evaluacion(p);
     if (accion === 'guardarEvaluacion') return guardarEvaluacion(p, e);
+    if (accion === 'evaluacionEspecial') return evaluacionEspecial(p);
+    if (accion === 'publicarNotasEspecial') return publicarNotasEspecial(p, e);
     if (accion === 'enviarDuda')       return enviarDuda(p, e);
     if (accion === 'misDudas')         return misDudas(p);
     if (accion === 'responderDuda')    return responderDuda(p, e);
@@ -95,8 +97,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 10,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
+        version: 11,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'evaluacionEspecial', 'publicarNotasEspecial', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -616,6 +618,163 @@ function guardarEvaluacion(p, e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* 4b. Convocatoria especial: nota y corrección por pregunta           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Las hojas de respuestas de la convocatoria especial se leen en local
+ * (leer_omr.py) y sus resultados viven en dos pestañas de la hoja de evaluación:
+ *   · «Convocatoria Especial» — una fila por alumno: correo, modelo, aciertos,
+ *     errores, blancos, nota y respuestas (60 caracteres: A–D; «-» si se dejó
+ *     en blanco; «*» si hubo marca doble, que se cuenta como en blanco).
+ *   · «_ClavesEspecial» — la clave y la justificación de cada pregunta de cada
+ *     modelo: modelo, n, clave, tema, enunciado, correcta, justificacion.
+ *     Empieza por «_» para que quede fuera de lo que barren otras acciones.
+ *
+ * Privacidad: el alumno recibe SOLO su fila y las claves de SU modelo, y solo
+ * cuando el profesor las ha publicado (propiedad NOTAS_ESPECIAL_PUBLICAS = '1').
+ * Antes de publicar no recibe nada, ni siquiera su propia nota. El profesor
+ * recibe un resumen (cuántas filas hay y cuántas no tienen correo), nunca las
+ * respuestas de los demás.
+ */
+var HOJA_ESPECIAL = 'Convocatoria Especial';
+var HOJA_CLAVES_ESPECIAL = '_ClavesEspecial';
+
+function notasEspecialPublicas_() {
+  return propiedad_('NOTAS_ESPECIAL_PUBLICAS') === '1';
+}
+
+function normalizarCabecera_(t) {
+  return String(t == null ? '' : t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+/** Índice (base 0) de cada columna buscada por sus nombres posibles; -1 si falta. */
+function columnasPorNombre_(cabeceras, buscadas) {
+  var h = cabeceras.map(normalizarCabecera_);
+  var out = {};
+  Object.keys(buscadas).forEach(function (clave) {
+    var idx = -1;
+    for (var j = 0; j < h.length && idx === -1; j++) {
+      if (buscadas[clave].indexOf(h[j]) !== -1) idx = j;
+    }
+    out[clave] = idx;
+  });
+  return out;
+}
+
+function numeroOCero_(v) {
+  var n = Number(String(v).replace(',', '.'));
+  return isNaN(n) ? 0 : n;
+}
+
+function evaluacionEspecial(p) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  var esProfesor = s.r === 'profesor';
+  var publicadas = notasEspecialPublicas_();
+
+  // Sin publicar, el alumnado no recibe nada (ni su propia fila)
+  if (!esProfesor && !publicadas) return json({ ok: true, publicadas: false, fila: null, detalle: [] });
+
+  var ss = SpreadsheetApp.openById(propiedad_('EVALUACION_HOJA_ID') || EVALUACION_HOJA_ID);
+  var hoja = ss.getSheetByName(HOJA_ESPECIAL);
+  if (!hoja) return json({ ok: false, error: 'Falta la pestaña «' + HOJA_ESPECIAL + '» en la hoja de evaluación.' });
+
+  var datos = hoja.getDataRange().getValues();
+  if (datos.length < 2) return json({ ok: true, publicadas: publicadas, fila: null, detalle: [], total: 0, sinCorreo: 0 });
+
+  var c = columnasPorNombre_(datos[0], {
+    correo: ['correo', 'email', 'correo electronico'],
+    modelo: ['modelo'],
+    aciertos: ['aciertos'],
+    errores: ['errores'],
+    blancos: ['blancos', 'en blanco'],
+    nota: ['nota', 'calificacion'],
+    respuestas: ['respuestas']
+  });
+  if (c.correo === -1 || c.modelo === -1 || c.nota === -1 || c.respuestas === -1) {
+    return json({ ok: false, error: 'La pestaña «' + HOJA_ESPECIAL + '» necesita las columnas correo, modelo, nota y respuestas.' });
+  }
+
+  var filas = datos.slice(1).filter(function (f) {
+    return f.some(function (v) { return String(v).trim() !== ''; });
+  });
+
+  if (esProfesor) {
+    var sinCorreo = filas.filter(function (f) { return String(f[c.correo]).trim().indexOf('@') === -1; }).length;
+    return json({ ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [], total: filas.length, sinCorreo: sinCorreo });
+  }
+
+  var mia = null;
+  for (var i = 0; i < filas.length; i++) {
+    if (String(filas[i][c.correo]).trim().toLowerCase() === s.e) { mia = filas[i]; break; }
+  }
+  if (!mia) return json({ ok: true, publicadas: true, fila: null, detalle: [] });
+
+  var modelo = String(mia[c.modelo]).trim().toUpperCase();
+  var respuestas = String(mia[c.respuestas]).replace(/\s+/g, '');
+  var fila = {
+    modelo: modelo,
+    aciertos: c.aciertos === -1 ? 0 : numeroOCero_(mia[c.aciertos]),
+    errores: c.errores === -1 ? 0 : numeroOCero_(mia[c.errores]),
+    blancos: c.blancos === -1 ? 0 : numeroOCero_(mia[c.blancos]),
+    nota: numeroOCero_(mia[c.nota])
+  };
+
+  // Claves y justificaciones: solo las del modelo de este alumno
+  var detalle = [];
+  var hc = ss.getSheetByName(HOJA_CLAVES_ESPECIAL);
+  if (hc && hc.getLastRow() > 1) {
+    var kd = hc.getDataRange().getValues();
+    var k = columnasPorNombre_(kd[0], {
+      modelo: ['modelo'],
+      n: ['n', 'numero', 'pregunta'],
+      clave: ['clave'],
+      tema: ['tema'],
+      enunciado: ['enunciado'],
+      correcta: ['correcta', 'opcion correcta'],
+      justificacion: ['justificacion']
+    });
+    if (k.modelo === -1 || k.n === -1 || k.clave === -1) {
+      return json({ ok: false, error: 'La pestaña «' + HOJA_CLAVES_ESPECIAL + '» necesita las columnas modelo, n y clave.' });
+    }
+    var cadena = function (v) { return v === undefined || v === null ? '' : String(v); };
+    for (var r = 1; r < kd.length; r++) {
+      if (String(kd[r][k.modelo]).trim().toUpperCase() !== modelo) continue;
+      var n = Number(kd[r][k.n]);
+      if (!(n >= 1)) continue;
+      var marcada = (respuestas.charAt(n - 1) || '-').toUpperCase();
+      var correcta = String(kd[r][k.clave]).trim().toUpperCase();
+      var estado = marcada === correcta ? 'acierto' : marcada === '-' ? 'blanco' : marcada === '*' ? 'doble' : 'error';
+      detalle.push({
+        n: n,
+        marcada: marcada,
+        clave: correcta,
+        estado: estado,
+        tema: k.tema === -1 ? '' : cadena(kd[r][k.tema]),
+        enunciado: k.enunciado === -1 ? '' : cadena(kd[r][k.enunciado]),
+        correcta: k.correcta === -1 ? '' : cadena(kd[r][k.correcta]),
+        justificacion: k.justificacion === -1 ? '' : cadena(kd[r][k.justificacion])
+      });
+    }
+    detalle.sort(function (a, b) { return a.n - b.n; });
+  }
+  return json({ ok: true, publicadas: true, fila: fila, detalle: detalle });
+}
+
+/** Publica u oculta la convocatoria especial para el alumnado. Solo profesorado. */
+function publicarNotasEspecial(p, e) {
+  var s = verificarSesion_(p.sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede publicar las notas.' });
+
+  var d = cuerpoJson_(e);
+  if (typeof d.publicadas !== 'boolean') return json({ ok: false, error: 'Falta indicar si se publican o se ocultan.' });
+  PropertiesService.getScriptProperties().setProperty('NOTAS_ESPECIAL_PUBLICAS', d.publicadas ? '1' : '0');
+  return json({ ok: true, notasPublicadas: d.publicadas });
 }
 
 /* ------------------------------------------------------------------ */
