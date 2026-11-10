@@ -100,9 +100,9 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
         {casilla('En blanco', fila.blancos, 'var(--text-muted)')}
       </div>
       <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
-        Nota = (aciertos − 0,25 × errores) / 60 × 10. Cada error resta un cuarto de acierto y las preguntas en blanco no puntúan.
+        Cada acierto suma 1 punto, cada error resta 0,25 y las preguntas en blanco no puntúan.
       </p>
-      {ajustada && (
+      {docente && ajustada && (
         <p
           style={{
             fontSize: '0.8rem',
@@ -114,11 +114,11 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
             color: 'var(--text-main)'
           }}
         >
-          {docente ? 'Nota ajustada' : 'Tu nota se ha ajustado'}: el cálculo directo da <strong>{formatoNota(directa)}</strong> y la calificación
-          final es <strong>{formatoNota(fila.nota)}</strong>, por decisión del profesor.
+          Nota ajustada (solo lo ve el profesorado): el cálculo directo, (aciertos − 0,25 × errores) / 60 × 10, da{' '}
+          <strong>{formatoNota(directa)}</strong> y la calificación publicada es <strong>{formatoNota(fila.nota)}</strong>.
         </p>
       )}
-      {!ajustada && <div style={{ marginBottom: '0.75rem' }} />}
+      {!(docente && ajustada) && <div style={{ marginBottom: '0.75rem' }} />}
 
       {detalle.length > 0 ? (
         <>
