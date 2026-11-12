@@ -28,6 +28,7 @@ export interface CourseAttachment {
 export interface TestQuestionOption {
   text: string;
   smiles?: string;
+  imagePath?: string;
   /** Nombre o descripción que se revela exclusivamente tras contestar o en el solucionario para mantener el rigor del examen */
   revealedName?: string;
 }
@@ -39,7 +40,7 @@ export interface TestQuestion {
   question: string;
   questionSmiles?: string;
   /** Estructuras de referencia del enunciado, con su nombre (reactivos, sustratos) */
-  questionStructures?: { name: string; smiles: string }[];
+  questionStructures?: { name: string; smiles?: string; imagePath?: string }[];
   options: (string | TestQuestionOption)[];
   correctIndex: number;
   explanation: string;
@@ -54,7 +55,8 @@ export interface TestQuestion {
 
 export interface FlashcardStructure {
   name: string;
-  smiles: string;
+  smiles?: string;
+  imagePath?: string;
   badge?: string;
 }
 
@@ -581,8 +583,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.77.2';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-13T00:15:00.000Z';
+export const COURSE_DATA_VERSION = '3.77.3';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-13T00:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

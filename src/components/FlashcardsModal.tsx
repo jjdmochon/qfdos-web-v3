@@ -660,7 +660,17 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                                 </span>
                               )}
                             </div>
-                            <Chem2DDrawer smiles={st.smiles} width={130} height={85} />
+                            {st.imagePath ? (
+                              <div style={{ background: '#ffffff', padding: '6px', borderRadius: '6px', border: '1px solid var(--border-color)', width: '100%', display: 'flex', justifyContent: 'center' }}>
+                                <img
+                                  src={recurso(st.imagePath)}
+                                  alt={st.name}
+                                  style={{ maxHeight: '110px', maxWidth: '100%', objectFit: 'contain' }}
+                                />
+                              </div>
+                            ) : st.smiles ? (
+                              <Chem2DDrawer smiles={st.smiles} width={130} height={85} />
+                            ) : null}
                           </div>
                         ))}
                       </div>

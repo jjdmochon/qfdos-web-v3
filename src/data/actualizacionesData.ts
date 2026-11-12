@@ -27,6 +27,14 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.77.3-tema6-reshiki-historias-spotify',
+    version: 'v3.77.3',
+    fecha: '13 Noviembre 2026',
+    titulo: 'Estructuras ReShiki en tests y flashcards, e Historias completas',
+    texto: 'En cuanto al Tema 6 (Sistema Opioide), los tests y las flashcards integran ahora los renders químicos oficiales ReShiki en alta fidelidad. Además, la historia del tema reúne el clip animado, el episodio en Spotify y la reproducción del podcast docente.',
+    imagen: 'historias/tema-06-brag.jpg'
+  },
+  {
     id: 'act-3.77.2-tema6-podcast-audio',
     version: 'v3.77.2',
     fecha: '13 Noviembre 2026',
