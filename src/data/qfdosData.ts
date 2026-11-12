@@ -581,8 +581,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.76.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-12T19:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.77.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-12T21:15:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
