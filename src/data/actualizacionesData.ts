@@ -27,6 +27,14 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.77.1-tema6-historias',
+    version: 'v3.77.1',
+    fecha: '12 Noviembre 2026',
+    titulo: 'El Tema 6, en las Historias con su vídeo brag y podcast',
+    texto: 'En cuanto al Tema 6 (Opioides y analgesia), ya tiene su círculo en las Historias con el cartel oficial, el clip animado vertical y el podcast. Todo el material audiovisual y los apuntes están disponibles en la plataforma.',
+    imagen: 'historias/tema-06-brag.jpg'
+  },
+  {
     id: 'act-3.76.0-tema6-revision',
     version: 'v3.76.0',
     fecha: '12 Noviembre 2026',
