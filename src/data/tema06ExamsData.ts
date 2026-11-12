@@ -33,7 +33,7 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: "SAR · Morfina",
     badge: "Modelo 1 · P2 · SAR · Morfina",
     question: "¿Qué consecuencia directa tiene sobre la afinidad intrínseca por el receptor opioide mu la eterificación del fenol C3-OH frente a la del alcohol alílico C6-OH?",
-    questionStructures: [{ name: "Morfina (C3-OH y C6-OH libres)", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5" }, { name: "Codeína (C3-OMe bloqueado)", smiles: "COc1ccc2c3c1O[C@H]1[C@@H](O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341" }],
+    questionStructures: [{ name: "Morfina (C3-OH y C6-OH libres)", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5" }, { name: "Codeína (C3-OMe bloqueado)", imagePath: "estructuras/tema-06/QFDOS-300_codeina.png", smiles: "COc1ccc2c3c1O[C@H]1[C@@H](O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341" }],
     options: [
       { text: "Eterificar C3 incrementa la afinidad; eterificar C6 la anula de forma completa" },
       { text: "Eterificar C3 destruye la afinidad directa; eterificar C6 la conserva o eleva" },
@@ -80,10 +80,10 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 1 · P5 · SAR · Heroína",
     question: "¿Cuál de las siguientes estructuras corresponde al metabolito 6-monoacetilmorfina (6-MAM), responsable de la rápida activación de receptores opioides en el SNC tras la hidrólisis de heroína?",
     options: [
-      { text: "Estructura A", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
-      { text: "Estructura B", smiles: "CC(=O)O[C@H]1C=C[C@H]2[C@H]3CC4=C5[C@]2([C@H]1OC5=C(C=C4)O)CCN3C", revealedName: "6-Monoacetilmorfina (6-MAM)" },
-      { text: "Estructura C", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](OC(C)=O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "Heroína (Diacetilmorfina)" },
-      { text: "Estructura D", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "3-Monoacetilmorfina" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-304_6_acetilmorfina.png", smiles: "CC(=O)O[C@H]1C=C[C@H]2[C@H]3CC4=C5[C@]2([C@H]1OC5=C(C=C4)O)CCN3C", revealedName: "6-Monoacetilmorfina (6-MAM)" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-305_heroina.png", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](OC(C)=O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "Heroína (Diacetilmorfina)" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-302_3_acetilmorfina.png", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "3-Monoacetilmorfina" },
     ],
     correctIndex: 1,
     explanation: "La 6-monoacetilmorfina (6-MAM) conserva el fenol C3-OH libre (indispensable para el enlace de H con el receptor) y mantiene esterificado el C6-OH con un grupo acetilo, lo que le confiere alta lipofilia y afinidad por el receptor mu superior a la propia morfina.\n\nDescartamos la A: La morfina presenta ambos hidroxilos libres (C3-OH y C6-OH), no el éster acetato en C6.\nDescartamos la C: La heroína es el diacetilderivado (acetilada en C3 y C6) y se comporta como profármaco inactivo in vitro.\nDescartamos la D: La 3-monoacetilmorfina posee el fenol C3 acetilado y carece de afinidad directa por el receptor mu.\n\nReferencia: Apuntes, La heroína como profármaco de penetración rápida."
@@ -109,7 +109,7 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: "Síntesis · N-desmetilación",
     badge: "Modelo 1 · P7 · Síntesis · N-desmetilación",
     question: "¿Qué secuencia de reactivos permite la N-desmetilación quimioselectiva de derivados morfinánicos para acceder a normorfina o noroximorfona?",
-    questionStructures: [{ name: "Morfina (N17-Me)", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5" }, { name: "Normorfina (N17-H)", smiles: "NCC[C@]12c3c4ccc(O)c3O[C@H]1[C@@H](O)C=C[C@H]2[C@H]5CC45" }],
+    questionStructures: [{ name: "Morfina (N17-Me)", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5" }, { name: "Normorfina (N17-H)", imagePath: "estructuras/tema-06/QFDOS-307_normorfina.png", smiles: "NCC[C@]12c3c4ccc(O)c3O[C@H]1[C@@H](O)C=C[C@H]2[C@H]5CC45" }],
     options: [
       { text: "Tratamiento directo con borohidruro sódico en medio alcohólico bajo reflujo suave" },
       { text: "Oxidación drástica con permanganato potásico seguida de transposición catalítica" },
@@ -126,10 +126,10 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 1 · P8 · SAR · Antagonistas",
     question: "¿Cuál de las siguientes estructuras corresponde a la naloxona, antagonista opioide puro portador de un grupo alilo en N17 y un hidroxilo en C14?",
     options: [
-      { text: "Estructura A", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
-      { text: "Estructura B", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Nalorfina" },
-      { text: "Estructura C", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Naloxona" },
-      { text: "Estructura D", smiles: "NCC[C@]12c3c4ccc(O)c3O[C@H]1[C@@H](O)C=C[C@H]2[C@H]5CC45", revealedName: "Normorfina" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-315_nalorfina.png", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Nalorfina" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-316_naloxona.png", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Naloxona" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-307_normorfina.png", smiles: "NCC[C@]12c3c4ccc(O)c3O[C@H]1[C@@H](O)C=C[C@H]2[C@H]5CC45", revealedName: "Normorfina" },
     ],
     correctIndex: 2,
     explanation: "La naloxona combina la cadena N-alilo (que proyecta hacia la cavidad accesoria hidrofóbica del receptor e impide el cambio conformacional de activación) con el sustituyente 14-OH y la función cetona en C6, confiriendo un perfil de antagonista competitivo puro.\n\nDescartamos la A: La morfina porta un grupo N-metilo y es un agonista pleno, no un antagonista.\nDescartamos la B: La nalorfina tiene grupo N-alilo pero carece del 14-OH y conserva el alcohol alílico C6-OH, siendo agonista parcial kappa.\nDescartamos la D: La normorfina es la amina secundaria desmetilada (N-H), no portadora de cadena alílica ni 14-OH.\n\nReferencia: Apuntes, SAR del nitrógeno: tamaño de la cadena y transición a antagonistas."
@@ -156,10 +156,10 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 1 · P10 · Síntesis · Petidina",
     question: "¿Cuál de las siguientes estructuras corresponde al intermedio 4-ciano-4-fenilpiperidina obtenido tras la ciclación antes de la eterificación a petidina?",
     options: [
-      { text: "Estructura A", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
-      { text: "Estructura B", smiles: "CCC(=O)C1(c2cccc(O)c2)CCN(C)CC1", revealedName: "Cetobemidona" },
-      { text: "Estructura C", smiles: "N#CC1(c2ccccc2)CCN(C)CC1", revealedName: "4-Ciano-4-fenil-1-metilpiperidina" },
-      { text: "Estructura D", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", revealedName: "Fentanilo" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-333_petidina.png", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-334_cetobemidona.png", smiles: "CCC(=O)C1(c2cccc(O)c2)CCN(C)CC1", revealedName: "Cetobemidona" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-348_nitrilo_de_la_petidina.png", smiles: "N#CC1(c2ccccc2)CCN(C)CC1", revealedName: "4-Ciano-4-fenil-1-metilpiperidina" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-337_fentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", revealedName: "Fentanilo" },
     ],
     correctIndex: 2,
     explanation: "La doble alquilación del fenilacetonitrilo con mecloretamina rinde 4-ciano-4-fenil-1-metilpiperidina. Posteriormente, la hidrólisis ácida del nitrilo combinada con etanol rinde el éster etílico de la petidina en una sola etapa.\n\nDescartamos la A: La petidina es el éster etílico final (C4-COOEt), no el intermedio nitrilo inicial.\nDescartamos la B: La cetobemidona posee un grupo propionilo y fenol en meta, siendo un producto analgésico final.\nDescartamos la D: El fentanilo es una anilidopiperidina con cadena N-fenetilo y sin grupo nitrilo.\n\nReferencia: Apuntes, Síntesis de la petidina."
@@ -201,10 +201,10 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 1 · P13 · Bioquímica · Péptidos endógenos",
     question: "¿Cuál de las siguientes estructuras corresponde al pentapéptido opioide endógeno Met-encefalina (H-Tyr-Gly-Gly-Phe-Met-OH)?",
     options: [
-      { text: "Estructura A", smiles: "CSCC[C@@H](C(=O)O)NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)CNC(=O)CNC(=O)[C@H](CC2=CC=C(C=C2)O)N", revealedName: "Metionina-encefalina (Met-encefalina)" },
-      { text: "Estructura B", smiles: "C[C@H](C(=O)NCC(=O)N(C)[C@@H](CC1=CC=CC=C1)C(=O)NCCO)NC(=O)[C@H](CC2=CC=C(C=C2)O)N", revealedName: "DAMGO" },
-      { text: "Estructura C", smiles: "CC(C)C[C@@H](NC(=O)[C@@H](Cc1ccccc1)NC(=O)[C@H](N)Cc1ccccc1)C(=O)N[C@H](CCCCN)C(=O)N1CCC(N)(C(=O)O)CC1", revealedName: "Difelikefalina" },
-      { text: "Estructura D", smiles: "CC(C)C[C@@H](C(=O)O)NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)CNC(=O)CNC(=O)[C@H](CC2=CC=C(C=C2)O)N", revealedName: "Leucina-encefalina (Leu-encefalina)" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-369_met_encefalina.png", smiles: "CSCC[C@@H](C(=O)O)NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)CNC(=O)CNC(=O)[C@H](CC2=CC=C(C=C2)O)N", revealedName: "Metionina-encefalina (Met-encefalina)" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-371_damgo.png", smiles: "C[C@H](C(=O)NCC(=O)N(C)[C@@H](CC1=CC=CC=C1)C(=O)NCCO)NC(=O)[C@H](CC2=CC=C(C=C2)O)N", revealedName: "DAMGO" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-372_difelikefalina.png", smiles: "CC(C)C[C@@H](NC(=O)[C@@H](Cc1ccccc1)NC(=O)[C@H](N)Cc1ccccc1)C(=O)N[C@H](CCCCN)C(=O)N1CCC(N)(C(=O)O)CC1", revealedName: "Difelikefalina" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-370_leu_encefalina.png", smiles: "CC(C)C[C@@H](C(=O)O)NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)CNC(=O)CNC(=O)[C@H](CC2=CC=C(C=C2)O)N", revealedName: "Leucina-encefalina (Leu-encefalina)" },
     ],
     correctIndex: 0,
     explanation: "La Met-encefalina es un pentapéptido opioide endógeno sintetizado a partir de la proencefalina; su secuencia es H-Tyr-Gly-Gly-Phe-Met-OH y actúa como agonista fisiológico con afinidad preferente por receptores delta y mu.\n\nDescartamos la B: DAMGO es un análogo sintético modificado con D-Ala2, N-Me-Phe4 y alcohol terminal Gly-ol.\nDescartamos la C: La difelikefalina es un tetrapéptido D-aminoacídico sintético con núcleo piperidina terminal.\nDescartamos la D: La Leu-encefalina posee leucina en el extremo carboxilo terminal en lugar de metionina.\n\nReferencia: Apuntes, Péptidos opioides endógenos: las encefalinas."
@@ -230,7 +230,7 @@ export const TEMA6_MODELO_1_TEST_QUESTIONS: TestQuestion[] = [
     block: "Síntesis · Fentanilo",
     badge: "Modelo 1 · P15 · Síntesis · Fentanilo",
     question: "En la ruta industrial del fentanilo a partir de 1-fenetil-4-piperidona, ¿qué secuencia sintética completa la obtención del analgésico final?",
-    questionStructures: [{ name: "1-Fenetil-4-piperidona", smiles: "C1CN(CCC1=O)CCc2ccccc2" }, { name: "Intermedio 4-ANPP", smiles: "C1CN(CCC1Nc2ccccc2)CCc3ccccc3" }],
+    questionStructures: [{ name: "1-Fenetil-4-piperidona", imagePath: "estructuras/tema-06/QFDOS-353_1_fenetil_4_piperidona.png", smiles: "C1CN(CCC1=O)CCc2ccccc2" }, { name: "Intermedio 4-ANPP", imagePath: "estructuras/tema-06/QFDOS-356_4_anpp.png", smiles: "C1CN(CCC1Nc2ccccc2)CCc3ccccc3" }],
     options: [
       { text: "Bencilamina con cianuro sódico y posterior hidrólisis ácida de la función amida" },
       { text: "Fenilhidrazina seguida de reducción con cinc metálico en medio acético caliente" },
@@ -252,10 +252,10 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 2 · P1 · Síntesis · Heroína",
     question: "¿Cuál de las siguientes estructuras corresponde a la diacetilmorfina (heroína), obtenida por tratamiento exhaustivo de la morfina con anhídrido acético a reflujo?",
     options: [
-      { text: "Estructura A", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "3-Acetilmorfina" },
-      { text: "Estructura B", smiles: "CC(=O)O[C@H]1C=C[C@H]2[C@H]3CC4=C5[C@]2([C@H]1OC5=C(C=C4)O)CCN3C", revealedName: "6-Acetilmorfina (6-MAM)" },
-      { text: "Estructura C", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](OC(C)=O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "Heroína (Diacetilmorfina)" },
-      { text: "Estructura D", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-302_3_acetilmorfina.png", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "3-Acetilmorfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-304_6_acetilmorfina.png", smiles: "CC(=O)O[C@H]1C=C[C@H]2[C@H]3CC4=C5[C@]2([C@H]1OC5=C(C=C4)O)CCN3C", revealedName: "6-Acetilmorfina (6-MAM)" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-305_heroina.png", smiles: "CC(=O)Oc1ccc2c3c1O[C@H]1[C@@H](OC(C)=O)C=C[C@H]4[C@@H](C2)N(C)CC[C@@]341", revealedName: "Heroína (Diacetilmorfina)" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
     ],
     correctIndex: 2,
     explanation: "La reacción de la morfina con exceso de anhídrido acético (Ac2O) o cloruro de acetilo calienta y acetila secuencialmente primero el fenol C3-OH (más nucleófilo por resonancia fenólica) y luego el alcohol secundario alílico en C6, rindiendo diacetilmorfina pura (heroína).\n\nDescartamos la A: La 3-acetilmorfina es el producto de monoacetilación selectiva del fenol C3-OH en frío.\nDescartamos la B: La 6-acetilmorfina presenta el fenol C3-OH libre y solo el C6-OH esterificado.\nDescartamos la D: La morfina es el reactivo dihidroxilado de partida sin ningún grupo acetato.\n\nReferencia: Apuntes, La heroína como profármaco de penetración rápida."
@@ -267,10 +267,10 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 2 · P2 · SAR · Morfinanos y 14-OH",
     question: "¿Cuál de las siguientes estructuras corresponde a la oximorfona, agonista opioide semisintético portador del grupo 14-hidroxilo y carbonilo en C6?",
     options: [
-      { text: "Estructura A", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Oximorfona" },
-      { text: "Estructura B", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
-      { text: "Estructura C", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@H]3[C@H]1C5", revealedName: "Hidromorfona" },
-      { text: "Estructura D", smiles: "COc1ccc2c3c1O[C@H]1C(=O)CC[C@@]4(O)[C@@H](C2)N(C)CC[C@]314", revealedName: "Oxicodona" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-312_oximorfona.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Oximorfona" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-311_hidromorfona.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@H]3[C@H]1C5", revealedName: "Hidromorfona" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-313_oxicodona.png", smiles: "COc1ccc2c3c1O[C@H]1C(=O)CC[C@@]4(O)[C@@H](C2)N(C)CC[C@]314", revealedName: "Oxicodona" },
     ],
     correctIndex: 0,
     explanation: "La oximorfona incorpora un grupo hidroxilo terciario en C14 en configuración beta junto a la cetona en C6 y saturación de C7-C8, lo que incrementa su afinidad y potencia analgésica unas 10 veces respecto a la morfina.\n\nDescartamos la B: La morfina carece de hidroxilo en C14 y posee un alcohol secundario alílico en C6.\nDescartamos la C: La hidromorfona presenta carbonilo en C6 pero carece del grupo 14-hidroxilo (C14-H).\nDescartamos la D: La oxicodona porta un éter metílico en C3 (C3-OMe), comportándose como derivado de codeína.\n\nReferencia: Apuntes, El sustituyente 14-OH: oximorfona y oxicodona."
@@ -297,10 +297,10 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 2 · P4 · SAR · Morfinanos",
     question: "¿Cuál de las siguientes estructuras corresponde al levorfanol, morfinano obtenido por eliminación formal del puente éter furánico de la morfina?",
     options: [
-      { text: "Estructura A", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
-      { text: "Estructura B", smiles: "CN1CC[C@]23CCCC[C@H]2[C@H]1Cc1ccc(O)cc13", revealedName: "Levorfanol" },
-      { text: "Estructura C", smiles: "CC(C)=CCN1CCC2(C)c3cc(O)ccc3CC1C2C", revealedName: "Pentazocina" },
-      { text: "Estructura D", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-324_levorfanol.png", smiles: "CN1CC[C@]23CCCC[C@H]2[C@H]1Cc1ccc(O)cc13", revealedName: "Levorfanol" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-331_pentazocina.png", smiles: "CC(C)=CCN1CCC2(C)c3cc(O)ccc3CC1C2C", revealedName: "Pentazocina" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-333_petidina.png", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
     ],
     correctIndex: 1,
     explanation: "El levorfanol representa la simplificación a morfinano (sistema tetracíclico A-B-C-D), prescindiendo del anillo E (furano) y del oxígeno alílico en C6, rindiendo un fármaco con afinidad mu y potencia superiores a la morfina.\n\nDescartamos la A: La morfina conserva el anillo dihidrofuránico E (puente éter 4,5-epóxido).\nDescartamos la C: La pentazocina es un 6,7-benzomorfano donde también se ha eliminado el anillo C de ciclohexano.\nDescartamos la D: La petidina es una 4-fenilpiperidina monocíclica con éster etílico, no un morfinano tetracíclico.\n\nReferencia: Apuntes, Morfinanos: eliminación del puente éter (anillo B)."
@@ -311,7 +311,7 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     block: "SAR · Morfinanos",
     badge: "Modelo 2 · P5 · SAR · Morfinanos",
     question: "Al comparar los enantiómeros de la serie del morfinano mostrados, ¿qué divergencia farmacológica fundamental exhiben el levorfanol y el dextrometorfano?",
-    questionStructures: [{ name: "Levorfanol (−)", smiles: "CN1CC[C@]23CCCC[C@H]2[C@H]1Cc1ccc(O)cc13" }, { name: "Dextrometorfano (+)", smiles: "COc1ccc2c(c1)[C@]13CCCC[C@@H]1[C@H](C2)N(C)CC3" }],
+    questionStructures: [{ name: "Levorfanol (−)", imagePath: "estructuras/tema-06/QFDOS-324_levorfanol.png", smiles: "CN1CC[C@]23CCCC[C@H]2[C@H]1Cc1ccc(O)cc13" }, { name: "Dextrometorfano (+)", imagePath: "estructuras/tema-06/QFDOS-328_dextrometorfano.png", smiles: "COc1ccc2c(c1)[C@]13CCCC[C@@H]1[C@H](C2)N(C)CC3" }],
     options: [
       { text: "El levógiro es potente agonista mu; el dextrógiro es antitusígeno sin acción mu" },
       { text: "El dextrógiro es el agonista mu; el levógiro carece de cualquier efecto biológico" },
@@ -358,10 +358,10 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 2 · P8 · SAR · Piperidinas",
     question: "¿Cuál de las siguientes estructuras corresponde a la petidina (meperidina), prototipo analgésico de la familia de las 4-fenilpiperidinas?",
     options: [
-      { text: "Estructura A", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
-      { text: "Estructura B", smiles: "CCC(=O)C1(c2cccc(O)c2)CCN(C)CC1", revealedName: "Cetobemidona" },
-      { text: "Estructura C", smiles: "CCC(=O)C(CC(C)N(C)C)(c1ccccc1)c1ccccc1", revealedName: "Metadona" },
-      { text: "Estructura D", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-334_cetobemidona.png", smiles: "CCC(=O)C1(c2cccc(O)c2)CCN(C)CC1", revealedName: "Cetobemidona" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-341_metadona.png", smiles: "CCC(=O)C(CC(C)N(C)C)(c1ccccc1)c1ccccc1", revealedName: "Metadona" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-333_petidina.png", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
     ],
     correctIndex: 3,
     explanation: "La petidina fue el primer opioide sintético simple; conserva únicamente el anillo aromático A y la piperidina D (4-fenilpiperidina) con un éster etílico en el carbono cuaternario C4 y un grupo N-metilo.\n\nDescartamos la A: La morfina es un sistema pentacíclico rígido, mientras que la petidina es una piperidina monocíclica flexible.\nDescartamos la B: La cetobemidona porta una cetona propionilo en C4 y un fenol en meta sobre el anillo aromático.\nDescartamos la C: La metadona es una difenilheptanona acíclica de cadena abierta, sin anillo de piperidina.\n\nReferencia: Apuntes, 4-Fenilpiperidinas: petidina y cetobemidona."
@@ -417,7 +417,7 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     block: "Síntesis · Tramadol",
     badge: "Modelo 2 · P12 · Síntesis · Tramadol",
     question: "En la síntesis industrial del tramadol, ¿qué transformación organometálica genera su esqueleto de aminociclohexanol sustituido?",
-    questionStructures: [{ name: "Tramadol (QFDOS-336)", smiles: "COc1cccc(C2(O)CCCCC2CN(C)C)c1" }],
+    questionStructures: [{ name: "Tramadol (QFDOS-336)", imagePath: "estructuras/tema-06/QFDOS-343_tramadol.png", smiles: "COc1cccc(C2(O)CCCCC2CN(C)C)c1" }],
     options: [
       { text: "Alquilación de Friedel-Crafts del ciclohexeno con anisol en medio ácido" },
       { text: "Adición del reactivo de Grignard de m-bromoanisol sobre la cetona aminometilada" },
@@ -449,10 +449,10 @@ export const TEMA6_MODELO_2_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 2 · P14 · Síntesis · Orvinoles",
     question: "¿Cuál de las siguientes estructuras corresponde a la etorfina, orvinol obtenido por adición de bromuro de propilmagnesio sobre el carbonilo de la tevinona?",
     options: [
-      { text: "Estructura A", smiles: "CCC[C@@](C)(O)[C@H]1C[C@@]23C=C[C@]1(OC)[C@@H]1Oc4c(O)ccc5c4[C@@]12CCN(C)[C@@H]3C5", revealedName: "Etorfina" },
-      { text: "Estructura B", smiles: "CC(=O)[C@H]1C[C@@]23C=C[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)OC)O4)C)OC", revealedName: "Tevinona" },
-      { text: "Estructura C", smiles: "C[C@]([C@H]1C[C@@]23CC[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)O)O4)CC7CC7)OC)(C(C)(C)C)O", revealedName: "Buprenorfina" },
-      { text: "Estructura D", smiles: "COC1=CC=C2[C@H]3Cc4ccc(OC)c5c4[C@@]2(CCN3C)[C@H]1O5", revealedName: "Tebaína" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-365_etorfina.png", smiles: "CCC[C@@](C)(O)[C@H]1C[C@@]23C=C[C@]1(OC)[C@@H]1Oc4c(O)ccc5c4[C@@]12CCN(C)[C@@H]3C5", revealedName: "Etorfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-360_tevinona.png", smiles: "CC(=O)[C@H]1C[C@@]23C=C[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)OC)O4)C)OC", revealedName: "Tevinona" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-367_buprenorfina.png", smiles: "C[C@]([C@H]1C[C@@]23CC[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)O)O4)CC7CC7)OC)(C(C)(C)C)O", revealedName: "Buprenorfina" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-357_tebaina.png", smiles: "COC1=CC=C2[C@H]3Cc4ccc(OC)c5c4[C@@]2(CCN3C)[C@H]1O5", revealedName: "Tebaína" },
     ],
     correctIndex: 0,
     explanation: "La reacción del reactivo de Grignard bromuro de n-propilmagnesio con el grupo carbonilo de la tevinona genera el alcohol terciario con cadena n-propílica; la posterior desmetilación quimioselectiva del fenol en C3 rinde etorfina, agonista analgésico varios miles de veces más potente que la morfina.\n\nDescartamos la B: La tevinona es el aducto directo de Diels-Alder con la cetona metílica intacta en C7.\nDescartamos la C: La buprenorfina incorpora un grupo t-butilo terciario y un sustituyente N-ciclopropilmetilo.\nDescartamos la D: La tebaína es el alcaloide natural de partida sin puente eteno ni cadena lateral en C7.\n\nReferencia: Apuntes, Extensión sobre la cetona: adición organometálica de Grignard."
@@ -514,10 +514,10 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 3 · P3 · SAR · PAMORA",
     question: "¿Cuál de las siguientes estructuras corresponde a la metilnaltrexona, antagonista opioide periférico con nitrógeno cuaternario permanente?",
     options: [
-      { text: "Estructura A", smiles: "C[N+]1(CC2CC2)CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Metilnaltrexona" },
-      { text: "Estructura B", smiles: "O=C1CC[C@@]2(O)[C@H]3Cc4ccc(O)c5c4[C@@]2(CCN3CC2CC2)[C@H]1O5", revealedName: "Naltrexona" },
-      { text: "Estructura C", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Naloxona" },
-      { text: "Estructura D", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](OCCOCCOCCOCCOCCOCCOCCOC)CC[C@@]3(O)[C@H]1C5", revealedName: "Naloxegol" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-319_metilnaltrexona.png", smiles: "C[N+]1(CC2CC2)CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Metilnaltrexona" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-317_naltrexona.png", smiles: "O=C1CC[C@@]2(O)[C@H]3Cc4ccc(O)c5c4[C@@]2(CCN3CC2CC2)[C@H]1O5", revealedName: "Naltrexona" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-316_naloxona.png", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2C(=O)CC[C@@]3(O)[C@H]1C5", revealedName: "Naloxona" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-320_naloxegol.png", smiles: "C=CCN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](OCCOCCOCCOCCOCCOCCOCCOC)CC[C@@]3(O)[C@H]1C5", revealedName: "Naloxegol" },
     ],
     correctIndex: 0,
     explanation: "La metilnaltrexona porta una carga positiva permanente en su nitrógeno cuaternario (N,N-dialquilamonio), lo que impide totalmente su paso a través de la barrera hematoencefálica y le permite actuar selectivamente en el tracto gastrointestinal como antagonista periférico (PAMORA).\n\nDescartamos la B: La naltrexona posee amina terciaria protonable y cruza la BHE con facilidad produciendo bloqueo central.\nDescartamos la C: La naloxona es una amina terciaria N-alílica neutra a pH muy básico que difunde al SNC.\nDescartamos la D: El naloxegol es un derivado pegilado de naloxol, no una sal de amonio cuaternario.\n\nReferencia: Apuntes, Antagonistas periféricos (PAMORA)."
@@ -529,10 +529,10 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 3 · P4 · SAR · Piperidinas",
     question: "¿Cuál de las siguientes estructuras corresponde a la cetobemidona, 4-fenilpiperidina portadora de fenol en posición meta y grupo propionilo en C4?",
     options: [
-      { text: "Estructura A", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
-      { text: "Estructura B", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", revealedName: "Fentanilo" },
-      { text: "Estructura C", smiles: "CCC(=O)C1(c2cccc(O)c2)CCN(C)CC1", revealedName: "Cetobemidona" },
-      { text: "Estructura D", smiles: "CCC(=O)C(CC(C)N(C)C)(c1ccccc1)c1ccccc1", revealedName: "Metadona" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-333_petidina.png", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-337_fentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", revealedName: "Fentanilo" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-334_cetobemidona.png", smiles: "CCC(=O)C1(c2cccc(O)c2)CCN(C)CC1", revealedName: "Cetobemidona" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-341_metadona.png", smiles: "CCC(=O)C(CC(C)N(C)C)(c1ccccc1)c1ccccc1", revealedName: "Metadona" },
     ],
     correctIndex: 2,
     explanation: "La cetobemidona optimiza la serie de la petidina incorporando un fenol en meta sobre el fenilo (mimetizando el C3-OH de la morfina) y sustituyendo el éster etílico por una etilcetona (propionilo), lo que eleva su potencia analgésica al nivel de la morfina.\n\nDescartamos la A: La petidina posee un éster etílico y carece de sustituyente fenólico en el anillo de benceno.\nDescartamos la B: El fentanilo es una 4-anilidopiperidina con cadena N-fenetilo y función propionamida.\nDescartamos la D: La metadona es una difenilpropilamina acíclica con dos fenilos no sustituidos.\n\nReferencia: Apuntes, 4-Fenilpiperidinas: petidina y cetobemidona."
@@ -543,7 +543,7 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     block: "SAR · Anilidopiperidinas",
     badge: "Modelo 3 · P5 · SAR · Anilidopiperidinas",
     question: "En la estructura del fentanilo, ¿a qué características moleculares se debe su extraordinaria potencia (50 a 100 veces superior a la morfina)?",
-    questionStructures: [{ name: "Fentanilo (QFDOS-328)", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1" }],
+    questionStructures: [{ name: "Fentanilo (QFDOS-328)", imagePath: "estructuras/tema-06/QFDOS-337_fentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1" }],
     options: [
       { text: "La formación de enlaces covalentes directos y permanentes con los lípidos del SNC" },
       { text: "Su alta lipofilia y la perfecta orientación fenetilo en el bolsillo hidrofóbico" },
@@ -560,10 +560,10 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 3 · P6 · Síntesis · Anilidopiperidinas",
     question: "¿Cuál de las siguientes estructuras corresponde al sufentanilo, análogo de fentanilo donde el fenilo se sustituye por tiofeno y C4 porta un éter metoximetilo?",
     options: [
-      { text: "Estructura A", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", revealedName: "Fentanilo" },
-      { text: "Estructura B", smiles: "CCC(=O)N(c1ccccc1)C1(COC)CCN(CCN2N=NN(CC)C2=O)CC1", revealedName: "Alfentanilo" },
-      { text: "Estructura C", smiles: "CCC(=O)N(c1ccccc1)C1(C(=O)OC)CCN(CCC(=O)OC)CC1", revealedName: "Remifentanilo" },
-      { text: "Estructura D", smiles: "CCC(=O)N(c1ccccc1)C1(COC)CCN(CCc2cccs2)CC1", revealedName: "Sufentanilo" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-337_fentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1CCN(CCc2ccccc2)CC1", revealedName: "Fentanilo" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/alfentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1(COC)CCN(CCN2N=NN(CC)C2=O)CC1", revealedName: "Alfentanilo" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-339_remifentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1(C(=O)OC)CCN(CCC(=O)OC)CC1", revealedName: "Remifentanilo" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-338_sufentanilo.png", smiles: "CCC(=O)N(c1ccccc1)C1(COC)CCN(CCc2cccs2)CC1", revealedName: "Sufentanilo" },
     ],
     correctIndex: 3,
     explanation: "El sufentanilo optimiza el farmacóforo del fentanilo mediante dos modificaciones bioisostéricas clave: la sustitución del anillo de benceno terminal por un bioisóstero clásico de tiofeno (2-(tiofen-2-il)etilo) y la introducción de un grupo metoximetilo (-CH2OCH3) en la posición 4 de la piperidina, confiriendo una potencia analgésica de 5 a 10 veces superior al fentanilo.\n\nDescartamos la A: El fentanilo porta un grupo N-fenetilo con fenilo no sustituido y C4-H en la piperidina.\nDescartamos la B: El alfentanilo incorpora un heterociclo tetrazol-5-ona unido por cadena etilo al nitrógeno.\nDescartamos la C: El remifentanilo contiene dos grupos éster metílico en C4 y en la cadena N-alquílica.\n\nReferencia: Apuntes, 4-Anilidopiperidinas: fentanilo y análogos."
@@ -590,10 +590,10 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 3 · P8 · SAR · Difenilheptanonas",
     question: "¿Cuál de las siguientes estructuras corresponde a la metadona, agonista opioide de cadena abierta derivado de la difenilheptanona?",
     options: [
-      { text: "Estructura A", smiles: "CCC(=O)C(CC(C)N(C)C)(c1ccccc1)c1ccccc1", revealedName: "Metadona" },
-      { text: "Estructura B", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
-      { text: "Estructura C", smiles: "CCC(=O)OC(Cc1ccccc1)(C(C)CN(C)C)c1ccccc1", revealedName: "Dextropropoxifeno" },
-      { text: "Estructura D", smiles: "COc1cccc(C2(O)CCCCC2CN(C)C)c1", revealedName: "Tramadol" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-341_metadona.png", smiles: "CCC(=O)C(CC(C)N(C)C)(c1ccccc1)c1ccccc1", revealedName: "Metadona" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-333_petidina.png", smiles: "CCOC(=O)C1(c2ccccc2)CCN(C)CC1", revealedName: "Petidina" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/dextropropoxifeno.png", smiles: "CCC(=O)OC(Cc1ccccc1)(C(C)CN(C)C)c1ccccc1", revealedName: "Dextropropoxifeno" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-343_tramadol.png", smiles: "COc1cccc(C2(O)CCCCC2CN(C)C)c1", revealedName: "Tramadol" },
     ],
     correctIndex: 0,
     explanation: "La metadona es un derivado acíclico de difenilpropilamina donde un carbono cuaternario soporta dos anillos fenílicos y una cadena heptanona con amina terciaria ramificada. En disolución adopta una conformación pseudocíclica estabilizada por atracción dipolo-dipolo entre el nitrógeno y el carbonilo.\n\nDescartamos la B: La petidina es una piperidina monocíclica con un solo anillo aromático.\nDescartamos la C: El propoxifeno posee un éster propionato en lugar de la cetona heptanona de la metadona.\nDescartamos la D: El tramadol es un aminociclohexanol sustituido con un anillo de m-metoxifenilo.\n\nReferencia: Apuntes, Difenilpropilaminas: metadona."
@@ -620,10 +620,10 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     badge: "Modelo 3 · P10 · SAR · Orvinoles",
     question: "¿Cuál de las siguientes estructuras corresponde a la buprenorfina, orvinol portador de puente 6,14-endo-etano, grupo t-butilo y N-ciclopropilmetilo?",
     options: [
-      { text: "Estructura A", smiles: "CCC[C@@](C)(O)[C@H]1C[C@@]23C=C[C@]1(OC)[C@@H]1Oc4c(O)ccc5c4[C@@]12CCN(C)[C@@H]3C5", revealedName: "Etorfina" },
-      { text: "Estructura B", smiles: "COC1=CC=C2[C@H]3Cc4ccc(OC)c5c4[C@@]2(CCN3C)[C@H]1O5", revealedName: "Tebaína" },
-      { text: "Estructura C", smiles: "C[C@]([C@H]1C[C@@]23CC[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)O)O4)CC7CC7)OC)(C(C)(C)C)O", revealedName: "Buprenorfina" },
-      { text: "Estructura D", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
+      { text: "Estructura A", imagePath: "estructuras/tema-06/QFDOS-365_etorfina.png", smiles: "CCC[C@@](C)(O)[C@H]1C[C@@]23C=C[C@]1(OC)[C@@H]1Oc4c(O)ccc5c4[C@@]12CCN(C)[C@@H]3C5", revealedName: "Etorfina" },
+      { text: "Estructura B", imagePath: "estructuras/tema-06/QFDOS-357_tebaina.png", smiles: "COC1=CC=C2[C@H]3Cc4ccc(OC)c5c4[C@@]2(CCN3C)[C@H]1O5", revealedName: "Tebaína" },
+      { text: "Estructura C", imagePath: "estructuras/tema-06/QFDOS-367_buprenorfina.png", smiles: "C[C@]([C@H]1C[C@@]23CC[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)O)O4)CC7CC7)OC)(C(C)(C)C)O", revealedName: "Buprenorfina" },
+      { text: "Estructura D", imagePath: "estructuras/tema-06/QFDOS-299_morfina.png", smiles: "CN1CC[C@]23c4c5ccc(O)c4O[C@H]2[C@@H](O)C=C[C@H]3[C@H]1C5", revealedName: "Morfina" },
     ],
     correctIndex: 2,
     explanation: "La buprenorfina es un orvinol semisintético altamente lipófilo derivado de la tebaína; combina un puente 6,14-endo-etano, una cadena terciaria con t-butilo y un grupo N-ciclopropilmetilo, lo que le confiere un perfil de agonista parcial mu con cinética de disociación sumamente lenta y techo terapéutico.\n\nDescartamos la A: La etorfina posee cadena N-metilo y grupo n-propilo en el carbono terciario, siendo agonista pleno ultradotado.\nDescartamos la B: La tebaína es el dieno natural precursor con dos éteres metílicos y sin puente endo-eteno.\nDescartamos la D: La morfina carece del puente etano C6-C14 y del voluminoso sustituyente t-butilo.\n\nReferencia: Apuntes, Etorfina, diprenorfina y buprenorfina."
@@ -634,7 +634,7 @@ export const TEMA6_MODELO_3_TEST_QUESTIONS: TestQuestion[] = [
     block: "Síntesis · Orvinoles",
     badge: "Modelo 3 · P11 · Síntesis · Orvinoles",
     question: "En la semisíntesis de la buprenorfina a partir del aducto de Diels-Alder, ¿qué etapas críticas fijan su carácter de agonista parcial y alta potencia?",
-    questionStructures: [{ name: "Buprenorfina (QFDOS-343)", smiles: "C[C@]([C@H]1C[C@@]23CC[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)O)O4)CC7CC7)OC)(C(C)(C)C)O" }],
+    questionStructures: [{ name: "Buprenorfina (QFDOS-343)", imagePath: "estructuras/tema-06/QFDOS-367_buprenorfina.png", smiles: "C[C@]([C@H]1C[C@@]23CC[C@@]1([C@H]4[C@@]25CCN([C@@H]3CC6=C5C(=C(C=C6)O)O4)CC7CC7)OC)(C(C)(C)C)O" }],
     options: [
       { text: "Hidrogenación de C7=C8, adición de t-BuMgBr y N-alquilación con bromuro de CPM" },
       { text: "Oxidación con ácido crómico, metilación de C3-OH y N-desmetilación selectiva" },

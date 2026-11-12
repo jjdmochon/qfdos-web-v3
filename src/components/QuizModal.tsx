@@ -2286,8 +2286,27 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   {currentQ.questionStructures && currentQ.questionStructures.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginBottom: '1rem' }}>
                       {currentQ.questionStructures.map(ref => (
-                        <figure key={ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                          <Chem2DDrawer smiles={ref.smiles} width={220} height={120} stereoLabels={showExplanation} />
+                        <figure key={ref.name || ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                          {ref.imagePath ? (
+                            <div style={{
+                              background: '#ffffff',
+                              padding: '8px 12px',
+                              borderRadius: 'var(--radius-md)',
+                              border: '1px solid var(--border-color)',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center'
+                            }}>
+                              <img
+                                src={ref.imagePath.startsWith('http') ? ref.imagePath : `${import.meta.env.BASE_URL || '/'}${ref.imagePath.replace(/^\//, '')}`}
+                                alt={ref.name}
+                                style={{ maxHeight: '130px', maxWidth: '240px', objectFit: 'contain' }}
+                              />
+                            </div>
+                          ) : ref.smiles ? (
+                            <Chem2DDrawer smiles={ref.smiles} width={220} height={120} stereoLabels={showExplanation} />
+                          ) : null}
                           <figcaption style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
                         </figure>
                       ))}
@@ -2299,6 +2318,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     {currentQ.options.map((opt, idx) => {
                       const optText = typeof opt === 'string' ? opt : opt.text;
                       const optSmiles = typeof opt === 'string' ? undefined : opt.smiles;
+                      const optImagePath = typeof opt === 'string' ? undefined : opt.imagePath;
                       const optRevealedName = typeof opt === 'string' ? undefined : opt.revealedName;
 
                       let optionBg = 'var(--surface)';
@@ -2357,10 +2377,29 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                               {String.fromCharCode(65 + idx)}
                             </span>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minWidth: 0 }}>
-                              <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45, fontWeight: optSmiles ? 600 : 400 }}>
+                              <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45, fontWeight: (optSmiles || optImagePath) ? 600 : 400 }}>
                                 {optText}
                               </span>
-                              {optSmiles && (
+                              {optImagePath ? (
+                                <div style={{ 
+                                  marginTop: '4px', 
+                                  padding: '6px 12px',
+                                  borderRadius: 'var(--radius-md)',
+                                  background: '#ffffff',
+                                  border: '1px solid var(--border-color)',
+                                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                                  maxWidth: '100%', 
+                                  overflowX: 'auto',
+                                  display: 'inline-flex',
+                                  justifyContent: 'center'
+                                }}>
+                                  <img
+                                    src={optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`}
+                                    alt={optRevealedName || optText}
+                                    style={{ maxHeight: '110px', maxWidth: '240px', objectFit: 'contain' }}
+                                  />
+                                </div>
+                              ) : optSmiles ? (
                                 <div style={{ 
                                   marginTop: '2px', 
                                   padding: '4px 8px',
@@ -2373,7 +2412,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 }}>
                                   <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} stereoLabels={showExplanation} />
                                 </div>
-                              )}
+                              ) : null}
                               {showExplanation && optRevealedName && (
                                 <div style={{
                                   fontSize: '0.78rem',

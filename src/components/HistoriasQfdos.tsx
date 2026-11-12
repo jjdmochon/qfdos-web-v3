@@ -201,30 +201,51 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
         acciones: abrirTema, duracionMs: 6000
       });
     }
+    if (m?.clip) {
+      const accionesClip: Accion[] = [...abrirTema];
+      if (spotify && accionesClip.length < 2) {
+        accionesClip.push({ label: 'Escuchar en Spotify', icono: 'spotify', href: spotify });
+      }
+      historias.push({
+        id: `clip-${t.id}`, grupo: t.id, fondo: 'marca', etiqueta: 'Clip',
+        titulo: `${t.number} · ${t.title}`, texto: 'El clip completo del tema.',
+        video: resolver(m.clip), imagen: m.imagen ? resolver(m.imagen) : undefined, ajuste: 'cubrir',
+        requiere: m.clip, acciones: accionesClip, duracionMs: 12000
+      });
+    }
     if (audio) {
-      const reproductor: Accion[] = cb.onAbrirReproductor
-        ? [{
-            label: 'Escuchar el podcast completo',
-            icono: 'audio',
-            alPulsar: () => cb.onAbrirReproductor?.({
-              id: `sp_${t.id}`,
-              title: t.audioPodcastName || `Podcast Oficial: ${t.number} — ${t.title}`,
-              type: 'audio',
-              url: audio,
-              audioUrl: audio,
-              spotifyUri: t.spotifyPodcastUrl,
-              date: 'Curso 2026/2027',
-              isPodcastVideo: !!t.videoPodcastUrl,
-              cabecera: `${t.number}: ${t.title}`,
-              descripcion: t.subtitle,
-              contenidosClave: t.keyConcepts
-            })
-          }]
-        : [];
+      const reproductor: Accion[] = [];
+      if (cb.onAbrirReproductor) {
+        reproductor.push({
+          label: 'Escuchar el podcast completo',
+          icono: 'audio',
+          alPulsar: () => cb.onAbrirReproductor?.({
+            id: `sp_${t.id}`,
+            title: t.audioPodcastName || `Podcast Oficial: ${t.number} — ${t.title}`,
+            type: 'audio',
+            url: audio,
+            audioUrl: audio,
+            spotifyUri: t.spotifyPodcastUrl,
+            date: 'Curso 2026/2027',
+            isPodcastVideo: !!t.videoPodcastUrl,
+            cabecera: `${t.number}: ${t.title}`,
+            descripcion: t.subtitle,
+            contenidosClave: t.keyConcepts
+          })
+        });
+      }
+      if (spotify) {
+        reproductor.push({
+          label: 'Escuchar en Spotify',
+          icono: 'spotify',
+          href: spotify
+        });
+      }
       historias.push({
         id: `podcast-audio-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Podcast de audio',
         titulo: `${t.number} · ${t.title}`, texto: t.audioPodcastName || t.subtitle,
-        imagen: portadaPodcast, audio: fuenteAudio(audio), maxSegundos: SEGUNDOS_PODCAST,
+        imagen: m?.imagen ? resolver(m.imagen) : portadaPodcast,
+        audio: fuenteAudio(audio), maxSegundos: SEGUNDOS_PODCAST,
         acciones: reproductor, duracionMs: SEGUNDOS_PODCAST * 1000
       });
     }
@@ -238,12 +259,16 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
         duracionMs: SEGUNDOS_PODCAST * 1000
       });
     }
-    if (m?.clip) {
+    if (spotify && !m?.videoPodcast) {
       historias.push({
-        id: `clip-${t.id}`, grupo: t.id, fondo: 'marca', etiqueta: 'Clip',
-        titulo: `${t.number} · ${t.title}`, texto: 'El clip completo del tema.',
-        video: resolver(m.clip), imagen: m.imagen ? resolver(m.imagen) : undefined, ajuste: 'cubrir',
-        requiere: m.clip, acciones: abrirTema, duracionMs: 12000
+        id: `podcast-spotify-${t.id}`, grupo: t.id, fondo: 'podcast', etiqueta: 'Spotify',
+        titulo: `${t.number} · ${t.title}`, texto: 'Episodio docente oficial disponible en Spotify.',
+        imagen: m?.imagen ? resolver(m.imagen) : portadaPodcast,
+        acciones: [
+          { label: 'Escuchar en Spotify', icono: 'spotify', href: spotify },
+          ...abrirTema
+        ],
+        duracionMs: 8000
       });
     }
     grupos.push({

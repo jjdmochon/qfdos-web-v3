@@ -29,8 +29,16 @@ const Enunciado: React.FC<{ q: TestQuestion }> = ({ q }) => {
       )}
       {q.questionSmiles && <Chem2DDrawer smiles={q.questionSmiles} width={220} height={100} bare={true} />}
       {q.questionStructures?.map(ref => (
-        <figure key={ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-          <Chem2DDrawer smiles={ref.smiles} width={200} height={95} bare={true} />
+        <figure key={ref.name || ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+          {ref.imagePath ? (
+            <img
+              src={rutaImagen(ref.imagePath)}
+              alt={ref.name}
+              style={{ maxWidth: '100%', maxHeight: '110px', objectFit: 'contain', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px', border: '1px solid var(--border-color)' }}
+            />
+          ) : ref.smiles ? (
+            <Chem2DDrawer smiles={ref.smiles} width={200} height={95} bare={true} />
+          ) : null}
           <figcaption style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
         </figure>
       ))}
@@ -51,17 +59,26 @@ const Opcion: React.FC<{ q: TestQuestion; idx: number; rotulo: string; tinta: st
   if (opt === undefined) return null;
   const texto = typeof opt === 'string' ? opt : opt.text;
   const smiles = typeof opt === 'string' ? undefined : opt.smiles;
+  const imagePath = typeof opt === 'string' ? undefined : opt.imagePath;
   const farmaco = typeof opt === 'string' ? undefined : opt.revealedName;
   return (
     <div style={{ fontSize: '0.8rem', lineHeight: 1.45, color: 'var(--text-main)' }}>
       <strong style={{ color: tinta }}>{rotulo}:</strong>{' '}
       <span className="font-mono" style={{ fontWeight: 700 }}>{String.fromCharCode(65 + idx)}.</span> {texto}
       {farmaco && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fármaco: {farmaco}</div>}
-      {smiles && (
+      {imagePath ? (
+        <div style={{ marginTop: '4px', maxWidth: '100%', overflowX: 'auto' }}>
+          <img
+            src={rutaImagen(imagePath)}
+            alt={farmaco || texto}
+            style={{ maxHeight: '95px', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px', border: '1px solid var(--border-color)' }}
+          />
+        </div>
+      ) : smiles ? (
         <div style={{ marginTop: '4px', maxWidth: '100%', overflowX: 'auto' }}>
           <Chem2DDrawer smiles={smiles} width={200} height={90} bare={true} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
