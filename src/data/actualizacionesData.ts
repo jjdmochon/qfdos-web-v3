@@ -27,6 +27,13 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.77.2-tema6-podcast-audio',
+    version: 'v3.77.2',
+    fecha: '13 Noviembre 2026',
+    titulo: 'Podcast del Tema 6 disponible en la web',
+    texto: 'En cuanto al Tema 6 (Sistema Opioide y Manejo del Dolor), ya podéis escuchar el episodio docente completo (11 min, voces de Lucía y Javi) directamente en el reproductor integrado de la plataforma.',
+  },
+  {
     id: 'act-3.77.1-tema6-historias',
     version: 'v3.77.1',
     fecha: '12 Noviembre 2026',
