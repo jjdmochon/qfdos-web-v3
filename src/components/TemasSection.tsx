@@ -332,7 +332,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       )}
                     </>
                   )}
-                  {topic.id === 'tema-02' && test && (
+                  {(topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') && test && (
                     <span 
                       style={{ 
                         fontSize: '0.66rem', 

@@ -22,7 +22,10 @@ import {
   TEMA4_MODELO_3_TEST_QUESTIONS,
   TEMA5_MODELO_1_TEST_QUESTIONS,
   TEMA5_MODELO_2_TEST_QUESTIONS,
-  TEMA5_MODELO_3_TEST_QUESTIONS
+  TEMA5_MODELO_3_TEST_QUESTIONS,
+  TEMA6_MODELO_1_TEST_QUESTIONS,
+  TEMA6_MODELO_2_TEST_QUESTIONS,
+  TEMA6_MODELO_3_TEST_QUESTIONS
 } from '../data/qfdosData';
 import {
   submitAttemptToGoogleSheets,
@@ -89,7 +92,8 @@ export type QuizModelType =
   | 't2-modelo-1' | 't2-modelo-2' | 't2-modelo-3'
   | 't3-modelo-1' | 't3-modelo-2' | 't3-modelo-3'
   | 't4-modelo-1' | 't4-modelo-2' | 't4-modelo-3'
-  | 't5-modelo-1' | 't5-modelo-2' | 't5-modelo-3';
+  | 't5-modelo-1' | 't5-modelo-2' | 't5-modelo-3'
+  | 't6-modelo-1' | 't6-modelo-2' | 't6-modelo-3';
 
 /** Modelos del Tema 3 que ve el alumnado en el selector (tarjetas generadas desde esta lista). */
 const MODELOS_TEMA3: { id: QuizModelType; n: number; titulo: string; etiqueta: string; resumen: string; color: string; fondo: string; tinta: string }[] = [
@@ -148,7 +152,26 @@ const MODELOS_TEMA5: typeof MODELOS_TEMA3 = [
   }
 ];
 
-const MODELOS_TEMAS_TEST = [...MODELOS_TEMA3, ...MODELOS_TEMA4, ...MODELOS_TEMA5];
+/** Modelos del Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos). */
+const MODELOS_TEMA6: typeof MODELOS_TEMA3 = [
+  {
+    id: 't6-modelo-1', n: 1, titulo: 'Morfina, SAR de C3/C6, N-desmetilación, síntesis de petidina y péptidos opioides', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Morfina y centros quirales, fenol C3-OH y alcohol C6-OH, heroína como profármaco, N-desmetilación con cloroformiatos, modelo de Snyder, síntesis de fenilpiperidinas (petidina), péptidos opioides endógenos y analgesia.',
+    color: 'var(--navy)', fondo: 'rgba(30, 58, 138, 0.05)', tinta: 'var(--navy-ink)'
+  },
+  {
+    id: 't6-modelo-2', n: 2, titulo: 'Heroína, farmacóforo opioide, sustituyente 14-OH, morfinanos, cetobemidona y acoplamiento Gi/Go', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Activación de heroína a 6-MAM, modelo de Snyder, N-alilo frente a N-vinilo, sustituyente 14-OH en agonistas/antagonistas, simplificación a morfinanos y benzomorfanos, síntesis de cetobemidona, PAMORA periféricos y transducción Gi/Go.',
+    color: 'var(--teal)', fondo: 'rgba(13, 148, 136, 0.05)', tinta: 'var(--teal-ink)'
+  },
+  {
+    id: 't6-modelo-3', n: 3, titulo: 'Rigidez molecular, orvinoles, benzomorfanos, síntesis de fentanilo y análogos peptídicos DAMGO', etiqueta: 'Consolidado con los apuntes',
+    resumen: 'Cicloadición de Diels–Alder en tebaína, adición de Grignard, etorfina y buprenorfina, síntesis de fentanilo por aminación reductora, anilidopiperidinas y carfentanilo, metadona y receptores NMDA/hERG, estabilización de encefalinas (D-Ala2, DAMGO).',
+    color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
+  }
+];
+
+const MODELOS_TEMAS_TEST = [...MODELOS_TEMA3, ...MODELOS_TEMA4, ...MODELOS_TEMA5, ...MODELOS_TEMA6];
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -159,7 +182,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Model Selection State
   const [selectedModel, setSelectedModel] = useState<QuizModelType>(
-    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : topic.id === 'tema-04' ? 't4-modelo-1' : topic.id === 'tema-05' ? 't5-modelo-1' : 'modelo-e'
+    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : topic.id === 'tema-04' ? 't4-modelo-1' : topic.id === 'tema-05' ? 't5-modelo-1' : topic.id === 'tema-06' ? 't6-modelo-1' : 'modelo-e'
   );
 
   useEffect(() => {
@@ -171,6 +194,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       setSelectedModel('t4-modelo-1');
     } else if (topic.id === 'tema-05') {
       setSelectedModel('t5-modelo-1');
+    } else if (topic.id === 'tema-06') {
+      setSelectedModel('t6-modelo-1');
     } else if (topic.id === 'tema-01') {
       setSelectedModel('modelo-e');
     }
@@ -219,6 +244,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (selectedModel === 't5-modelo-2') return TEMA5_MODELO_2_TEST_QUESTIONS;
       if (selectedModel === 't5-modelo-3') return TEMA5_MODELO_3_TEST_QUESTIONS;
       return TEMA5_MODELO_1_TEST_QUESTIONS;
+    }
+    if (topic.id === 'tema-06') {
+      if (selectedModel === 't6-modelo-2') return TEMA6_MODELO_2_TEST_QUESTIONS;
+      if (selectedModel === 't6-modelo-3') return TEMA6_MODELO_3_TEST_QUESTIONS;
+      return TEMA6_MODELO_1_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
   }, [topic, selectedModel, isProfesor]);
@@ -544,6 +574,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       case 't5-modelo-1': return 'var(--navy)';
       case 't5-modelo-2': return 'var(--teal)';
       case 't5-modelo-3': return '#8b5cf6';
+      case 't6-modelo-1': return 'var(--navy)';
+      case 't6-modelo-2': return 'var(--teal)';
+      case 't6-modelo-3': return '#8b5cf6';
       case 'modelo-e': return 'var(--navy)';
       case 'modelo-fir': return 'var(--teal)';
       case 'modelo-b': return '#8b5cf6';
@@ -568,6 +601,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (!MODELOS_TEMA4.some(m => m.id === selectedModel)) setSelectedModel('t4-modelo-1');
     } else if (topic.id === 'tema-05') {
       if (!MODELOS_TEMA5.some(m => m.id === selectedModel)) setSelectedModel('t5-modelo-1');
+    } else if (topic.id === 'tema-06') {
+      if (!MODELOS_TEMA6.some(m => m.id === selectedModel)) setSelectedModel('t6-modelo-1');
     } else {
       if (selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
         setSelectedModel('modelo-e');
@@ -1690,9 +1725,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     )}
 
-                    {(topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05') && (
+                    {(topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') && (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
-                        {(topic.id === 'tema-05' ? MODELOS_TEMA5 : topic.id === 'tema-04' ? MODELOS_TEMA4 : MODELOS_TEMA3).map(mod => {
+                        {(topic.id === 'tema-06' ? MODELOS_TEMA6 : topic.id === 'tema-05' ? MODELOS_TEMA5 : topic.id === 'tema-04' ? MODELOS_TEMA4 : MODELOS_TEMA3).map(mod => {
                           const st = getModelStats(mod.id);
                           const activo = selectedModel === mod.id;
                           return (

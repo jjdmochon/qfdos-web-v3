@@ -581,8 +581,8 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  */
-export const COURSE_DATA_VERSION = '3.75.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-10-31T12:00:00.000Z';
+export const COURSE_DATA_VERSION = '3.76.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-12T19:30:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",
@@ -610,9 +610,22 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tema05-lanzamiento', 'ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-tema06-revision', 'ann-tema05-lanzamiento', 'ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-tema06-revision',
+    title: '🎙️ Tema 6 · Sistema Opioide e Hipnoanalgésicos: materiales y podcast disponibles',
+    content: 'Respecto al Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos / Sistema Opioide & Manejo del Dolor), ya podéis consultar las diapositivas completas, los apuntes magistrales, el cuaderno interactivo y el podcast oficial en Spotify. El tema se encuentra actualmente en revisión: el test y las flashcards quedan reservados para el perfil docente y se abrirán a todo el grupo con la publicación definitiva.',
+    date: '12 Noviembre 2026',
+    priority: 'alta',
+    imageUrl: 'historias/tema-06-brag.jpg',
+    imageCaption: 'Del opio al receptor opioide Mu: química del alivio y reversión',
+    linkUrl: 'https://open.spotify.com/episode/4rUqkxorRiMB0EefCBO4S5',
+    linkLabel: 'Escuchar el episodio en Spotify',
+    enHistorias: true,
+    temaId: 'tema-06'
+  },
   {
     id: 'ann-tema05-lanzamiento',
     title: '📝 Tema 5 · Sistema GABAérgico: ya está disponible todo el material',
@@ -2240,6 +2253,9 @@ import { TEMA4_FLASHCARDS } from './tema04FlashcardsData';
 export * from './tema05ExamsData';
 import { TEMA5_MODELO_1_TEST_QUESTIONS } from './tema05ExamsData';
 import { TEMA5_FLASHCARDS } from './tema05FlashcardsData';
+export * from './tema06ExamsData';
+import { TEMA6_MODELO_1_TEST_QUESTIONS } from './tema06ExamsData';
+import { TEMA6_FLASHCARDS } from './tema06FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
@@ -5503,13 +5519,16 @@ flashcards: [
     slideCount: 58,
     pdbTargetId: '4DKL',
     targetName: 'Receptor Opioide Mu Humano unido al Antagonista β-FNA',
-    status: 'Próximamente',
-    slidesPdfUrl: '',
+    status: 'En Revisión',
+    // Test (3 modelos JEV, 45P) y 31 flashcards listos para revisión docente.
+    testDisponible: true,
+    flashcardsDisponibles: true,
+    slidesPdfUrl: 'https://drive.google.com/file/d/1-xrR7TUlIIFtBtAEKIf-HiBl-Zdj6iHr/view?usp=sharing',
     slidesPdfName: 'Tema 06: Diapositivas Oficiales Sistema Opioide.pdf',
-    notesPdfUrl: '',
+    notesPdfUrl: 'https://drive.google.com/file/d/1VhIEife2fmcxbY0Dj0SxUmqIj-PxEaMX/view?usp=sharing',
     notesPdfName: 'Tema 06: Apuntes Magistrales Fármacos Opioides y SAR.pdf',
-    geminiNotebookUrl: '',
-    spotifyPodcastUrl: '',
+    geminiNotebookUrl: 'https://notebooklm.google.com/notebook/8afc8f10-9e63-4173-96f9-fea1d0a8f5bf',
+    spotifyPodcastUrl: 'https://open.spotify.com/episode/4rUqkxorRiMB0EefCBO4S5',
     drugs: [
       {
         name: 'Morfina',
@@ -5547,36 +5566,8 @@ flashcards: [
       }
     ],
     attachments: [],
-    testQuestions: [
-      {
-        id: 't06-q1',
-        topicId: 'tema-06',
-        block: 'SAR Opioides',
-        question: '¿Qué modificación química en el átomo de nitrógeno terciario de la morfina o oximorfona transforma un agonista opioide potente en un antagonista puro competitivo como la naloxona?',
-        questionSmiles: 'C=CCN1CC[C@]23[C@@H]4C(=O)CC[C@]2([C@H]1CC5=C3C(=C(C=C5)O)O4)O',
-        options: [
-          'La adición de un grupo metilo extra para formar una sal cuaternaria.',
-          'La sustitución del grupo N-metilo por un grupo N-alilo (-CH2-CH=CH2) o N-ciclopropilmetilo.',
-          'La oxidación del nitrógeno a N-óxido.',
-          'La acetilación directa del nitrógeno terciario.'
-        ],
-        correctIndex: 1,
-        explanation: 'La presencia de una cadena voluminosa e insaturada o cíclica sobre el nitrógeno orienta el grupo hacia una bolsa hidrofóbica auxiliar del receptor que impide el cambio conformacional necesario para acoplar la proteína Gi, bloqueando la activación y actuando como antagonista puro.',
-        difficulty: 'Medio'
-      }
-    ],
-    flashcards: [
-      {
-        id: 'fc-06-1',
-        topicId: 'tema-06',
-        concept: 'Regla de Beckett-Casy',
-        front: '¿Cuáles son los 4 elementos topológicos del modelo farmacofórico de Beckett-Casy en analgésicos opioides?',
-        back: '1) Anillo aromático plano para interacciones hidrofóbicas/van der Waals.\n2) Carbono cuaternario adyacente que posiciona el anillo fuera del plano.\n3) Cadena hidrocarbonada etilénica (-CH2-CH2-).\n4) Nitrógeno terciario básico protonado a pH fisiológico para formar un enlace iónico con un residuo de Aspartato (Asp147 en MOR).',
-        smiles: 'CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)O)O[C@H]3[C@H](C=C4)O',
-        difficulty: 'medium',
-        category: 'Farmacóforos'
-      }
-    ]
+    testQuestions: TEMA6_MODELO_1_TEST_QUESTIONS,
+    flashcards: TEMA6_FLASHCARDS
   },
   {
     id: 'tema-07',

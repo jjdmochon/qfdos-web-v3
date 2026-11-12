@@ -27,6 +27,14 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.76.0-tema6-revision',
+    version: 'v3.76.0',
+    fecha: '12 Noviembre 2026',
+    titulo: 'El Tema 6 ya está abierto, en revisión',
+    texto: 'Respecto al Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos / Sistema Opioide & Manejo del Dolor), ya podéis consultar las diapositivas oficiales, los apuntes magistrales, el cuaderno interactivo de estudio y el episodio oficial en Spotify. El test y las flashcards quedan reservados para el perfil docente mientras el tema está en revisión.',
+    enlace: { label: 'Escuchar en Spotify', href: 'https://open.spotify.com/episode/4rUqkxorRiMB0EefCBO4S5' }
+  },
+  {
     id: 'act-3.73.0-cartas-movil',
     version: 'v3.73.0',
     fecha: '2 Noviembre 2026',
