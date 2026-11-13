@@ -12,6 +12,7 @@
 // ==========================================================================
 
 import { tokenSesion, esSesionInvalida } from './sesion';
+import { senalConLimite } from './googleSheetsService';
 import { QfdosTopic, QfdosAnnouncement, QfdosGlossaryTerm, QfdosResourceLink, COURSE_BUILD_TIMESTAMP, INITIAL_TOPICS } from '../data/qfdosData';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
@@ -205,7 +206,8 @@ export async function descargarContenido(): Promise<ContenidoPublicado | null> {
   try {
     const resp = await fetch(`${WEBAPP_URL}?accion=leerContenido&t=${Date.now()}`, {
       method: 'GET',
-      redirect: 'follow'
+      redirect: 'follow',
+      signal: senalConLimite(8000)
     });
     if (!resp.ok) return null;
 
@@ -281,7 +283,8 @@ export async function publicarContenido(
         // text/plain evita la petición previa de CORS, que Apps Script no atiende
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(contenido),
-        redirect: 'follow'
+        redirect: 'follow',
+        signal: senalConLimite(10000)
       }
     );
 
@@ -371,7 +374,7 @@ export async function misEntregas(email: string): Promise<EntregaPropia[] | null
         // atiende si quien pregunta es profesor
         `${WEBAPP_URL}?accion=misEntregas&email=${encodeURIComponent(normEmail)}` +
           `&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
-        { method: 'GET', redirect: 'follow' }
+        { method: 'GET', redirect: 'follow', signal: senalConLimite(8000) }
       );
       if (!resp.ok) {
         return getCachedEntregas(normEmail);
@@ -422,7 +425,7 @@ export async function leerEvaluacion(): Promise<ResultadoEvaluacion> {
   try {
     const resp = await fetch(
       `${WEBAPP_URL}?accion=evaluacion&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
-      { method: 'GET', redirect: 'follow' }
+      { method: 'GET', redirect: 'follow', signal: senalConLimite(8000) }
     );
     const cuerpo = await resp.json().catch(() => null);
     if (cuerpo?.ok && Array.isArray(cuerpo.cabeceras) && Array.isArray(cuerpo.filas)) {
@@ -466,7 +469,8 @@ export async function guardarEvaluacion(
         // text/plain evita la petición previa de CORS, que Apps Script no atiende
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(notas),
-        redirect: 'follow'
+        redirect: 'follow',
+        signal: senalConLimite(10000)
       }
     );
     const cuerpo = await resp.json().catch(() => null);

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { RefreshCw } from 'lucide-react';
 import { hayTrabajoEnCurso, EVENTO_TRABAJO_EN_CURSO } from '../utils/proteccionSalida';
+import { senalConLimite } from '../services/googleSheetsService';
 
 const CADA_5_MIN = 5 * 60 * 1000;
 const SEGUNDOS_AVISO = 5;
@@ -36,7 +37,10 @@ export const PwaUpdatePrompt: React.FC = () => {
   const comprobar = useCallback(async () => {
     if (!navigator.onLine) return;
     try {
-      const resp = await fetch(`${import.meta.env.BASE_URL}version.json?t=${Date.now()}`, { cache: 'no-store' });
+      const resp = await fetch(`${import.meta.env.BASE_URL}version.json?t=${Date.now()}`, {
+        cache: 'no-store',
+        signal: senalConLimite(5000)
+      });
       if (!resp.ok) return;
       const { build } = await resp.json();
       if (typeof build === 'string' && build && build !== __BUILD_TIME__) setNueva(build);

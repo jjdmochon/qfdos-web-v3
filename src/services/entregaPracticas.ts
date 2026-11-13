@@ -12,6 +12,7 @@
 
 import { addCachedEntrega } from './contenidoRemoto';
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
+import { senalConLimite } from './googleSheetsService';
 
 export const PROFESOR_EMAIL = 'juandiaz@ugr.es';
 
@@ -118,13 +119,13 @@ export async function enviarAHoja(
   };
 
   try {
-    // Sin respuesta en 20 s se avisa, en vez de dejar «Enviando…» colgado
+    // Sin respuesta en 10 s se avisa, en vez de dejar «Enviando…» colgado
     const resp = await fetch(`${WEBAPP_URL}?accion=anotarFila`, {
       method: 'POST',
       redirect: 'follow',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ ...datos, sheetName: hoja, sesion }),
-      signal: AbortSignal.timeout(20000)
+      signal: senalConLimite(10000)
     });
     if (!resp.ok) return { estado: 'error', mensaje: `El servidor respondió ${resp.status}.` };
     const cuerpo = await resp.json().catch(() => null);
@@ -134,7 +135,7 @@ export async function enviarAHoja(
     // Compatibilidad con el despliegue anterior (GET con los datos en la URL)
     const params = new URLSearchParams({ ...datos, sheetName: hoja, sesion });
     const viejo = await fetch(`${WEBAPP_URL}?${params.toString()}`, {
-      method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(20000)
+      method: 'GET', redirect: 'follow', signal: senalConLimite(10000)
     });
     if (!viejo.ok) return { estado: 'error', mensaje: `El servidor respondió ${viejo.status}.` };
     return interpretar(await viejo.json().catch(() => null)) ?? {
@@ -167,7 +168,7 @@ export async function comprobarEndpoint(): Promise<ResultadoEnvio> {
     return { estado: 'no-configurado', mensaje: 'Falta VITE_PRACTICAS_WEBAPP_URL en .env.local' };
   }
   try {
-    const resp = await fetch(WEBAPP_URL, { method: 'GET', redirect: 'follow' });
+    const resp = await fetch(WEBAPP_URL, { method: 'GET', redirect: 'follow', signal: senalConLimite(6000) });
     const cuerpo = await resp.json().catch(() => null);
     return cuerpo?.ok
       ? { estado: 'confirmado', mensaje: 'El endpoint responde correctamente.' }

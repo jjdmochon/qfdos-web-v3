@@ -10,6 +10,7 @@
 // ==========================================================================
 
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
+import { senalConLimite } from './googleSheetsService';
 import type { Resultado } from './cuaderno';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
@@ -87,13 +88,14 @@ async function llamar<T>(
     const resp = await fetch(
       `${WEBAPP_URL}?accion=${accion}&sesion=${encodeURIComponent(sesion)}${consulta}&t=${Date.now()}`,
       cuerpo === undefined
-        ? { method: 'GET', redirect: 'follow' }
+        ? { method: 'GET', redirect: 'follow', signal: senalConLimite(8000) }
         : {
             method: 'POST',
             // text/plain evita la petición previa de CORS, que Apps Script no atiende
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(cuerpo),
-            redirect: 'follow'
+            redirect: 'follow',
+            signal: senalConLimite(10000)
           }
     );
     const c = await resp.json().catch(() => null);

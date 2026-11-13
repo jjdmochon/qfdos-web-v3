@@ -348,11 +348,28 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   const syncEnCursoRef = React.useRef(false);
   const mountedRef = React.useRef(true);
+  const syncAbortControllerRef = React.useRef<AbortController | null>(null);
+
+  const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+  const [exitActionType, setExitActionType] = useState<'reset' | 'close'>('reset');
+
+  const cancelarSyncPendiente = () => {
+    if (syncAbortControllerRef.current) {
+      try {
+        syncAbortControllerRef.current.abort();
+      } catch {
+        /* noop */
+      }
+      syncAbortControllerRef.current = null;
+    }
+    syncEnCursoRef.current = false;
+  };
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      cancelarSyncPendiente();
     };
   }, []);
 
@@ -456,6 +473,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const sincronizarRegistros = async () => {
     if (syncEnCursoRef.current) return;
     syncEnCursoRef.current = true;
+    cancelarSyncPendiente();
+    const abortCtrl = new AbortController();
+    syncAbortControllerRef.current = abortCtrl;
 
     try {
       const locales = leerRegistrosLocales();
@@ -476,10 +496,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       // Reenvío de pendientes en background (sin bloquear la carga si falla)
       reenviarPendientes().catch(() => 0);
 
-      // Traer intentos remotos con timeout estricto de 8s para no colgar la pestaña
-      const remotos = await misCalificaciones(correo, 8000);
+      // Traer intentos remotos con timeout estricto de 8s y señal abortable para no colgar la pestaña
+      const remotos = await misCalificaciones(correo, 8000, abortCtrl.signal);
 
-      if (!mountedRef.current) return;
+      if (!mountedRef.current || abortCtrl.signal.aborted) return;
 
       if (remotos === null) {
         const enCola = intentosPendientes(correo).filter(p => !locales.some(l => l.id === p.id));
@@ -514,12 +534,16 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       );
       setRecords([...enCola, ...fusionados]);
       setEstadoHistorial('sincronizado');
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || abortCtrl.signal.aborted) return;
       console.warn('[QuizModal] Error no bloqueante al sincronizar registros:', err);
       if (mountedRef.current) {
         setEstadoHistorial('sin_conexion');
       }
     } finally {
+      if (syncAbortControllerRef.current === abortCtrl) {
+        syncAbortControllerRef.current = null;
+      }
       syncEnCursoRef.current = false;
     }
   };
@@ -717,14 +741,30 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     };
   };
 
-  // Un examen empezado y sin entregar se pierde al cerrar: se pregunta por
-  // el fondo, la X y Escape (que llega como clic en el fondo), Atrás,
-  // recargar y cerrar la pestaña
+  // Un examen empezado y sin entregar se pierde al cerrar: confirmación no bloqueante
+  // por el fondo, la X, Escape y botón Salir del Examen
   const enCurso = isStarted && !isCompleted;
+
   const cerrarConGuarda = () => {
-    if (enCurso && !window.confirm('¿Salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) return;
+    if (enCurso) {
+      setExitActionType('close');
+      setShowExitConfirm(true);
+      return;
+    }
+    cancelarSyncPendiente();
     onClose();
   };
+
+  const handleConfirmExit = () => {
+    setShowExitConfirm(false);
+    cancelarSyncPendiente();
+    setIsStarted(false);
+    handleRestart();
+    if (exitActionType === 'close') {
+      onClose();
+    }
+  };
+
   useProtegerSalida(enCurso);
 
   if (questions.length === 0) {
@@ -2111,6 +2151,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                           alert('Por favor, indica tu nombre o el del evaluado antes de comenzar.');
                           return;
                         }
+                        cancelarSyncPendiente();
                         setIsStarted(true);
                         handleRestart();
                       }}
@@ -3241,11 +3282,10 @@ export const QuizModal: React.FC<QuizModalProps> = ({
           <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', padding: '10px 16px' }}>
             <div className="quiz-in-progress-footer" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
               <button
+                type="button"
                 onClick={() => {
-                  if (window.confirm('¿Deseas salir del examen sin entregarlo? Se perderán las respuestas marcadas.')) {
-                    setIsStarted(false);
-                    handleRestart();
-                  }
+                  setExitActionType('reset');
+                  setShowExitConfirm(true);
                 }}
                 className="btn btn-sm btn-outline"
                 style={{ whiteSpace: 'nowrap' }}
@@ -3490,6 +3530,92 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         image={lightboxImage}
         onClose={() => setLightboxImage(null)}
       />
+
+      {/* Diálogo No Bloqueante de Confirmación de Salida del Examen */}
+      {showExitConfirm && (
+        <div
+          className="modal-overlay quiz-exit-dialog-overlay"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.72)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            padding: '1rem',
+            backdropFilter: 'blur(3px)'
+          }}
+          onClick={() => setShowExitConfirm(false)}
+        >
+          <div
+            className="quiz-exit-dialog-container"
+            style={{
+              maxWidth: '460px',
+              width: '100%',
+              padding: '1.5rem',
+              background: 'var(--surface)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
+              border: '1.5px solid var(--border-color)',
+              textAlign: 'left'
+            }}
+            onClick={e => e.stopPropagation()}
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="quiz-exit-dialog-title"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+              <div style={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.12)',
+                color: '#ef4444',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <AlertCircle size={24} />
+              </div>
+              <h4 id="quiz-exit-dialog-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)' }}>
+                ¿Deseas salir del examen en curso?
+              </h4>
+            </div>
+            <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
+              Se perderán las respuestas marcadas hasta ahora y este intento no quedará registrado en tu expediente ni en la hoja oficial.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn btn-outline quiz-exit-cancel-btn"
+                onClick={() => setShowExitConfirm(false)}
+                style={{ fontWeight: 600, fontSize: '0.86rem' }}
+              >
+                Continuar con el Examen
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger quiz-exit-confirm-btn"
+                style={{
+                  background: '#dc2626',
+                  color: '#ffffff',
+                  border: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.86rem',
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer'
+                }}
+                onClick={handleConfirmExit}
+              >
+                Salir del Examen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

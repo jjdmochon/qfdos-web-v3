@@ -8,6 +8,7 @@
 // ==========================================================================
 
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
+import { senalConLimite } from './googleSheetsService';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 
@@ -56,7 +57,8 @@ async function post(accion: string, query: Record<string, string | number>, cuer
     // text/plain evita la petición previa de CORS, que Apps Script no atiende
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: cuerpo,
-    redirect: 'follow'
+    redirect: 'follow',
+    signal: senalConLimite(12000)
   });
   return resp.json().catch(() => null);
 }
@@ -147,7 +149,7 @@ export async function listarMaterialesDrive(): Promise<Resultado<{ carpeta: stri
   try {
     const resp = await fetch(
       `${WEBAPP_URL}?accion=materiales&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
-      { method: 'GET', redirect: 'follow' }
+      { method: 'GET', redirect: 'follow', signal: senalConLimite(8000) }
     );
     const c = await resp.json().catch(() => null);
     if (c?.ok) {
