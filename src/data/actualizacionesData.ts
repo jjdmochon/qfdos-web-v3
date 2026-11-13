@@ -27,6 +27,14 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.78.0-tema6-cartas-coleccionables',
+    version: 'v3.78.0',
+    fecha: '13 Noviembre 2026',
+    titulo: 'Baraja Coleccionable del Tema 6 · 35 Cartas de Opioides ReShiki',
+    texto: 'Respecto al Tema 6 (Sistema Opioide), ya está disponible la colección completa de 35 cartas de fármacos en la Baraja oficial y en la ficha del temario, con renders químicos ReShiki, escala comparativa de afinidad e índices SAR, reverso didáctico y soporte de Modo Marino.',
+    imagen: 'historias/tema-06-brag.jpg'
+  },
+  {
     id: 'act-3.77.3-tema6-reshiki-historias-spotify',
     version: 'v3.77.3',
     fecha: '13 Noviembre 2026',
@@ -53,8 +61,8 @@ export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
     id: 'act-3.76.0-tema6-revision',
     version: 'v3.76.0',
     fecha: '12 Noviembre 2026',
-    titulo: 'El Tema 6 ya está abierto, en revisión',
-    texto: 'Respecto al Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos / Sistema Opioide & Manejo del Dolor), ya podéis consultar las diapositivas oficiales, los apuntes magistrales, el cuaderno interactivo de estudio y el episodio oficial en Spotify. El test y las flashcards quedan reservados para el perfil docente mientras el tema está en revisión.',
+    titulo: 'El Tema 6 ya está publicado con tests y flashcards',
+    texto: 'Respecto al Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos / Sistema Opioide & Manejo del Dolor), ya podéis consultar las diapositivas oficiales, los apuntes magistrales, el cuaderno interactivo de estudio y el episodio oficial en Spotify. El Tema 6 ya está publicado: el test (3 modelos) y las flashcards están disponibles para todo el grupo.',
     enlace: { label: 'Escuchar en Spotify', href: 'https://open.spotify.com/episode/4rUqkxorRiMB0EefCBO4S5' }
   },
   {

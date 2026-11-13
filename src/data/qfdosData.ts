@@ -618,7 +618,7 @@ export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
   {
     id: 'ann-tema06-revision',
     title: '🎙️ Tema 6 · Sistema Opioide e Hipnoanalgésicos: materiales y podcast disponibles',
-    content: 'Respecto al Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos / Sistema Opioide & Manejo del Dolor), ya podéis consultar las diapositivas completas, los apuntes magistrales, el cuaderno interactivo y el podcast oficial en Spotify. El tema se encuentra actualmente en revisión: el test y las flashcards quedan reservados para el perfil docente y se abrirán a todo el grupo con la publicación definitiva.',
+    content: 'Respecto al Tema 6 (Péptidos como neurotransmisores e hipnoanalgésicos / Sistema Opioide & Manejo del Dolor), ya podéis consultar las diapositivas completas, los apuntes magistrales, el cuaderno interactivo y el podcast oficial en Spotify. El Tema 6 ya está publicado: el test (3 modelos) y las flashcards están disponibles para todo el grupo.',
     date: '12 Noviembre 2026',
     priority: 'alta',
     imageUrl: 'historias/tema-06-brag.jpg',
