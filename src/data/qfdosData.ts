@@ -23,6 +23,9 @@ export interface CourseAttachment {
   contenidosClave?: string[];
   /** Solo lo ve el profesorado (el alumnado no lo ve aunque el tema esté publicado) */
   soloDocente?: boolean;
+  /** Atribución / crédito opcional de la obra (p. ej. licencias CC o enlaces a la fuente original) */
+  credito?: string;
+  creditoUrl?: string;
 }
 
 export interface TestQuestionOption {
@@ -582,8 +585,9 @@ export interface StudentQuestion {
  * v3.54.2 — Las Historias (círculos) también aparecen en la página del temario.
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
+ * v3.79.5 — Material General: infografía de 20 aminoácidos (Compound Interest 2014) en tema-varios. Historias: buscador de quiralidad R/S de MolDraw en Herramientas.
  */
-export const COURSE_DATA_VERSION = '3.77.3';
+export const COURSE_DATA_VERSION = '3.79.5';
 export const COURSE_BUILD_TIMESTAMP = '2026-11-13T00:30:00.000Z';
 
 export const QFDOS_INFO = {
@@ -5978,6 +5982,16 @@ flashcards: [
         url: 'varios/Mapa_de_las_dianas_terapeuticas.png',
         size: '5.1 MB',
         date: '28/09/2026'
+      },
+      {
+        id: 'att-var-aminoacidos',
+        title: 'Guía de los 20 aminoácidos comunes · Infografía © Compound Interest 2014 (compoundchem.com)',
+        type: 'data',
+        url: 'varios/aminoacidos-guia-compound-interest-2014.jpg',
+        size: '244 KB',
+        date: '13/11/2026',
+        credito: '© Compound Interest 2014 · www.compoundchem.com',
+        creditoUrl: 'https://www.compoundchem.com/2014/09/16/aminoacids/'
       }
     ],
     drugs: [],

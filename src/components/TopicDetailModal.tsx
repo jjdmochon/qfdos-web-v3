@@ -1374,6 +1374,24 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             <h5 style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-title)', lineHeight: 1.4, margin: '4px 0 6px' }}>
                               {att.title}
                             </h5>
+                            {att.credito && (
+                              <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '4px', marginBottom: '4px' }}>
+                                {att.creditoUrl ? (
+                                  <a
+                                    href={att.creditoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: 'var(--teal-ink)', textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+                                    title="Ver fuente original"
+                                  >
+                                    <span>{att.credito}</span>
+                                    <ExternalLink size={11} />
+                                  </a>
+                                ) : (
+                                  <span>{att.credito}</span>
+                                )}
+                              </div>
+                            )}
                           </div>
 
                           {/* Actions */}

@@ -306,6 +306,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     id: `material-${a.id}`, grupo: 'recursos', fondo: 'recursos' as const,
     etiqueta: a.type === 'pdf' ? 'Material · PDF' : 'Material',
     titulo: a.title, texto: [a.size, a.date].filter(Boolean).join(' · ') || undefined,
+    credito: a.credito,
     acciones: [{
       label: a.type === 'pdf' ? 'Abrir el PDF' : 'Abrir el material',
       icono: (a.type === 'pdf' ? 'pdf' : 'enlace') as Accion['icono'],
@@ -349,7 +350,10 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
       herramienta('pdb', 'El fármaco dentro de su diana',
         'En el caso de la PDB, vemos el fármaco dentro de su diana: estructuras tridimensionales de proteínas resueltas por rayos X, RMN y criomicroscopía electrónica, como la 6CM4, el receptor D2 unido a risperidona que estudiamos en el Tema 3.',
         [{ label: 'Ver la 6CM4 en la PDB', icono: 'enlace', href: 'https://www.rcsb.org/structure/6CM4' }, ...verTodas],
-        'Imagen de la 6CM4: RCSB PDB')
+        'Imagen de la 6CM4: RCSB PDB'),
+      herramienta('quiralidad', 'Configuración R/S y centros estereogénicos',
+        'En cuanto a la estereoquímica, el Buscador de quiralidad R/S de MolDraw identifica los centros quirales y calcula su configuración absoluta según las reglas CIP. Dibujamos la estructura o pegamos su SMILES y la herramienta numera las prioridades Cahn-Ingold-Prelog para determinar si cada centro es R o S al instante.',
+        [{ label: 'Abrir el buscador R/S', icono: 'enlace', href: url('Buscador de quiralidad') }, ...verTodas])
     ]
   });
   return grupos.filter(g => g.historias.length > 0);
