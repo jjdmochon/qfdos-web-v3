@@ -15,6 +15,8 @@ export interface LightboxImagePayload {
   title: string;
   subtitle?: string;
   tag?: string;
+  /** Oculta el nombre/leyenda de la molécula que aparece dibujada en la zona inferior de la estructura (para Modo Examen) */
+  hideBottomLabel?: boolean;
 }
 
 interface ImageLightboxModalProps {
@@ -150,26 +152,28 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({ image, o
             <span>{isZoomed ? 'Ajustar' : 'Zoom 100%'}</span>
           </button>
 
-          {/* Botón Descargar */}
-          <button
-            onClick={handleDownload}
-            className="btn btn-sm"
-            style={{
-              background: 'rgba(255, 255, 255, 0.12)',
-              color: '#ffffff',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '6px 12px'
-            }}
-            title="Descargar imagen en alta resolución"
-          >
-            <Download size={14} />
-            <span>Descargar</span>
-          </button>
+          {/* Botón Descargar (solo disponible fuera de modo examen) */}
+          {!image.hideBottomLabel && (
+            <button
+              onClick={handleDownload}
+              className="btn btn-sm"
+              style={{
+                background: 'rgba(255, 255, 255, 0.12)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 12px'
+              }}
+              title="Descargar imagen en alta resolución"
+            >
+              <Download size={14} />
+              <span>Descargar</span>
+            </button>
+          )}
 
           {/* Botón Cerrar */}
           <button
@@ -229,20 +233,46 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({ image, o
             setIsZoomed(!isZoomed);
           }}
         >
-          <img 
-            src={image.src} 
-            alt={image.alt || image.title}
+          <div
             style={{
-              maxHeight: isZoomed ? 'none' : 'calc(100vh - 150px)',
-              maxWidth: isZoomed ? 'none' : 'calc(100vw - 80px)',
-              width: isZoomed ? 'auto' : 'auto',
-              height: isZoomed ? 'auto' : 'auto',
-              objectFit: 'contain',
-              display: 'block',
-              borderRadius: 'var(--radius-md)',
-              cursor: isZoomed ? 'zoom-out' : 'zoom-in'
+              position: 'relative',
+              display: 'inline-flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              overflow: 'hidden'
             }}
-          />
+          >
+            <img 
+              src={image.src} 
+              alt={image.alt || image.title}
+              style={{
+                maxHeight: isZoomed ? 'none' : 'calc(100vh - 150px)',
+                maxWidth: isZoomed ? 'none' : 'calc(100vw - 80px)',
+                width: isZoomed ? 'auto' : 'auto',
+                height: isZoomed ? 'auto' : 'auto',
+                objectFit: 'contain',
+                display: 'block',
+                borderRadius: 'var(--radius-md)',
+                cursor: isZoomed ? 'zoom-out' : 'zoom-in',
+                ...(image.hideBottomLabel ? {
+                  clipPath: 'inset(0 0 13% 0)'
+                } : {})
+              }}
+            />
+            {image.hideBottomLabel && (
+              <div 
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: '14%',
+                  background: '#ffffff',
+                  pointerEvents: 'none'
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
 

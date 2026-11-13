@@ -2444,7 +2444,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                       src,
                                       title: showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`),
                                       subtitle: `Pregunta ${currentIndex + 1}`,
-                                      tag: `Opción ${String.fromCharCode(65 + idx)}`
+                                      tag: `Opción ${String.fromCharCode(65 + idx)}`,
+                                      hideBottomLabel: isExamMode && !showExplanation
                                     });
                                   }}
                                   title="Haz clic para ampliar la estructura (no selecciona la opción)"
@@ -2482,7 +2483,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                       src: svgUrl,
                                       title: showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`),
                                       subtitle: `Pregunta ${currentIndex + 1}`,
-                                      tag: `Opción ${String.fromCharCode(65 + idx)}`
+                                      tag: `Opción ${String.fromCharCode(65 + idx)}`,
+                                      hideBottomLabel: isExamMode && !showExplanation
                                     })}
                                   />
                                 </div>
