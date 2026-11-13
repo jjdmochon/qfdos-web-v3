@@ -329,12 +329,32 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
   const [urlSaveSuccess, setUrlSaveSuccess] = useState<boolean>(false);
 
-  const [records, setRecords] = useState<QuizRegistrationRecord[]>([]);
+  const [records, setRecords] = useState<QuizRegistrationRecord[]>(() => {
+    try {
+      const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY)
+        ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as QuizRegistrationRecord[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [estadoHistorial, setEstadoHistorial] =
     useState<'local' | 'cargando' | 'sincronizado' | 'sin_conexion'>('local');
   const [recordsFilterTopic, setRecordsFilterTopic] = useState<'current' | 'all'>('current');
   const [recordsSearchQuery, setRecordsSearchQuery] = useState<string>('');
   const [expandedRecordId, setExpandedRecordId] = useState<string | null>(null);
+
+  const syncEnCursoRef = React.useRef(false);
+  const mountedRef = React.useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   /** Lo guardado en ESTE navegador. */
   const leerRegistrosLocales = (): QuizRegistrationRecord[] => {
@@ -430,63 +450,78 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   };
 
   /**
-   * Trae de la hoja los intentos de la cuenta con la que se ha entrado.
-   *
-   * Antes esto no existía: «Mis Calificaciones» leía el localStorage, así que
-   * al entrar desde otro equipo con la misma cuenta el historial salía vacío
-   * aunque la nota estuviera registrada.
+   * Trae de la hoja los intentos de la cuenta con la que se ha entrado
+   * de forma desacoplada y no bloqueante en segundo plano (timeout 8s).
    */
   const sincronizarRegistros = async () => {
-    const locales = leerRegistrosLocales();
-    const correo = (user?.email || studentEmail || '').trim();
+    if (syncEnCursoRef.current) return;
+    syncEnCursoRef.current = true;
 
-    if (!correo) {
-      setRecords(locales);
-      setEstadoHistorial('local');
-      return;
-    }
+    try {
+      const locales = leerRegistrosLocales();
+      const correo = (user?.email || studentEmail || '').trim();
 
-    setEstadoHistorial('cargando');
-    // Primero se envía lo que esté en cola, para que el historial ya lo traiga
-    await reenviarPendientes();
-    const remotos = await misCalificaciones(correo);
-
-    if (remotos === null) {
-      const enCola = intentosPendientes(correo).filter(p => !locales.some(l => l.id === p.id));
-      setRecords([...enCola, ...locales]);
-      setEstadoHistorial('sin_conexion');
-      return;
-    }
-
-    // Intentos de este navegador que no constan en la hoja: antes fusionar los
-    // borraba del historial local y la nota se perdía. Ahora pasan a la cola.
-    const yaEnHoja = (l: QuizRegistrationRecord) => remotos.some(r =>
-      (r.idIntento && r.idIntento === l.id) ||
-      (r.topicId === l.topicId && (
-        (r.timestamp && l.timestamp && r.timestamp.trim() === l.timestamp.trim()) ||
-        (parseTimestampMinutes(r.timestamp) > 0 && Math.abs(parseTimestampMinutes(r.timestamp) - parseTimestampMinutes(l.timestamp)) <= 2)
-      ))
-    );
-    const huerfanos = locales.filter(l =>
-      l.id.startsWith('rec_') && esIntentoDeTest(l) &&
-      (l.answersDetail ?? []).some(a => a.questionId) &&
-      (l.studentEmail || '').toLowerCase().trim() === correo.toLowerCase() &&
-      !yaEnHoja(l)
-    );
-    if (huerfanos.length) {
-      huerfanos.forEach(h => encolarIntento(h, correo));
-      if (await reenviarPendientes()) {
-        const otraVez = await misCalificaciones(correo);
-        if (otraVez) remotos.splice(0, remotos.length, ...otraVez);
+      if (!correo) {
+        if (mountedRef.current) {
+          setRecords(locales);
+          setEstadoHistorial('local');
+        }
+        return;
       }
-    }
 
-    const fusionados = fusionar(remotos, locales);
-    const enCola = intentosPendientes(correo).filter(p =>
-      !fusionados.some(r => (r.idIntento && r.idIntento === p.id) || sonMismoIntento(r, p))
-    );
-    setRecords([...enCola, ...fusionados]);
-    setEstadoHistorial('sincronizado');
+      if (mountedRef.current) {
+        setEstadoHistorial('cargando');
+      }
+
+      // Reenvío de pendientes en background (sin bloquear la carga si falla)
+      reenviarPendientes().catch(() => 0);
+
+      // Traer intentos remotos con timeout estricto de 8s para no colgar la pestaña
+      const remotos = await misCalificaciones(correo, 8000);
+
+      if (!mountedRef.current) return;
+
+      if (remotos === null) {
+        const enCola = intentosPendientes(correo).filter(p => !locales.some(l => l.id === p.id));
+        setRecords([...enCola, ...locales]);
+        setEstadoHistorial('sin_conexion');
+        return;
+      }
+
+      // Intentos de este navegador que no constan en la hoja: pasan a la cola
+      const yaEnHoja = (l: QuizRegistrationRecord) => remotos.some(r =>
+        (r.idIntento && r.idIntento === l.id) ||
+        (r.topicId === l.topicId && (
+          (r.timestamp && l.timestamp && r.timestamp.trim() === l.timestamp.trim()) ||
+          (parseTimestampMinutes(r.timestamp) > 0 && Math.abs(parseTimestampMinutes(r.timestamp) - parseTimestampMinutes(l.timestamp)) <= 2)
+        ))
+      );
+      const huerfanos = locales.filter(l =>
+        l.id.startsWith('rec_') && esIntentoDeTest(l) &&
+        (l.answersDetail ?? []).some(a => a.questionId) &&
+        (l.studentEmail || '').toLowerCase().trim() === correo.toLowerCase() &&
+        !yaEnHoja(l)
+      );
+      if (huerfanos.length) {
+        huerfanos.forEach(h => encolarIntento(h, correo));
+        // Lanzamos reenvío en background sin bloquear la UI ni encadenar más awaits
+        reenviarPendientes().catch(() => 0);
+      }
+
+      const fusionados = fusionar(remotos, locales);
+      const enCola = intentosPendientes(correo).filter(p =>
+        !fusionados.some(r => (r.idIntento && r.idIntento === p.id) || sonMismoIntento(r, p))
+      );
+      setRecords([...enCola, ...fusionados]);
+      setEstadoHistorial('sincronizado');
+    } catch (err) {
+      console.warn('[QuizModal] Error no bloqueante al sincronizar registros:', err);
+      if (mountedRef.current) {
+        setEstadoHistorial('sin_conexion');
+      }
+    } finally {
+      syncEnCursoRef.current = false;
+    }
   };
 
   useEffect(() => {

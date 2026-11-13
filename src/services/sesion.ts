@@ -12,6 +12,8 @@
 // quien usa la plataforma con normalidad no vuelve a ver la pantalla de login.
 // ==========================================================================
 
+import { senalConLimite } from './googleSheetsService';
+
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 const SESION_KEY = 'qfdos_v3_sesion';
 
@@ -85,7 +87,8 @@ export async function iniciarSesionServidor(idToken: string): Promise<ResultadoI
       // text/plain evita la petición previa de CORS, que Apps Script no atiende
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ idToken }),
-      redirect: 'follow'
+      redirect: 'follow',
+      signal: senalConLimite(10000)
     });
     const cuerpo = await resp.json().catch(() => null);
     const sesion = cuerpo ? aSesion(cuerpo) : null;
@@ -117,7 +120,7 @@ export function renovarSiHaceFalta(): Promise<void> {
     try {
       const resp = await fetch(
         `${WEBAPP_URL}?accion=renovarSesion&sesion=${encodeURIComponent(s.token)}`,
-        { method: 'GET', redirect: 'follow' }
+        { method: 'GET', redirect: 'follow', signal: senalConLimite(8000) }
       );
       const cuerpo = await resp.json().catch(() => null);
       const nueva = cuerpo ? aSesion(cuerpo) : null;

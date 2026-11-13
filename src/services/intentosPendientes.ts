@@ -103,7 +103,9 @@ export function reenviarPendientes(): Promise<number> {
     const cuenta = norm(getSesion()?.email);
     if (!cuenta || (typeof navigator !== 'undefined' && navigator.onLine === false)) return 0;
     let registrados = 0;
-    for (const p of leer().filter(x => x.cuenta === cuenta)) {
+    // Procesamos en lotes de hasta 3 para no saturar la red ni retener el hilo en segundo plano
+    const enEspera = leer().filter(x => x.cuenta === cuenta).slice(0, 3);
+    for (const p of enEspera) {
       const res = await submitAttemptToGoogleSheets(p.intento);
       anotarResultado(p.intento.id, res);
       if (res.status === 'sent') registrados++;

@@ -17,7 +17,7 @@ import { TEMA3_MODELO_1_TEST_QUESTIONS, TEMA3_MODELO_2_TEST_QUESTIONS, TEMA3_MOD
 import { TEMA4_MODELO_1_TEST_QUESTIONS, TEMA4_MODELO_2_TEST_QUESTIONS, TEMA4_MODELO_3_TEST_QUESTIONS } from '../data/tema04ExamsData';
 import { TEMA5_MODELO_1_TEST_QUESTIONS, TEMA5_MODELO_2_TEST_QUESTIONS, TEMA5_MODELO_3_TEST_QUESTIONS } from '../data/tema05ExamsData';
 import { TEMA6_MODELO_1_TEST_QUESTIONS, TEMA6_MODELO_2_TEST_QUESTIONS, TEMA6_MODELO_3_TEST_QUESTIONS } from '../data/tema06ExamsData';
-import { getGoogleSheetsUrl } from './googleSheetsService';
+import { getGoogleSheetsUrl, senalConLimite } from './googleSheetsService';
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 
 export interface EstadoClaves {
@@ -82,13 +82,14 @@ async function llamar<T>(
   if (!sesion) return { ok: false, error: SESION_CADUCADA };
   try {
     const resp = cuerpo === undefined
-      ? await fetch(`${url}?accion=${accion}&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`, { method: 'GET', redirect: 'follow' })
+      ? await fetch(`${url}?accion=${accion}&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`, { method: 'GET', redirect: 'follow', signal: senalConLimite(10000) })
       : await fetch(url, {
           method: 'POST',
           // text/plain evita la petición previa de CORS, que Apps Script no atiende
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: accion, sesion, ...(cuerpo as object) }),
-          redirect: 'follow'
+          redirect: 'follow',
+          signal: senalConLimite(12000)
         });
     const c = await resp.json().catch(() => null);
     if (c?.ok) {
