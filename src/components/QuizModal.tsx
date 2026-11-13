@@ -2278,7 +2278,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                   {/* Optional SMILES Structure for Question */}
                   {currentQ.questionSmiles && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                      <Chem2DDrawer smiles={currentQ.questionSmiles} width={260} height={120} stereoLabels={showExplanation} />
+                      <Chem2DDrawer
+                        smiles={currentQ.questionSmiles}
+                        width={260}
+                        height={120}
+                        stereoLabels={showExplanation}
+                        onExpand={(svgUrl) => setLightboxImage({
+                          src: svgUrl,
+                          title: `Pregunta ${currentIndex + 1}`,
+                          subtitle: currentQ.question,
+                          tag: 'Estructura Enunciado'
+                        })}
+                      />
                     </div>
                   )}
 
@@ -2288,24 +2299,53 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       {currentQ.questionStructures.map(ref => (
                         <figure key={ref.name || ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                           {ref.imagePath ? (
-                            <div style={{
-                              background: '#ffffff',
-                              padding: '8px 12px',
-                              borderRadius: 'var(--radius-md)',
-                              border: '1px solid var(--border-color)',
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center'
-                            }}>
+                            <div
+                              style={{
+                                background: '#ffffff',
+                                padding: '8px 12px',
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-color)',
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                cursor: 'zoom-in',
+                                boxSizing: 'border-box'
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const src = ref.imagePath!.startsWith('http') ? ref.imagePath! : `${import.meta.env.BASE_URL || '/'}${ref.imagePath!.replace(/^\//, '')}`;
+                                setLightboxImage({
+                                  src,
+                                  title: ref.name || 'Estructura de referencia',
+                                  subtitle: `Pregunta ${currentIndex + 1}: ${currentQ.question}`,
+                                  tag: 'Estructura Enunciado'
+                                });
+                              }}
+                              title="Haz clic para ampliar la estructura a pantalla completa"
+                            >
                               <img
                                 src={ref.imagePath.startsWith('http') ? ref.imagePath : `${import.meta.env.BASE_URL || '/'}${ref.imagePath.replace(/^\//, '')}`}
                                 alt={ref.name}
                                 style={{ maxHeight: '130px', maxWidth: '240px', objectFit: 'contain' }}
                               />
+                              <span style={{ fontSize: '0.64rem', color: 'var(--teal-ink)', fontWeight: 700, marginTop: '3px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                <Maximize2 size={10} /> Clic para ampliar
+                              </span>
                             </div>
                           ) : ref.smiles ? (
-                            <Chem2DDrawer smiles={ref.smiles} width={220} height={120} stereoLabels={showExplanation} />
+                            <Chem2DDrawer
+                              smiles={ref.smiles}
+                              width={220}
+                              height={120}
+                              stereoLabels={showExplanation}
+                              onExpand={(svgUrl) => setLightboxImage({
+                                src: svgUrl,
+                                title: ref.name || 'Estructura de referencia',
+                                subtitle: `Pregunta ${currentIndex + 1}: ${currentQ.question}`,
+                                tag: 'Estructura Enunciado'
+                              })}
+                            />
                           ) : null}
                           <figcaption style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
                         </figure>
@@ -2381,36 +2421,70 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 {optText}
                               </span>
                               {optImagePath ? (
-                                <div style={{ 
-                                  marginTop: '4px', 
-                                  padding: '6px 12px',
-                                  borderRadius: 'var(--radius-md)',
-                                  background: '#ffffff',
-                                  border: '1px solid var(--border-color)',
-                                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-                                  maxWidth: '100%', 
-                                  overflowX: 'auto',
-                                  display: 'inline-flex',
-                                  justifyContent: 'center'
-                                }}>
+                                <div
+                                  style={{
+                                    marginTop: '4px',
+                                    padding: '6px 12px',
+                                    borderRadius: 'var(--radius-md)',
+                                    background: '#ffffff',
+                                    border: '1px solid var(--border-color)',
+                                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                                    maxWidth: '100%',
+                                    overflowX: 'auto',
+                                    display: 'inline-flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    cursor: 'zoom-in',
+                                    boxSizing: 'border-box'
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const src = optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`;
+                                    setLightboxImage({
+                                      src,
+                                      title: showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`),
+                                      subtitle: `Pregunta ${currentIndex + 1}`,
+                                      tag: `Opción ${String.fromCharCode(65 + idx)}`
+                                    });
+                                  }}
+                                  title="Haz clic para ampliar la estructura (no selecciona la opción)"
+                                >
                                   <img
                                     src={optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`}
-                                    alt={optRevealedName || optText}
+                                    alt={showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`)}
                                     style={{ maxHeight: '110px', maxWidth: '240px', objectFit: 'contain' }}
                                   />
+                                  <span style={{ fontSize: '0.64rem', color: 'var(--teal-ink)', fontWeight: 700, marginTop: '3px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                    <Maximize2 size={10} /> Clic para ampliar
+                                  </span>
                                 </div>
                               ) : optSmiles ? (
-                                <div style={{ 
-                                  marginTop: '2px', 
-                                  padding: '4px 8px',
-                                  borderRadius: 'var(--radius-sm)',
-                                  background: 'var(--surface-alt)',
-                                  maxWidth: '100%', 
-                                  overflowX: 'auto',
-                                  display: 'inline-flex',
-                                  justifyContent: 'center'
-                                }}>
-                                  <Chem2DDrawer smiles={optSmiles} width={220} height={95} bare={true} stereoLabels={showExplanation} />
+                                <div
+                                  style={{
+                                    marginTop: '2px',
+                                    padding: '4px 8px',
+                                    borderRadius: 'var(--radius-sm)',
+                                    background: 'var(--surface-alt)',
+                                    maxWidth: '100%',
+                                    overflowX: 'auto',
+                                    display: 'inline-flex',
+                                    justifyContent: 'center'
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Chem2DDrawer
+                                    smiles={optSmiles}
+                                    width={220}
+                                    height={95}
+                                    bare={true}
+                                    stereoLabels={showExplanation}
+                                    onExpand={(svgUrl) => setLightboxImage({
+                                      src: svgUrl,
+                                      title: showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`),
+                                      subtitle: `Pregunta ${currentIndex + 1}`,
+                                      tag: `Opción ${String.fromCharCode(65 + idx)}`
+                                    })}
+                                  />
                                 </div>
                               ) : null}
                               {showExplanation && optRevealedName && (

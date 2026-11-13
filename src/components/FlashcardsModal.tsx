@@ -25,8 +25,10 @@ import {
   Filter,
   RefreshCw,
   BookOpen,
-  User
+  User,
+  Maximize2
 } from 'lucide-react';
+import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 
 interface FlashcardsModalProps {
   topic: QfdosTopic;
@@ -53,6 +55,8 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const [filterHardOnly, setFilterHardOnly] = useState(false);
   // Ocultar las tarjetas de ampliación de temario
   const [ocultarAmpliacion, setOcultarAmpliacion] = useState(false);
+  // Visor ampliado de estructuras a pantalla completa
+  const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
 
   // Almacenamiento local persistente por tema
   // Por cuenta: dos personas que comparten equipo no mezclan sus valoraciones.
@@ -661,15 +665,51 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                               )}
                             </div>
                             {st.imagePath ? (
-                              <div style={{ background: '#ffffff', padding: '6px', borderRadius: '6px', border: '1px solid var(--border-color)', width: '100%', display: 'flex', justifyContent: 'center' }}>
+                              <div
+                                style={{
+                                  background: '#ffffff',
+                                  padding: '6px',
+                                  borderRadius: '6px',
+                                  border: '1px solid var(--border-color)',
+                                  width: '100%',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  cursor: 'zoom-in',
+                                  boxSizing: 'border-box'
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setLightboxImage({
+                                    src: recurso(st.imagePath!),
+                                    title: st.name,
+                                    subtitle: currentCard.concept,
+                                    tag: st.badge || topic.number
+                                  });
+                                }}
+                                title="Haz clic para ampliar la estructura a pantalla completa"
+                              >
                                 <img
                                   src={recurso(st.imagePath)}
                                   alt={st.name}
                                   style={{ maxHeight: '110px', maxWidth: '100%', objectFit: 'contain' }}
                                 />
+                                <span style={{ fontSize: '0.64rem', color: 'var(--teal-ink)', fontWeight: 700, marginTop: '3px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  <Maximize2 size={10} /> Clic para ampliar
+                                </span>
                               </div>
                             ) : st.smiles ? (
-                              <Chem2DDrawer smiles={st.smiles} width={130} height={85} />
+                              <Chem2DDrawer
+                                smiles={st.smiles}
+                                width={130}
+                                height={85}
+                                onExpand={(svgUrl) => setLightboxImage({
+                                  src: svgUrl,
+                                  title: st.name,
+                                  subtitle: currentCard.concept,
+                                  tag: st.badge || topic.number
+                                })}
+                              />
                             ) : null}
                           </div>
                         ))}
@@ -679,27 +719,55 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     {/* Single Structure Display (si no hay imagen didáctica anotada específica) */}
                     {currentCard.smiles && !currentCard.structures && !currentCard.imagePath && (
                       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-                        <Chem2DDrawer smiles={currentCard.smiles} width={220} height={100} />
+                        <Chem2DDrawer
+                          smiles={currentCard.smiles}
+                          width={220}
+                          height={100}
+                          onExpand={(svgUrl) => setLightboxImage({
+                            src: svgUrl,
+                            title: currentCard.concept,
+                            subtitle: topic.title,
+                            tag: topic.number
+                          })}
+                        />
                       </div>
                     )}
 
                     {/* Optional Didactic Image Asset */}
                     {currentCard.imagePath && (
-                      <div style={{
-                        marginTop: '16px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        background: '#ffffff',
-                        padding: '12px',
-                        borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border-color)',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                      }}>
+                      <div
+                        style={{
+                          marginTop: '16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          background: '#ffffff',
+                          padding: '12px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '1px solid var(--border-color)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                          cursor: 'zoom-in',
+                          boxSizing: 'border-box'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLightboxImage({
+                            src: recurso(currentCard.imagePath!),
+                            title: currentCard.concept,
+                            subtitle: topic.title,
+                            tag: topic.number
+                          });
+                        }}
+                        title="Haz clic para ampliar la imagen a pantalla completa"
+                      >
                         <img
                           src={recurso(currentCard.imagePath)}
                           alt={currentCard.concept}
                           style={{ maxHeight: '360px', maxWidth: '100%', objectFit: 'contain', borderRadius: '6px' }}
                         />
+                        <span style={{ fontSize: '0.72rem', color: 'var(--teal-ink)', fontWeight: 700, marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Maximize2 size={12} /> Clic para ampliar a pantalla completa
+                        </span>
                       </div>
                     )}
                   </div>
@@ -836,6 +904,12 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Visor Lightbox a Pantalla Completa para Estructuras Químicas */}
+        <ImageLightboxModal
+          image={lightboxImage}
+          onClose={() => setLightboxImage(null)}
+        />
 
       </div>
     </div>

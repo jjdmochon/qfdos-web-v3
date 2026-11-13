@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { CheckCircle2, XCircle, MinusCircle, ListChecks, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, MinusCircle, ListChecks, AlertCircle, Maximize2 } from 'lucide-react';
 import type { TestQuestion } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 
 type Estado = 'acierto' | 'fallo' | 'blanco';
 
@@ -16,28 +17,74 @@ const rutaImagen = (ruta: string) =>
   ruta.startsWith('http') ? ruta : `${import.meta.env.BASE_URL || '/'}${ruta.replace(/^\//, '')}`;
 
 /** Lo que el enunciado muestra además del texto: figura y estructuras. */
-const Enunciado: React.FC<{ q: TestQuestion }> = ({ q }) => {
+const Enunciado: React.FC<{ q: TestQuestion; onExpand?: (payload: LightboxImagePayload) => void }> = ({ q, onExpand }) => {
   if (!q.imagePath && !q.questionSmiles && !q.questionStructures?.length) return null;
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', margin: '2px 0 8px', maxWidth: '100%', overflowX: 'auto' }}>
       {q.imagePath && (
-        <img
-          src={rutaImagen(q.imagePath)}
-          alt={`Figura del enunciado: ${q.question}`}
-          style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px' }}
+        <div
+          style={{ cursor: onExpand ? 'zoom-in' : undefined, display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}
+          onClick={() => onExpand?.({
+            src: rutaImagen(q.imagePath!),
+            title: 'Figura del enunciado',
+            subtitle: q.question,
+            tag: 'Enunciado'
+          })}
+          title="Clic para ampliar figura"
+        >
+          <img
+            src={rutaImagen(q.imagePath)}
+            alt={`Figura del enunciado: ${q.question}`}
+            style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px' }}
+          />
+        </div>
+      )}
+      {q.questionSmiles && (
+        <Chem2DDrawer
+          smiles={q.questionSmiles}
+          width={220}
+          height={100}
+          bare={true}
+          onExpand={(svgUrl) => onExpand?.({
+            src: svgUrl,
+            title: 'Estructura del enunciado',
+            subtitle: q.question,
+            tag: 'Enunciado'
+          })}
         />
       )}
-      {q.questionSmiles && <Chem2DDrawer smiles={q.questionSmiles} width={220} height={100} bare={true} />}
       {q.questionStructures?.map(ref => (
         <figure key={ref.name || ref.smiles} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
           {ref.imagePath ? (
-            <img
-              src={rutaImagen(ref.imagePath)}
-              alt={ref.name}
-              style={{ maxWidth: '100%', maxHeight: '110px', objectFit: 'contain', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px', border: '1px solid var(--border-color)' }}
-            />
+            <div
+              style={{ cursor: onExpand ? 'zoom-in' : undefined, display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}
+              onClick={() => onExpand?.({
+                src: rutaImagen(ref.imagePath!),
+                title: ref.name || 'Estructura de referencia',
+                subtitle: q.question,
+                tag: 'Enunciado'
+              })}
+              title="Clic para ampliar estructura"
+            >
+              <img
+                src={rutaImagen(ref.imagePath)}
+                alt={ref.name}
+                style={{ maxWidth: '100%', maxHeight: '110px', objectFit: 'contain', background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '4px', border: '1px solid var(--border-color)' }}
+              />
+            </div>
           ) : ref.smiles ? (
-            <Chem2DDrawer smiles={ref.smiles} width={200} height={95} bare={true} />
+            <Chem2DDrawer
+              smiles={ref.smiles}
+              width={200}
+              height={95}
+              bare={true}
+              onExpand={(svgUrl) => onExpand?.({
+                src: svgUrl,
+                title: ref.name || 'Estructura de referencia',
+                subtitle: q.question,
+                tag: 'Enunciado'
+              })}
+            />
           ) : null}
           <figcaption style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-main)' }}>{ref.name}</figcaption>
         </figure>
@@ -54,7 +101,7 @@ const IconoEstado: React.FC<{ estado: Estado }> = ({ estado }) => {
 };
 
 /** Una opción con su letra, su texto, el fármaco que esconde y su estructura. */
-const Opcion: React.FC<{ q: TestQuestion; idx: number; rotulo: string; tinta: string }> = ({ q, idx, rotulo, tinta }) => {
+const Opcion: React.FC<{ q: TestQuestion; idx: number; rotulo: string; tinta: string; onExpand?: (payload: LightboxImagePayload) => void }> = ({ q, idx, rotulo, tinta, onExpand }) => {
   const opt = q.options[idx];
   if (opt === undefined) return null;
   const texto = typeof opt === 'string' ? opt : opt.text;
@@ -67,7 +114,16 @@ const Opcion: React.FC<{ q: TestQuestion; idx: number; rotulo: string; tinta: st
       <span className="font-mono" style={{ fontWeight: 700 }}>{String.fromCharCode(65 + idx)}.</span> {texto}
       {farmaco && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Fármaco: {farmaco}</div>}
       {imagePath ? (
-        <div style={{ marginTop: '4px', maxWidth: '100%', overflowX: 'auto' }}>
+        <div
+          style={{ marginTop: '4px', maxWidth: '100%', overflowX: 'auto', cursor: onExpand ? 'zoom-in' : undefined, display: 'inline-flex' }}
+          onClick={() => onExpand?.({
+            src: rutaImagen(imagePath),
+            title: farmaco || texto || `Opción ${String.fromCharCode(65 + idx)}`,
+            subtitle: q.question,
+            tag: `Opción ${String.fromCharCode(65 + idx)}`
+          })}
+          title="Clic para ampliar estructura"
+        >
           <img
             src={rutaImagen(imagePath)}
             alt={farmaco || texto}
@@ -76,7 +132,18 @@ const Opcion: React.FC<{ q: TestQuestion; idx: number; rotulo: string; tinta: st
         </div>
       ) : smiles ? (
         <div style={{ marginTop: '4px', maxWidth: '100%', overflowX: 'auto' }}>
-          <Chem2DDrawer smiles={smiles} width={200} height={90} bare={true} />
+          <Chem2DDrawer
+            smiles={smiles}
+            width={200}
+            height={90}
+            bare={true}
+            onExpand={(svgUrl) => onExpand?.({
+              src: svgUrl,
+              title: farmaco || texto || `Opción ${String.fromCharCode(65 + idx)}`,
+              subtitle: q.question,
+              tag: `Opción ${String.fromCharCode(65 + idx)}`
+            })}
+          />
         </div>
       ) : null}
     </div>
@@ -95,6 +162,7 @@ export const RevisionRespuestas: React.FC<{
   claveDistinta?: boolean;
 }> = ({ questions, answers, claveDistinta = false }) => {
   const [soloFalladas, setSoloFalladas] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<LightboxImagePayload | null>(null);
 
   const filas = questions.map((q, idx) => {
     const marcada = answers[idx];
@@ -207,15 +275,15 @@ export const RevisionRespuestas: React.FC<{
               </span>
             </div>
 
-            <Enunciado q={q} />
+            <Enunciado q={q} onExpand={setLightboxImage} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {respondida ? (
-                <Opcion q={q} idx={marcada} rotulo="Tu respuesta" tinta={ESTILO[estado].tinta} />
+                <Opcion q={q} idx={marcada} rotulo="Tu respuesta" tinta={ESTILO[estado].tinta} onExpand={setLightboxImage} />
               ) : (
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>No marcaste ninguna opción.</div>
               )}
-              {estado !== 'acierto' && <Opcion q={q} idx={q.correctIndex} rotulo="Respuesta correcta" tinta="var(--ok-ink)" />}
+              {estado !== 'acierto' && <Opcion q={q} idx={q.correctIndex} rotulo="Respuesta correcta" tinta="var(--ok-ink)" onExpand={setLightboxImage} />}
             </div>
 
             {q.explanation && (
@@ -227,6 +295,12 @@ export const RevisionRespuestas: React.FC<{
           </li>
         ))}
       </ol>
+
+      {/* Visor Lightbox a Pantalla Completa para Estructuras en Revisión */}
+      <ImageLightboxModal
+        image={lightboxImage}
+        onClose={() => setLightboxImage(null)}
+      />
     </section>
   );
 };

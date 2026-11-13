@@ -15,6 +15,8 @@ interface Chem2DDrawerProps {
   bare?: boolean;
   /** Etiquetas R/S de RDKit; se apagan cuando la pregunta pide la configuración */
   stereoLabels?: boolean;
+  /** Callback al hacer clic para ampliar la estructura a pantalla completa */
+  onExpand?: (dataUrl: string) => void;
 }
 
 /**
@@ -31,7 +33,8 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
   className = '',
   highlightSmarts,
   bare = false,
-  stereoLabels = true
+  stereoLabels = true,
+  onExpand
 }) => {
   const [svg, setSvg] = useState<string | null>(null);
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
@@ -99,8 +102,24 @@ export const Chem2DDrawer: React.FC<Chem2DDrawerProps> = ({
         transition: 'all var(--transition-fast)'
       };
 
+  const handleExpand = (e: React.MouseEvent) => {
+    if (onExpand && svg) {
+      e.stopPropagation();
+      const dataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+      onExpand(dataUrl);
+    }
+  };
+
   return (
-    <div style={frameStyle} className={`chem-2d-container ${className}`}>
+    <div
+      style={{
+        ...frameStyle,
+        cursor: onExpand && svg ? 'zoom-in' : frameStyle.cursor
+      }}
+      className={`chem-2d-container ${className}`}
+      onClick={onExpand && svg ? handleExpand : undefined}
+      title={onExpand && svg ? 'Clic para ampliar estructura' : undefined}
+    >
       <div
         style={{
           // Se encoge con su contenedor en móvil sin perder la proporción
