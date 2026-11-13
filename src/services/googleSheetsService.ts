@@ -67,7 +67,7 @@ export interface GoogleSheetsSubmissionResult {
 }
 
 /** AbortSignal.timeout no existe en Safari < 16: sin él, fetch ni salía. */
-function senalConLimite(ms: number): AbortSignal | undefined {
+export function senalConLimite(ms: number): AbortSignal | undefined {
   if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
   if (typeof AbortController === 'undefined') return undefined;
   const c = new AbortController();
@@ -148,22 +148,22 @@ export async function submitAttemptToGoogleSheets(
     // YA ha llegado: no se reintenta (duplicaría la nota) y se relee abajo.
     let cuerpo: any = null;
     // «ocupado»: el servidor no escribió nada (toda la clase entregando a la
-    // vez), así que repetir es seguro
-    for (let intento = 0; intento < 3; intento++) {
+    // vez), así que repetir es seguro. Máximo 2 intentos con 12s de límite para no colgar la UI.
+    for (let intento = 0; intento < 2; intento++) {
       try {
         const resp = await fetch(url, {
           method: 'POST',
           redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload),
-          signal: senalConLimite(30000)
+          signal: senalConLimite(12000)
         });
         cuerpo = await resp.json().catch(() => null);
       } catch {
         cuerpo = null;
       }
       if (cuerpo?.codigo !== 'ocupado') break;
-      await esperar(2000 + Math.random() * 4000);
+      await esperar(1000 + Math.random() * 2000);
     }
 
     if (cuerpo?.ok) {
@@ -212,8 +212,8 @@ export async function submitAttemptToGoogleSheets(
       };
     }
 
-    // Respuesta ilegible: la confirmación se obtiene releyendo, que no escribe nada.
-    const registrados = await misCalificaciones(attempt.studentEmail);
+    // Respuesta ilegible: la confirmación se obtiene releyendo, que no escribe nada (con 8s límite).
+    const registrados = await misCalificaciones(attempt.studentEmail, 8000);
     const parseMinutos = (ts?: string): number => {
       if (!ts) return 0;
       const match = ts.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
@@ -397,7 +397,7 @@ export function esIntentoDeTest(r: { evaluationMode?: string; modelName?: string
   return r.evaluationMode !== 'flashcards_autoevaluacion' && !/^flashcards/i.test(r.modelName || '');
 }
 
-export async function misCalificaciones(email: string): Promise<QuizRegistrationRecord[] | null> {
+export async function misCalificaciones(email: string, timeoutMs: number = 8000): Promise<QuizRegistrationRecord[] | null> {
   const norm = (email || '').toLowerCase().trim();
   const url = getGoogleSheetsUrl();
   const sesion = tokenSesion();
@@ -412,7 +412,7 @@ export async function misCalificaciones(email: string): Promise<QuizRegistration
       const resp = await fetch(
         `${url}?accion=misCalificaciones&email=${encodeURIComponent(norm)}` +
           `&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
-        { method: 'GET', redirect: 'follow' }
+        { method: 'GET', redirect: 'follow', signal: senalConLimite(timeoutMs) }
       );
       if (!resp.ok) return getCachedCalificaciones(norm);
 
