@@ -2450,11 +2450,44 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   }}
                                   title="Haz clic para ampliar la estructura (no selecciona la opción)"
                                 >
-                                  <img
-                                    src={optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`}
-                                    alt={showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`)}
-                                    style={{ maxHeight: '110px', maxWidth: '240px', objectFit: 'contain' }}
-                                  />
+                                  <div
+                                    style={{
+                                      position: 'relative',
+                                      display: 'inline-flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      overflow: 'hidden'
+                                    }}
+                                  >
+                                    <img
+                                      src={optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`}
+                                      alt={showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`)}
+                                      style={{
+                                        maxHeight: '110px',
+                                        maxWidth: '240px',
+                                        width: 'auto',
+                                        height: 'auto',
+                                        objectFit: 'contain',
+                                        display: 'block',
+                                        ...((isExamMode && !showExplanation) ? {
+                                          clipPath: 'inset(0 0 13% 0)'
+                                        } : {})
+                                      }}
+                                    />
+                                    {(isExamMode && !showExplanation) && (
+                                      <div
+                                        style={{
+                                          position: 'absolute',
+                                          bottom: 0,
+                                          left: 0,
+                                          right: 0,
+                                          height: '14%',
+                                          background: '#ffffff',
+                                          pointerEvents: 'none'
+                                        }}
+                                      />
+                                    )}
+                                  </div>
                                   <span style={{ fontSize: '0.64rem', color: 'var(--teal-ink)', fontWeight: 700, marginTop: '3px', display: 'flex', alignItems: 'center', gap: '3px' }}>
                                     <Maximize2 size={10} /> Clic para ampliar
                                   </span>
