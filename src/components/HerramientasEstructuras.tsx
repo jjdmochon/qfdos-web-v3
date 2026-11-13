@@ -28,6 +28,13 @@ export const EDITORES: Herramienta[] = [
       'Respecto a MolDraw, es un editor 2D gratuito que trabaja directamente en el navegador, sin instalar nada y sin crear cuenta. Dibujamos la molécula o la reacción, obtenemos su SMILES, la vemos en 3D y exportamos la imagen, lo que lo hace muy práctico para resolver ejercicios de SAR desde el móvil o desde un ordenador de la biblioteca.'
   },
   {
+    nombre: 'Buscador de quiralidad R/S (MolDraw)',
+    url: 'https://www.moldraw.com/es/tools/free-chem-tools/rs-chirality-finder.html',
+    etiqueta: 'Gratuito · navegador',
+    descripcion:
+      'En cuanto al buscador de quiralidad de MolDraw, es una utilidad web gratuita para determinar de forma directa la configuración absoluta R o S de cualquier centro estereogénico según las reglas de Cahn-Ingold-Prelog (CIP). Dibujamos la molécula en el editor o pegamos su código SMILES, y la herramienta identifica los carbonos asimétricos, numera las prioridades de los cuatro sustituyentes y muestra el sentido de giro, lo que permite comprobar rápidamente la quiralidad y la eudismia de los fármacos que vemos en clase sin instalar ningún programa.'
+  },
+  {
     nombre: 'MolView',
     url: 'https://molview.org/',
     etiqueta: 'Código abierto · navegador',
@@ -119,8 +126,8 @@ export const HerramientasEstructuras: React.FC = () => (
     </div>
     <p className="herr-intro">
       Para preparar un trabajo, repasar un tema o comprobar una estructura del examen nos basta con
-      el navegador. Hemos reunido aquí tres editores gratuitos para dibujar moléculas y las tres bases
-      de datos que usamos con más frecuencia en clase, y estoy seguro de que os van a ahorrar bastante
+      el navegador. Hemos reunido aquí editores y herramientas gratuitas para dibujar y analizar moléculas
+      junto a las tres bases de datos que usamos con más frecuencia en clase, y estoy seguro de que os van a ahorrar bastante
       tiempo a lo largo del curso.
     </p>
 
