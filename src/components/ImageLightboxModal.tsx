@@ -31,16 +31,20 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({ image, o
     
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         onClose();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    // Usar capture: true para capturar Escape antes de que modalA11y cierre el modal padre
+    window.addEventListener('keydown', handleKeyDown, true);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown, true);
       document.body.style.overflow = prevOverflow;
     };
   }, [image, onClose]);
