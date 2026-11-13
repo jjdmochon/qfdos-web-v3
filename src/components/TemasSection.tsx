@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QfdosTopic, testHabilitado, flashcardsHabilitadas, enRevisionParaAlumnado, moleculaDeTarjeta } from '../data/qfdosData';
 import { Chem2DDrawer } from './Chem2DDrawer';
+import { recurso } from '../services/rutas';
 import { MapaCursoTarjeta } from './MapaCursoTarjeta';
 import { useAuth } from '../context/AuthContext';
 import { BARAJAS, TemaCartas } from './cartas/CartasDeckView';
@@ -374,8 +375,32 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   </div>
                 )}
 
-                {/* Estructura 2D del fármaco destacado (por defecto, el primero) */}
-                {moleculaDeTarjeta(topic) && (
+                {/* Estructura 2D del fármaco destacado (Tema 06: Fentanilo con render oficial ReShiki) */}
+                {topic.id === 'tema-06' ? (
+                  <div style={{ margin: '8px 0 12px', display: 'flex', justifyContent: 'center' }}>
+                    <div
+                      style={{
+                        width: 260,
+                        height: 110,
+                        background: '#ffffff',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md, 8px)',
+                        padding: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.03)'
+                      }}
+                      title="Fentanilo (QFDOS-337) · Estructura química oficial ReShiki"
+                    >
+                      <img
+                        src={recurso('estructuras/tema-06/QFDOS-337_fentanilo.png')}
+                        alt="Fentanilo · Estructura química oficial ReShiki"
+                        style={{ maxHeight: '98px', maxWidth: '100%', objectFit: 'contain' }}
+                      />
+                    </div>
+                  </div>
+                ) : moleculaDeTarjeta(topic) && (
                   <div style={{ margin: '8px 0 12px', display: 'flex', justifyContent: 'center' }}>
                     <Chem2DDrawer smiles={moleculaDeTarjeta(topic)!.smiles} name={moleculaDeTarjeta(topic)!.name} width={260} height={110} />
                   </div>

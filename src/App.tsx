@@ -484,6 +484,8 @@ export const App: React.FC = () => {
         abrirCartas(4);
       } else if (raw === 'cartas-tema-05') {
         abrirCartas(5);
+      } else if (raw === 'cartas-tema-06') {
+        abrirCartas(6);
       } else {
         setIsCartasModalOpen(false);
       }

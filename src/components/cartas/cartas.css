@@ -457,6 +457,16 @@
   transform: scale(1.03);
 }
 
+/* Renders químicos oficiales ReShiki (Tema 6): fondo blanco sin invertir */
+.qf-estructura--reshiki {
+  background: #ffffff !important;
+}
+
+.qf-estructura--reshiki img,
+.qf-estructura--reshiki svg {
+  filter: none !important;
+}
+
 /* Tipografía de la carta */
 .qf-nombre {
   font-family: var(--font-sans, 'Montserrat', sans-serif);
@@ -784,6 +794,17 @@
 .qf-deck--theme-dark .qf-estructura img,
 .qf-deck--theme-dark .qf-estructura svg {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.qf-deck--theme-dark .qf-estructura--reshiki {
+  background: #ffffff !important;
+  border-color: rgba(45, 212, 191, 0.4) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.qf-deck--theme-dark .qf-estructura--reshiki img,
+.qf-deck--theme-dark .qf-estructura--reshiki svg {
+  filter: none !important;
 }
 
 .qf-deck--theme-dark .qf-nombre {

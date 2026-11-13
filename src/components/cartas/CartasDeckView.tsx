@@ -4,6 +4,7 @@ import rawTema02 from '../../data/farmacosTema02.json';
 import rawTema03 from '../../data/farmacosTema03.json';
 import rawTema04 from '../../data/farmacosTema04.json';
 import rawTema05 from '../../data/farmacosTema05.json';
+import rawTema06 from '../../data/farmacosTema06.json';
 import { MoleculeDrug } from '../../data/qfdosData';
 import './cartas.css';
 import {
@@ -54,7 +55,7 @@ export interface FarmacoCarta {
   regulatorio?: string;
 }
 
-export type TemaCartas = 1 | 2 | 3 | 4 | 5;
+export type TemaCartas = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface EstadoRegulatorio {
   etiqueta: string;
@@ -86,6 +87,7 @@ export const BARAJAS: Record<TemaCartas, BarajaTema & { familia: string }> = {
   3: { ...(rawTema03 as unknown as BarajaTema), familia: 'Dopaminérgicos' },
   4: { ...(rawTema04 as unknown as BarajaTema), familia: 'Serotoninérgicos' },
   5: { ...(rawTema05 as unknown as BarajaTema), familia: 'GABAérgicos' },
+  6: { ...(rawTema06 as unknown as BarajaTema), familia: 'Opioides' },
 };
 
 export interface CartasDeckViewProps {
@@ -384,7 +386,10 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
         <div className="qf-cartas-grid">
           {filteredFarmacos.map(f => {
             const isFlipped = !!flippedCards[f.id];
-            const imgSrc = `${cleanBase}cartas/${f.estructura}`;
+            const isReshiki = f.estructura.startsWith('estructuras/tema-06/') || f.estructura.includes('tema-06');
+            const imgSrc = f.estructura.startsWith('estructuras/tema-06/')
+              ? `${cleanBase}${f.estructura}`
+              : `${cleanBase}cartas/${f.estructura}`;
             const est = estados && f.estado ? estados[f.estado] : undefined;
             const sello = f.estado ? SELLO_ESTADO[f.estado] : undefined;
 
@@ -458,8 +463,8 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Contenedor Molecular con SVG de RDKit */}
-                    <div className="qf-estructura">
+                    {/* Contenedor Molecular con render ReShiki o SVG */}
+                    <div className={`qf-estructura ${isReshiki ? 'qf-estructura--reshiki' : ''}`}>
                       <img
                         src={imgSrc}
                         alt={`Estructura molecular 2D de ${f.nombre}`}
@@ -468,7 +473,9 @@ export const CartasDeckView: React.FC<CartasDeckViewProps> = ({
                           // Fallback si la ruta relativa falla
                           const target = e.currentTarget;
                           if (!target.src.includes('public')) {
-                            target.src = `/cartas/${f.estructura}`;
+                            target.src = f.estructura.startsWith('estructuras/')
+                              ? `/${f.estructura}`
+                              : `/cartas/${f.estructura}`;
                           }
                         }}
                       />
