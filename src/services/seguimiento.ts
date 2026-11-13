@@ -8,6 +8,7 @@
 // ==========================================================================
 
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
+import { senalConLimite } from './googleSheetsService';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 
@@ -55,7 +56,7 @@ export async function cargarSeguimiento(): Promise<Resultado<Seguimiento>> {
   try {
     const resp = await fetch(
       `${WEBAPP_URL}?accion=seguimiento&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
-      { method: 'GET', redirect: 'follow' }
+      { method: 'GET', redirect: 'follow', signal: senalConLimite(8000) }
     );
     const c = await resp.json().catch(() => null);
     if (c?.ok) {

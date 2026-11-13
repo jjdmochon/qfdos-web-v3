@@ -8,6 +8,7 @@
 // ==========================================================================
 
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
+import { senalConLimite } from './googleSheetsService';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 
@@ -42,7 +43,8 @@ export async function enviarRecordatorio(d: {
         // text/plain evita la petición previa de CORS, que Apps Script no atiende
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(d),
-        redirect: 'follow'
+        redirect: 'follow',
+        signal: senalConLimite(10000)
       }
     );
     const c = await resp.json().catch(() => null);

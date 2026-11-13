@@ -66,12 +66,22 @@ export interface GoogleSheetsSubmissionResult {
   codigo?: string;
 }
 
-/** AbortSignal.timeout no existe en Safari < 16: sin él, fetch ni salía. */
-export function senalConLimite(ms: number): AbortSignal | undefined {
-  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+/** AbortSignal con límite de tiempo y soporte para señal de cancelación externa. */
+export function senalConLimite(ms: number, extraSignal?: AbortSignal): AbortSignal | undefined {
   if (typeof AbortController === 'undefined') return undefined;
   const c = new AbortController();
-  setTimeout(() => c.abort(), ms);
+  const timer = setTimeout(() => c.abort(), ms);
+  if (extraSignal) {
+    if (extraSignal.aborted) {
+      clearTimeout(timer);
+      c.abort();
+    } else {
+      extraSignal.addEventListener('abort', () => {
+        clearTimeout(timer);
+        c.abort();
+      }, { once: true });
+    }
+  }
   return c.signal;
 }
 
@@ -397,7 +407,7 @@ export function esIntentoDeTest(r: { evaluationMode?: string; modelName?: string
   return r.evaluationMode !== 'flashcards_autoevaluacion' && !/^flashcards/i.test(r.modelName || '');
 }
 
-export async function misCalificaciones(email: string, timeoutMs: number = 8000): Promise<QuizRegistrationRecord[] | null> {
+export async function misCalificaciones(email: string, timeoutMs: number = 8000, signal?: AbortSignal): Promise<QuizRegistrationRecord[] | null> {
   const norm = (email || '').toLowerCase().trim();
   const url = getGoogleSheetsUrl();
   const sesion = tokenSesion();
@@ -412,7 +422,7 @@ export async function misCalificaciones(email: string, timeoutMs: number = 8000)
       const resp = await fetch(
         `${url}?accion=misCalificaciones&email=${encodeURIComponent(norm)}` +
           `&sesion=${encodeURIComponent(sesion)}&t=${Date.now()}`,
-        { method: 'GET', redirect: 'follow', signal: senalConLimite(timeoutMs) }
+        { method: 'GET', redirect: 'follow', signal: senalConLimite(timeoutMs, signal) }
       );
       if (!resp.ok) return getCachedCalificaciones(norm);
 
