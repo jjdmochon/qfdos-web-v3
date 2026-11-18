@@ -98,6 +98,19 @@ export function conMediosDelCodigo(enlaces: QfdosResourceLink[], iniciales: Qfdo
  * marca un aviso para las Historias (enHistorias y temaId) y la copia
  * publicada no lo lleva, se completa con esas marcas.
  */
+/** Enlaces del código que llegan tanto al alumnado como al profesorado. */
+export function conEnlacesDelCodigo(
+  publicados: QfdosResourceLink[],
+  iniciales: QfdosResourceLink[],
+  idsFijos: string[],
+  esProfesor: boolean
+): QfdosResourceLink[] {
+  if (esProfesor) return conEnlacesNuevos(publicados, iniciales);
+  const presentes = new Set(publicados.map(l => l.id));
+  const faltan = iniciales.filter(l => idsFijos.includes(l.id) && !presentes.has(l.id));
+  return faltan.length ? [...faltan, ...publicados] : publicados;
+}
+
 export function conAvisosDelCodigo(
   publicados: QfdosAnnouncement[],
   iniciales: QfdosAnnouncement[],

@@ -285,6 +285,17 @@ export type ResourceCategory = typeof RESOURCE_CATEGORIES[number];
 
 export const INITIAL_RESOURCE_LINKS: QfdosResourceLink[] = [
   {
+    id: 'link-deltaplus-organic-chemistry',
+    title: 'DeltaPlus | Organic Chemistry',
+    url: 'https://www.instagram.com/deltaplus.sci',
+    summary:
+      'Tenéis en @deltaplus.sci animaciones de mecanismos de química orgánica para repasar las reacciones que aparecen en las rutas sintéticas de los temas: SN1, SN2, Diels-Alder, Grignard y Wittig. En su canal de YouTube están además las clases completas por si necesitáis repasar algún paso con detalle.',
+    category: 'Divulgación',
+    source: 'Instagram · @deltaplus.sci',
+    featured: true,
+    addedAt: '2026-11-18'
+  },
+  {
     id: 'link-gemini-exploracion-inmersiva',
     title: 'Exploraciones inmersivas de Gemini (Google)',
     url: 'https://gemini.google.com/immersive-explorations/cd2bffbf-6342-5d3c-b010-9ad5672cda84',
@@ -587,9 +598,12 @@ export interface StudentQuestion {
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  * v3.79.5 — Material General: infografía de 20 aminoácidos (Compound Interest 2014) en tema-varios. Historias: buscador de quiralidad R/S de MolDraw en Herramientas.
  * v3.80.0 — Libros Interactivos 3D: publicación en public/libros/ (dopamina-3d.html en Tema 03 y serotonina-3d.html preparado en Tema 04) con fórmulas 2D limpias, efecto Pop-Out AR 2D→3D, complejos PDB y 45 preguntas oficiales de los Modelos 1–3.
+ * v3.80.1 — Enlaces de interés y pie de página: incorporación de DeltaPlus | Organic Chemistry (@deltaplus.sci) y visibilidad del Libro 3D del Tema 4 solo para docente.
  */
-export const COURSE_DATA_VERSION = '3.80.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-18T16:40:00.000Z';
+export const COURSE_DATA_VERSION = '3.80.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-18T17:52:00.000Z';
+
+export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

@@ -7,6 +7,7 @@ import {
   AVISOS_A_OFRECER,
   INITIAL_GLOSSARY,
   INITIAL_RESOURCE_LINKS,
+  ENLACES_A_OFRECER,
   QfdosTopic,
   QfdosAnnouncement,
   QfdosGlossaryTerm,
@@ -51,7 +52,7 @@ import { LimiteDeError } from './components/LimiteDeError';
 import { AvisoGrabacionTests } from './components/AvisoGrabacionTests';
 import { hayModalAbierto } from './services/modalA11y';
 import { abrirPreferencias } from './services/consentimiento';
-import { conAvisosDelCodigo, conEnlacesNuevos, conMediosDelCodigo, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
+import { conAvisosDelCodigo, conEnlacesDelCodigo, conMediosDelCodigo, anotarAvisosDescartados, anotarEnlacesDescartados } from './utils/enlacesNuevos';
 
 const VERSION_KEY = 'qfdos_v3_data_version';
 
@@ -316,7 +317,12 @@ export const App: React.FC = () => {
   );
 
   const [resourceLinks, setResourceLinks] = useState<QfdosResourceLink[]>(() =>
-    conMediosDelCodigo(contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS), INITIAL_RESOURCE_LINKS)
+    conEnlacesDelCodigo(
+      conMediosDelCodigo(contenidoEnCache()?.resourceLinks ?? loadCached('qfdos_v3_links', INITIAL_RESOURCE_LINKS), INITIAL_RESOURCE_LINKS),
+      INITIAL_RESOURCE_LINKS,
+      ENLACES_A_OFRECER,
+      false
+    )
   );
 
   // Modal states
@@ -437,9 +443,9 @@ export const App: React.FC = () => {
       }
       if (Array.isArray(remoto.glossary)) setGlossary(remoto.glossary);
       if (Array.isArray(remoto.resourceLinks)) {
-        // Al profesorado se le ofrecen los enlaces nuevos del código para que pueda publicarlos
+        // Enlaces nuevos del código: se muestran al alumnado (ENLACES_A_OFRECER) y se ofrecen al CMS docente
         const publicados = conMediosDelCodigo(remoto.resourceLinks, INITIAL_RESOURCE_LINKS);
-        setResourceLinks(isProfesor ? conEnlacesNuevos(publicados, INITIAL_RESOURCE_LINKS) : publicados);
+        setResourceLinks(conEnlacesDelCodigo(publicados, INITIAL_RESOURCE_LINKS, ENLACES_A_OFRECER, isProfesor));
       }
       setPublicadoEn(remoto.publicadoEn || '');
     });
@@ -801,6 +807,23 @@ export const App: React.FC = () => {
                   <span className="qfdos-badge" style={{ fontSize: '0.66rem' }}>
                     QFDOS Structural Affinity v2.0
                   </span>
+                </div>
+                <div className="ftr-social-line">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                  </svg>
+                  <span>Instagram:</span>
+                  <a
+                    href="https://www.instagram.com/deltaplus.sci"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ftr-social-link"
+                    title="DeltaPlus | Organic Chemistry en Instagram"
+                  >
+                    @deltaplus.sci
+                  </a>
                 </div>
                 {/* NEXUS.LAB Developer Badge Card */}
                 <a

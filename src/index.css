@@ -1696,6 +1696,27 @@ body:has(.modal-overlay:not(.modal-exit)) { overflow: hidden; }
   text-decoration: underline;
 }
 
+.ftr-social-line {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--ftr-muted, #b6c6e0);
+}
+
+.ftr-social-link {
+  color: var(--ftr-accent, #5eead4);
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+}
+
+.ftr-social-link:hover {
+  opacity: 0.88;
+  text-decoration: underline;
+}
+
 .nexus-login-badge {
   color: var(--text-muted);
   text-decoration: none;

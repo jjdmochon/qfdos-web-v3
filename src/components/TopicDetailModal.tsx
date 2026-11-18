@@ -920,7 +920,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 // tema 1, el taller de retrosíntesis) viven aquí. Los adjuntos que son
                 // el mismo recurso (GLB/enlace 3D, XLSX, CSV) se omiten para no
                 // mostrarlos dos veces.
-                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : (topic.id === 'tema-03' || topic.id === 'tema-04') ? 1 : 0;
+                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : (topic.id === 'tema-03' || (topic.id === 'tema-04' && isProfesor)) ? 1 : 0;
                 const yaIncluidos = topic.id === 'tema-01'
                   ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
                   : topic.id === 'tema-02'
@@ -1304,7 +1304,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       )}
 
                       {/* Libro Interactivo 3D Tema 03 y Tema 04 */}
-                      {(topic.id === 'tema-03' || topic.id === 'tema-04') && (() => {
+                      {(topic.id === 'tema-03' || (topic.id === 'tema-04' && isProfesor)) && (() => {
                         const esT3 = topic.id === 'tema-03';
                         const archivo = esT3 ? 'dopamina-3d.html' : 'serotonina-3d.html';
                         const hrefLibro = recurso(`libros/${archivo}`);
