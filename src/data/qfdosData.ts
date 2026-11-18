@@ -599,9 +599,10 @@ export interface StudentQuestion {
  * v3.79.5 — Material General: infografía de 20 aminoácidos (Compound Interest 2014) en tema-varios. Historias: buscador de quiralidad R/S de MolDraw en Herramientas.
  * v3.80.0 — Libros Interactivos 3D: publicación en public/libros/ (dopamina-3d.html en Tema 03 y serotonina-3d.html preparado en Tema 04) con fórmulas 2D limpias, efecto Pop-Out AR 2D→3D, complejos PDB y 45 preguntas oficiales de los Modelos 1–3.
  * v3.80.1 — Enlaces de interés y pie de página: incorporación de DeltaPlus | Organic Chemistry (@deltaplus.sci) y visibilidad del Libro 3D del Tema 4 solo para docente.
+ * v3.80.2 — Tema 04: Libro Interactivo 3D de Serotonina visible para el alumnado igual que el del Tema 03.
  */
-export const COURSE_DATA_VERSION = '3.80.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-18T17:52:00.000Z';
+export const COURSE_DATA_VERSION = '3.80.2';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-18T17:55:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 
