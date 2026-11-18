@@ -108,7 +108,7 @@ const MEDIOS_TEMA: Record<string, { videoPodcast?: string; clip?: string; imagen
 };
 
 /** Las rutas relativas (audio/x.mp3) cuelgan de BASE_URL; las absolutas y data: se dejan tal cual. */
-const resolver = (u: string) => (/^(https?:|data:|blob:|\/)/i.test(u) ? u : `${import.meta.env.BASE_URL}${u}`);
+const resolver = (u: string) => (/^(https?:|mailto:|data:|blob:|\/)/i.test(u) ? u : `${import.meta.env.BASE_URL}${u}`);
 
 const reduceMotion = () =>
   typeof window !== 'undefined' && typeof window.matchMedia === 'function' &&
@@ -151,7 +151,7 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     id: a.id, grupo: 'actualizaciones', fondo: 'marca' as const, etiqueta: `Actualización · ${a.version}`,
     titulo: a.titulo, texto: a.texto, fecha: a.fecha,
     imagen: a.imagen ? resolver(a.imagen) : undefined, ajuste: 'cubrir' as const,
-    acciones: a.enlace ? [{ label: a.enlace.label, icono: 'enlace' as const, href: a.enlace.href }] : [],
+    acciones: a.enlace ? [{ label: a.enlace.label, icono: 'enlace' as const, href: resolver(a.enlace.href) }] : [],
     duracionMs: Math.max(9000, duracionPorTexto(a.texto))
   }));
   if (actualizaciones.length) {

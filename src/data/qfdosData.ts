@@ -586,9 +586,10 @@ export interface StudentQuestion {
  * v3.54.1 — Tema 3: episodio del vídeo resumen en Spotify (tarjeta del tema, Historias y aviso).
  * v3.54.0 — Tema 3: test publicado con 3 modelos de 15 preguntas (consensuado 1, consolidado 2 y 3), Historias (cartel, clip y vídeo resumen) y aviso en el tablón con tests, flashcards y cartas.
  * v3.79.5 — Material General: infografía de 20 aminoácidos (Compound Interest 2014) en tema-varios. Historias: buscador de quiralidad R/S de MolDraw en Herramientas.
+ * v3.80.0 — Libros Interactivos 3D: publicación en public/libros/ (dopamina-3d.html en Tema 03 y serotonina-3d.html preparado en Tema 04) con fórmulas 2D limpias, efecto Pop-Out AR 2D→3D, complejos PDB y 45 preguntas oficiales de los Modelos 1–3.
  */
-export const COURSE_DATA_VERSION = '3.79.5';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-13T00:30:00.000Z';
+export const COURSE_DATA_VERSION = '3.80.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-18T16:40:00.000Z';
 
 export const QFDOS_INFO = {
   code: "2041142 (2627 QFDOS E)",

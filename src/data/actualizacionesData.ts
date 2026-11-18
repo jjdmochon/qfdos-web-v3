@@ -27,6 +27,15 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.80.0-libro-3d-dopamina',
+    version: 'v3.80.0',
+    fecha: '18 Noviembre 2026',
+    titulo: 'Libro Interactivo 3D del Tema 3 · Dopamina y Neurolépticos',
+    texto: 'Ya tenéis abierto el libro interactivo 3D del Tema 3 en la ficha del tema y en el acceso directo de la tarjeta. Podéis repasar las 8 lecciones con las fórmulas en 2D sin marcas, girar los modelos y complejos PDB en 3D (con efecto Pop-Out sobre la tarjeta 2D y cámara opcional) y practicar las 45 preguntas de examen de los tres modelos.',
+    imagen: 'historias/tema-03-brag.jpg',
+    enlace: { label: 'Abrir Libro 3D del Tema 3', href: 'libros/dopamina-3d.html' }
+  },
+  {
     id: 'act-3.78.0-tema6-cartas-coleccionables',
     version: 'v3.78.0',
     fecha: '13 Noviembre 2026',

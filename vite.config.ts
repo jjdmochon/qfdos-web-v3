@@ -96,8 +96,8 @@ const pwa = VitePWA({
         }
       },
       {
-        // RDKit (estructuras 2D) y model-viewer (visor 3D)
-        urlPattern: /^https:\/\/(unpkg\.com\/@rdkit|ajax\.googleapis\.com\/ajax\/libs\/model-viewer)\/.*/,
+        // RDKit (estructuras 2D), 3Dmol.js y model-viewer (visores 3D)
+        urlPattern: /^https:\/\/(unpkg\.com\/@rdkit|ajax\.googleapis\.com\/ajax\/libs\/model-viewer|3Dmol\.csb\.pitt\.edu|3Dmol\.org)\/.*/,
         handler: 'CacheFirst',
         options: {
           cacheName: 'librerias-cdn',

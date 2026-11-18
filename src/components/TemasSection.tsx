@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { BARAJAS, TemaCartas } from './cartas/CartasDeckView';
 import { 
   BookOpen, 
+  Box,
   Layers, 
   HelpCircle, 
   Radio, 
@@ -333,6 +334,21 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       )}
                     </>
                   )}
+                  {(topic.id === 'tema-03' || (topic.id === 'tema-04' && !bloqueado)) && (
+                    <span
+                      style={{
+                        fontSize: '0.66rem',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        background: 'linear-gradient(135deg, rgba(13,148,136,0.2) 0%, rgba(30,58,138,0.15) 100%)',
+                        color: 'var(--teal-ink)',
+                        border: '1px solid var(--teal)',
+                        fontWeight: 800
+                      }}
+                    >
+                      📘 Libro 3D · AR ✓
+                    </span>
+                  )}
                   {(topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') && test && (
                     <span 
                       style={{ 
@@ -467,6 +483,30 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                     >
                       <GitBranch size={13} /> Retrosíntesis
                     </button>
+                  )}
+                  {(topic.id === 'tema-03' || topic.id === 'tema-04') && !bloqueado && (
+                    <a
+                      href={recurso(topic.id === 'tema-03' ? 'libros/dopamina-3d.html' : 'libros/serotonina-3d.html')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="btn btn-sm btn-outline"
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        fontSize: '0.76rem',
+                        padding: '7px 8px',
+                        whiteSpace: 'nowrap',
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '5px'
+                      }}
+                      title="Abrir Libro Interactivo 3D (fórmulas 2D, visores AR y 45 preguntas oficiales)"
+                    >
+                      <Box size={13} /> Libro 3D
+                    </a>
                   )}
                 </div>
 

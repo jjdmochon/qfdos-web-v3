@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { RetrosintesisWorkshop } from './RetrosintesisWorkshop';
 import { BotonSubirDrive } from './BotonSubirDrive';
 import { Model3DViewerModal } from './Model3DViewerModal';
+import { recurso } from '../services/rutas';
 import { CartasDeckView } from './cartas';
 import { BARAJAS, TemaCartas } from './cartas/CartasDeckView';
 
@@ -919,7 +920,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 // tema 1, el taller de retrosíntesis) viven aquí. Los adjuntos que son
                 // el mismo recurso (GLB/enlace 3D, XLSX, CSV) se omiten para no
                 // mostrarlos dos veces.
-                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : 0;
+                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : (topic.id === 'tema-03' || topic.id === 'tema-04') ? 1 : 0;
                 const yaIncluidos = topic.id === 'tema-01'
                   ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
                   : topic.id === 'tema-02'
@@ -1301,6 +1302,93 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                           </div>
                         </div>
                       )}
+
+                      {/* Libro Interactivo 3D Tema 03 y Tema 04 */}
+                      {(topic.id === 'tema-03' || topic.id === 'tema-04') && (() => {
+                        const esT3 = topic.id === 'tema-03';
+                        const archivo = esT3 ? 'dopamina-3d.html' : 'serotonina-3d.html';
+                        const hrefLibro = recurso(`libros/${archivo}`);
+                        return (
+                          <div
+                            className="qfdos-card card-teal resource-card is-active"
+                            style={{
+                              border: '2px solid var(--teal)',
+                              boxShadow: '0 6px 20px -3px rgba(13, 148, 136, 0.28)',
+                              background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, rgba(30, 58, 138, 0.06) 100%)',
+                              position: 'relative',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)', color: '#ffffff', fontSize: '0.6rem', fontWeight: 800, padding: '3px 10px', borderBottomLeftRadius: '8px', letterSpacing: '0.5px' }}>
+                              ✨ LIBRO 3D · AR
+                            </div>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', marginTop: '4px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div style={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '8px',
+                                    background: 'linear-gradient(135deg, rgba(13,148,136,0.22) 0%, rgba(30,58,138,0.24) 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                  }}>
+                                    <Box size={17} color="var(--teal-ink)" />
+                                  </div>
+                                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-title)' }}>
+                                    {esT3 ? 'Libro Interactivo 3D · Dopamina' : 'Libro Interactivo 3D · Serotonina'}
+                                  </strong>
+                                </div>
+                                <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
+                                  8 Lecciones · 45P
+                                </span>
+                              </div>
+                              <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
+                                Tenéis aquí las 8 lecciones del tema con las estructuras en 2D limpias, los modelos 3Dmol.js interactivos (con vista 2D+3D, Pop-Out espacial, cámara opcional y 3D estéreo), los complejos cristalográficos PDB y las 45 preguntas oficiales de los Modelos 1 a 3.
+                              </p>
+                            </div>
+                            <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                              <a
+                                href={hrefLibro}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm btn-primary"
+                                style={{
+                                  flex: 1.35,
+                                  justifyContent: 'center',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 800,
+                                  background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)',
+                                  border: 'none',
+                                  boxShadow: '0 2px 8px rgba(13, 148, 136, 0.3)',
+                                  padding: '7px 8px',
+                                  textDecoration: 'none',
+                                  color: '#ffffff'
+                                }}
+                              >
+                                <BookOpen size={13} /> Abrir Libro Interactivo 3D <ExternalLink size={12} style={{ marginLeft: 4 }} />
+                              </a>
+                              <a
+                                href={hrefLibro}
+                                download={archivo}
+                                className="btn btn-sm btn-outline"
+                                style={{
+                                  flex: 0.65,
+                                  justifyContent: 'center',
+                                  fontSize: '0.74rem',
+                                  padding: '7px 8px',
+                                  textDecoration: 'none'
+                                }}
+                                title="Descargar capítulo HTML autocontenido para estudio sin conexión"
+                              >
+                                <Download size={12} /> HTML
+                              </a>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
 
