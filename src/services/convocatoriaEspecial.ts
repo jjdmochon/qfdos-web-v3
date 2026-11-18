@@ -1,5 +1,6 @@
 // ==========================================================================
-// Convocatoria especial: nota y corrección por pregunta
+// Exámenes corregidos con lector OMR (convocatoria especial y examen parcial):
+// nota y corrección por pregunta
 //
 // Las hojas de respuestas se leen en local y sus resultados viven en la
 // pestaña «Convocatoria Especial» de la hoja de evaluación; las claves y su
@@ -12,6 +13,9 @@
 import { tokenSesion, renovarSiHaceFalta, esSesionInvalida } from './sesion';
 import { senalConLimite } from './googleSheetsService';
 import type { Resultado } from './cuaderno';
+
+/** Qué examen se pide. Cada uno tiene sus pestañas, sus claves y su interruptor de publicación en Codigo.gs. */
+export type ConvId = 'especial' | 'parcial';
 
 const WEBAPP_URL = (import.meta.env.VITE_PRACTICAS_WEBAPP_URL ?? '').trim();
 
@@ -47,6 +51,8 @@ export interface ResumenEspecial {
 
 export interface ConvocatoriaEspecial {
   publicadas: boolean;
+  /** Filas con el mismo código en más de una hoja (nadie del alumnado las ve; las resuelve el profesorado) */
+  ambiguas?: number;
   /** Solo en la vista del alumno: su fila, o null si no hay hoja a su nombre */
   fila: ResumenEspecial | null;
   detalle: PreguntaEspecial[];
@@ -62,6 +68,7 @@ export interface ConvocatoriaEspecial {
 }
 
 export interface AlumnoEspecial extends ResumenEspecial {
+  ambigua?: boolean;
   correo: string;
   nombre: string;
   conExamen: boolean;
@@ -69,6 +76,7 @@ export interface AlumnoEspecial extends ResumenEspecial {
 
 /** Lo que vería un alumno con su cuenta; el profesorado lo pide por correo. */
 export interface VistaAlumnoEspecial {
+  ambigua?: boolean;
   nombre: string;
   fila: ResumenEspecial | null;
   detalle: PreguntaEspecial[];
@@ -113,6 +121,16 @@ async function llamar<T>(
   }
 }
 
+/**
+ * Un script anterior a la v13 no conoce el examen parcial y contestaría con los datos de la
+ * convocatoria especial: para el parcial se exige que la respuesta diga a qué examen corresponde.
+ */
+function comprobarExamen(c: Record<string, unknown>, conv: ConvId): void {
+  if (conv === 'parcial' ? c.conv !== 'parcial' : c.conv !== undefined && c.conv !== 'especial') {
+    throw new Error(MENSAJE_SCRIPT_ANTIGUO);
+  }
+}
+
 const texto = (v: unknown): string => (typeof v === 'string' ? v : v == null ? '' : String(v));
 const numero = (v: unknown): number => {
   const n = Number(v);
@@ -147,10 +165,11 @@ function convertirDetalle(c: Record<string, unknown>): PreguntaEspecial[] {
 }
 
 /** Pide la convocatoria especial. El servidor decide qué corresponde a esta cuenta. */
-export function leerConvocatoriaEspecial(): Promise<Resultado<ConvocatoriaEspecial>> {
+export function leerConvocatoriaEspecial(conv: ConvId = 'especial'): Promise<Resultado<ConvocatoriaEspecial>> {
   return llamar('evaluacionEspecial', c => {
     // Un script anterior a la v11 no conoce la acción y contesta sin este campo
     if (typeof c.publicadas !== 'boolean') throw new Error(MENSAJE_SCRIPT_ANTIGUO);
+    comprobarExamen(c, conv);
     const lista = Array.isArray(c.alumnos) ? (c.alumnos as Record<string, unknown>[]) : undefined;
     return {
       publicadas: c.publicadas,
@@ -158,6 +177,7 @@ export function leerConvocatoriaEspecial(): Promise<Resultado<ConvocatoriaEspeci
       detalle: convertirDetalle(c),
       profesor: c.profesor === true,
       total: typeof c.total === 'number' ? c.total : undefined,
+      ambiguas: typeof c.ambiguas === 'number' ? c.ambiguas : undefined,
       sinExamen: typeof c.sinExamen === 'number' ? c.sinExamen : undefined,
       sinCorreo: typeof c.sinCorreo === 'number' ? c.sinCorreo : undefined,
       alumnos: lista?.map(a => ({
@@ -168,37 +188,41 @@ export function leerConvocatoriaEspecial(): Promise<Resultado<ConvocatoriaEspeci
         nota: numero(a.nota),
         correo: texto(a.correo),
         nombre: texto(a.nombre),
-        conExamen: a.conExamen === true
+        conExamen: a.conExamen === true,
+        ambigua: a.ambigua === true
       }))
     };
-  });
+  }, undefined, `&conv=${conv}`);
 }
 
 /** Solo profesorado: la corrección de un alumno, tal como la ve con su cuenta (script v12 o posterior). */
-export function leerAlumnoEspecial(correo: string): Promise<Resultado<VistaAlumnoEspecial>> {
+export function leerAlumnoEspecial(correo: string, conv: ConvId = 'especial'): Promise<Resultado<VistaAlumnoEspecial>> {
   return llamar(
     'evaluacionEspecial',
     c => {
       if (c.profesor !== true) throw new Error(MENSAJE_SCRIPT_ANTIGUO);
+      comprobarExamen(c, conv);
       return {
+        ambigua: c.ambigua === true,
         nombre: texto(c.nombre),
         fila: convertirResumen(c.fila as Record<string, unknown> | null | undefined),
         detalle: convertirDetalle(c)
       };
     },
     undefined,
-    `&correo=${encodeURIComponent(correo)}`
+    `&conv=${conv}&correo=${encodeURIComponent(correo)}`
   );
 }
 
 /** Publica u oculta la convocatoria especial para el alumnado. Solo profesorado. */
-export function publicarConvocatoriaEspecial(publicadas: boolean): Promise<Resultado<boolean>> {
+export function publicarConvocatoriaEspecial(publicadas: boolean, conv: ConvId = 'especial'): Promise<Resultado<boolean>> {
   return llamar(
     'publicarNotasEspecial',
     c => {
       if (typeof c.notasPublicadas !== 'boolean') throw new Error(MENSAJE_SCRIPT_ANTIGUO);
+      comprobarExamen(c, conv);
       return c.notasPublicadas;
     },
-    { publicadas }
+    { publicadas, conv }
   );
 }
