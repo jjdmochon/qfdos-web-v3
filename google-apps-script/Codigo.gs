@@ -97,7 +97,7 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 12,
+        version: 13,
         acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'evaluacionEspecial', 'publicarNotasEspecial', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
@@ -621,34 +621,66 @@ function guardarEvaluacion(p, e) {
 }
 
 /* ------------------------------------------------------------------ */
-/* 4b. Convocatoria especial: nota y corrección por pregunta           */
+/* 4b. Exámenes corregidos con lector OMR: nota y corrección           */
+/*     (convocatoria especial y examen parcial)                        */
 /* ------------------------------------------------------------------ */
 
 /**
- * Las hojas de respuestas de la convocatoria especial se leen en local
- * (leer_omr.py) y sus resultados viven en dos pestañas de la hoja de evaluación:
- *   · «Convocatoria Especial» — una fila por alumno: correo, modelo, aciertos,
- *     errores, blancos, nota y respuestas (60 caracteres: A–D; «-» si se dejó
- *     en blanco; «*» si hubo marca doble, que se cuenta como en blanco).
- *   · «_ClavesEspecial» — la clave y la justificación de cada pregunta de cada
+ * Las hojas de respuestas se leen en local (leer_omr.py) y sus resultados
+ * viven en dos pestañas de la hoja de evaluación por examen:
+ *   · la de resultados — una fila por alumno: correo, modelo, aciertos,
+ *     errores, blancos, nota y respuestas (una letra A–D por pregunta; «-» si
+ *     se dejó en blanco; «*» si hubo marca doble, que se cuenta como en blanco).
+ *     Si lleva una columna «codigo» (las 4 últimas cifras del DNI con las que
+ *     se cruzó la hoja) y/o una columna «aviso», se usan para el control de
+ *     ambigüedad (ver más abajo).
+ *   · la de claves — la clave y la justificación de cada pregunta de cada
  *     modelo: modelo, n, clave, tema, enunciado, correcta, justificacion.
  *     Empieza por «_» para que quede fuera de lo que barren otras acciones.
  *
- * Privacidad: el alumno recibe SOLO su fila y las claves de SU modelo, y solo
- * cuando el profesor las ha publicado (propiedad NOTAS_ESPECIAL_PUBLICAS = '1').
- * Antes de publicar no recibe nada, ni siquiera su propia nota. El profesor
- * recibe un resumen (cuántas filas hay y cuántas no tienen correo), nunca las
- * respuestas de los demás.
+ * Cada examen es una entrada de CONVOCATORIAS_ y se pide con el parámetro
+ * `conv` (por defecto «especial», que es lo que mandaban las versiones
+ * anteriores). Un `conv` desconocido se rechaza: la lista blanca es lo único
+ * que decide qué pestañas se leen.
+ *
+ * Privacidad (se aplica en el servidor; el navegador nunca recibe de más):
+ *   · Antes de publicar el examen (propiedad de cada entrada = '1'), el
+ *     alumnado no recibe nada, ni siquiera su propia nota. Cada examen se
+ *     publica por separado y por defecto está oculto.
+ *   · El alumno recibe SOLO su fila —se busca con el correo de la sesión
+ *     firmada, nunca con un parámetro— y las claves de SU modelo.
+ *   · Una fila ambigua (código repetido entre filas con examen, o columna
+ *     «aviso» rellena) no se enseña a nadie del alumnado: dos alumnos con las
+ *     mismas 4 últimas cifras recibirían la misma hoja. El profesor la ve
+ *     marcada y la resuelve a mano en la hoja.
+ *   · El profesor recibe la lista y, por correo, la vista de un alumno; nunca
+ *     las respuestas de todos a la vez. No se devuelve el DNI ni el código.
  */
-var HOJA_ESPECIAL = 'Convocatoria Especial';
-var HOJA_CLAVES_ESPECIAL = '_ClavesEspecial';
+var CONVOCATORIAS_ = {
+  especial: { hoja: 'Convocatoria Especial', claves: '_ClavesEspecial', propiedad: 'NOTAS_ESPECIAL_PUBLICAS' },
+  parcial:  { hoja: 'Examen Parcial',        claves: '_ClavesParcial',  propiedad: 'NOTAS_PARCIAL_PUBLICAS' }
+};
 
-function notasEspecialPublicas_() {
-  return propiedad_('NOTAS_ESPECIAL_PUBLICAS') === '1';
+/** La entrada de CONVOCATORIAS_ que corresponde a p.conv, o null si no existe. */
+function convocatoria_(conv) {
+  var id = String(conv === undefined || conv === null || conv === '' ? 'especial' : conv);
+  if (!Object.prototype.hasOwnProperty.call(CONVOCATORIAS_, id)) return null;
+  var c = CONVOCATORIAS_[id];
+  return { id: id, hoja: c.hoja, claves: c.claves, propiedad: c.propiedad };
+}
+
+function notasPublicas_(cv) {
+  return propiedad_(cv.propiedad) === '1';
+}
+
+/** JSON con el examen al que responde, para que el cliente detecte un script que no lo conoce. */
+function salidaConv_(cv, objeto) {
+  objeto.conv = cv.id;
+  return json(objeto);
 }
 
 function normalizarCabecera_(t) {
-  return String(t == null ? '' : t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  return String(t == null ? '' : t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 }
 
 /** Índice (base 0) de cada columna buscada por sus nombres posibles; -1 si falta. */
@@ -673,18 +705,20 @@ function numeroOCero_(v) {
 function evaluacionEspecial(p) {
   var s = verificarSesion_(p.sesion);
   if (!s) return sesionInvalida_();
+  var cv = convocatoria_(p.conv);
+  if (!cv) return json({ ok: false, error: 'Examen desconocido.' });
   var esProfesor = s.r === 'profesor';
-  var publicadas = notasEspecialPublicas_();
+  var publicadas = notasPublicas_(cv);
 
   // Sin publicar, el alumnado no recibe nada (ni su propia fila)
-  if (!esProfesor && !publicadas) return json({ ok: true, publicadas: false, fila: null, detalle: [] });
+  if (!esProfesor && !publicadas) return salidaConv_(cv, { ok: true, publicadas: false, fila: null, detalle: [] });
 
   var ss = SpreadsheetApp.openById(propiedad_('EVALUACION_HOJA_ID') || EVALUACION_HOJA_ID);
-  var hoja = ss.getSheetByName(HOJA_ESPECIAL);
-  if (!hoja) return json({ ok: false, error: 'Falta la pestaña «' + HOJA_ESPECIAL + '» en la hoja de evaluación.' });
+  var hoja = ss.getSheetByName(cv.hoja);
+  if (!hoja) return json({ ok: false, error: 'Falta la pestaña «' + cv.hoja + '» en la hoja de evaluación.' });
 
   var datos = hoja.getDataRange().getValues();
-  if (datos.length < 2) return json({ ok: true, publicadas: publicadas, fila: null, detalle: [], total: 0, sinCorreo: 0 });
+  if (datos.length < 2) return salidaConv_(cv, { ok: true, publicadas: publicadas, fila: null, detalle: [], total: 0, sinCorreo: 0, ambiguas: 0 });
 
   var c = columnasPorNombre_(datos[0], {
     correo: ['correo', 'email', 'correo electronico'],
@@ -694,10 +728,12 @@ function evaluacionEspecial(p) {
     errores: ['errores'],
     blancos: ['blancos', 'en blanco'],
     nota: ['nota', 'calificacion'],
-    respuestas: ['respuestas']
+    respuestas: ['respuestas'],
+    codigo: ['codigo'],
+    aviso: ['aviso']
   });
   if (c.correo === -1 || c.modelo === -1 || c.nota === -1 || c.respuestas === -1) {
-    return json({ ok: false, error: 'La pestaña «' + HOJA_ESPECIAL + '» necesita las columnas correo, modelo, nota y respuestas.' });
+    return json({ ok: false, error: 'La pestaña «' + cv.hoja + '» necesita las columnas correo, modelo, nota y respuestas.' });
   }
 
   var filas = datos.slice(1).filter(function (f) {
@@ -707,6 +743,25 @@ function evaluacionEspecial(p) {
   var tieneExamen = function (f) { return String(f[c.modelo]).trim() !== ''; };
   var correoDe = function (f) { return String(f[c.correo]).trim().toLowerCase(); };
   var nombreDe = function (f) { return c.nombre === -1 ? '' : cadena(f[c.nombre]).trim(); };
+
+  // Control de ambigüedad: el mismo código en más de una fila con examen
+  var porCodigo = {};
+  if (c.codigo !== -1) {
+    filas.filter(tieneExamen).forEach(function (f) {
+      var k = cadena(f[c.codigo]).trim();
+      if (k !== '') porCodigo[k] = (porCodigo[k] || 0) + 1;
+    });
+  }
+  var esAmbigua = function (f) {
+    if (!tieneExamen(f)) return false;
+    if (c.aviso !== -1 && cadena(f[c.aviso]).trim() !== '') return true;
+    if (c.codigo !== -1) {
+      var k = cadena(f[c.codigo]).trim();
+      if (k !== '' && porCodigo[k] > 1) return true;
+    }
+    return false;
+  };
+
   var resumenDe = function (f) {
     return {
       modelo: String(f[c.modelo]).trim().toUpperCase(),
@@ -717,12 +772,13 @@ function evaluacionEspecial(p) {
     };
   };
   var detalleDe = function (f) {
-    return detalleEspecial_(ss, String(f[c.modelo]).trim().toUpperCase(), String(f[c.respuestas]).replace(/\s+/g, ''));
+    return detalleEspecial_(ss, cv, String(f[c.modelo]).trim().toUpperCase(), String(f[c.respuestas]).replace(/\s+/g, ''));
   };
 
   if (esProfesor) {
     var conExamen = filas.filter(tieneExamen);
     var sinCorreo = conExamen.filter(function (f) { return correoDe(f).indexOf('@') === -1; }).length;
+    var ambiguas = conExamen.filter(esAmbigua).length;
     var pedido = String(p.correo || '').trim().toLowerCase();
     if (pedido) {
       // Vista de un alumno concreto, tal como la vería con su cuenta
@@ -730,10 +786,13 @@ function evaluacionEspecial(p) {
       for (var k = 0; k < conExamen.length; k++) {
         if (correoDe(conExamen[k]) === pedido) { elegida = conExamen[k]; break; }
       }
-      if (!elegida) return json({ ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [] });
+      if (!elegida) return salidaConv_(cv, { ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [] });
+      if (esAmbigua(elegida)) {
+        return salidaConv_(cv, { ok: true, publicadas: publicadas, profesor: true, nombre: nombreDe(elegida), ambigua: true, fila: null, detalle: [] });
+      }
       var dp = detalleDe(elegida);
       if (dp.error) return json({ ok: false, error: dp.error });
-      return json({ ok: true, publicadas: publicadas, profesor: true, nombre: nombreDe(elegida), fila: resumenDe(elegida), detalle: dp.detalle });
+      return salidaConv_(cv, { ok: true, publicadas: publicadas, profesor: true, nombre: nombreDe(elegida), fila: resumenDe(elegida), detalle: dp.detalle });
     }
     var alumnos = filas.map(function (f) {
       var con = tieneExamen(f);
@@ -746,27 +805,28 @@ function evaluacionEspecial(p) {
         errores: r ? r.errores : 0,
         blancos: r ? r.blancos : 0,
         nota: r ? r.nota : 0,
-        conExamen: con
+        conExamen: con,
+        ambigua: esAmbigua(f)
       };
     });
-    return json({ ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [], total: conExamen.length, sinExamen: filas.length - conExamen.length, sinCorreo: sinCorreo, alumnos: alumnos });
+    return salidaConv_(cv, { ok: true, publicadas: publicadas, profesor: true, fila: null, detalle: [], total: conExamen.length, sinExamen: filas.length - conExamen.length, sinCorreo: sinCorreo, ambiguas: ambiguas, alumnos: alumnos });
   }
 
-  // Alumno: solo su fila, y solo si tiene examen corregido
+  // Alumno: solo su fila, solo si tiene examen corregido y solo si no es ambigua
   var mia = null;
   for (var i = 0; i < filas.length; i++) {
     if (correoDe(filas[i]) === s.e && tieneExamen(filas[i])) { mia = filas[i]; break; }
   }
-  if (!mia) return json({ ok: true, publicadas: true, fila: null, detalle: [] });
+  if (!mia || esAmbigua(mia)) return salidaConv_(cv, { ok: true, publicadas: true, fila: null, detalle: [] });
   var dm = detalleDe(mia);
   if (dm.error) return json({ ok: false, error: dm.error });
-  return json({ ok: true, publicadas: true, fila: resumenDe(mia), detalle: dm.detalle });
+  return salidaConv_(cv, { ok: true, publicadas: true, fila: resumenDe(mia), detalle: dm.detalle });
 }
 
 /** Claves y justificaciones del modelo indicado, con el estado de cada pregunta según las respuestas del alumno. */
-function detalleEspecial_(ss, modelo, respuestas) {
+function detalleEspecial_(ss, cv, modelo, respuestas) {
   var detalle = [];
-  var hc = ss.getSheetByName(HOJA_CLAVES_ESPECIAL);
+  var hc = ss.getSheetByName(cv.claves);
   if (hc && hc.getLastRow() > 1) {
     var kd = hc.getDataRange().getValues();
     var k = columnasPorNombre_(kd[0], {
@@ -779,7 +839,7 @@ function detalleEspecial_(ss, modelo, respuestas) {
       justificacion: ['justificacion']
     });
     if (k.modelo === -1 || k.n === -1 || k.clave === -1) {
-      return { error: 'La pestaña «' + HOJA_CLAVES_ESPECIAL + '» necesita las columnas modelo, n y clave.', detalle: [] };
+      return { error: 'La pestaña «' + cv.claves + '» necesita las columnas modelo, n y clave.', detalle: [] };
     }
     var cadena = function (v) { return v === undefined || v === null ? '' : String(v); };
     for (var r = 1; r < kd.length; r++) {
@@ -805,16 +865,20 @@ function detalleEspecial_(ss, modelo, respuestas) {
   return { error: '', detalle: detalle };
 }
 
-/** Publica u oculta la convocatoria especial para el alumnado. Solo profesorado. */
+/** Publica u oculta las notas de un examen para el alumnado. Solo profesorado. */
 function publicarNotasEspecial(p, e) {
   var s = verificarSesion_(p.sesion);
   if (!s) return sesionInvalida_();
   if (s.r !== 'profesor') return json({ ok: false, error: 'Sólo el profesorado puede publicar las notas.' });
 
   var d = cuerpoJson_(e);
-  if (typeof d.publicadas !== 'boolean') return json({ ok: false, error: 'Falta indicar si se publican o se ocultan.' });
-  PropertiesService.getScriptProperties().setProperty('NOTAS_ESPECIAL_PUBLICAS', d.publicadas ? '1' : '0');
-  return json({ ok: true, notasPublicadas: d.publicadas });
+  var cv = convocatoria_(d.conv !== undefined ? d.conv : p.conv);
+  if (!cv) return json({ ok: false, error: 'Examen desconocido.' });
+  // Acepta el booleano del JSON y también su forma en texto
+  var publicar = (d.publicadas === true || d.publicadas === 'true') ? true : (d.publicadas === false || d.publicadas === 'false') ? false : null;
+  if (publicar === null) return json({ ok: false, error: 'Falta indicar si se publican o se ocultan.' });
+  PropertiesService.getScriptProperties().setProperty(cv.propiedad, publicar ? '1' : '0');
+  return salidaConv_(cv, { ok: true, notasPublicadas: publicar });
 }
 
 /* ------------------------------------------------------------------ */

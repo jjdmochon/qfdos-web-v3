@@ -8,6 +8,7 @@ import {
   publicarConvocatoriaEspecial,
   MENSAJE_SCRIPT_ANTIGUO,
   type AlumnoEspecial,
+  type ConvId,
   type ConvocatoriaEspecial,
   type EstadoPregunta,
   type PreguntaEspecial,
@@ -15,7 +16,19 @@ import {
   type VistaAlumnoEspecial
 } from '../services/convocatoriaEspecial';
 
-const TITULO = 'Convocatoria especial · 10 de noviembre de 2026';
+interface ConfigExamen {
+  titulo: string;
+  /** Pestaña de la hoja de evaluación de la que sale (texto para el profesorado) */
+  pestana: string;
+  preguntas: number;
+  /** Mínimo de 1 punto neto en cada bloque temático para superar el examen */
+  bloques: boolean;
+}
+
+const EXAMENES: Record<ConvId, ConfigExamen> = {
+  especial: { titulo: 'Convocatoria especial · 10 de noviembre de 2026', pestana: 'Convocatoria Especial', preguntas: 60, bloques: false },
+  parcial: { titulo: 'Examen parcial · 19 de noviembre de 2026', pestana: 'Examen Parcial', preguntas: 30, bloques: true }
+};
 
 const ESTADO: Record<EstadoPregunta, { etiqueta: string; color: string; Icono: React.ElementType }> = {
   acierto: { etiqueta: 'Acierto', color: 'var(--ok-ink)', Icono: CircleCheck },
@@ -26,6 +39,17 @@ const ESTADO: Record<EstadoPregunta, { etiqueta: string; color: string; Icono: R
 
 const formatoNota = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const sinAcentos = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** Puntos netos (aciertos − 0,25 × errores) por bloque temático, a partir del tema de cada pregunta. */
+function puntosPorBloque(detalle: PreguntaEspecial[]): { tema: string; neto: number }[] {
+  const mapa = new Map<string, number>();
+  for (const p of detalle) {
+    if (!p.tema) continue;
+    const suma = p.estado === 'acierto' ? 1 : p.estado === 'error' ? -0.25 : 0;
+    mapa.set(p.tema, (mapa.get(p.tema) ?? 0) + suma);
+  }
+  return [...mapa.entries()].map(([tema, neto]) => ({ tema, neto })).sort((a, b) => a.tema.localeCompare(b.tema, 'es', { numeric: true }));
+}
 
 const Pregunta: React.FC<{ p: PreguntaEspecial; docente?: boolean }> = ({ p, docente }) => {
   const e = ESTADO[p.estado];
@@ -67,13 +91,15 @@ const Pregunta: React.FC<{ p: PreguntaEspecial; docente?: boolean }> = ({ p, doc
 };
 
 /** Nota, desglose y corrección pregunta a pregunta. La misma vista para el alumno y para el profesorado. */
-const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspecial[]; docente?: boolean }> = ({ fila, detalle, docente }) => {
+const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspecial[]; docente?: boolean; examen: ConfigExamen }> = ({ fila, detalle, docente, examen }) => {
   const [soloFalladas, setSoloFalladas] = useState(false);
   const mostradas = useMemo(() => (soloFalladas ? detalle.filter(p => p.estado !== 'acierto') : detalle), [detalle, soloFalladas]);
   const falladas = detalle.filter(p => p.estado !== 'acierto').length;
-  const aprobado = fila.nota >= 5;
+  const bloques = useMemo(() => (examen.bloques ? puntosPorBloque(detalle) : []), [detalle, examen.bloques]);
+  const bloquesFlojos = bloques.filter(b => b.neto < 1);
+  const aprobado = fila.nota >= 5 && bloquesFlojos.length === 0;
   // El profesor puede ajustar la nota en la hoja; si no coincide con el cálculo directo, se dice
-  const directa = Math.round((Math.max(fila.aciertos - 0.25 * fila.errores, 0) / 60) * 1000) / 100;
+  const directa = Math.round((Math.max(fila.aciertos - 0.25 * fila.errores, 0) / examen.preguntas) * 1000) / 100;
   const ajustada = Math.abs(fila.nota - directa) > 0.011;
   const casilla = (titulo: string, valor: React.ReactNode, color: string): React.ReactNode => (
     <div style={{ background: 'var(--surface-alt)', padding: '0.9rem 1rem', borderRadius: '8px', borderLeft: `3px solid ${color}` }}>
@@ -102,6 +128,37 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
       <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
         Cada acierto suma 1 punto, cada error resta 0,25 y las preguntas en blanco no puntúan.
       </p>
+      {bloques.length > 0 && (
+        <div style={{ margin: '0 0 0.75rem' }}>
+          <p style={{ fontSize: '0.8rem', margin: '0 0 0.4rem', color: 'var(--text-main)' }}>
+            Para superar el examen hacen falta al menos <strong>1 punto neto en cada bloque temático</strong>, además de la nota global.
+          </p>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {bloques.map(b => (
+              <span
+                key={b.tema}
+                className="font-mono"
+                style={{
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: '999px',
+                  background: b.neto >= 1 ? 'var(--ok-bg)' : 'var(--bad-bg)',
+                  color: b.neto >= 1 ? 'var(--ok-ink)' : 'var(--bad-ink)',
+                  border: `1px solid ${b.neto >= 1 ? 'var(--ok-border)' : 'var(--bad-border)'}`
+                }}
+              >
+                {b.tema}: {formatoNota(b.neto)}
+              </span>
+            ))}
+          </div>
+          {bloquesFlojos.length > 0 && (
+            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0 0', color: 'var(--bad-ink)', fontWeight: 700 }}>
+              {docente ? 'Tiene' : 'Tienes'} {bloquesFlojos.length === 1 ? 'un bloque' : `${bloquesFlojos.length} bloques`} por debajo de 1 punto neto ({bloquesFlojos.map(b => b.tema).join(', ')}): el examen no se supera aunque la nota global lo haga.
+            </p>
+          )}
+        </div>
+      )}
       {docente && ajustada && (
         <p
           style={{
@@ -114,7 +171,7 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
             color: 'var(--text-main)'
           }}
         >
-          Nota ajustada (solo lo ve el profesorado): el cálculo directo, (aciertos − 0,25 × errores) / 60 × 10, da{' '}
+          Nota ajustada (solo lo ve el profesorado): el cálculo directo, (aciertos − 0,25 × errores) / {examen.preguntas} × 10, da{' '}
           <strong>{formatoNota(directa)}</strong> y la calificación publicada es <strong>{formatoNota(fila.nota)}</strong>.
         </p>
       )}
@@ -133,7 +190,7 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
           <div>
             {mostradas.length === 0 ? (
               <p style={{ fontSize: '0.88rem', color: 'var(--ok-ink)', padding: '1rem 0.25rem' }}>
-                {docente ? 'No falló ninguna: 60 de 60.' : 'No fallaste ninguna: 60 de 60.'}
+                {docente ? `No falló ninguna: ${examen.preguntas} de ${examen.preguntas}.` : `No fallaste ninguna: ${examen.preguntas} de ${examen.preguntas}.`}
               </p>
             ) : (
               mostradas.map(p => <Pregunta key={p.n} p={p} docente={docente} />)
@@ -150,7 +207,8 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
 };
 
 /** Profesorado: lista de la pestaña y corrección de cualquier alumno tal como la ve con su cuenta. */
-const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[] }> = ({ alumnos }) => {
+const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[]; conv: ConvId }> = ({ alumnos, conv }) => {
+  const examen = EXAMENES[conv];
   const [filtro, setFiltro] = useState('');
   const [elegido, setElegido] = useState<AlumnoEspecial | null>(null);
   const [vista, setVista] = useState<VistaAlumnoEspecial | null>(null);
@@ -167,7 +225,7 @@ const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[] }> = ({ alumnos }) => {
     setVista(null);
     setError(null);
     setCargando(true);
-    const r = await leerAlumnoEspecial(a.correo);
+    const r = await leerAlumnoEspecial(a.correo, conv);
     if (r.ok) setVista(r.datos);
     else setError(r.error);
     setCargando(false);
@@ -182,7 +240,7 @@ const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[] }> = ({ alumnos }) => {
           value={filtro}
           onChange={e => setFiltro(e.target.value)}
           placeholder="Buscar por nombre o correo…"
-          aria-label="Buscar alumno de la convocatoria especial"
+          aria-label={`Buscar alumno · ${examen.titulo}`}
           style={{ width: '100%', padding: '8px 10px 8px 32px', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '0.86rem', background: 'var(--surface)', color: 'var(--text-main)' }}
         />
       </div>
@@ -206,6 +264,11 @@ const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[] }> = ({ alumnos }) => {
                 <td style={{ padding: '8px 10px' }}>
                   <div style={{ fontWeight: 700, color: 'var(--text-title)' }}>{a.nombre || '—'}</div>
                   <div className="font-mono" style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{a.correo || 'sin correo'}</div>
+                  {a.ambigua && (
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--warn-ink)' }}>
+                      Código repetido: nadie del alumnado la ve hasta que la resuelvas en la hoja
+                    </div>
+                  )}
                 </td>
                 {a.conExamen ? (
                   <>
@@ -259,15 +322,21 @@ const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[] }> = ({ alumnos }) => {
             </p>
           )}
           {error && <p role="alert" style={{ fontSize: '0.84rem', color: 'var(--bad-ink)' }}>{error}</p>}
-          {vista && vista.fila && <ResultadoEspecial fila={vista.fila} detalle={vista.detalle} docente />}
-          {vista && !vista.fila && <p style={{ fontSize: '0.86rem' }}>Este alumno no tiene una hoja corregida.</p>}
+          {vista && vista.fila && <ResultadoEspecial fila={vista.fila} detalle={vista.detalle} docente examen={examen} />}
+          {vista && !vista.fila && (
+            <p style={{ fontSize: '0.86rem' }}>
+              {vista.ambigua ? 'Esta hoja comparte código con otra: el alumno no la ve hasta que la resuelvas en la hoja de evaluación.' : 'Este alumno no tiene una hoja corregida.'}
+            </p>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-export const ConvocatoriaEspecialCard: React.FC = () => {
+export const ConvocatoriaCard: React.FC<{ conv: ConvId }> = ({ conv }) => {
+  const examen = EXAMENES[conv];
+  const TITULO = examen.titulo;
   const { isProfesor } = useAuth();
   const [datos, setDatos] = useState<ConvocatoriaEspecial | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -277,7 +346,7 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
   const cargar = async () => {
     setCargando(true);
     setError(null);
-    const r = await leerConvocatoriaEspecial();
+    const r = await leerConvocatoriaEspecial(conv);
     if (r.ok) setDatos(r.datos);
     else setError(r.error);
     setCargando(false);
@@ -286,19 +355,19 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
   useEffect(() => {
     cargar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [conv]);
 
   const alternar = async () => {
     if (!datos) return;
     const publicar = !datos.publicadas;
     const aviso = publicar
-      ? `Se publicarán las notas de la convocatoria especial. Cada estudiante verá su nota y la corrección de sus 60 preguntas${
+      ? `Se publicarán las notas de «${TITULO}». Cada estudiante verá su nota y la corrección de sus ${examen.preguntas} preguntas${
           datos.sinCorreo ? `. Hay ${datos.sinCorreo} fila${datos.sinCorreo === 1 ? '' : 's'} sin correo válido que nadie verá` : ''
         }. ¿Continuar?`
-      : 'El alumnado dejará de ver su nota y la corrección. ¿Continuar?';
+      : `El alumnado dejará de ver su nota y la corrección de «${TITULO}». ¿Continuar?`;
     if (!window.confirm(aviso)) return;
     setCambiando(true);
-    const r = await publicarConvocatoriaEspecial(publicar);
+    const r = await publicarConvocatoriaEspecial(publicar, conv);
     if (r.ok) setDatos({ ...datos, publicadas: r.datos });
     else setError(r.error);
     setCambiando(false);
@@ -316,7 +385,7 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
             <div>
               <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>{TITULO}</h3>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Notas y corrección por pregunta, desde la pestaña «Convocatoria Especial» de la hoja de evaluación
+                Notas y corrección por pregunta, desde la pestaña «{examen.pestana}» de la hoja de evaluación
               </span>
             </div>
           </div>
@@ -345,10 +414,15 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
             . {datos.publicadas ? 'El alumnado ya ve su nota y su corrección.' : 'De momento, el alumnado no ve nada.'}
           </p>
         )}
-        {datos && !error && datos.alumnos && datos.alumnos.length > 0 && <ListaDocente alumnos={datos.alumnos} />}
+        {datos && !error && datos.ambiguas ? (
+          <p role="alert" style={{ margin: '0.5rem 0 0', fontSize: '0.84rem', color: 'var(--warn-ink)', fontWeight: 700 }}>
+            {datos.ambiguas} hoja{datos.ambiguas === 1 ? '' : 's'} con código repetido: ningún alumno las ve hasta que las resuelvas en la hoja de evaluación (deja los datos solo en la fila correcta).
+          </p>
+        ) : null}
+        {datos && !error && datos.alumnos && datos.alumnos.length > 0 && <ListaDocente alumnos={datos.alumnos} conv={conv} />}
         {datos && !error && datos.profesor && !datos.alumnos && (
           <p style={{ margin: '1rem 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Para ver la lista del alumnado falta desplegar la última versión de Codigo.gs (v12).
+            Para ver la lista del alumnado falta desplegar la última versión de Codigo.gs (v13).
           </p>
         )}
       </div>
@@ -361,7 +435,7 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
       <div className="qfdos-card" style={caja}>
         <div className="state-panel" role="status" aria-busy="true">
           <RefreshCw size={26} className="spin" />
-          <h3>Consultando tu convocatoria especial…</h3>
+          <h3>Consultando tu nota…</h3>
         </div>
       </div>
     );
@@ -372,7 +446,7 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
     return (
       <div className="qfdos-card" style={caja}>
         <div className="state-panel state-panel--bad" role="alert">
-          <h3>No se ha podido cargar la convocatoria especial</h3>
+          <h3>No se ha podido cargar la nota de este examen</h3>
           <p>{error}</p>
           <button type="button" className="btn btn-sm btn-primary" onClick={cargar}>
             <RefreshCw size={13} /> Reintentar
@@ -405,12 +479,15 @@ export const ConvocatoriaEspecialCard: React.FC = () => {
         <ClipboardCheck size={22} color="var(--teal)" aria-hidden="true" style={{ flexShrink: 0 }} />
         <div>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-title)', margin: 0 }}>{TITULO}</h3>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Modelo {datos.fila.modelo} · 60 preguntas</span>
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Modelo {datos.fila.modelo} · {examen.preguntas} preguntas</span>
         </div>
       </div>
-      <ResultadoEspecial fila={datos.fila} detalle={datos.detalle} />
+      <ResultadoEspecial fila={datos.fila} detalle={datos.detalle} examen={examen} />
     </div>
   );
 };
+
+export const ConvocatoriaEspecialCard: React.FC = () => <ConvocatoriaCard conv="especial" />;
+export const ExamenParcialCard: React.FC = () => <ConvocatoriaCard conv="parcial" />;
 
 export default ConvocatoriaEspecialCard;
