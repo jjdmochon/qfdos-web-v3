@@ -224,11 +224,26 @@ const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[]; conv: ConvId }> = ({ a
   const [vista, setVista] = useState<VistaAlumnoEspecial | null>(null);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [orden, setOrden] = useState<{ campo: 'nombre' | 'nota'; dir: 1 | -1 }>({ campo: 'nombre', dir: 1 });
 
   const visibles = useMemo(() => {
     const q = sinAcentos(filtro.trim());
-    return q ? alumnos.filter(a => sinAcentos(`${a.nombre} ${a.correo}`).includes(q)) : alumnos;
-  }, [alumnos, filtro]);
+    const filtrados = q ? alumnos.filter(a => sinAcentos(`${a.nombre} ${a.correo}`).includes(q)) : alumnos;
+    return [...filtrados].sort((x, y) => {
+      if (orden.campo === 'nota') {
+        const nx = x.conExamen ? x.nota : -Infinity;
+        const ny = y.conExamen ? y.nota : -Infinity;
+        if (nx !== ny) return (nx < ny ? -1 : 1) * orden.dir;
+      }
+      // Los nombres van «Apellidos, Nombre»: ordenar por el nombre completo ordena por apellido
+      return (x.nombre || '').localeCompare(y.nombre || '', 'es') * orden.dir;
+    });
+  }, [alumnos, filtro, orden]);
+
+  const pulsarOrden = (campo: 'nombre' | 'nota') =>
+    setOrden(o => (o.campo === campo ? { campo, dir: o.dir === 1 ? -1 : 1 } : { campo, dir: campo === 'nota' ? -1 : 1 }));
+  const flecha = (campo: 'nombre' | 'nota') => (orden.campo === campo ? (orden.dir === 1 ? ' ▲' : ' ▼') : '');
+  const botonOrden: React.CSSProperties = { background: 'none', border: 'none', padding: 0, font: 'inherit', fontWeight: 700, color: 'inherit', cursor: 'pointer' };
 
   const abrir = async (a: AlumnoEspecial) => {
     setElegido(a);
@@ -259,12 +274,16 @@ const ListaDocente: React.FC<{ alumnos: AlumnoEspecial[]; conv: ConvId }> = ({ a
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
           <thead>
             <tr style={{ background: 'var(--surface-alt)', textAlign: 'left' }}>
-              <th scope="col" style={{ padding: '8px 10px' }}>Estudiante</th>
+              <th scope="col" aria-sort={orden.campo === 'nombre' ? (orden.dir === 1 ? 'ascending' : 'descending') : 'none'} style={{ padding: '8px 10px' }}>
+                <button type="button" onClick={() => pulsarOrden('nombre')} style={botonOrden}>Estudiante{flecha('nombre')}</button>
+              </th>
               <th scope="col" style={{ padding: '8px 10px' }}>Modelo</th>
               <th scope="col" style={{ padding: '8px 10px', textAlign: 'right' }}>Aciertos</th>
               <th scope="col" style={{ padding: '8px 10px', textAlign: 'right' }}>Errores</th>
               <th scope="col" style={{ padding: '8px 10px', textAlign: 'right' }}>Blancos</th>
-              <th scope="col" style={{ padding: '8px 10px', textAlign: 'right' }}>Nota</th>
+              <th scope="col" aria-sort={orden.campo === 'nota' ? (orden.dir === 1 ? 'ascending' : 'descending') : 'none'} style={{ padding: '8px 10px', textAlign: 'right' }}>
+                <button type="button" onClick={() => pulsarOrden('nota')} style={botonOrden}>Nota{flecha('nota')}</button>
+              </th>
               <th scope="col" aria-label="Ver corrección" style={{ padding: '8px 10px' }} />
             </tr>
           </thead>
