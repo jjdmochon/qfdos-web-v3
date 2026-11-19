@@ -604,9 +604,10 @@ export interface StudentQuestion {
  * v3.82.0 — Tema 06: Libro Interactivo 3D de Opioides (opioides-3d.html, solo perfil docente) con fórmulas 2D limpias, efecto Pop-Out AR 2D→3D, 8 complejos PDB y 45 preguntas oficiales de los Modelos 1–3.
  * v3.83.0 — Tema 02: Libro Interactivo 3D de Noradrenalina (noradrenalina-3d.html, solo perfil docente) con fórmulas 2D limpias, efecto Pop-Out AR 2D→3D, 10 complejos PDB y 38 preguntas oficiales de los Modelos 1–3.
  * v3.83.1 — Tema 06: Libro Interactivo 3D de Opioides visible para el alumnado igual que los Temas 03 y 04.
+ * v3.83.2 — Tema 06: Libro Interactivo 3D de Opioides cerrado de nuevo a acceso exclusivo para perfil docente.
  */
-export const COURSE_DATA_VERSION = '3.83.1';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-19T08:23:00.000Z';
+export const COURSE_DATA_VERSION = '3.83.2';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-19T08:51:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 
