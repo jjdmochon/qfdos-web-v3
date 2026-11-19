@@ -63,6 +63,8 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
   const [editParcial, setEditParcial] = useState<number>(0);
   const [editLab, setEditLab] = useState<number>(0);
   const [editTrabajos, setEditTrabajos] = useState<number>(0);
+  // Pronóstico del profesorado: notas sobre 10 supuestas para las partes que faltan
+  const [pronostico, setPronostico] = useState<{ email: string; examen: number; lab: number; trab: number } | null>(null);
 
   // Sincronización con la hoja de evaluación, vía Apps Script
   const syncFromGoogleSheet = async () => {
@@ -113,6 +115,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
         const name = nameIdx !== -1 ? cols[nameIdx] : `Estudiante ${i}`;
         
         if (!email && !name) continue;
+
+        // Quien ya superó la asignatura en la convocatoria especial sale del acta (columna «acta» de la hoja)
+        const actaIdx = headers.indexOf('acta');
+        if (actaIdx !== -1 && String(cols[actaIdx] ?? '').toLowerCase().includes('superado')) continue;
 
         const finalGrade = finalIdx !== -1 ? parseGrade(cols[finalIdx]) : 0;
         const parcialGrade = parcialIdx !== -1 ? parseGrade(cols[parcialIdx]) : 0;
@@ -193,6 +199,31 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
       isLabApproved
     };
   };
+
+  /** Cuánto falta para el 5 y qué media hace falta en las partes que aún no tienen nota (0 en la hoja). */
+  const resumenPendiente = (s: StudentEvaluationProfile) => {
+    const g = calculateOfficialGrade(s);
+    const examen = Number(g.finalExamScore);
+    const parcial = Number(g.parcialScore);
+    const lab = Number(g.labScore);
+    const trab = Number(g.trabajosScore);
+    const acumulado = examen * 0.7 + parcial * 0.2 + lab * 0.05 + trab * 0.05;
+    const pesoPendiente = (examen === 0 ? 0.7 : 0) + (lab === 0 ? 0.05 : 0) + (trab === 0 ? 0.05 : 0);
+    const faltan = Math.max(0, 5 - acumulado);
+    const mediaNecesaria = pesoPendiente > 0 ? faltan / pesoPendiente : 0;
+    return { acumulado, faltan, pesoPendiente, mediaNecesaria };
+  };
+
+  /** Misma regla que calculateOfficialGrade, con notas supuestas. */
+  const notaPronosticada = (examen: number, parcial: number, lab: number, trab: number) => {
+    const examenOk = examen >= 5;
+    const labOk = lab >= 5;
+    const ponderada = examen * 0.7 + parcial * 0.2 + lab * 0.05 + trab * 0.05;
+    const nota = examenOk ? ponderada : Math.min(ponderada, 4.9);
+    return { nota, examenOk, labOk, aprueba: nota >= 5 && examenOk && labOk };
+  };
+
+  const coma = (n: number) => n.toFixed(2).replace('.', ',');
 
   const handleExportCsv = () => {
     const headers = [
@@ -669,7 +700,8 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                     const isEditing = editingEmail === s.email;
 
                     return (
-                      <tr key={s.email} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <React.Fragment key={s.email}>
+                      <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                         <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--text-main)' }}>
                           {s.name}
                         </td>
@@ -747,7 +779,12 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                         </td>
                         <td style={{ padding: '10px 12px', textAlign: 'center' }}>
                           <span className={`qfdos-badge ${isPassed ? (Number(finalScore) >= 9 ? 'badge-emerald' : 'badge-teal') : 'badge-amber'}`} style={{ fontSize: '0.68rem' }}>
-                            {Number(finalScore) >= 9 ? 'Sobresaliente' : isPassed ? 'Aprobado' : 'Suspenso'}
+                            {isPassed
+                              ? (Number(finalScore) >= 9 ? 'Sobresaliente' : 'Aprobado')
+                              : (() => {
+                                  const r = resumenPendiente(s);
+                                  return r.pesoPendiente > 0 && r.faltan > 0 ? `Le faltan ${coma(r.faltan)} para el 5` : 'Suspenso';
+                                })()}
                           </span>
                         </td>
                         <td style={{ padding: '10px 12px', textAlign: 'center' }}>
@@ -771,8 +808,69 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                                 : <><Edit3 size={12} /> Editar</>}
                             </button>
                           )}
+                          <button
+                            onClick={() => setPronostico(p => (p?.email === s.email ? null : { email: s.email, examen: Number(finalExamScore), lab: Number(labScore), trab: Number(trabajosScore) }))}
+                            className="btn btn-sm btn-outline"
+                            style={{ padding: '3px 8px', fontSize: '0.72rem', marginLeft: 6 }}
+                          >
+                            {pronostico?.email === s.email ? 'Cerrar' : 'Pronosticar'}
+                          </button>
                         </td>
                       </tr>
+                      {pronostico?.email === s.email && (() => {
+                        const pr = notaPronosticada(pronostico.examen, Number(parcialScore), pronostico.lab, pronostico.trab);
+                        const r = resumenPendiente(s);
+                        const campo = (etiqueta: string, clave: 'examen' | 'lab' | 'trab') => (
+                          <label style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-title)' }}>
+                            {etiqueta}
+                            <input
+                              type="number"
+                              min={0}
+                              max={10}
+                              step={0.1}
+                              value={pronostico[clave]}
+                              onChange={e => {
+                                const v = Math.min(10, Math.max(0, parseFloat(e.target.value) || 0));
+                                setPronostico(p => (p ? { ...p, examen: clave === 'examen' ? v : p.examen, lab: clave === 'lab' ? v : p.lab, trab: clave === 'trab' ? v : p.trab } : p));
+                              }}
+                              style={{ display: 'block', width: '90px', marginTop: '4px', padding: '4px 6px', fontSize: '0.85rem' }}
+                            />
+                          </label>
+                        );
+                        return (
+                          <tr style={{ background: 'var(--surface-alt)', borderBottom: '1px solid var(--border-color)' }}>
+                            <td colSpan={9} style={{ padding: '12px 16px' }}>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-end', marginBottom: '0.6rem' }}>
+                                {campo('Examen final (0-10)', 'examen')}
+                                {campo('Laboratorio (0-10)', 'lab')}
+                                {campo('Trabajos (0-10)', 'trab')}
+                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Parcial ya evaluado: {parcialScore}</span>
+                              </div>
+                              <p style={{ margin: 0, fontSize: '0.84rem', color: 'var(--text-main)' }}>
+                                Nota final pronosticada: <strong className="font-mono">{coma(pr.nota)}</strong> ·{' '}
+                                <strong style={{ color: pr.aprueba ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>{pr.aprueba ? 'Aprobado' : 'Suspenso'}</strong>
+                              </p>
+                              {!pr.examenOk && (
+                                <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--warn-ink)' }}>
+                                  El examen final tiene que ser al menos 5 para aprobar; sin eso la nota no pasa de 4,9.
+                                </p>
+                              )}
+                              {!pr.labOk && (
+                                <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--warn-ink)' }}>
+                                  El laboratorio tiene que ser al menos 5 para aprobar.
+                                </p>
+                              )}
+                              {r.pesoPendiente > 0 && r.faltan > 0 && (
+                                <p style={{ margin: '6px 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                                  Para llegar al 5 con las partes pendientes (peso {Math.round(r.pesoPendiente * 100)}%) hace falta una media de{' '}
+                                  <strong>{r.mediaNecesaria > 10 ? 'más de 10 (no llega)' : `${coma(r.mediaNecesaria)} / 10`}</strong>.
+                                </p>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })()}
+                      </React.Fragment>
                     );
                   })}
                 </tbody>
