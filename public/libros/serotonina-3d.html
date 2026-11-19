@@ -3774,12 +3774,6 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     const anchors = [];
     const addAnchor = (id, label, ax, ay, az, tx, ty, tz, color) => {
       try {
-        viewer.addCylinder({
-          start: { x: ax, y: ay, z: az },
-          end: { x: tx, y: ty, z: tz },
-          radius: 0.08, fromCap: 1, toCap: 1, color, dashed: true, dashLength: 0.25, gapLength: 0.18
-        });
-        viewer.addSphere({ center: { x: ax, y: ay, z: az }, radius: 0.42, color });
         if (state.showLabels) {
           viewer.addLabel(label, {
             position: { x: ax, y: ay + 0.55, z: az },
@@ -3838,44 +3832,8 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
 
     const feat = findPharmacophoreFeatures(model, entry);
 
-    if (feat.cyan.size) {
-      viewer.setStyle({ index: Array.from(feat.cyan) }, {
-        stick: { radius: 0.25, color: '#0d9488' },
-        sphere: { scale: 0.33, color: '#0d9488' }
-      });
-    }
-    if (feat.amber.size) {
-      viewer.setStyle({ index: Array.from(feat.amber) }, {
-        stick: { radius: 0.25, color: '#d97706' },
-        sphere: { scale: 0.33, color: '#d97706' }
-      });
-    }
-    if (feat.magenta.size) {
-      viewer.setStyle({ index: Array.from(feat.magenta) }, {
-        stick: { radius: 0.28, color: '#7c3aed' },
-        sphere: { scale: 0.37, color: '#7c3aed' }
-      });
-    }
-
     if (state.showSurface) {
-      const restIdx = [];
-      const hlSet = new Set([...feat.cyan, ...feat.amber, ...feat.magenta]);
-      model.selectedAtoms({}).forEach((a, pos) => {
-        const idx = typeof a.index === 'number' ? a.index : pos;
-        if (!hlSet.has(idx)) restIdx.push(idx);
-      });
-      if (feat.cyan.size) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.36, color: '#0d9488' }, { index: Array.from(feat.cyan) });
-      }
-      if (feat.amber.size) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.40, color: '#f59e0b' }, { index: Array.from(feat.amber) });
-      }
-      if (feat.magenta.size) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.38, color: '#8b5cf6' }, { index: Array.from(feat.magenta) });
-      }
-      if (restIdx.length) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.20, color: '#3b82f6' }, { index: restIdx });
-      }
+      viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.22, color: '#94a3b8' }, {});
     }
 
     let simAnchors = [];

@@ -607,9 +607,10 @@ export interface StudentQuestion {
  * v3.83.2 — Tema 06: Libro Interactivo 3D de Opioides cerrado de nuevo a acceso exclusivo para perfil docente.
  * v3.83.3 — Tema 06: anillos aromáticos 2D con alternancia Kekulé correcta y visores 3D CPK limpios sin resaltados (sigue solo docente).
  * v3.83.4 — Tema 02: anillos aromáticos 2D con alternancia Kekulé correcta y visores 3D CPK limpios sin resaltados (sigue solo docente).
+ * v3.83.5 — Temas 03 y 04: visores 3D CPK limpios sin resaltados ni halos en Dopamina y Serotonina (siguen públicos).
  */
-export const COURSE_DATA_VERSION = '3.83.4';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-19T11:54:00.000Z';
+export const COURSE_DATA_VERSION = '3.83.5';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-19T11:58:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 
