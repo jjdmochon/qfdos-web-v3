@@ -219,8 +219,9 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
     const examenOk = examen >= 5;
     const labOk = lab >= 5;
     const ponderada = examen * 0.7 + parcial * 0.2 + lab * 0.05 + trab * 0.05;
-    const nota = examenOk ? ponderada : Math.min(ponderada, 4.9);
-    return { nota, examenOk, labOk, aprueba: nota >= 5 && examenOk && labOk };
+    // Con examen final o prácticas por debajo de 5, la nota no pasa de 4,90
+    const nota = examenOk && labOk ? ponderada : Math.min(ponderada, 4.9);
+    return { ponderada, nota, examenOk, labOk, aprueba: nota >= 5 && examenOk && labOk };
   };
 
   const coma = (n: number) => n.toFixed(2).replace('.', ',');
@@ -847,17 +848,17 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Parcial ya evaluado: {parcialScore}</span>
                               </div>
                               <p style={{ margin: 0, fontSize: '0.84rem', color: 'var(--text-main)' }}>
-                                Nota final pronosticada: <strong className="font-mono">{coma(pr.nota)}</strong> ·{' '}
+                                Nota pronosticada sin condición del 5: <strong className="font-mono">{coma(pr.ponderada)}</strong>
+                                {' '}· con la condición: <strong className="font-mono">{coma(pr.nota)}</strong> ·{' '}
                                 <strong style={{ color: pr.aprueba ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>{pr.aprueba ? 'Aprobado' : 'Suspenso'}</strong>
                               </p>
-                              {!pr.examenOk && (
+                              {(!pr.examenOk || !pr.labOk) && (
                                 <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--warn-ink)' }}>
-                                  El examen final tiene que ser al menos 5 para aprobar; sin eso la nota no pasa de 4,9.
-                                </p>
-                              )}
-                              {!pr.labOk && (
-                                <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--warn-ink)' }}>
-                                  El laboratorio tiene que ser al menos 5 para aprobar.
+                                  {!pr.examenOk && !pr.labOk
+                                    ? 'El examen final y las prácticas están por debajo de 5: la nota no pasa de 4,90.'
+                                    : !pr.examenOk
+                                      ? 'El examen final está por debajo de 5: la nota no pasa de 4,90.'
+                                      : 'Las prácticas están por debajo de 5: la nota no pasa de 4,90.'}
                                 </p>
                               )}
                               {r.pesoPendiente > 0 && r.faltan > 0 && (
