@@ -1034,7 +1034,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       'Modelo',
       'Modo Evaluación',
       'Estudiante',
-      'DNI / Identificador',
       'Correo Electrónico',
       'Docente Evaluador',
       'Calificación (/10)',
@@ -1050,7 +1049,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       `"${r.modelName || 'Modelo A'}"`,
       `"${r.evaluationMode === 'docente_sesion' ? 'Sesión Docente' : 'Alumno Evaluado'}"`,
       `"${r.studentName.replace(/"/g, '""')}"`,
-      `"${(r.studentDni || '-').replace(/"/g, '""')}"`,
       `"${r.studentEmail.replace(/"/g, '""')}"`,
       `"${(r.evaluator || user?.name || 'Profesor').replace(/"/g, '""')}"`,
       r.score.toFixed(1),
@@ -1079,8 +1077,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         const q = recordsSearchQuery.toLowerCase();
         const matchName = r.studentName?.toLowerCase().includes(q);
         const matchEmail = r.studentEmail?.toLowerCase().includes(q);
-        const matchDni = r.studentDni?.toLowerCase().includes(q);
-        return matchName || matchEmail || matchDni;
+        return matchName || matchEmail;
       }
       return true;
     });
@@ -3040,7 +3037,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                     type="text"
                     value={recordsSearchQuery}
                     onChange={e => setRecordsSearchQuery(e.target.value)}
-                    placeholder="Buscar por alumno, DNI o correo..."
+                    placeholder="Buscar por alumno o correo..."
                     className="form-control"
                     style={{
                       width: '100%',
@@ -3159,9 +3156,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                 )}
                               </div>
                               <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                                {rec.studentDni && rec.studentDni !== '-' && (
-                                  <span>DNI: <strong className="font-mono">{rec.studentDni}</strong></span>
-                                )}
                                 <span>{rec.studentEmail}</span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                                   <Clock size={12} /> {formatearFechaVisual(rec.timestamp)}

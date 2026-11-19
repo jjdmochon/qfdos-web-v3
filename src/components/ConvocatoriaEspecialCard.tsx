@@ -80,6 +80,11 @@ const Pregunta: React.FC<{ p: PreguntaEspecial; docente?: boolean }> = ({ p, doc
             {docente ? 'Marcó' : 'Marcaste'} más de una opción, así que la pregunta se ha contado como en blanco.
           </p>
         )}
+        {p.admitidas && p.admitidas.length > 1 && (
+          <p style={{ margin: '0 0 0.6rem' }}>
+            También se admite <strong>{p.admitidas.split('').join(' y ')}</strong> como respuesta válida.
+          </p>
+        )}
         {p.justificacion && (
           <p style={{ margin: 0, padding: '0.6rem 0.8rem', background: 'var(--surface-alt)', borderRadius: '8px', borderLeft: '3px solid var(--teal)' }}>
             {p.justificacion}
@@ -158,6 +163,11 @@ const ResultadoEspecial: React.FC<{ fila: ResumenEspecial; detalle: PreguntaEspe
             </p>
           )}
         </div>
+      )}
+      {examen.bloques && (
+        <p role="status" style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 0.75rem', color: aprobado ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
+          {aprobado ? 'Examen superado' : 'Examen no superado'}
+        </p>
       )}
       {docente && ajustada && (
         <p

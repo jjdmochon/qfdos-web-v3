@@ -27,6 +27,13 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
+    id: 'act-3.84.0-parcial-bloques',
+    version: 'v3.84.0',
+    fecha: '19 Noviembre 2026',
+    titulo: 'Notas del examen parcial por bloques',
+    texto: 'Ya podéis ver vuestra nota del examen parcial desglosada por bloques temáticos. Para superar el examen hacen falta la nota mínima y al menos 1 punto neto en cada bloque; la página indica si lo habéis superado o no. La pregunta 15 del modelo B da por buena la respuesta A o la B, y se explica cuál es la forma activa.'
+  },
+  {
     id: 'act-3.80.0-libro-3d-dopamina',
     version: 'v3.80.0',
     fecha: '18 Noviembre 2026',
