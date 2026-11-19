@@ -116,6 +116,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
         
         if (!email && !name) continue;
 
+        // Quien ya superó la asignatura en la convocatoria especial sale del acta (columna «acta» de la hoja)
+        const actaIdx = headers.indexOf('acta');
+        if (actaIdx !== -1 && String(cols[actaIdx] ?? '').toLowerCase().includes('superado')) continue;
+
         const finalGrade = finalIdx !== -1 ? parseGrade(cols[finalIdx]) : 0;
         const parcialGrade = parcialIdx !== -1 ? parseGrade(cols[parcialIdx]) : 0;
         const labGrade = labIdx !== -1 ? parseGrade(cols[labIdx]) : 0;
