@@ -38,6 +38,8 @@ export interface PreguntaEspecial {
   /** Texto o nombre de la opción correcta */
   correcta: string;
   justificacion: string;
+  /** Letras dadas también por buenas además de la clave (p. ej. «AB»); vacío si solo vale la clave */
+  admitidas?: string;
 }
 
 export interface ResumenEspecial {
@@ -160,7 +162,8 @@ function convertirDetalle(c: Record<string, unknown>): PreguntaEspecial[] {
     tema: texto(d.tema),
     enunciado: texto(d.enunciado),
     correcta: texto(d.correcta),
-    justificacion: texto(d.justificacion)
+    justificacion: texto(d.justificacion),
+    admitidas: texto(d.admitidas)
   }));
 }
 

@@ -97,7 +97,7 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 13,
+        version: 14,
         acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'evaluacionEspecial', 'publicarNotasEspecial', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
@@ -836,7 +836,8 @@ function detalleEspecial_(ss, cv, modelo, respuestas) {
       tema: ['tema'],
       enunciado: ['enunciado'],
       correcta: ['correcta', 'opcion correcta'],
-      justificacion: ['justificacion']
+      justificacion: ['justificacion'],
+      aceptadas: ['aceptadas']
     });
     if (k.modelo === -1 || k.n === -1 || k.clave === -1) {
       return { error: 'La pestaña «' + cv.claves + '» necesita las columnas modelo, n y clave.', detalle: [] };
@@ -848,11 +849,15 @@ function detalleEspecial_(ss, cv, modelo, respuestas) {
       if (!(n >= 1)) continue;
       var marcada = (respuestas.charAt(n - 1) || '-').toUpperCase();
       var correcta = String(kd[r][k.clave]).trim().toUpperCase();
-      var estado = marcada === correcta ? 'acierto' : marcada === '-' ? 'blanco' : marcada === '*' ? 'doble' : 'error';
+      // Respuestas dadas por buenas además de la clave (columna «aceptadas», p. ej. «AB»)
+      var admitidas = k.aceptadas === -1 ? '' : cadena(kd[r][k.aceptadas]).trim().toUpperCase();
+      var valida = marcada === correcta || (marcada !== '-' && marcada !== '*' && admitidas.indexOf(marcada) !== -1);
+      var estado = valida ? 'acierto' : marcada === '-' ? 'blanco' : marcada === '*' ? 'doble' : 'error';
       detalle.push({
         n: n,
         marcada: marcada,
         clave: correcta,
+        admitidas: admitidas,
         estado: estado,
         tema: k.tema === -1 ? '' : cadena(kd[r][k.tema]),
         enunciado: k.enunciado === -1 ? '' : cadena(kd[r][k.enunciado]),
