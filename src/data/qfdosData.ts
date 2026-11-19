@@ -610,8 +610,9 @@ export interface StudentQuestion {
  * v3.83.5 — Temas 03 y 04: visores 3D CPK limpios sin resaltados ni halos en Dopamina y Serotonina (siguen públicos).
  * v3.83.6 — Tema 01: integración del Libro Interactivo 3D de Acetilcolina (acetilcolina-3d.html, solo perfil docente) con fórmulas 2D limpias, Pop-Out AR 2D→3D y 40 preguntas oficiales.
  * v3.84.0 — Examen parcial: notas por bloque con veredicto «superado / no superado», respuestas admitidas (pregunta 15 del modelo B) y DNI retirado del visor de cuestionarios.
+ * v3.84.1 — Lista del profesorado en el examen parcial: ordenable por apellido o por nota.
  */
-export const COURSE_DATA_VERSION = '3.84.0';
+export const COURSE_DATA_VERSION = '3.84.1';
 export const COURSE_BUILD_TIMESTAMP = '2026-11-19T12:00:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
