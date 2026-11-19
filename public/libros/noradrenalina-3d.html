@@ -3687,48 +3687,7 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     };
 
     const anchors = [];
-    const addAnchor = (id, label, ax, ay, az, tx, ty, tz, color) => {
-      try {
-        viewer.addCylinder({
-          start: { x: ax, y: ay, z: az },
-          end: { x: tx, y: ty, z: tz },
-          radius: 0.08, fromCap: 1, toCap: 1, color, dashed: true, dashLength: 0.25, gapLength: 0.18
-        });
-        viewer.addSphere({ center: { x: ax, y: ay, z: az }, radius: 0.42, color });
-        if (state.showLabels) {
-          viewer.addLabel(label, {
-            position: { x: ax, y: ay + 0.55, z: az },
-            fontSize: 10.5, fontColor: '#ffffff',
-            backgroundColor: '#172554', backgroundOpacity: 0.92,
-            borderThickness: 1, borderColor: color
-          });
-        }
-        anchors.push({ id, label, x: ax, y: ay, z: az });
-      } catch (e) {}
-    };
-
-    const amberArr = Array.from(feat.amber);
-    const basicAtom = amberArr.map(i => atoms.find((a, pos) => ((typeof a.index === 'number' ? a.index : pos) === i))).find(a => a && a.elem === 'N')
-      || heavy.find(a => a.elem === 'N');
-    if (basicAtom) {
-      const [ux, uy, uz] = getUnitVec(cx, cy, cz, basicAtom.x, basicAtom.y, basicAtom.z);
-      const saltLbl = entry.mode === 'presynaptic' ? 'Glu312 · VMAT2 / NET (2,9 Å)' : 'Asp113 · TM3 (2,8 Å)';
-      addAnchor('asp_salt', saltLbl, basicAtom.x + ux * 2.8, basicAtom.y + uy * 2.8, basicAtom.z + uz * 2.8, basicAtom.x, basicAtom.y, basicAtom.z, '#f59e0b');
-    }
-
-    const hbAtom = Array.from(feat.cyan).map(i => atoms.find((a, pos) => ((typeof a.index === 'number' ? a.index : pos) === i))).find(a => a && (a.elem === 'O' || a.elem === 'N'))
-      || heavy.find(a => a.elem === 'O');
-    if (hbAtom) {
-      const [ux, uy, uz] = getUnitVec(cx, cy, cz, hbAtom.x, hbAtom.y, hbAtom.z);
-      addAnchor('ser_hb', 'Ser203 / Ser207 · TM5 (2,9 Å)', hbAtom.x + ux * 2.9, hbAtom.y + uy * 2.9, hbAtom.z + uz * 2.9, hbAtom.x, hbAtom.y, hbAtom.z, '#0d9488');
-    }
-
-    const magAtom = Array.from(feat.magenta).map(i => atoms.find((a, pos) => ((typeof a.index === 'number' ? a.index : pos) === i))).find(a => a && a.elem === 'O');
-    if (magAtom) {
-      const [ux, uy, uz] = getUnitVec(cx, cy, cz, magAtom.x, magAtom.y, magAtom.z);
-      const thirdLbl = entry.mode === 'beta_blocker' ? 'Asn312 · TM7 (3,0 Å)' : 'Asn293 · TM6 (3,1 Å)';
-      addAnchor('asn_hb', thirdLbl, magAtom.x + ux * 3.1, magAtom.y + uy * 3.1, magAtom.z + uz * 3.1, magAtom.x, magAtom.y, magAtom.z, '#8b5cf6');
-    }
+    // Resaltados 3D desactivados: sin esferas de énfasis ni líneas discontinuas de highlight
     return anchors;
   }
 
@@ -3738,7 +3697,7 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     viewer.removeAllLabels();
     viewer.removeAllShapes();
 
-    // Base ligand as sticks + spheres (CPK)
+    // Base ligand as sticks + spheres (colores CPK normales sin resaltados ni halos)
     viewer.setStyle({}, {
       stick: { radius: 0.16, colorscheme: 'Jmol' },
       sphere: { scale: 0.25, colorscheme: 'Jmol' }
@@ -3746,60 +3705,9 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
 
     const feat = findPharmacophoreFeatures(model, entry);
 
-    if (feat.cyan.size) {
-      viewer.setStyle({ index: Array.from(feat.cyan) }, {
-        stick: { radius: 0.25, color: '#0d9488' },
-        sphere: { scale: 0.33, color: '#0d9488' }
-      });
-    }
-    if (feat.amber.size) {
-      viewer.setStyle({ index: Array.from(feat.amber) }, {
-        stick: { radius: 0.25, color: '#d97706' },
-        sphere: { scale: 0.33, color: '#d97706' }
-      });
-    }
-    if (feat.magenta.size) {
-      viewer.setStyle({ index: Array.from(feat.magenta) }, {
-        stick: { radius: 0.28, color: '#7c3aed' },
-        sphere: { scale: 0.37, color: '#7c3aed' }
-      });
-    }
-
-    if (state.showSurface) {
-      const restIdx = [];
-      const hlSet = new Set([...feat.cyan, ...feat.amber, ...feat.magenta]);
-      model.selectedAtoms({}).forEach((a, pos) => {
-        const idx = typeof a.index === 'number' ? a.index : pos;
-        if (!hlSet.has(idx)) restIdx.push(idx);
-      });
-      if (feat.cyan.size) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.36, color: '#0d9488' }, { index: Array.from(feat.cyan) });
-      }
-      if (feat.amber.size) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.40, color: '#f59e0b' }, { index: Array.from(feat.amber) });
-      }
-      if (feat.magenta.size) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.38, color: '#8b5cf6' }, { index: Array.from(feat.magenta) });
-      }
-      if (restIdx.length) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.20, color: '#3b82f6' }, { index: restIdx });
-      }
-    }
-
-    let simAnchors = [];
-    if (state.showSimPocket4A) {
-      simAnchors = renderSimPocket4A(viewer, model, entry, feat);
-    }
-
     if (els.res4ADrawer) {
-      if (state.showSimPocket4A && simAnchors.length) {
-        els.res4ADrawer.style.display = 'flex';
-        els.res4ADrawer.innerHTML = `<span style="font-size:11px;color:#cbd5e1;margin-right:4px">Bolsillo simulado ≤ 4 Å (orientativo):</span>` +
-          simAnchors.map(a => `<button type="button" class="res-chip key-res" data-simx="1">${a.label}</button>`).join('');
-      } else {
-        els.res4ADrawer.style.display = 'none';
-        els.res4ADrawer.innerHTML = '';
-      }
+      els.res4ADrawer.style.display = 'none';
+      els.res4ADrawer.innerHTML = '';
     }
 
     if (state.showLabels) {
@@ -3872,6 +3780,7 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     const viewer = state.viewer;
     viewer.removeAllSurfaces();
     viewer.removeAllLabels();
+    viewer.removeAllShapes();
     viewer.setStyle({}, {}); // Hide crystallization Fab chains & lipid detergents cleanly
 
     // Protein as cartoon colored by secondary structure
@@ -3880,12 +3789,12 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
       cartoon: { colorscheme: 'ssPyMol', opacity: 0.84 }
     });
 
-    // Cofactors (e.g. FAD in 2Z5X, 2V5Z)
+    // Cofactors (e.g. FAD in 2Z5X, 2V5Z) en CPK estándar
     if (entry.cofactors) {
       entry.cofactors.forEach(cf => {
         viewer.setStyle({ chain: cf.chain, resn: cf.resn, resi: cf.resi }, {
-          stick: { radius: 0.2, colorscheme: 'yellowCarbon' },
-          sphere: { scale: 0.25, colorscheme: 'yellowCarbon' }
+          stick: { radius: 0.2, colorscheme: 'Jmol' },
+          sphere: { scale: 0.25, colorscheme: 'Jmol' }
         });
         if (state.showLabels) {
           const atoms = model.selectedAtoms({ chain: cf.chain, resn: cf.resn, resi: cf.resi });
@@ -3903,19 +3812,13 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     }
 
     const isPentamerOverview = false;
-    // Ligands as sticks + spheres (CPK) + high-contrast accent
+    // Ligands as sticks + spheres (CPK estándar sin halos de superficie)
     entry.ligands.forEach((lg, idx) => {
       const lsel = lg.isPeptide ? { chain: lg.chain } : { chain: lg.chain, resn: lg.resn, resi: lg.resi };
       viewer.setStyle(lsel, {
-        stick: { radius: isPentamerOverview ? 0.34 : 0.24, colorscheme: 'cyanCarbon' },
-        sphere: { scale: isPentamerOverview ? 0.52 : 0.30, colorscheme: 'cyanCarbon' }
+        stick: { radius: isPentamerOverview ? 0.34 : 0.24, colorscheme: 'Jmol' },
+        sphere: { scale: isPentamerOverview ? 0.52 : 0.30, colorscheme: 'Jmol' }
       });
-      if (state.showSurface && idx === 0) {
-        viewer.addSurface($3Dmol.SurfaceType.VDW, {
-          opacity: 0.34,
-          color: lg.color || '#0d9488'
-        }, lsel);
-      }
       if (state.showLabels && (idx === 0 || entry.ligands.length <= 2)) {
         const latoms = model.selectedAtoms(lsel);
         if (latoms.length) {
