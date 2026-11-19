@@ -334,7 +334,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       )}
                     </>
                   )}
-                  {(topic.id === 'tema-03' || topic.id === 'tema-04') && (
+                  {(topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) && (
                     <span
                       style={{
                         fontSize: '0.66rem',
@@ -484,9 +484,15 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       <GitBranch size={13} /> Retrosíntesis
                     </button>
                   )}
-                  {(topic.id === 'tema-03' || topic.id === 'tema-04') && !bloqueado && (
+                  {(topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) && !bloqueado && (
                     <a
-                      href={recurso(topic.id === 'tema-03' ? 'libros/dopamina-3d.html' : 'libros/serotonina-3d.html')}
+                      href={recurso(
+                        topic.id === 'tema-03'
+                          ? 'libros/dopamina-3d.html'
+                          : topic.id === 'tema-04'
+                            ? 'libros/serotonina-3d.html'
+                            : 'libros/opioides-3d.html'
+                      )}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
