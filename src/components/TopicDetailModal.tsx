@@ -920,7 +920,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 // tema 1, el taller de retrosíntesis) viven aquí. Los adjuntos que son
                 // el mismo recurso (GLB/enlace 3D, XLSX, CSV) se omiten para no
                 // mostrarlos dos veces.
-                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : (topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) ? 1 : 0;
+                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? (isProfesor ? 3 : 2) : (topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) ? 1 : 0;
                 const yaIncluidos = topic.id === 'tema-01'
                   ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
                   : topic.id === 'tema-02'
@@ -1303,20 +1303,25 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
-                      {/* Libro Interactivo 3D Tema 03, Tema 04 y Tema 06 (solo docente) */}
-                      {(topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) && (() => {
+                      {/* Libro Interactivo 3D Tema 02 (solo docente), Tema 03, Tema 04 y Tema 06 (solo docente) */}
+                      {((topic.id === 'tema-02' && isProfesor) || topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) && (() => {
                         const archivo =
-                          topic.id === 'tema-03'
-                            ? 'dopamina-3d.html'
-                            : topic.id === 'tema-04'
-                              ? 'serotonina-3d.html'
-                              : 'opioides-3d.html';
+                          topic.id === 'tema-02'
+                            ? 'noradrenalina-3d.html'
+                            : topic.id === 'tema-03'
+                              ? 'dopamina-3d.html'
+                              : topic.id === 'tema-04'
+                                ? 'serotonina-3d.html'
+                                : 'opioides-3d.html';
                         const tituloLibro =
-                          topic.id === 'tema-03'
-                            ? 'Libro Interactivo 3D · Dopamina'
-                            : topic.id === 'tema-04'
-                              ? 'Libro Interactivo 3D · Serotonina'
-                              : 'Libro Interactivo 3D · Opioides';
+                          topic.id === 'tema-02'
+                            ? 'Libro Interactivo 3D · Noradrenalina'
+                            : topic.id === 'tema-03'
+                              ? 'Libro Interactivo 3D · Dopamina'
+                              : topic.id === 'tema-04'
+                                ? 'Libro Interactivo 3D · Serotonina'
+                                : 'Libro Interactivo 3D · Opioides';
+                        const numPreguntas = topic.id === 'tema-02' ? 38 : 45;
                         const hrefLibro = recurso(`libros/${archivo}`);
                         return (
                           <div
@@ -1352,11 +1357,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                   </strong>
                                 </div>
                                 <span className="qfdos-badge badge-teal" style={{ fontSize: '0.66rem', fontWeight: 800, padding: '2px 8px' }}>
-                                  8 Lecciones · 45P
+                                  8 Lecciones · {numPreguntas}P
                                 </span>
                               </div>
                               <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginBottom: '12px', lineHeight: 1.45 }}>
-                                Tenéis aquí las 8 lecciones del tema con las estructuras en 2D limpias, los modelos 3Dmol.js interactivos (con vista 2D+3D, Pop-Out espacial, cámara opcional y 3D estéreo), los complejos cristalográficos PDB y las 45 preguntas oficiales de los Modelos 1 a 3.
+                                Tenéis aquí las 8 lecciones del tema con las estructuras en 2D limpias, los modelos 3Dmol.js interactivos (con vista 2D+3D, Pop-Out espacial, cámara opcional y 3D estéreo), los complejos cristalográficos PDB y las {numPreguntas} preguntas oficiales de los Modelos 1 a 3.
                               </p>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
