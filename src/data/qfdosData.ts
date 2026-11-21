@@ -615,9 +615,10 @@ export interface StudentQuestion {
  * v3.85.1 — Pronóstico: nota sin condición del 5 y nota con tope de 4,90 si el examen final o las prácticas están por debajo de 5.
  * v3.85.2 — Acta: la nota final también aplica el tope de 4,90 si las prácticas no llegan a 5, con la nota sin tope a la vista.
  * v3.86.0 — Tema 05: nuevo Libro Interactivo 3D del Sistema GABAérgico (gaba-3d.html, solo perfil docente) con 70 estructuras 2D/3D, 9 complejos PDB y 45 preguntas oficiales; limpieza uniforme de visores 3D CPK sin etiquetas farmacofóricas en 3D, resaltado 2D y ajuste móvil 390 px en Temas 1-6.
+ * v3.86.1 — Tema 05: retirada temporal de gaba-3d.html del repositorio público y ocultación del enlace docente hasta implantar acceso restringido real.
  */
-export const COURSE_DATA_VERSION = '3.86.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-21T12:05:00.000Z';
+export const COURSE_DATA_VERSION = '3.86.1';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-21T12:25:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 
