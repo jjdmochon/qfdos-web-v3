@@ -334,7 +334,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       )}
                     </>
                   )}
-                  {((topic.id === 'tema-01' && isProfesor) || (topic.id === 'tema-02' && isProfesor) || topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) && (
+                  {((topic.id === 'tema-01' && isProfesor) || (topic.id === 'tema-02' && isProfesor) || topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-05' && isProfesor) || (topic.id === 'tema-06' && isProfesor)) && (
                     <span
                       style={{
                         fontSize: '0.66rem',
@@ -484,7 +484,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       <GitBranch size={13} /> Retrosíntesis
                     </button>
                   )}
-                  {((topic.id === 'tema-01' && isProfesor) || (topic.id === 'tema-02' && isProfesor) || topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-06' && isProfesor)) && !bloqueado && (
+                  {((topic.id === 'tema-01' && isProfesor) || (topic.id === 'tema-02' && isProfesor) || topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-05' && isProfesor) || (topic.id === 'tema-06' && isProfesor)) && !bloqueado && (
                     <a
                       href={recurso(
                         topic.id === 'tema-01'
@@ -495,7 +495,9 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                               ? 'libros/dopamina-3d.html'
                               : topic.id === 'tema-04'
                                 ? 'libros/serotonina-3d.html'
-                                : 'libros/opioides-3d.html'
+                                : topic.id === 'tema-05'
+                                  ? 'libros/gaba-3d.html'
+                                  : 'libros/opioides-3d.html'
                       )}
                       target="_blank"
                       rel="noopener noreferrer"
