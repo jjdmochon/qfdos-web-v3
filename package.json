@@ -1,7 +1,7 @@
 {
   "name": "qfdos-web-v3",
   "private": true,
-  "version": "3.86.2",
+  "version": "3.87.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

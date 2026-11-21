@@ -920,7 +920,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 // tema 1, el taller de retrosíntesis) viven aquí. Los adjuntos que son
                 // el mismo recurso (GLB/enlace 3D, XLSX, CSV) se omiten para no
                 // mostrarlos dos veces.
-                const interactivos = topic.id === 'tema-01' ? 3 : topic.id === 'tema-02' ? 2 : (topic.id === 'tema-03' || topic.id === 'tema-04') ? 1 : 0;
+                const interactivos = topic.id === 'tema-01' ? (isProfesor ? 4 : 3) : topic.id === 'tema-02' ? (isProfesor ? 3 : 2) : (topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-05' && isProfesor) || (topic.id === 'tema-06' && isProfesor)) ? 1 : 0;
                 const yaIncluidos = topic.id === 'tema-01'
                   ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
                   : topic.id === 'tema-02'
@@ -1303,17 +1303,38 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                         </div>
                       )}
 
-                      {/* Libro Interactivo 3D Tema 03 y Tema 04 */}
-                      {(topic.id === 'tema-03' || topic.id === 'tema-04') && (() => {
+                      {/* Libro Interactivo 3D Tema 01 (solo docente), Tema 02 (solo docente), Tema 03, Tema 04, Tema 05 (solo docente) y Tema 06 (solo docente) */}
+                      {((topic.id === 'tema-01' && isProfesor) || (topic.id === 'tema-02' && isProfesor) || topic.id === 'tema-03' || topic.id === 'tema-04' || (topic.id === 'tema-05' && isProfesor) || (topic.id === 'tema-06' && isProfesor)) && (() => {
+                        const esLibroDocente =
+                          topic.id === 'tema-01' ||
+                          topic.id === 'tema-02' ||
+                          topic.id === 'tema-05' ||
+                          topic.id === 'tema-06';
                         const archivo =
-                          topic.id === 'tema-03'
-                            ? 'dopamina-3d.html'
-                            : 'serotonina-3d.html';
+                          topic.id === 'tema-01'
+                            ? 'acetilcolina-3d.html'
+                            : topic.id === 'tema-02'
+                              ? 'noradrenalina-3d.html'
+                              : topic.id === 'tema-03'
+                                ? 'dopamina-3d.html'
+                                : topic.id === 'tema-04'
+                                  ? 'serotonina-3d.html'
+                                  : topic.id === 'tema-05'
+                                    ? 'gaba-3d.html'
+                                    : 'opioides-3d.html';
                         const tituloLibro =
-                          topic.id === 'tema-03'
-                            ? 'Libro Interactivo 3D · Dopamina'
-                            : 'Libro Interactivo 3D · Serotonina';
-                        const numPreguntas = 45;
+                          topic.id === 'tema-01'
+                            ? 'Libro Interactivo 3D · Acetilcolina'
+                            : topic.id === 'tema-02'
+                              ? 'Libro Interactivo 3D · Noradrenalina'
+                              : topic.id === 'tema-03'
+                                ? 'Libro Interactivo 3D · Dopamina'
+                                : topic.id === 'tema-04'
+                                  ? 'Libro Interactivo 3D · Serotonina'
+                                  : topic.id === 'tema-05'
+                                    ? 'Libro Interactivo 3D · GABA'
+                                    : 'Libro Interactivo 3D · Opioides';
+                        const numPreguntas = topic.id === 'tema-01' ? 40 : topic.id === 'tema-02' ? 38 : 45;
                         const hrefLibro = recurso(`libros/${archivo}`);
                         return (
                           <div
@@ -1327,7 +1348,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             }}
                           >
                             <div style={{ position: 'absolute', top: 0, right: 0, background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-ink) 100%)', color: '#ffffff', fontSize: '0.6rem', fontWeight: 800, padding: '3px 10px', borderBottomLeftRadius: '8px', letterSpacing: '0.5px' }}>
-                              ✨ LIBRO 3D · AR
+                              {esLibroDocente ? '🔒 SOLO DOCENTE · 3D' : '✨ LIBRO 3D · AR'}
                             </div>
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', marginTop: '4px' }}>
@@ -1363,7 +1384,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 rel="noopener noreferrer"
                                 className="btn btn-sm btn-primary"
                                 style={{
-                                  flex: 1.35,
+                                  flex: esLibroDocente ? 1 : 1.35,
                                   justifyContent: 'center',
                                   fontSize: '0.78rem',
                                   fontWeight: 800,
@@ -1377,21 +1398,23 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                               >
                                 <BookOpen size={13} /> Abrir Libro Interactivo 3D <ExternalLink size={12} style={{ marginLeft: 4 }} />
                               </a>
-                              <a
-                                href={hrefLibro}
-                                download={archivo}
-                                className="btn btn-sm btn-outline"
-                                style={{
-                                  flex: 0.65,
-                                  justifyContent: 'center',
-                                  fontSize: '0.74rem',
-                                  padding: '7px 8px',
-                                  textDecoration: 'none'
-                                }}
-                                title="Descargar capítulo HTML autocontenido para estudio sin conexión"
-                              >
-                                <Download size={12} /> HTML
-                              </a>
+                              {!esLibroDocente && (
+                                <a
+                                  href={hrefLibro}
+                                  download={archivo}
+                                  className="btn btn-sm btn-outline"
+                                  style={{
+                                    flex: 0.65,
+                                    justifyContent: 'center',
+                                    fontSize: '0.74rem',
+                                    padding: '7px 8px',
+                                    textDecoration: 'none'
+                                  }}
+                                  title="Descargar capítulo HTML autocontenido para estudio sin conexión"
+                                >
+                                  <Download size={12} /> HTML
+                                </a>
+                              )}
                             </div>
                           </div>
                         );

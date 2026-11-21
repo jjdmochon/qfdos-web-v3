@@ -617,9 +617,10 @@ export interface StudentQuestion {
  * v3.86.0 — Tema 05: nuevo Libro Interactivo 3D del Sistema GABAérgico (gaba-3d.html, solo perfil docente) con 70 estructuras 2D/3D, 9 complejos PDB y 45 preguntas oficiales; limpieza uniforme de visores 3D CPK sin etiquetas farmacofóricas en 3D, resaltado 2D y ajuste móvil 390 px en Temas 1-6.
  * v3.86.1 — Tema 05: retirada temporal de gaba-3d.html del repositorio público y ocultación del enlace docente hasta implantar acceso restringido real.
  * v3.86.2 — Temas 01, 02 y 06: retirada temporal de acetilcolina-3d.html, noradrenalina-3d.html y opioides-3d.html del repositorio público y ocultación de sus enlaces hasta implantar acceso docente real (Temas 03 y 04 intactos).
+ * v3.87.0 — Temas 01, 02, 05 y 06: acceso docente real a los Libros Interactivos 3D mediante cifrado AES-256-GCM en navegador (Web Crypto), claves individuales en PropertiesService y validación de sesión docente en cada petición (Codigo.gs v15 · accion=libroClave); Temas 03 y 04 públicos intactos.
  */
-export const COURSE_DATA_VERSION = '3.86.2';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-21T12:57:00.000Z';
+export const COURSE_DATA_VERSION = '3.87.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-21T14:06:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 

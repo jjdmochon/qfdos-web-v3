@@ -25,6 +25,11 @@
  *                            La MISMA en el proyecto de Calificaciones.gs.
  *       · GOOGLE_CLIENT_ID — opcional; por defecto, el de la plataforma.
  *       · PROFESORES       — opcional; correos separados por comas.
+ *     Y para los Libros 3D de acceso exclusivo docente (sección 9):
+ *       · LIBRO_CLAVE_ACETILCOLINA  — clave AES-256-GCM en Base64 (32 bytes)
+ *       · LIBRO_CLAVE_NORADRENALINA — clave AES-256-GCM en Base64 (32 bytes)
+ *       · LIBRO_CLAVE_GABA          — clave AES-256-GCM en Base64 (32 bytes)
+ *       · LIBRO_CLAVE_OPIOIDES      — clave AES-256-GCM en Base64 (32 bytes)
  *  4. Implementar → Gestionar implementaciones (o Nueva implementación) → Editar:
  *       · Versión:             Nueva versión
  *       · Ejecutar como:       Yo
@@ -90,6 +95,7 @@ function manejar(e) {
     if (accion === 'materiales')       return materiales(p);
     if (accion === 'leerProgreso')     return leerProgreso(p);
     if (accion === 'guardarProgreso')  return guardarProgreso(p, e);
+    if (accion === 'libroClave')       return libroClave(p, e);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -97,8 +103,8 @@ function manejar(e) {
       return json({
         ok: true,
         servicio: 'QFDOS',
-        version: 14,
-        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'evaluacionEspecial', 'publicarNotasEspecial', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'anotarFila'],
+        version: 15,
+        acciones: ['iniciarSesion', 'renovarSesion', 'leerContenido', 'guardarContenido', 'misEntregas', 'evaluacion', 'guardarEvaluacion', 'evaluacionEspecial', 'publicarNotasEspecial', 'enviarDuda', 'misDudas', 'responderDuda', 'borrarDuda', 'cuaderno', 'calificarCuaderno', 'publicarNotasCuaderno', 'enviarRecordatorio', 'seguimiento', 'iniciarSubida', 'subirFragmento', 'materiales', 'leerProgreso', 'guardarProgreso', 'libroClave', 'anotarFila'],
         mensaje: 'Endpoint operativo.'
       });
     }
@@ -1745,6 +1751,53 @@ function guardarProgreso(p, e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* 9. Libros 3D docentes (claves AES-256-GCM)                          */
+/* ------------------------------------------------------------------ */
+
+var CLAVES_LIBROS_3D = {
+  acetilcolina: 'LIBRO_CLAVE_ACETILCOLINA',
+  noradrenalina: 'LIBRO_CLAVE_NORADRENALINA',
+  gaba: 'LIBRO_CLAVE_GABA',
+  opioides: 'LIBRO_CLAVE_OPIOIDES'
+};
+
+/**
+ * Devuelve la clave AES-256-GCM (Base64, 32 bytes) de un libro 3D docente.
+ * Valida sesión firmada y rol profesor en CADA petición. Sin tokens extra.
+ */
+function libroClave(p, e) {
+  var d = cuerpoJson_(e);
+  var sesion = String(d.sesion || p.sesion || '');
+  var s = verificarSesion_(sesion);
+  if (!s) return sesionInvalida_();
+  if (s.r !== 'profesor') {
+    return json({
+      ok: false,
+      codigo: 'solo_docente',
+      error: 'Acceso restringido al profesorado.'
+    });
+  }
+  var libro = String(d.libro || p.libro || '').trim().toLowerCase();
+  var prop = CLAVES_LIBROS_3D[libro];
+  if (!prop) {
+    return json({
+      ok: false,
+      codigo: 'libro_no_encontrado',
+      error: 'Libro 3D no reconocido.'
+    });
+  }
+  var clave = propiedad_(prop);
+  if (!clave) {
+    return json({
+      ok: false,
+      codigo: 'clave_no_configurada',
+      error: 'La clave de este libro no está configurada en Script Properties (' + prop + ').'
+    });
+  }
+  return json({ ok: true, libro: libro, clave: clave });
 }
 
 function json(obj) {

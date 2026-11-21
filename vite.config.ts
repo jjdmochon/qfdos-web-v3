@@ -65,6 +65,15 @@ const pwa = VitePWA({
   },
   workbox: {
     globPatterns: ['**/*.{js,css,html,ico,woff2}', 'icons/*.png', '*.webp'],
+    globIgnores: [
+      '**/node_modules/**/*',
+      'sw.js',
+      'workbox-*.js',
+      'libros/acetilcolina-3d.html',
+      'libros/noradrenalina-3d.html',
+      'libros/gaba-3d.html',
+      'libros/opioides-3d.html'
+    ],
     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
     cleanupOutdatedCaches: true,
     // La versión nueva se activa sola en cuanto se descarga. La recarga de las
