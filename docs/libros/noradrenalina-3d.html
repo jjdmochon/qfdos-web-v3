@@ -2663,36 +2663,61 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
 
   .viewer-switcher {
     width: 100%;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    gap: 4px !important;
     padding-bottom: 1px;
   }
-  .viewer-switcher::-webkit-scrollbar { display: none; }
+  .viewer-switcher .switch-pill {
+    padding: 2.5px 7px !important;
+    font-size: 10px !important;
+    line-height: 1.25;
+  }
 
   .viewer-toolbar {
     width: 100%;
     padding: 5px 8px !important;
-    gap: 5px !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
   }
-  .viewer-toolbar::-webkit-scrollbar { display: none; }
-  .viewer-toolbar .btn { padding: 4px 8px !important; font-size: 11px !important; flex-shrink: 0; }
+  .viewer-toolbar .btn {
+    padding: 4px 6.5px !important;
+    font-size: 10px !important;
+    line-height: 1.2;
+    flex: 1 1 auto;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .viewer-subbar {
+    padding: 5px 8px !important;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+  }
+  .viewer-subbar .btn {
+    padding: 3.5px 6px !important;
+    font-size: 10px !important;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 
   .depth-bar {
     width: 100%;
     padding: 5px 8px !important;
-    gap: 5px !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    scrollbar-width: none;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
   }
-  .depth-bar::-webkit-scrollbar { display: none; }
-  .depth-bar .btn { padding: 4px 8px !important; font-size: 11px !important; flex-shrink: 0; }
+  .depth-bar .btn {
+    padding: 4px 6.5px !important;
+    font-size: 10px !important;
+    line-height: 1.2;
+    flex: 1 1 auto;
+    justify-content: center;
+    white-space: nowrap;
+  }
   .depth-caption { display: none !important; }
 
   .viewer-footer {
@@ -2945,7 +2970,7 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
           <button type="button" class="btn" id="btn-reset">⌖ Reiniciar vista</button>
           <button type="button" class="btn" id="btn-res4a" title="Simular bolsillo de unión o mostrar residuos cristalográficos ≤ 4 Å">Residuos ≤ 4 Å</button>
           <button type="button" class="btn" id="btn-surface">Superficie farmacóforo</button>
-          <button type="button" class="btn active" id="btn-labels">Etiquetas 3D</button>
+          <button type="button" class="btn" id="btn-labels" disabled title="Mostrar u ocultar etiquetas estructurales en complejos PDB (las etiquetas farmacofóricas se muestran únicamente en la vista 2D)">Etiquetas PDB</button>
           <button type="button" class="btn active" id="btn-2d" aria-pressed="true" title="Mostrar estructura 2D junto al visor 3D">◧ 2D + 3D</button>
         </div>
 
@@ -3672,23 +3697,8 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
   }
 
   function renderSimPocket4A(viewer, model, entry, feat) {
-    const atoms = model.selectedAtoms({});
-    const heavy = atoms.filter(a => a.elem !== 'H');
-    if (!heavy.length) return [];
-    let cx = 0, cy = 0, cz = 0;
-    heavy.forEach(a => { cx += a.x; cy += a.y; cz += a.z; });
-    cx /= heavy.length; cy /= heavy.length; cz /= heavy.length;
-
-    const getUnitVec = (ox, oy, oz, tx, ty, tz) => {
-      let dx = tx - ox, dy = ty - oy, dz = tz - oz;
-      const len = Math.hypot(dx, dy, dz);
-      if (len > 0.25) return [dx / len, dy / len, dz / len];
-      return [0.7, 0.7, 0.14];
-    };
-
-    const anchors = [];
-    // Resaltados 3D desactivados: sin esferas de énfasis ni líneas discontinuas de highlight
-    return anchors;
+    // 3D highlights disabled for clean CPK view
+    return [];
   }
 
   function applySmallMolStyle(model, entry, skipRender = false) {
@@ -3705,29 +3715,16 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
 
     const feat = findPharmacophoreFeatures(model, entry);
 
+    if (state.showSurface) {
+      viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.22, color: '#94a3b8' }, {});
+    }
+
     if (els.res4ADrawer) {
       els.res4ADrawer.style.display = 'none';
       els.res4ADrawer.innerHTML = '';
     }
 
-    if (state.showLabels) {
-      const atoms = model.selectedAtoms({});
-      feat.labels.slice(0, 6).forEach(lb => {
-        const atom = atoms.find((a, idx) => ((typeof a.index === 'number') ? a.index : idx) === lb.idx);
-        if (atom) {
-          viewer.addLabel(lb.text, {
-            position: { x: atom.x, y: atom.y, z: atom.z },
-            font: 'sans-serif',
-            fontSize: 11,
-            fontColor: lb.color,
-            backgroundColor: '#172554',
-            backgroundOpacity: 0.90,
-            borderThickness: 1,
-            borderColor: lb.color
-          });
-        }
-      });
-    }
+    // Etiquetas farmacofóricas solo en el panel 2D, nunca sobre la molécula 3D.
     if (!skipRender) renderViewerAdaptive();
   }
 
@@ -3819,6 +3816,9 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
         stick: { radius: isPentamerOverview ? 0.34 : 0.24, colorscheme: 'Jmol' },
         sphere: { scale: isPentamerOverview ? 0.52 : 0.30, colorscheme: 'Jmol' }
       });
+      if (state.showSurface && idx === 0) {
+        viewer.addSurface($3Dmol.SurfaceType.VDW, { opacity: 0.22, color: '#94a3b8' }, lsel);
+      }
       if (state.showLabels && (idx === 0 || entry.ligands.length <= 2)) {
         const latoms = model.selectedAtoms(lsel);
         if (latoms.length) {
@@ -3843,7 +3843,7 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
       nearRes.forEach(r => {
         const isKey = keySet.has(`${r.chain}:${r.resi}`);
         viewer.addStyle({ chain: r.chain, resi: r.resi, hetflag: false }, {
-          stick: { radius: isKey ? 0.22 : 0.14, colorscheme: isKey ? 'orangeCarbon' : 'Jmol' }
+          stick: { radius: isKey ? 0.22 : 0.14, colorscheme: 'Jmol' }
         });
         viewer.addLabel(`${r.resn}${r.resi}`, {
           position: r.caPos,
@@ -3858,7 +3858,7 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     } else if (entry.keyResidues && state.showLabels && !isPentamerOverview) {
       entry.keyResidues.forEach(kr => {
         viewer.addStyle({ chain: kr.chain, resi: kr.resi, hetflag: false }, {
-          stick: { radius: 0.21, colorscheme: 'orangeCarbon' }
+          stick: { radius: 0.21, colorscheme: 'Jmol' }
         });
         const ka = model.selectedAtoms({ chain: kr.chain, resi: kr.resi, atom: 'CA' })[0];
         if (ka) {
@@ -4002,6 +4002,11 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
     // Enable Residuos <= 4 A on BOTH PDB crystals and small molecules (simulated pocket)
     els.btnRes4A.disabled = false;
     els.btnRes4A.classList.toggle('active', isRes4AActive(entry));
+    if (els.btnLabels) {
+      const isPdbTarget = entry.type === 'pdb';
+      els.btnLabels.disabled = !isPdbTarget;
+      els.btnLabels.classList.toggle('active', isPdbTarget && state.showLabels);
+    }
 
     if (!initViewer()) return;
     hideError();
@@ -5084,10 +5089,11 @@ body.dark-mode .btn.btn-hdr-danger:hover:not(:disabled) {
   });
 
   els.btnLabels.addEventListener('click', () => {
+    const entry = TARGETS[state.targetId];
+    if (!entry || entry.type !== 'pdb') return;
     state.showLabels = !state.showLabels;
     els.btnLabels.classList.toggle('active', state.showLabels);
-    const entry = TARGETS[state.targetId];
-    if (!entry || !state.activeModel) return;
+    if (!state.activeModel) return;
     if (entry.type === 'pdb') applyPDBStyle(state.activeModel, entry, state.activeFocusSel, state.activeViewId);
     else applySmallMolStyle(state.activeModel, entry);
   });
