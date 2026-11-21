@@ -185,8 +185,8 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
 
     const weightedScore = (finalExamScore * 0.70) + (parcialScore * 0.20) + (labScore * 0.05) + (trabajosScore * 0.05);
     
-    // Si no alcanza el mínimo en el examen final, la nota final no puede superar 4.9
-    const finalScore = isExamMinimumMet ? weightedScore : Math.min(weightedScore, 4.9);
+    // Si no alcanza el mínimo en el examen final o en prácticas, la nota final no puede superar 4.9
+    const finalScore = isExamMinimumMet && isLabApproved ? weightedScore : Math.min(weightedScore, 4.9);
 
     return {
       finalExamScore: finalExamScore.toFixed(1),
@@ -194,6 +194,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
       labScore: labScore.toFixed(1),
       trabajosScore: trabajosScore.toFixed(1),
       finalScore: finalScore.toFixed(2),
+      finalSinTope: weightedScore.toFixed(2),
       isPassed: finalScore >= 5.0 && isExamMinimumMet && isLabApproved,
       isExamMinimumMet,
       isLabApproved
@@ -611,6 +612,11 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                       <div className="font-mono" style={{ fontSize: '1.9rem', fontWeight: 800, color: isPassed ? 'var(--ok-ink)' : 'var(--bad-ink)' }}>
                         {finalScore}
                       </div>
+                      {Number(calculateOfficialGrade(myStudentProfile).finalSinTope) !== Number(finalScore) && (
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          Sin tope del 4,90: {calculateOfficialGrade(myStudentProfile).finalSinTope.replace('.', ',')}
+                        </span>
+                      )}
                       <span className="qfdos-badge" style={{ alignSelf: 'flex-start', background: isPassed ? '#10b981' : '#ef4444', color: '#fff', fontSize: '0.7rem', fontWeight: 700 }}>
                         {isPassed ? (Number(finalScore) >= 9 ? 'Sobresaliente' : Number(finalScore) >= 7 ? 'Notable' : 'Aprobado') : 'Suspenso'}
                       </span>
@@ -777,6 +783,11 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
                           <strong style={{ fontSize: '1rem', color: isPassed ? 'var(--navy-ink)' : 'var(--accent-red)' }}>
                             {finalScore}
                           </strong>
+                          {Number(calculateOfficialGrade(s).finalSinTope) !== Number(finalScore) && (
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              sin tope: {calculateOfficialGrade(s).finalSinTope.replace('.', ',')}
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: '10px 12px', textAlign: 'center' }}>
                           <span className={`qfdos-badge ${isPassed ? (Number(finalScore) >= 9 ? 'badge-emerald' : 'badge-teal') : 'badge-amber'}`} style={{ fontSize: '0.68rem' }}>
