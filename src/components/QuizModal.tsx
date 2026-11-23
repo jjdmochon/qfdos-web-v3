@@ -38,6 +38,7 @@ import {
 } from '../services/googleSheetsService';
 import { encolarIntento, anotarResultado, intentosPendientes, reenviarPendientes } from '../services/intentosPendientes';
 import { useAuth } from '../context/AuthContext';
+import { opcionTema6AntesDeResponder } from '../data/tema06OpcionesSinLeyenda';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { pulsable } from '../utils/a11y';
@@ -2433,6 +2434,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       const optSmiles = typeof opt === 'string' ? undefined : opt.smiles;
                       const optImagePath = typeof opt === 'string' ? undefined : opt.imagePath;
                       const optRevealedName = typeof opt === 'string' ? undefined : opt.revealedName;
+                      // Tema 6: hasta responder se enseña la copia sin la leyenda del nombre (en examen y en
+                      // práctica), sin recortes por CSS; tras responder, el original con el nombre
+                      const optImageAntes = optImagePath ? opcionTema6AntesDeResponder(optImagePath) : undefined;
+                      const optImageVista = optImageAntes && !showExplanation ? optImageAntes : optImagePath;
+                      const ocultarPieImagen = isExamMode && !showExplanation && !optImageAntes;
 
                       let optionBg = 'var(--surface)';
                       let optionBorder = 'var(--border-color)';
@@ -2512,13 +2518,15 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                   }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    const src = optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`;
+                                    const ruta = optImageVista ?? optImagePath;
+                                    const src = ruta.startsWith('http') ? ruta : `${import.meta.env.BASE_URL || '/'}${ruta.replace(/^\//, '')}`;
                                     setLightboxImage({
                                       src,
                                       title: showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`),
                                       subtitle: `Pregunta ${currentIndex + 1}`,
                                       tag: `Opción ${String.fromCharCode(65 + idx)}`,
-                                      hideBottomLabel: isExamMode && !showExplanation
+                                      hideBottomLabel: ocultarPieImagen,
+                                      hideDownload: isExamMode && !showExplanation
                                     });
                                   }}
                                   title="Haz clic para ampliar la estructura (no selecciona la opción)"
@@ -2533,7 +2541,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                     }}
                                   >
                                     <img
-                                      src={optImagePath.startsWith('http') ? optImagePath : `${import.meta.env.BASE_URL || '/'}${optImagePath.replace(/^\//, '')}`}
+                                      src={(optImageVista ?? optImagePath).startsWith('http') ? (optImageVista ?? optImagePath) : `${import.meta.env.BASE_URL || '/'}${(optImageVista ?? optImagePath).replace(/^\//, '')}`}
                                       alt={showExplanation && optRevealedName ? optRevealedName : (optText || `Opción ${String.fromCharCode(65 + idx)}`)}
                                       style={{
                                         maxHeight: '110px',
@@ -2542,12 +2550,12 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                                         height: 'auto',
                                         objectFit: 'contain',
                                         display: 'block',
-                                        ...((isExamMode && !showExplanation) ? {
+                                        ...(ocultarPieImagen ? {
                                           clipPath: 'inset(0 0 13% 0)'
                                         } : {})
                                       }}
                                     />
-                                    {(isExamMode && !showExplanation) && (
+                                    {ocultarPieImagen && (
                                       <div
                                         style={{
                                           position: 'absolute',

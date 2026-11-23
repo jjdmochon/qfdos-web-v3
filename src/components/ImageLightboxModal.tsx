@@ -17,6 +17,8 @@ export interface LightboxImagePayload {
   tag?: string;
   /** Oculta el nombre/leyenda de la molécula que aparece dibujada en la zona inferior de la estructura (para Modo Examen) */
   hideBottomLabel?: boolean;
+  /** Oculta el botón Descargar sin recortar la imagen (imagen ya sin leyenda en Modo Examen) */
+  hideDownload?: boolean;
 }
 
 interface ImageLightboxModalProps {
@@ -153,7 +155,7 @@ export const ImageLightboxModal: React.FC<ImageLightboxModalProps> = ({ image, o
           </button>
 
           {/* Botón Descargar (solo disponible fuera de modo examen) */}
-          {!image.hideBottomLabel && (
+          {!image.hideBottomLabel && !image.hideDownload && (
             <button
               onClick={handleDownload}
               className="btn btn-sm"
