@@ -163,10 +163,17 @@ function construirGrupos(topics: QfdosTopic[], resourceLinks: QfdosResourceLink[
     const acciones: Accion[] = [];
     if (tema && cb.onAbrirTema) acciones.push({ label: `Ir al ${tema.number}`, icono: 'tema', alPulsar: () => cb.onAbrirTema?.(tema) });
     if (a.pdfUrl) acciones.push({ label: a.pdfName || 'Abrir el PDF', icono: 'pdf', href: resolver(a.pdfUrl) });
-    if (a.linkUrl) acciones.push({ label: a.linkLabel || 'Más información', icono: 'enlace', href: resolver(a.linkUrl) });
-    // Novedad de un tema con clip: se reproduce el clip, con el cartel como póster
+    if (a.linkUrl) {
+      const ruta = a.linkUrl;
+      // Una ruta de la propia web (#/temario) se abre aquí mismo, al cerrar el visor
+      acciones.push(ruta.startsWith('#/')
+        ? { label: a.linkLabel || 'Más información', icono: 'tema', alPulsar: () => { window.location.hash = ruta.slice(1); } }
+        : { label: a.linkLabel || 'Más información', icono: 'enlace', href: resolver(ruta) });
+    }
+    // Novedad con vídeo propio (videoUrl) o de un tema con clip: se reproduce, con el cartel como póster
     const medios = a.temaId ? MEDIOS_TEMA[a.temaId] : undefined;
-    const clip = medios?.clip;
+    const videoAviso = a.videoUrl && /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(a.videoUrl) ? a.videoUrl : undefined;
+    const clip = videoAviso ?? medios?.clip;
     const cartel = a.imageUrl ? resolver(a.imageUrl) : medios?.imagen ? resolver(medios.imagen) : undefined;
     return {
       id: `aviso-${a.id}`, grupo: 'avisos', fondo: 'marca', etiqueta: 'Novedad',

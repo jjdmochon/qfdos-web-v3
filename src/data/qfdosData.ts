@@ -619,9 +619,10 @@ export interface StudentQuestion {
  * v3.86.2 — Temas 01, 02 y 06: retirada temporal de acetilcolina-3d.html, noradrenalina-3d.html y opioides-3d.html del repositorio público y ocultación de sus enlaces hasta implantar acceso docente real (Temas 03 y 04 intactos).
  * v3.87.0 — Temas 01, 02, 05 y 06: acceso docente real a los Libros Interactivos 3D mediante cifrado AES-256-GCM en navegador (Web Crypto), claves individuales en PropertiesService y validación de sesión docente en cada petición (Codigo.gs v15 · accion=libroClave); Temas 03 y 04 públicos intactos.
  * v3.88.0 — Temas 01, 02, 05 y 06: publicación abierta para todo el alumnado de los Libros Interactivos 3D (Acetilcolina, Noradrenalina, GABA y Opioides) en claro sin acceso docente ni cifrado, junto con Dopamina y Serotonina.
+ * v3.89.0 — Aviso «Libros interactivos 3D» con vídeo propio (historias/libros-3d-novedad.mp4): se reproduce en «Novedades del curso» de las Historias (videoUrl del aviso, con cartel de póster) y dentro de su tarjeta del Tablón de avisos; los enlaces internos (#/temario) se abren en la misma pestaña.
  */
-export const COURSE_DATA_VERSION = '3.88.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-23T08:36:00.000Z';
+export const COURSE_DATA_VERSION = '3.89.0';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-23T11:27:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 
@@ -651,9 +652,21 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-tema06-revision', 'ann-tema05-lanzamiento', 'ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-libros-3d-novedad', 'ann-tema06-revision', 'ann-tema05-lanzamiento', 'ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-libros-3d-novedad',
+    title: 'Libros interactivos 3D',
+    content: 'Ya tenéis disponibles los libros de los seis primeros temas. Iremos completando los diez. En el vídeo podéis ver los visores 2D y 3D y la cámara opcional, mostrada con un fondo simulado.',
+    date: '23 Noviembre 2026',
+    priority: 'normal',
+    imageUrl: 'historias/libros-3d-novedad.jpg',
+    videoUrl: 'historias/libros-3d-novedad.mp4',
+    linkUrl: '#/temario',
+    linkLabel: 'Abrir el temario',
+    enHistorias: true
+  },
   {
     id: 'ann-tema06-revision',
     title: '🎙️ Tema 6 · Sistema Opioide e Hipnoanalgésicos: materiales y podcast disponibles',

@@ -227,7 +227,11 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {avisosVisibles.map(ann => (
+              {avisosVisibles.map(ann => {
+                // Vídeo propio de la web (mp4…): se reproduce aquí mismo, con la imagen del aviso como póster
+                const videoPropio = ann.videoUrl && /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(ann.videoUrl) ? ann.videoUrl : undefined;
+                const rutaInterna = !!ann.linkUrl?.startsWith('#/');
+                return (
                 <div key={ann.id} className="ann-card ann-normal">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 4, gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -239,8 +243,30 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                   </div>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5, margin: '4px 0 8px' }}>{ann.content}</p>
 
+                  {/* Multimedia: Vídeo propio */}
+                  {videoPropio && (
+                    <video
+                      controls
+                      playsInline
+                      preload="none"
+                      poster={ann.imageUrl}
+                      src={videoPropio}
+                      aria-label={ann.title}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        maxHeight: 420,
+                        objectFit: 'contain',
+                        background: '#0f1c2d',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)',
+                        margin: '8px 0'
+                      }}
+                    />
+                  )}
+
                   {/* Multimedia: Imagen */}
-                  {ann.imageUrl && (
+                  {ann.imageUrl && !videoPropio && (
                     <div style={{ marginTop: 8, marginBottom: 8 }}>
                       <a href={ann.imageUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
                         <img
@@ -304,7 +330,7 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                           <FileText size={13} color="var(--navy-ink)" /> {ann.pdfName || 'Documento PDF Adjunto'}
                         </a>
                       )}
-                      {ann.videoUrl && (
+                      {ann.videoUrl && !videoPropio && (
                         <a
                           href={ann.videoUrl}
                           target="_blank"
@@ -318,18 +344,19 @@ export const HubDashboard: React.FC<HubDashboardProps> = ({
                       {ann.linkUrl && (
                         <a
                           href={ann.linkUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          target={rutaInterna ? undefined : '_blank'}
+                          rel={rutaInterna ? undefined : 'noopener noreferrer'}
                           className="btn btn-sm btn-ghost"
                           style={{ fontSize: '0.72rem', padding: '4px 9px', gap: 5, color: 'var(--teal-ink)' }}
                         >
-                          <ExternalLink size={12} /> {ann.linkLabel || 'Más información'}
+                          {rutaInterna ? <ArrowRight size={12} /> : <ExternalLink size={12} />} {ann.linkLabel || 'Más información'}
                         </a>
                       )}
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {anteriores > 0 && (
