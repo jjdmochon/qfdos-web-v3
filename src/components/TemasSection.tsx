@@ -349,7 +349,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                       📘 Libro 3D · AR ✓
                     </span>
                   )}
-                  {(topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') && test && (
+                  {(topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06' || topic.id === 'tema-07') && test && (
                     <span 
                       style={{ 
                         fontSize: '0.66rem', 
@@ -579,7 +579,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                         }}
                         title="Realizar autoevaluación tipo test"
                       >
-                        <HelpCircle size={13} /> {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06' || topic.vistaPrivada ? 'Test (MODELOS)' : `Test (${topic.testQuestions ? topic.testQuestions.length : 0})`}
+                        <HelpCircle size={13} /> {topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06' || topic.id === 'tema-07' || topic.vistaPrivada ? 'Test (MODELOS)' : `Test (${topic.testQuestions ? topic.testQuestions.length : 0})`}
                       </button>
                     )}
 

@@ -25,7 +25,10 @@ import {
   TEMA5_MODELO_3_TEST_QUESTIONS,
   TEMA6_MODELO_1_TEST_QUESTIONS,
   TEMA6_MODELO_2_TEST_QUESTIONS,
-  TEMA6_MODELO_3_TEST_QUESTIONS
+  TEMA6_MODELO_3_TEST_QUESTIONS,
+  TEMA7_MODELO_1_TEST_QUESTIONS,
+  TEMA7_MODELO_2_TEST_QUESTIONS,
+  TEMA7_MODELO_3_TEST_QUESTIONS
 } from '../data/qfdosData';
 import {
   submitAttemptToGoogleSheets,
@@ -94,7 +97,8 @@ export type QuizModelType =
   | 't3-modelo-1' | 't3-modelo-2' | 't3-modelo-3'
   | 't4-modelo-1' | 't4-modelo-2' | 't4-modelo-3'
   | 't5-modelo-1' | 't5-modelo-2' | 't5-modelo-3'
-  | 't6-modelo-1' | 't6-modelo-2' | 't6-modelo-3';
+  | 't6-modelo-1' | 't6-modelo-2' | 't6-modelo-3'
+  | 't7-modelo-1' | 't7-modelo-2' | 't7-modelo-3';
 
 /** Modelos del Tema 3 que ve el alumnado en el selector (tarjetas generadas desde esta lista). */
 const MODELOS_TEMA3: { id: QuizModelType; n: number; titulo: string; etiqueta: string; resumen: string; color: string; fondo: string; tinta: string }[] = [
@@ -172,7 +176,26 @@ const MODELOS_TEMA6: typeof MODELOS_TEMA3 = [
   }
 ];
 
-const MODELOS_TEMAS_TEST = [...MODELOS_TEMA3, ...MODELOS_TEMA4, ...MODELOS_TEMA5, ...MODELOS_TEMA6];
+/** Modelos del Tema 7 (Sistema histaminérgico). */
+const MODELOS_TEMA7: typeof MODELOS_TEMA3 = [
+  {
+    id: 't7-modelo-1', n: 1, titulo: 'Antihistamínicos H₁, Síntesis de antihistamínicos, Biosíntesis y almacenamiento', etiqueta: 'Revisado por el profesor',
+    resumen: "Antihistamínicos H₁, Síntesis de antihistamínicos, Biosíntesis y almacenamiento, Tautomería del anillo de imidazol, Segunda generación, Antagonistas H₂, Los cuatro receptores, Propilaminas, H₁ frente a H₂.",
+    color: 'var(--navy)', fondo: 'rgba(30, 58, 138, 0.05)', tinta: 'var(--navy-ink)'
+  },
+  {
+    id: 't7-modelo-2', n: 2, titulo: 'Tautomería del anillo de imidazol, Antagonistas H₂, Los cuatro receptores', etiqueta: 'Revisado por el profesor',
+    resumen: "Tautomería del anillo de imidazol, Antagonistas H₂, Los cuatro receptores, Síntesis de antihistamínicos, Etilendiaminas, Primera generación, Conformación, Segunda generación, De la tiourea a la cianoguanidina.",
+    color: 'var(--teal)', fondo: 'rgba(13, 148, 136, 0.05)', tinta: 'var(--teal-ink)'
+  },
+  {
+    id: 't7-modelo-3', n: 3, titulo: 'Antagonistas H₂, Síntesis de antihistamínicos, Biosíntesis y almacenamiento', etiqueta: 'Revisado por el profesor',
+    resumen: "Antagonistas H₂, Síntesis de antihistamínicos, Biosíntesis y almacenamiento, Tautomería del anillo de imidazol, Primera generación, Segunda generación, Los cuatro receptores.",
+    color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
+  }
+];
+
+const MODELOS_TEMAS_TEST = [...MODELOS_TEMA3, ...MODELOS_TEMA4, ...MODELOS_TEMA5, ...MODELOS_TEMA6, ...MODELOS_TEMA7];
 
 export const QuizModal: React.FC<QuizModalProps> = ({
   topic,
@@ -183,7 +206,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   // Model Selection State
   const [selectedModel, setSelectedModel] = useState<QuizModelType>(
-    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : topic.id === 'tema-04' ? 't4-modelo-1' : topic.id === 'tema-05' ? 't5-modelo-1' : topic.id === 'tema-06' ? 't6-modelo-1' : 'modelo-e'
+    topic.id === 'tema-02' ? 't2-modelo-1' : topic.id === 'tema-03' ? 't3-modelo-1' : topic.id === 'tema-04' ? 't4-modelo-1' : topic.id === 'tema-05' ? 't5-modelo-1' : topic.id === 'tema-06' ? 't6-modelo-1' : topic.id === 'tema-07' ? 't7-modelo-1' : 'modelo-e'
   );
 
   useEffect(() => {
@@ -197,6 +220,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       setSelectedModel('t5-modelo-1');
     } else if (topic.id === 'tema-06') {
       setSelectedModel('t6-modelo-1');
+    } else if (topic.id === 'tema-07') {
+      setSelectedModel('t7-modelo-1');
     } else if (topic.id === 'tema-01') {
       setSelectedModel('modelo-e');
     }
@@ -250,6 +275,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (selectedModel === 't6-modelo-2') return TEMA6_MODELO_2_TEST_QUESTIONS;
       if (selectedModel === 't6-modelo-3') return TEMA6_MODELO_3_TEST_QUESTIONS;
       return TEMA6_MODELO_1_TEST_QUESTIONS;
+    }
+    if (topic.id === 'tema-07') {
+      if (selectedModel === 't7-modelo-2') return TEMA7_MODELO_2_TEST_QUESTIONS;
+      if (selectedModel === 't7-modelo-3') return TEMA7_MODELO_3_TEST_QUESTIONS;
+      return TEMA7_MODELO_1_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
   }, [topic, selectedModel, isProfesor]);
@@ -637,6 +667,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       case 't6-modelo-1': return 'var(--navy)';
       case 't6-modelo-2': return 'var(--teal)';
       case 't6-modelo-3': return '#8b5cf6';
+      case 't7-modelo-1': return 'var(--navy)';
+      case 't7-modelo-2': return 'var(--teal)';
+      case 't7-modelo-3': return '#8b5cf6';
       case 'modelo-e': return 'var(--navy)';
       case 'modelo-fir': return 'var(--teal)';
       case 'modelo-b': return '#8b5cf6';
@@ -663,6 +696,8 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       if (!MODELOS_TEMA5.some(m => m.id === selectedModel)) setSelectedModel('t5-modelo-1');
     } else if (topic.id === 'tema-06') {
       if (!MODELOS_TEMA6.some(m => m.id === selectedModel)) setSelectedModel('t6-modelo-1');
+    } else if (topic.id === 'tema-07') {
+      if (!MODELOS_TEMA7.some(m => m.id === selectedModel)) setSelectedModel('t7-modelo-1');
     } else {
       if (selectedModel !== 'modelo-e' && selectedModel !== 'modelo-fir' && selectedModel !== 'modelo-a') {
         setSelectedModel('modelo-e');
@@ -1798,9 +1833,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       </div>
                     )}
 
-                    {(topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') && (
+                    {(topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06' || topic.id === 'tema-07') && (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '12px', marginBottom: '12px' }}>
-                        {(topic.id === 'tema-06' ? MODELOS_TEMA6 : topic.id === 'tema-05' ? MODELOS_TEMA5 : topic.id === 'tema-04' ? MODELOS_TEMA4 : MODELOS_TEMA3).map(mod => {
+                        {(topic.id === 'tema-07' ? MODELOS_TEMA7 : topic.id === 'tema-06' ? MODELOS_TEMA6 : topic.id === 'tema-05' ? MODELOS_TEMA5 : topic.id === 'tema-04' ? MODELOS_TEMA4 : MODELOS_TEMA3).map(mod => {
                           const st = getModelStats(mod.id);
                           const activo = selectedModel === mod.id;
                           return (

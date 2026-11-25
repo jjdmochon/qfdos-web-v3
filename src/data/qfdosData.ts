@@ -625,6 +625,7 @@ export interface StudentQuestion {
  * v3.88.0 — Temas 01, 02, 05 y 06: publicación abierta para todo el alumnado de los Libros Interactivos 3D (Acetilcolina, Noradrenalina, GABA y Opioides) en claro sin acceso docente ni cifrado, junto con Dopamina y Serotonina.
  * v3.89.0 — Aviso «Libros interactivos 3D» con vídeo propio (historias/libros-3d-novedad.mp4): se reproduce en «Novedades del curso» de las Historias (videoUrl del aviso, con cartel de póster) y dentro de su tarjeta del Tablón de avisos; los enlaces internos (#/temario) se abren en la misma pestaña.
  * v3.90.0 — Test del Tema 6: las opciones con imagen ya no revelan el nombre antes de responder, en examen y en práctica (miniatura y ampliador usan copias -sin-leyenda de las 31 estructuras QFDOS-* con el nombre impreso; alfentanilo y dextropropoxifeno, sin leyenda de origen, se ven intactos y sin recorte); tras responder vuelve el original con el nombre.
+ * v3.95.0 — Tema 7: banco de 3 modelos de 15 preguntas (45) en el código, con las mismas pantallas que los Temas 3 a 6 (examen registrado y repetible, o preparación) y sus claves en el panel de publicación. El tema sigue «En Revisión»: el alumnado no ve el test hasta que el profesorado lo publique.
  * v3.94.1 — Test privado del Tema 7: figura compacta dentro de la pregunta (altura máxima adaptable a la pantalla, object-fit contain) con ampliación a pantalla completa; solo tamaño, sin tocar el banco ni el backend.
  * v3.94.4 — Seguimiento del alumnado: el límite de espera de la consulta al servidor pasa de 8 s a 30 s (la consulta abre tres hojas y puede tardar más de 8 s). Solo cliente.
  * v3.94.3 — Vista docente del Tema 7: botón verde del podcast con contraste suficiente (texto blanco sobre verde oscuro) y tarjeta «5. Test de Autoevaluación» con el texto veraz (tres modelos, sin registro de calificaciones). Integra la figura compacta (3.94.1) y el estado del audio (3.94.2). Solo código; sin datos privados.
@@ -633,7 +634,7 @@ export interface StudentQuestion {
  * v3.93.0 — Vista docente privada del Tema 7 (test interactivo con corrección, flashcards y podcast): solo para el profesor titular, el contenido se pide a Apps Script con comprobación de sesión en el servidor, vive en memoria y no está en la web ni en el repositorio. El Tema 7 sigue «En Revisión» para el alumnado.
  * v3.92.0 — Gestión docente: sección «Exámenes privados» (solo profesor; los documentos se piden a Codigo.gs a demanda, con comprobación de sesión en el servidor, y no se guardan en el navegador ni en la web).
  */
-export const COURSE_DATA_VERSION = '3.94.4';
+export const COURSE_DATA_VERSION = '3.95.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-11-25T15:25:32.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
@@ -2321,6 +2322,8 @@ import { TEMA5_MODELO_1_TEST_QUESTIONS } from './tema05ExamsData';
 import { TEMA5_FLASHCARDS } from './tema05FlashcardsData';
 export * from './tema06ExamsData';
 import { TEMA6_MODELO_1_TEST_QUESTIONS } from './tema06ExamsData';
+export * from './tema07ExamsData';
+import { TEMA7_MODELO_1_TEST_QUESTIONS } from './tema07ExamsData';
 import { TEMA6_FLASHCARDS } from './tema06FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
@@ -5697,24 +5700,7 @@ flashcards: [
       }
     ],
     attachments: [],
-    testQuestions: [
-      {
-        id: 't07-q1',
-        topicId: 'tema-07',
-        block: 'Antihistamínicos H1',
-        question: '¿Qué característica estructural explica la ausencia de efectos sedantes centrales en la cetirizina frente a la hidroxizina de la que deriva?',
-        questionSmiles: 'c1ccc(cc1)C(c2ccc(Cl)cc2)N3CCN(CC3)CCOCC(=O)O',
-        options: [
-          'La eliminación completa del anillo aromático clorado.',
-          'La presencia de un grupo ácido carboxílico terminal (-COOH) que a pH fisiológico existe como ion carboxilato zwitteriónico, impidiendo atravesar la BHE.',
-          'Su degradación ácida ultra-rápida en el torrente sanguíneo.',
-          'Su unión irreversible a los receptores H2 gástricos.'
-        ],
-        correctIndex: 1,
-        explanation: 'La cetirizina es el metabolito carboxílico de la hidroxizina. Su carácter polar zwitteriónico reduce drásticamente la permeabilidad pasiva a través de la barrera hematoencefálica, eliminando la somnolencia central.',
-        difficulty: 'Fácil'
-      }
-    ],
+    testQuestions: TEMA7_MODELO_1_TEST_QUESTIONS,
     flashcards: [
       {
         id: 'fc-07-1',
