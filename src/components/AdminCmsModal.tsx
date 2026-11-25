@@ -11,6 +11,8 @@ import {
 import { PanelDudasProfesor } from './PanelDudasProfesor';
 import { PanelClavesCorreccion } from './PanelClavesCorreccion';
 import { PanelSeguimiento } from './PanelSeguimiento';
+import { PanelExamenesPrivados } from './PanelExamenesPrivados';
+import { listaExamenesPrivados, type DocumentoPrivado } from '../services/examenesPrivados';
 import { 
   getStoredGeminiApiKey, 
   setStoredGeminiApiKey 
@@ -46,7 +48,8 @@ import {
   Image,
   Film,
   Headphones,
-  Users
+  Users,
+  Lock
 } from 'lucide-react';
 
 interface AdminCmsModalProps {
@@ -87,7 +90,14 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
   initialTab = 'modules',
   initialEditingTopicId
 }) => {
-  const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'seguimiento' | 'apikey'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'materials' | 'modules' | 'announcements' | 'links' | 'drugs' | 'questions' | 'seguimiento' | 'apikey' | 'examenes'>(initialTab);
+  // Exámenes privados: la pestaña solo existe si el servidor responde ok (solo para el profesor). Solo en memoria.
+  const [examenesDocs, setExamenesDocs] = useState<DocumentoPrivado[] | null>(null);
+  React.useEffect(() => {
+    let vivo = true;
+    listaExamenesPrivados().then(d => { if (vivo) setExamenesDocs(d); });
+    return () => { vivo = false; };
+  }, []);
   const [materialsTopicId, setMaterialsTopicId] = useState<string>('');
   const [moduleSaveSuccess, setModuleSaveSuccess] = useState<string | null>(null);
 
@@ -677,6 +687,14 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
             >
               <Key size={14} /> Clave API Gemini
             </button>
+            {examenesDocs && (
+              <button
+                onClick={() => setActiveTab('examenes')}
+                className={`tab-btn ${activeTab === 'examenes' ? 'active' : ''}`} role="tab" aria-selected={activeTab === 'examenes'}
+              >
+                <Lock size={14} /> Exámenes privados
+              </button>
+            )}
           </div>
         </div>
 
@@ -2115,6 +2133,10 @@ export const AdminCmsModal: React.FC<AdminCmsModalProps> = ({
               <PanelClavesCorreccion topics={topics} />
               <PanelSeguimiento topics={topics} />
             </div>
+          )}
+
+          {activeTab === 'examenes' && examenesDocs && (
+            <PanelExamenesPrivados documentos={examenesDocs} />
           )}
 
           {/* TAB 5: Clave API Gemini */}
