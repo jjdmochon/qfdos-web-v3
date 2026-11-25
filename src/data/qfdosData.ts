@@ -207,6 +207,8 @@ export interface QfdosTopic {
   flashcards?: Flashcard[];
   /** Solo en memoria: el tema lleva contenido de la vista docente privada (nunca se guarda ni se publica) */
   vistaPrivada?: boolean;
+  /** Solo en memoria: avance o error de la descarga del podcast privado (nunca se guarda ni se publica) */
+  audioPrivado?: { fase: 'cargando' | 'error'; hechos: number; total: number; mensaje?: string };
   lectureAudios?: LectureAudioNote[];
   /** false = el test existe pero aún no se ofrece al alumnado */
   testDisponible?: boolean;
@@ -623,12 +625,13 @@ export interface StudentQuestion {
  * v3.88.0 — Temas 01, 02, 05 y 06: publicación abierta para todo el alumnado de los Libros Interactivos 3D (Acetilcolina, Noradrenalina, GABA y Opioides) en claro sin acceso docente ni cifrado, junto con Dopamina y Serotonina.
  * v3.89.0 — Aviso «Libros interactivos 3D» con vídeo propio (historias/libros-3d-novedad.mp4): se reproduce en «Novedades del curso» de las Historias (videoUrl del aviso, con cartel de póster) y dentro de su tarjeta del Tablón de avisos; los enlaces internos (#/temario) se abren en la misma pestaña.
  * v3.90.0 — Test del Tema 6: las opciones con imagen ya no revelan el nombre antes de responder, en examen y en práctica (miniatura y ampliador usan copias -sin-leyenda de las 31 estructuras QFDOS-* con el nombre impreso; alfentanilo y dextropropoxifeno, sin leyenda de origen, se ven intactos y sin recorte); tras responder vuelve el original con el nombre.
+ * v3.94.2 — Podcast privado del Tema 7: estado visible desde que se confirma el acceso, con «Cargando audio… (X de N)» y, si falla un paso, mensaje claro y botón «Reintentar». El audio sigue solo en memoria.
  * v3.94.0 — Test privado del Tema 7 con el mismo formato que el Test (MODELOS) del Tema 6 (pantalla inicial, tarjetas de modelo, examen y preparación) y flashcards privadas sin guardado, sin sincronización y sin envío de opiniones. Solo docente; sigue sin registro de notas.
  * v3.93.0 — Vista docente privada del Tema 7 (test interactivo con corrección, flashcards y podcast): solo para el profesor titular, el contenido se pide a Apps Script con comprobación de sesión en el servidor, vive en memoria y no está en la web ni en el repositorio. El Tema 7 sigue «En Revisión» para el alumnado.
  * v3.92.0 — Gestión docente: sección «Exámenes privados» (solo profesor; los documentos se piden a Codigo.gs a demanda, con comprobación de sesión en el servidor, y no se guardan en el navegador ni en la web).
  */
-export const COURSE_DATA_VERSION = '3.94.0';
-export const COURSE_BUILD_TIMESTAMP = '2026-11-25T15:10:00.000Z';
+export const COURSE_DATA_VERSION = '3.94.2';
+export const COURSE_BUILD_TIMESTAMP = '2026-11-25T18:10:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
 

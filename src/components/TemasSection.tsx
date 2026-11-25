@@ -286,7 +286,7 @@ export const TemasSection: React.FC<TemasSectionProps> = ({
                   )}
                   {(!soloPublicados || (topic.spotifyPodcastUrl || topic.audioPodcastUrl)) && (
                     <span style={{ fontSize: '0.66rem', padding: '2px 6px', borderRadius: '4px', background: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'rgba(29,185,84,0.15)' : 'var(--surface-alt)', color: (topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? 'var(--ok-ink)' : 'var(--text-muted)' }}>
-                      🎙️ Podcast {(topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? '✓' : ''}
+                      🎙️ Podcast {(topic.spotifyPodcastUrl || topic.audioPodcastUrl) ? '✓' : topic.audioPrivado ? (topic.audioPrivado.fase === 'error' ? '⚠' : '…') : ''}
                     </span>
                   )}
                   {topic.id === 'tema-01' && (
