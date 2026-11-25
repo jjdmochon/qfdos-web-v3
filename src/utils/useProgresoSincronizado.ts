@@ -21,7 +21,9 @@ export function useProgresoSincronizado<T extends Valor>(
   mapa: Record<string, T>,
   setMapa: (m: Record<string, T>) => void,
   /** Solo sincroniza mientras está activo (por ejemplo, con el modal abierto) */
-  activo = true
+  activo = true,
+  /** Si es false no escribe las marcas de tiempo en localStorage (vista privada) */
+  persistir = true
 ): EstadoSync {
   const marcas = useRef<Record<string, number>>((() => {
     try { return JSON.parse(localStorage.getItem(almacenMarcas) || '{}'); } catch { return {}; }
@@ -34,6 +36,7 @@ export function useProgresoSincronizado<T extends Valor>(
   const [estado, setEstado] = useState<EstadoSync>('local');
 
   const guardarMarcas = () => {
+    if (!persistir) return;
     try { localStorage.setItem(almacenMarcas, JSON.stringify(marcas.current)); } catch { /* sin almacenamiento */ }
   };
 

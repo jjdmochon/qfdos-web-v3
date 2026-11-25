@@ -413,6 +413,7 @@ export const App: React.FC = () => {
       testDisponible: true,
       flashcards: privadoT7.flashcards,
       flashcardsDisponibles: true,
+      vistaPrivada: true,
       audioPodcastUrl: audioPrivadoT7 ?? t.audioPodcastUrl,
       audioPodcastName: audioPrivadoT7 ? 'Tema 7: Podcast de histamina (vista privada)' : t.audioPodcastName
     };
@@ -428,6 +429,7 @@ export const App: React.FC = () => {
       testDisponible: orig?.testDisponible,
       flashcards: orig?.flashcards,
       flashcardsDisponibles: orig?.flashcardsDisponibles,
+      vistaPrivada: undefined,
       audioPodcastUrl: t.audioPodcastUrl?.startsWith('blob:') ? orig?.audioPodcastUrl : t.audioPodcastUrl,
       audioPodcastName: t.audioPodcastName === 'Tema 7: Podcast de histamina (vista privada)' ? orig?.audioPodcastName : t.audioPodcastName
     };
@@ -752,7 +754,7 @@ export const App: React.FC = () => {
         <TestPrivadoModal datos={privadoT7} onClose={() => setTestPrivadoAbierto(false)} />
       )}
       {selectedFlashcardsTopic && (
-        <FlashcardsModal topic={conPrivado(selectedFlashcardsTopic)} onClose={() => setSelectedFlashcardsTopic(null)} />
+        <FlashcardsModal topic={conPrivado(selectedFlashcardsTopic)} privado={!!privadoT7 && selectedFlashcardsTopic.id === 'tema-07'} onClose={() => setSelectedFlashcardsTopic(null)} />
       )}
       {selectedSpotifyAttachment && (
         <SpotifyPlayerModal attachment={selectedSpotifyAttachment} onClose={() => setSelectedSpotifyAttachment(null)} />
