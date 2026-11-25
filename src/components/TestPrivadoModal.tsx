@@ -38,6 +38,8 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
   const [selected, setSelected] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [zoom, setZoom] = useState<LightboxImagePayload | null>(null);
+  // Proporción de cada figura (ancho/alto), medida al cargarla: las rejillas de varias estructuras (a–d) necesitan algo más de alto que una franja
+  const [proporciones, setProporciones] = useState<Record<string, number>>({});
 
   const modelo = datos.modelos[modelIdx];
   const questions = modelo.preguntas;
@@ -287,12 +289,17 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
 
               {q.imagen && (
                 <div
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem', background: '#ffffff', padding: '10px 14px', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border-color)', cursor: 'zoom-in', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '0.75rem', background: '#ffffff', padding: '6px 10px', borderRadius: 'var(--radius-md)', border: '1.5px solid var(--border-color)', cursor: 'zoom-in', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
                   onClick={() => ampliar(q)} {...pulsable(() => ampliar(q))}
                   title="Haz clic para ver la figura a pantalla completa"
                 >
-                  <img src={q.imagen} alt="Figura de la pregunta" style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain' }} />
-                  <span style={{ marginTop: '6px', fontSize: '0.72rem', color: 'var(--teal-ink)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <img
+                    src={q.imagen}
+                    alt="Figura de la pregunta"
+                    onLoad={e => { const k = `${modelo.id}-${q.n}`; const p = e.currentTarget.naturalWidth / (e.currentTarget.naturalHeight || 1); setProporciones(prev => (prev[k] === p ? prev : { ...prev, [k]: p })); }}
+                    style={{ maxHeight: (proporciones[`${modelo.id}-${q.n}`] ?? 3) < 2 ? 'clamp(160px, 42vw, 200px)' : 'clamp(120px, 30vw, 170px)', maxWidth: '100%', width: 'auto', height: 'auto', objectFit: 'contain' }}
+                  />
+                  <span style={{ marginTop: '3px', fontSize: '0.68rem', color: 'var(--teal-ink)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <Maximize2 size={12} /> Clic para ampliar a pantalla completa
                   </span>
                 </div>
@@ -389,7 +396,7 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
                         </span>
                       </div>
                       <div style={{ fontSize: '0.84rem', lineHeight: 1.45, marginBottom: '6px' }}>{p.enunciado}</div>
-                      {p.imagen && <img src={p.imagen} alt="Figura de la pregunta" style={{ maxHeight: '130px', maxWidth: '100%', objectFit: 'contain', background: '#fff', borderRadius: '6px', marginBottom: '6px' }} />}
+                      {p.imagen && <img src={p.imagen} alt="Figura de la pregunta" style={{ maxHeight: 'clamp(90px, 20vw, 120px)', maxWidth: '100%', objectFit: 'contain', background: '#fff', borderRadius: '6px', marginBottom: '6px' }} />}
                       <div style={{ fontSize: '0.78rem', lineHeight: 1.5 }}>
                         {r !== undefined && r >= 0 && !acierto && <div style={{ color: 'var(--bad-ink)' }}>Tu respuesta: {String.fromCharCode(65 + r)}) {p.opciones[r]}</div>}
                         <div style={{ color: 'var(--ok-ink)', fontWeight: 600 }}>Correcta: {String.fromCharCode(65 + p.correcta)}) {p.opciones[p.correcta]}</div>
