@@ -625,6 +625,7 @@ export interface StudentQuestion {
  * v3.88.0 — Temas 01, 02, 05 y 06: publicación abierta para todo el alumnado de los Libros Interactivos 3D (Acetilcolina, Noradrenalina, GABA y Opioides) en claro sin acceso docente ni cifrado, junto con Dopamina y Serotonina.
  * v3.89.0 — Aviso «Libros interactivos 3D» con vídeo propio (historias/libros-3d-novedad.mp4): se reproduce en «Novedades del curso» de las Historias (videoUrl del aviso, con cartel de póster) y dentro de su tarjeta del Tablón de avisos; los enlaces internos (#/temario) se abren en la misma pestaña.
  * v3.90.0 — Test del Tema 6: las opciones con imagen ya no revelan el nombre antes de responder, en examen y en práctica (miniatura y ampliador usan copias -sin-leyenda de las 31 estructuras QFDOS-* con el nombre impreso; alfentanilo y dextropropoxifeno, sin leyenda de origen, se ven intactos y sin recorte); tras responder vuelve el original con el nombre.
+ * v3.95.1 — Tema 7: las 34 flashcards del banco pasan al código y se abren al alumnado junto con el test (mismas tarjetas que la vista docente).
  * v3.95.0 — Tema 7: banco de 3 modelos de 15 preguntas (45) en el código, con las mismas pantallas que los Temas 3 a 6 (examen registrado y repetible, o preparación) y sus claves en el panel de publicación. El tema sigue «En Revisión»: el alumnado no ve el test hasta que el profesorado lo publique.
  * v3.94.1 — Test privado del Tema 7: figura compacta dentro de la pregunta (altura máxima adaptable a la pantalla, object-fit contain) con ampliación a pantalla completa; solo tamaño, sin tocar el banco ni el backend.
  * v3.94.4 — Seguimiento del alumnado: el límite de espera de la consulta al servidor pasa de 8 s a 30 s (la consulta abre tres hojas y puede tardar más de 8 s). Solo cliente.
@@ -634,7 +635,7 @@ export interface StudentQuestion {
  * v3.93.0 — Vista docente privada del Tema 7 (test interactivo con corrección, flashcards y podcast): solo para el profesor titular, el contenido se pide a Apps Script con comprobación de sesión en el servidor, vive en memoria y no está en la web ni en el repositorio. El Tema 7 sigue «En Revisión» para el alumnado.
  * v3.92.0 — Gestión docente: sección «Exámenes privados» (solo profesor; los documentos se piden a Codigo.gs a demanda, con comprobación de sesión en el servidor, y no se guardan en el navegador ni en la web).
  */
-export const COURSE_DATA_VERSION = '3.95.0';
+export const COURSE_DATA_VERSION = '3.95.1';
 export const COURSE_BUILD_TIMESTAMP = '2026-11-25T15:25:32.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
@@ -2325,6 +2326,7 @@ import { TEMA6_MODELO_1_TEST_QUESTIONS } from './tema06ExamsData';
 export * from './tema07ExamsData';
 import { TEMA7_MODELO_1_TEST_QUESTIONS } from './tema07ExamsData';
 import { TEMA6_FLASHCARDS } from './tema06FlashcardsData';
+import { TEMA7_FLASHCARDS } from './tema07FlashcardsData';
 
 export const INITIAL_TOPICS: QfdosTopic[] = [
   {
@@ -5701,18 +5703,8 @@ flashcards: [
     ],
     attachments: [],
     testQuestions: TEMA7_MODELO_1_TEST_QUESTIONS,
-    flashcards: [
-      {
-        id: 'fc-07-1',
-        topicId: 'tema-07',
-        concept: 'Grupos Isósteros en Antagonistas H2',
-        front: '¿Por qué en los antagonistas H2 se sustituyó el grupo tiourea de la metiamida por cianoguanidina (cimetidina) o nitroetenodiamina (ranitidina)?',
-        back: 'El grupo tiourea producía agranulocitosis tóxica en humanos. Los grupos cianoguanidina y nitroetenodiamina actúan como bioisósteros neutros polares coplanares, no ionizables a pH fisiológico, conservando la alta afinidad por H2 sin citotoxicidad medular.',
-        smiles: 'CN/C(=C\[N+](=O)[O-])/NCCSCC1=CC=C(O1)CN(C)C',
-        difficulty: 'medium',
-        category: 'Bioisosterismo & Toxicología'
-      }
-    ]
+    flashcardsDisponibles: true,
+    flashcards: TEMA7_FLASHCARDS
   },
   {
     id: 'tema-08',
