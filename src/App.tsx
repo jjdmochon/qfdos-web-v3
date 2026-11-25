@@ -38,6 +38,8 @@ import { CourseInfoSection } from './components/CourseInfoSection';
 
 import { QuizModal } from './components/QuizModal';
 import { FlashcardsModal } from './components/FlashcardsModal';
+import { TestPrivadoModal } from './components/TestPrivadoModal';
+import { cargarTemaPrivado, cargarAudioPrivado, preguntasComoTest, type TemaPrivado } from './services/temaPrivado';
 import { StudentQuestionModal } from './components/StudentQuestionModal';
 import { SpotifyPlayerModal } from './components/SpotifyPlayerModal';
 import { SearchModal } from './components/SearchModal';
@@ -378,6 +380,64 @@ export const App: React.FC = () => {
   );
   const [publicadoEn, setPublicadoEn] = useState<string>(contenidoEnCache()?.publicadoEn ?? '');
 
+  // Vista docente privada del Tema 7: solo en memoria, nunca en `topics` (que se guarda en localStorage y se publica)
+  const [privadoT7, setPrivadoT7] = useState<TemaPrivado | null>(null);
+  const [audioPrivadoT7, setAudioPrivadoT7] = useState<string | null>(null);
+  const [testPrivadoAbierto, setTestPrivadoAbierto] = useState(false);
+  useEffect(() => {
+    if (!isProfesor) { setPrivadoT7(null); setAudioPrivadoT7(null); return; }
+    let vivo = true;
+    let urlAudio: string | null = null;
+    cargarTemaPrivado().then(d => {
+      if (!vivo || !d) return;
+      setPrivadoT7(d);
+      cargarAudioPrivado().then(u => {
+        if (!u) return;
+        if (!vivo) { URL.revokeObjectURL(u); return; }
+        urlAudio = u;
+        setAudioPrivadoT7(u);
+      });
+    });
+    return () => {
+      vivo = false;
+      if (urlAudio) URL.revokeObjectURL(urlAudio);
+      setPrivadoT7(null);
+      setAudioPrivadoT7(null);
+    };
+  }, [isProfesor]);
+  const conPrivado = useCallback((t: QfdosTopic): QfdosTopic => {
+    if (!privadoT7 || t.id !== 'tema-07') return t;
+    return {
+      ...t,
+      testQuestions: preguntasComoTest(privadoT7),
+      testDisponible: true,
+      flashcards: privadoT7.flashcards,
+      flashcardsDisponibles: true,
+      audioPodcastUrl: audioPrivadoT7 ?? t.audioPodcastUrl,
+      audioPodcastName: audioPrivadoT7 ? 'Tema 7: Podcast de histamina (vista privada)' : t.audioPodcastName
+    };
+  }, [privadoT7, audioPrivadoT7]);
+  const topicsVista = useMemo(() => topics.map(conPrivado), [topics, conPrivado]);
+  /** Quita de un tema lo que solo existe en la vista privada antes de guardarlo */
+  const sinPrivado = (t: QfdosTopic): QfdosTopic => {
+    if (t.id !== 'tema-07' || !privadoT7) return t;
+    const orig = topics.find(x => x.id === 'tema-07');
+    return {
+      ...t,
+      testQuestions: orig?.testQuestions,
+      testDisponible: orig?.testDisponible,
+      flashcards: orig?.flashcards,
+      flashcardsDisponibles: orig?.flashcardsDisponibles,
+      audioPodcastUrl: t.audioPodcastUrl?.startsWith('blob:') ? orig?.audioPodcastUrl : t.audioPodcastUrl,
+      audioPodcastName: t.audioPodcastName === 'Tema 7: Podcast de histamina (vista privada)' ? orig?.audioPodcastName : t.audioPodcastName
+    };
+  };
+  const abrirTest = (t: QfdosTopic) => {
+    if (!testHabilitado(t, isProfesor)) return;
+    if (t.id === 'tema-07' && privadoT7) setTestPrivadoAbierto(true);
+    else setSelectedQuizTopic(t);
+  };
+
   const handleOpenAdmet = (drug: MoleculeDrug) => {
     setSelectedAdmetDrug(drug);
     navigateTo('admet');
@@ -624,13 +684,13 @@ export const App: React.FC = () => {
         {activeTab === 'info' && <CourseInfoSection />}
         {activeTab === 'temas' && (
           <TemasSection
-            topics={topics}
+            topics={topicsVista}
             onSelectTopic={(topic, tab) => { 
               setTopicInitialTab(tab);
               setSelectedTopicDetail(topic); 
               navigateTo('temas', topic.id); 
             }}
-            onOpenQuiz={t => { if (testHabilitado(t, isProfesor)) setSelectedQuizTopic(t); }}
+            onOpenQuiz={abrirTest}
             onOpenFlashcards={t => { if (flashcardsHabilitadas(t, isProfesor)) setSelectedFlashcardsTopic(t); }}
             onOpenCartas={(tema?: TemaCartas) => abrirCartas(tema ?? 1)}
             onEditTopic={handleOpenAdminCmsForTopic}
@@ -664,7 +724,7 @@ export const App: React.FC = () => {
       {/* Modals */}
       {selectedTopicDetail && (
         <TopicDetailModal
-          topic={selectedTopicDetail}
+          topic={conPrivado(selectedTopicDetail)}
           initialTab={topicInitialTab}
           onClose={() => {
             setSelectedTopicDetail(null);
@@ -674,11 +734,12 @@ export const App: React.FC = () => {
             }
           }}
           onUpdateTopic={updatedTopic => {
-            setTopics(prev => prev.map(t => t.id === updatedTopic.id ? updatedTopic : t));
-            setSelectedTopicDetail(updatedTopic);
+            const limpio = sinPrivado(updatedTopic);
+            setTopics(prev => prev.map(t => t.id === limpio.id ? limpio : t));
+            setSelectedTopicDetail(conPrivado(limpio));
           }}
           onEditTopicInCms={handleOpenAdminCmsForTopic}
-          onOpenQuiz={t => { if (!testHabilitado(t, isProfesor)) return; setSelectedTopicDetail(null); setSelectedQuizTopic(t); }}
+          onOpenQuiz={t => { if (!testHabilitado(t, isProfesor)) return; setSelectedTopicDetail(null); abrirTest(t); }}
           onOpenFlashcards={t => { if (!flashcardsHabilitadas(t, isProfesor)) return; setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
           onOpenAdmet={handleOpenAdmet}
@@ -687,8 +748,11 @@ export const App: React.FC = () => {
       {selectedQuizTopic && (
         <QuizModal topic={selectedQuizTopic} onClose={() => setSelectedQuizTopic(null)} />
       )}
+      {testPrivadoAbierto && privadoT7 && (
+        <TestPrivadoModal datos={privadoT7} onClose={() => setTestPrivadoAbierto(false)} />
+      )}
       {selectedFlashcardsTopic && (
-        <FlashcardsModal topic={selectedFlashcardsTopic} onClose={() => setSelectedFlashcardsTopic(null)} />
+        <FlashcardsModal topic={conPrivado(selectedFlashcardsTopic)} onClose={() => setSelectedFlashcardsTopic(null)} />
       )}
       {selectedSpotifyAttachment && (
         <SpotifyPlayerModal attachment={selectedSpotifyAttachment} onClose={() => setSelectedSpotifyAttachment(null)} />
