@@ -779,7 +779,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                     justifyContent: 'center',
                                     fontSize: '0.78rem',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                                    background: 'linear-gradient(135deg, #047857, #065f46)',
                                     color: '#ffffff',
                                     border: 'none',
                                     boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
@@ -855,7 +855,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (${topic.id === 'tema-02' || topic.id === 'tema-03' ? 'tres modelos disponibles' : 'cuatro modelos disponibles'}). Calificaciones volcadas en Google Sheets.`
+                                ? (topic.vistaPrivada
+                                  ? 'Tres modelos de 15 preguntas del banco privado, solo visibles en esta sesión de docente. No se registra ninguna calificación.'
+                                  : `${topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (${topic.id === 'tema-02' || topic.id === 'tema-03' ? 'tres modelos disponibles' : 'cuatro modelos disponibles'}). Calificaciones volcadas en Google Sheets.`)
                                 : `${topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales calibradas (${topic.id === 'tema-02' || topic.id === 'tema-03' ? '3 modelos disponibles' : 'modelos disponibles'}). Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
                               }
                             </p>
