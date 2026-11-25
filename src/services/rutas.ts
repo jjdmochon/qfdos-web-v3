@@ -10,6 +10,8 @@
  * Esta función antepone la base correcta en cada caso.
  */
 export function recurso(ruta: string): string {
+  // Imágenes ya resueltas (vista privada en memoria) o absolutas: no llevan la base
+  if (/^(data:|blob:|https?:)/i.test(ruta)) return ruta;
   const base = import.meta.env.BASE_URL || '/';
   const limpia = ruta.startsWith('/') ? ruta.slice(1) : ruta;
   return `${base.endsWith('/') ? base : base + '/'}${limpia}`;
