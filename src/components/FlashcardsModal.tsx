@@ -33,11 +33,14 @@ import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 interface FlashcardsModalProps {
   topic: QfdosTopic;
   onClose: () => void;
+  /** Vista docente privada: sin guardado local, sin sincronización con la cuenta y sin envío de opiniones */
+  privado?: boolean;
 }
 
 export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   topic,
-  onClose
+  onClose,
+  privado = false
 }) => {
   const { user } = useAuth();
 
@@ -64,6 +67,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
   const STORAGE_KEY = `qfdos_v3_flashcards_${topic.id}_${(user?.email || 'anonimo').toLowerCase()}`;
   const STORAGE_KEY_ANTIGUA = `qfdos_v3_flashcards_${topic.id}`;
   const [cardStats, setCardStats] = useState<{ [id: string]: 'easy' | 'medium' | 'hard' }>(() => {
+    if (privado) return {};
     try {
       const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY_ANTIGUA);
       return saved ? JSON.parse(saved) : {};
@@ -74,15 +78,16 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
 
   // Guardar en localStorage ante cualquier cambio
   useEffect(() => {
+    if (privado) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cardStats));
     } catch (e) {
       console.error('Error guardando flashcards en localStorage', e);
     }
-  }, [cardStats, STORAGE_KEY]);
+  }, [cardStats, STORAGE_KEY, privado]);
 
   // Sincronización con la cuenta (gana la valoración más reciente por tarjeta)
-  const estadoSync = useProgresoSincronizado(claveFlashcards(topic.id), `${STORAGE_KEY}_t`, cardStats, setCardStats);
+  const estadoSync = useProgresoSincronizado(claveFlashcards(topic.id), `${STORAGE_KEY}_t`, cardStats, setCardStats, !privado, !privado);
 
   // Tarjetas a mostrar según filtro
   const displayCards = useMemo(() => {
@@ -284,7 +289,9 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
             <User size={13} color="var(--teal)" />
             <span>
-              <strong>Repaso personal</strong> · no cuenta para la nota; al terminar puedes enviar al profesor tu opinión sobre la dificultad
+              {privado
+                ? <><strong>Repaso privado del docente</strong> · sin registro ni envío: tus valoraciones no se guardan y se pierden al cerrar</>
+                : <><strong>Repaso personal</strong> · no cuenta para la nota; al terminar puedes enviar al profesor tu opinión sobre la dificultad</>}
             </span>
           </div>
 
@@ -359,7 +366,9 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                   Resumen del repaso: {topic.title}
                 </h4>
                 <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: '0 0 12px 0' }}>
-                  Las flashcards son para estudiar: no se califican. Si quieres, envía al profesor qué tarjetas te han resultado difíciles.
+                  {privado
+                    ? 'Las flashcards son para estudiar: no se califican y en esta vista privada no se guarda ni se envía nada.'
+                    : 'Las flashcards son para estudiar: no se califican. Si quieres, envía al profesor qué tarjetas te han resultado difíciles.'}
                 </p>
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', margin: '12px 0' }}>
@@ -386,7 +395,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
               </div>
 
               {/* Opinión: dificultad global + valoración de cada tarjeta, sin calificación */}
-              <OpinionDificultad
+              {!privado && <OpinionDificultad
                 tipo="flashcards"
                 temaId={topic.id}
                 tema={`${topic.number} · ${topic.title}`}
@@ -402,7 +411,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     .map(c => `${c.id}=${cardStats[c.id] === 'easy' ? 'facil' : cardStats[c.id] === 'medium' ? 'regular' : 'dificil'}`)
                     .join('; ')
                 }}
-              />
+              />}
 
               {/* Desglose individual de cada tarjeta */}
               <div style={{ width: '100%' }}>
@@ -795,7 +804,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
                     ¿Cómo valoras este concepto?
                   </span>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                    (No cuenta para la nota: organiza tu repaso y, si la envías, ayuda al profesor)
+                    {privado ? '(Solo para tu repaso: no se guarda ni se envía)' : '(No cuenta para la nota: organiza tu repaso y, si la envías, ayuda al profesor)'}
                   </span>
                 </div>
 
@@ -896,7 +905,7 @@ export const FlashcardsModal: React.FC<FlashcardsModalProps> = ({
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             {!showSummary && ratedCount > 0 && (
               <button type="button" onClick={() => setShowSummary(true)} className="btn btn-sm btn-secondary">
-                Terminar y opinar
+                {privado ? 'Terminar y ver resumen' : 'Terminar y opinar'}
               </button>
             )}
             <button onClick={onClose} className="btn btn-sm btn-outline">
