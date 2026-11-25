@@ -18,9 +18,13 @@
  *        TEMA7_PRIVADO_MP3_ID   id del MP3 del podcast en Drive
  *   4. Gestionar implementaciones → ✏️ → Nueva versión (nunca «Nueva implementación»).
  *
- * Falla cerrado: con una sesión inválida, un rol distinto de profesor, una cuenta no
- * institucional o sin los ids configurados, la respuesta no dice cuál falló
- * (sesión inválida: la de siempre; el resto: `no_disponible`).
+ * Falla cerrado: con la sesión inválida responde lo de siempre (`sesionInvalida_`);
+ * con una sesión válida, cualquier fallo (no titular, ids sin configurar, error de
+ * Drive, operación desconocida) devuelve la misma respuesta `no_disponible`.
+ *
+ * Nombres propios con prefijo temaPriv para no chocar con los del script vivo.
+ * Usa del vivo solo: verificarSesion_, sesionInvalida_, propiedad_, json,
+ * cuerpoJson_ (en la ruta) y examenesPrivadosAutorizado_.
  *
  * Operaciones (POST, cuerpo JSON { op, sesion, ... }):
  *   datos                 → { ok, datos: <contenido del JSON del Tema 7> }
@@ -28,37 +32,35 @@
  *   audioTrozo { n }      → { ok, n, base64 }   (trozos de 1 MiB)
  */
 
-var TEMA_PRIVADO_TROZO = 1048576;
+var temaPrivTrozo_ = 1048576;
 
-function temaPrivadoNo_() {
+function temaPrivDenegado_() {
   return json({ ok: false, codigo: 'no_disponible', error: 'No disponible.' });
 }
 
 /**
- * PUNTO ÚNICO Y AISLADO de la decisión «¿es el titular?». Es lo único que hay que
- * sustituir para igualar la comprobación de `examenesPrivados`; nada más del
- * fichero depende de cómo se decida.
- *
- * Lógica provisional, NO definitiva: la sesión firmada lleva rol 'profesor' si el
- * correo de Google figura en `listaProfesores_()` y la cuenta es institucional
- * (ver `emitirSesion_` en Codigo.gs). Eso admite a cualquier profesor.
+ * PUNTO ÚNICO Y AISLADO de la decisión «¿es el titular?». Reutiliza la puerta de
+ * `examenesPrivados` del script vivo (`examenesPrivadosAutorizado_`: sesión de
+ * profesor institucional cuyo correo figura en la propiedad
+ * EXAMENES_PRIVADOS_CORREOS). Esta acción no tiene lista ni propiedad de titular
+ * propias. Si esa función no existe en el proyecto, falla cerrado.
  */
 function esTitularTemaPrivado_(s) {
-  return !!s && s.r === 'profesor' && s.i === true;
+  return (typeof examenesPrivadosAutorizado_ === 'function') && examenesPrivadosAutorizado_(s) === true;
 }
 
 function temaPrivado(p) {
   var s = verificarSesion_(p.sesion);
   if (!s) return sesionInvalida_();
-  if (!esTitularTemaPrivado_(s)) return temaPrivadoNo_();
+  if (!esTitularTemaPrivado_(s)) return temaPrivDenegado_();
 
   var op = String(p.op || '');
   try {
     if (op === 'datos') {
       var idJson = propiedad_('TEMA7_PRIVADO_JSON_ID');
-      if (!idJson) return temaPrivadoNo_();
+      if (!idJson) return temaPrivDenegado_();
       var texto = DriveApp.getFileById(idJson).getBlob().getDataAsString('UTF-8').trim();
-      if (texto.charAt(0) !== '{') return temaPrivadoNo_();
+      if (texto.charAt(0) !== '{') return temaPrivDenegado_();
       // Se compone el JSON a mano: evita parsear y volver a serializar ~1 MB
       return ContentService.createTextOutput('{"ok":true,"datos":' + texto + '}')
         .setMimeType(ContentService.MimeType.JSON);
@@ -66,17 +68,17 @@ function temaPrivado(p) {
 
     if (op === 'audioInfo' || op === 'audioTrozo') {
       var idMp3 = propiedad_('TEMA7_PRIVADO_MP3_ID');
-      if (!idMp3) return temaPrivadoNo_();
+      if (!idMp3) return temaPrivDenegado_();
       var bytes = DriveApp.getFileById(idMp3).getBlob().getBytes();
-      var trozos = Math.ceil(bytes.length / TEMA_PRIVADO_TROZO);
+      var trozos = Math.ceil(bytes.length / temaPrivTrozo_);
       if (op === 'audioInfo') return json({ ok: true, tamano: bytes.length, trozos: trozos });
       var n = Number(p.n);
-      if (!(n >= 0 && n < trozos) || n !== Math.floor(n)) return temaPrivadoNo_();
-      var parte = bytes.slice(n * TEMA_PRIVADO_TROZO, (n + 1) * TEMA_PRIVADO_TROZO);
+      if (!(n >= 0 && n < trozos) || n !== Math.floor(n)) return temaPrivDenegado_();
+      var parte = bytes.slice(n * temaPrivTrozo_, (n + 1) * temaPrivTrozo_);
       return json({ ok: true, n: n, base64: Utilities.base64Encode(parte) });
     }
   } catch (err) {
-    return temaPrivadoNo_();
+    return temaPrivDenegado_();
   }
-  return temaPrivadoNo_();
+  return temaPrivDenegado_();
 }
