@@ -626,6 +626,7 @@ export interface StudentQuestion {
  * v3.89.0 — Aviso «Libros interactivos 3D» con vídeo propio (historias/libros-3d-novedad.mp4): se reproduce en «Novedades del curso» de las Historias (videoUrl del aviso, con cartel de póster) y dentro de su tarjeta del Tablón de avisos; los enlaces internos (#/temario) se abren en la misma pestaña.
  * v3.90.0 — Test del Tema 6: las opciones con imagen ya no revelan el nombre antes de responder, en examen y en práctica (miniatura y ampliador usan copias -sin-leyenda de las 31 estructuras QFDOS-* con el nombre impreso; alfentanilo y dextropropoxifeno, sin leyenda de origen, se ven intactos y sin recorte); tras responder vuelve el original con el nombre.
  * v3.95.1 — Tema 7: las 34 flashcards del banco pasan al código y se abren al alumnado junto con el test (mismas tarjetas que la vista docente).
+ * v3.96.0 — Tema 7: Libro Interactivo 3D de la Histamina (histamina-3d.html, abierto a todos los perfiles), historia del tema con cartel y clip brag (tema-07-brag.jpg y tema-07-clip.mp4) y aviso en el Tablón.
  * v3.95.0 — Tema 7: banco de 3 modelos de 15 preguntas (45) en el código, con las mismas pantallas que los Temas 3 a 6 (examen registrado y repetible, o preparación) y sus claves en el panel de publicación. El tema sigue «En Revisión»: el alumnado no ve el test hasta que el profesorado lo publique.
  * v3.94.1 — Test privado del Tema 7: figura compacta dentro de la pregunta (altura máxima adaptable a la pantalla, object-fit contain) con ampliación a pantalla completa; solo tamaño, sin tocar el banco ni el backend.
  * v3.94.4 — Seguimiento del alumnado: el límite de espera de la consulta al servidor pasa de 8 s a 30 s (la consulta abre tres hojas y puede tardar más de 8 s). Solo cliente.
@@ -635,7 +636,7 @@ export interface StudentQuestion {
  * v3.93.0 — Vista docente privada del Tema 7 (test interactivo con corrección, flashcards y podcast): solo para el profesor titular, el contenido se pide a Apps Script con comprobación de sesión en el servidor, vive en memoria y no está en la web ni en el repositorio. El Tema 7 sigue «En Revisión» para el alumnado.
  * v3.92.0 — Gestión docente: sección «Exámenes privados» (solo profesor; los documentos se piden a Codigo.gs a demanda, con comprobación de sesión en el servidor, y no se guardan en el navegador ni en la web).
  */
-export const COURSE_DATA_VERSION = '3.95.1';
+export const COURSE_DATA_VERSION = '3.96.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-11-25T15:25:32.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
@@ -666,9 +667,22 @@ export const QFDOS_INFO = {
 };
 
 /** Avisos del código que se ofrecen al profesorado para publicarlos (ver utils/enlacesNuevos.ts). */
-export const AVISOS_A_OFRECER = ['ann-libros-3d-novedad', 'ann-tema06-revision', 'ann-tema05-lanzamiento', 'ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
+export const AVISOS_A_OFRECER = ['ann-tema07-libro-historia', 'ann-libros-3d-novedad', 'ann-tema06-revision', 'ann-tema05-lanzamiento', 'ann-parcial-19-nov-turnos', 'ann-convocatoria-especial-10-nov', 'ann-tema04-material-completo', 'ann-tests-grabacion-solucionado', 'ann-tema03-tests-recursos', 'ann-tema02-tests-recursos', 'ann-podcast-t01'];
 
 export const INITIAL_ANNOUNCEMENTS: QfdosAnnouncement[] = [
+  {
+    id: 'ann-tema07-libro-historia',
+    title: '🧪 Tema 7 · Histamina y antihistamínicos: libro interactivo 3D e historia',
+    content: 'Respecto al Tema 7 (Sistema histaminérgico), ya podéis abrir su Libro Interactivo 3D desde la ficha del tema, con las lecciones, las estructuras en 2D y 3D y las preguntas de test. En las Historias de la portada tenéis también el cartel y un clip animado de 24 segundos.',
+    date: '25 Noviembre 2026',
+    priority: 'alta',
+    imageUrl: 'historias/tema-07-brag.jpg',
+    imageCaption: 'De la histamina a la cimetidina.',
+    linkUrl: '#/temario',
+    linkLabel: 'Abrir el temario',
+    enHistorias: true,
+    temaId: 'tema-07'
+  },
   {
     id: 'ann-libros-3d-novedad',
     title: 'Libros interactivos 3D',

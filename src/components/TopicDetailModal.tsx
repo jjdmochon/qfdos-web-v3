@@ -963,7 +963,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                 // tema 1, el taller de retrosíntesis) viven aquí. Los adjuntos que son
                 // el mismo recurso (GLB/enlace 3D, XLSX, CSV) se omiten para no
                 // mostrarlos dos veces.
-                const interactivos = topic.id === 'tema-01' ? 4 : topic.id === 'tema-02' ? 3 : (topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') ? 1 : 0;
+                const interactivos = topic.id === 'tema-01' ? 4 : topic.id === 'tema-02' ? 3 : (topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06' || topic.id === 'tema-07') ? 1 : 0;
                 const yaIncluidos = topic.id === 'tema-01'
                   ? ['nicotinic_acetylcholine_receptor.glb', 'estructuras/estructuras_qfdos.xlsx', 'estructuras/propiedades_qfdos.csv']
                   : topic.id === 'tema-02'
@@ -1347,7 +1347,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                       )}
 
                       {/* Libro Interactivo 3D Temas 01 al 06 */}
-                      {(topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06') && (() => {
+                      {(topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' || topic.id === 'tema-04' || topic.id === 'tema-05' || topic.id === 'tema-06' || topic.id === 'tema-07') && (() => {
                         const archivo =
                           topic.id === 'tema-01'
                             ? 'acetilcolina-3d.html'
@@ -1359,7 +1359,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                   ? 'serotonina-3d.html'
                                   : topic.id === 'tema-05'
                                     ? 'gaba-3d.html'
-                                    : 'opioides-3d.html';
+                                    : topic.id === 'tema-06'
+                                      ? 'opioides-3d.html'
+                                      : 'histamina-3d.html';
                         const tituloLibro =
                           topic.id === 'tema-01'
                             ? 'Libro Interactivo 3D · Acetilcolina'
@@ -1371,7 +1373,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                   ? 'Libro Interactivo 3D · Serotonina'
                                   : topic.id === 'tema-05'
                                     ? 'Libro Interactivo 3D · GABA'
-                                    : 'Libro Interactivo 3D · Opioides';
+                                    : topic.id === 'tema-06'
+                                      ? 'Libro Interactivo 3D · Opioides'
+                                      : 'Libro Interactivo 3D · Histamina';
                         const numPreguntas = topic.id === 'tema-01' ? 40 : topic.id === 'tema-02' ? 38 : 45;
                         const hrefLibro = recurso(`libros/${archivo}`);
                         return (
