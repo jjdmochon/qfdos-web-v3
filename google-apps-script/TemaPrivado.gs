@@ -24,7 +24,9 @@
  *
  * Nombres propios con prefijo temaPriv para no chocar con los del script vivo.
  * Usa del vivo solo: verificarSesion_, sesionInvalida_, propiedad_, json,
- * cuerpoJson_ (en la ruta) y examenesPrivadosAutorizado_.
+ * cuerpoJson_ (en la ruta), examenesPrivadosAutorizado_, DRIVE_API y
+ * cabeceraDrive_. Lee Drive con la API REST (UrlFetchApp), como el vivo: no usa
+ * DriveApp ni pide ámbitos nuevos.
  *
  * Operaciones (POST, cuerpo JSON { op, sesion, ... }):
  *   datos                 → { ok, datos: <contenido del JSON del Tema 7> }
@@ -33,6 +35,15 @@
  */
 
 var temaPrivTrozo_ = 1048576;
+
+/** Bytes o texto de un fichero de Drive por la API REST; null si la respuesta no es 200. */
+function temaPrivLeer_(id) {
+  var r = UrlFetchApp.fetch(DRIVE_API + '/files/' + encodeURIComponent(id) + '?alt=media&supportsAllDrives=true', {
+    headers: cabeceraDrive_(),
+    muteHttpExceptions: true
+  });
+  return r.getResponseCode() === 200 ? r : null;
+}
 
 function temaPrivDenegado_() {
   return json({ ok: false, codigo: 'no_disponible', error: 'No disponible.' });
@@ -59,7 +70,9 @@ function temaPrivado(p) {
     if (op === 'datos') {
       var idJson = propiedad_('TEMA7_PRIVADO_JSON_ID');
       if (!idJson) return temaPrivDenegado_();
-      var texto = DriveApp.getFileById(idJson).getBlob().getDataAsString('UTF-8').trim();
+      var rj = temaPrivLeer_(idJson);
+      if (!rj) return temaPrivDenegado_();
+      var texto = rj.getContentText('UTF-8').trim();
       if (texto.charAt(0) !== '{') return temaPrivDenegado_();
       // Se compone el JSON a mano: evita parsear y volver a serializar ~1 MB
       return ContentService.createTextOutput('{"ok":true,"datos":' + texto + '}')
@@ -69,7 +82,9 @@ function temaPrivado(p) {
     if (op === 'audioInfo' || op === 'audioTrozo') {
       var idMp3 = propiedad_('TEMA7_PRIVADO_MP3_ID');
       if (!idMp3) return temaPrivDenegado_();
-      var bytes = DriveApp.getFileById(idMp3).getBlob().getBytes();
+      var rm = temaPrivLeer_(idMp3);
+      if (!rm) return temaPrivDenegado_();
+      var bytes = rm.getContent();
       var trozos = Math.ceil(bytes.length / temaPrivTrozo_);
       if (op === 'audioInfo') return json({ ok: true, tamano: bytes.length, trozos: trozos });
       var n = Number(p.n);
