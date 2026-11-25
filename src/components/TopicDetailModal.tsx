@@ -58,6 +58,8 @@ interface TopicDetailModalProps {
   onOpenAdmet?: (drug: MoleculeDrug) => void;
   onUpdateTopic?: (updatedTopic: QfdosTopic) => void;
   onEditTopicInCms?: (topicId: string) => void;
+  /** Vista privada del Tema 7: vuelve a descargar el podcast si falló */
+  onReintentarAudioPrivado?: () => void;
 }
 
 export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
@@ -69,7 +71,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
   onOpenSpotifyPlayer,
   onOpenAdmet,
   onUpdateTopic,
-  onEditTopicInCms
+  onEditTopicInCms,
+  onReintentarAudioPrivado
 }) => {
   const [activeTab, setActiveTab] = useState<'sar' | 'materials' | 'drugs' | 'retrosintesis' | 'cartas'>(initialTab || 'sar');
   const { isProfesor } = useAuth();
@@ -779,7 +782,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                     justifyContent: 'center',
                                     fontSize: '0.78rem',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                                    background: 'linear-gradient(135deg, #047857, #065f46)',
                                     color: '#ffffff',
                                     border: 'none',
                                     boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
@@ -819,6 +822,44 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                                 </div>
                               )}
                             </div>
+                          ) : topic.audioPrivado ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {topic.audioPrivado.fase === 'cargando' ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled
+                                    aria-busy="true"
+                                    className="btn btn-sm"
+                                    style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 700, background: 'var(--surface-alt)', color: 'var(--text-main)', border: '1px solid var(--border-color)' }}
+                                  >
+                                    <Headphones size={13} /> Cargando audio…{topic.audioPrivado.total > 0 ? ` (${topic.audioPrivado.hechos} de ${topic.audioPrivado.total})` : ''}
+                                  </button>
+                                  <div
+                                    role="progressbar"
+                                    aria-label="Descarga del podcast privado"
+                                    aria-valuemin={0}
+                                    aria-valuemax={topic.audioPrivado.total || 1}
+                                    aria-valuenow={topic.audioPrivado.hechos}
+                                    style={{ height: 6, borderRadius: 3, background: 'var(--surface-alt)', overflow: 'hidden' }}
+                                  >
+                                    <div style={{ height: '100%', width: topic.audioPrivado.total > 0 ? `${(100 * topic.audioPrivado.hechos) / topic.audioPrivado.total}%` : '8%', background: '#10b981', transition: 'width 0.3s ease' }} />
+                                  </div>
+                                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>El podcast privado se descarga por partes; puede tardar un poco.</span>
+                                </>
+                              ) : (
+                                <>
+                                  <div role="alert" style={{ fontSize: '0.74rem', color: 'var(--bad-ink)', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-md)', padding: '6px 8px', lineHeight: 1.4 }}>
+                                    ⚠ {topic.audioPrivado.mensaje || 'No se ha podido cargar el audio.'}
+                                  </div>
+                                  {onReintentarAudioPrivado && (
+                                    <button type="button" onClick={onReintentarAudioPrivado} className="btn btn-sm btn-outline" style={{ width: '100%', justifyContent: 'center', fontWeight: 700 }}>
+                                      Reintentar
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           ) : (
                             <span className="qfdos-badge badge-neutral" style={{ width: '100%', justifyContent: 'center', fontSize: '0.74rem', padding: '6px' }}>
                               Próximamente disponible
@@ -855,7 +896,9 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({
                             </div>
                             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.45 }}>
                               {isProfesor
-                                ? `${topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (${topic.id === 'tema-02' || topic.id === 'tema-03' ? 'tres modelos disponibles' : 'cuatro modelos disponibles'}). Calificaciones volcadas en Google Sheets.`
+                                ? (topic.vistaPrivada
+                                  ? 'Tres modelos de 15 preguntas del banco privado, solo visibles en esta sesión de docente. No se registra ninguna calificación.'
+                                  : `${topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales (${topic.id === 'tema-02' || topic.id === 'tema-03' ? 'tres modelos disponibles' : 'cuatro modelos disponibles'}). Calificaciones volcadas en Google Sheets.`)
                                 : `${topic.id === 'tema-01' || topic.id === 'tema-02' || topic.id === 'tema-03' ? 15 : topic.testQuestions?.length ?? 0} preguntas oficiales calibradas (${topic.id === 'tema-02' || topic.id === 'tema-03' ? '3 modelos disponibles' : 'modelos disponibles'}). Respondes sin ver la corrección y entregas cuando quieras; tu nota se registra en Google Sheets.`
                               }
                             </p>

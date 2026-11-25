@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   QFDOS_INFO,
   COURSE_DATA_VERSION,
@@ -383,28 +383,41 @@ export const App: React.FC = () => {
   // Vista docente privada del Tema 7: solo en memoria, nunca en `topics` (que se guarda en localStorage y se publica)
   const [privadoT7, setPrivadoT7] = useState<TemaPrivado | null>(null);
   const [audioPrivadoT7, setAudioPrivadoT7] = useState<string | null>(null);
+  // Estado del podcast privado: avance «X de N» o error con «Reintentar» (solo en memoria)
+  const [estadoAudioT7, setEstadoAudioT7] = useState<{ fase: 'cargando' | 'listo' | 'error'; hechos: number; total: number; mensaje?: string } | null>(null);
+  const [intentoAudioT7, setIntentoAudioT7] = useState(0);
+  const urlAudioT7 = useRef<string | null>(null);
   const [testPrivadoAbierto, setTestPrivadoAbierto] = useState(false);
   useEffect(() => {
-    if (!isProfesor) { setPrivadoT7(null); setAudioPrivadoT7(null); return; }
+    if (!isProfesor) { setPrivadoT7(null); setAudioPrivadoT7(null); setEstadoAudioT7(null); return; }
     let vivo = true;
-    let urlAudio: string | null = null;
     cargarTemaPrivado().then(d => {
       if (!vivo || !d) return;
       setPrivadoT7(d);
-      cargarAudioPrivado().then(u => {
-        if (!u) return;
-        if (!vivo) { URL.revokeObjectURL(u); return; }
-        urlAudio = u;
-        setAudioPrivadoT7(u);
-      });
     });
     return () => {
       vivo = false;
-      if (urlAudio) URL.revokeObjectURL(urlAudio);
       setPrivadoT7(null);
-      setAudioPrivadoT7(null);
+      setEstadoAudioT7(null);
     };
   }, [isProfesor]);
+  // El audio solo se pide cuando el servidor ya ha confirmado el acceso privado (así no se avisa a quien no es titular)
+  const hayPrivadoT7 = privadoT7 !== null;
+  useEffect(() => {
+    if (!hayPrivadoT7) return;
+    let vivo = true;
+    setEstadoAudioT7({ fase: 'cargando', hechos: 0, total: 0 });
+    cargarAudioPrivado((hechos, total) => { if (vivo) setEstadoAudioT7({ fase: 'cargando', hechos, total }); }).then(r => {
+      if (!vivo) { if ('url' in r) URL.revokeObjectURL(r.url); return; }
+      if ('url' in r) { urlAudioT7.current = r.url; setAudioPrivadoT7(r.url); setEstadoAudioT7({ fase: 'listo', hechos: 1, total: 1 }); }
+      else setEstadoAudioT7({ fase: 'error', hechos: 0, total: 0, mensaje: r.error });
+    });
+    return () => {
+      vivo = false;
+      if (urlAudioT7.current) { URL.revokeObjectURL(urlAudioT7.current); urlAudioT7.current = null; }
+      setAudioPrivadoT7(null);
+    };
+  }, [hayPrivadoT7, intentoAudioT7]);
   const conPrivado = useCallback((t: QfdosTopic): QfdosTopic => {
     if (!privadoT7 || t.id !== 'tema-07') return t;
     return {
@@ -414,10 +427,11 @@ export const App: React.FC = () => {
       flashcards: privadoT7.flashcards,
       flashcardsDisponibles: true,
       vistaPrivada: true,
+      audioPrivado: estadoAudioT7 && estadoAudioT7.fase !== 'listo' ? { fase: estadoAudioT7.fase, hechos: estadoAudioT7.hechos, total: estadoAudioT7.total, mensaje: estadoAudioT7.mensaje } : undefined,
       audioPodcastUrl: audioPrivadoT7 ?? t.audioPodcastUrl,
       audioPodcastName: audioPrivadoT7 ? 'Tema 7: Podcast de histamina (vista privada)' : t.audioPodcastName
     };
-  }, [privadoT7, audioPrivadoT7]);
+  }, [privadoT7, audioPrivadoT7, estadoAudioT7]);
   const topicsVista = useMemo(() => topics.map(conPrivado), [topics, conPrivado]);
   /** Quita de un tema lo que solo existe en la vista privada antes de guardarlo */
   const sinPrivado = (t: QfdosTopic): QfdosTopic => {
@@ -430,6 +444,7 @@ export const App: React.FC = () => {
       flashcards: orig?.flashcards,
       flashcardsDisponibles: orig?.flashcardsDisponibles,
       vistaPrivada: undefined,
+      audioPrivado: undefined,
       audioPodcastUrl: t.audioPodcastUrl?.startsWith('blob:') ? orig?.audioPodcastUrl : t.audioPodcastUrl,
       audioPodcastName: t.audioPodcastName === 'Tema 7: Podcast de histamina (vista privada)' ? orig?.audioPodcastName : t.audioPodcastName
     };
@@ -744,6 +759,7 @@ export const App: React.FC = () => {
           onOpenQuiz={t => { if (!testHabilitado(t, isProfesor)) return; setSelectedTopicDetail(null); abrirTest(t); }}
           onOpenFlashcards={t => { if (!flashcardsHabilitadas(t, isProfesor)) return; setSelectedTopicDetail(null); setSelectedFlashcardsTopic(t); }}
           onOpenSpotifyPlayer={att => setSelectedSpotifyAttachment(att)}
+          onReintentarAudioPrivado={() => setIntentoAudioT7(n => n + 1)}
           onOpenAdmet={handleOpenAdmet}
         />
       )}

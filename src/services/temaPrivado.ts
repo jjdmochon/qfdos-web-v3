@@ -134,22 +134,33 @@ export function preguntasComoTest(t: TemaPrivado): TestQuestion[] {
  * Podcast: llega por trozos (Apps Script no sirve ficheros binarios) y se
  * monta como Blob en memoria. Devuelve una URL blob: o null.
  */
-export async function cargarAudioPrivado(): Promise<string | null> {
+export type ResultadoAudio = { url: string } | { error: string };
+
+/**
+ * Descarga el audio por trozos. Informa del avance (`alProgreso(hechos, total)`) y, si
+ * algo falla, devuelve un mensaje claro del paso que falló en lugar de un null mudo.
+ */
+export async function cargarAudioPrivado(alProgreso?: (hechos: number, total: number) => void): Promise<ResultadoAudio> {
   const info = await llamar({ op: 'audioInfo' }, 20000);
-  const trozos = Number(info?.trozos);
-  const tamano = Number(info?.tamano);
-  if (!info || !Number.isInteger(trozos) || trozos < 1 || trozos > 64 || !(tamano > 0)) return null;
+  if (!info) return { error: 'El servidor no ha devuelto los datos del audio (audioInfo): no ha respondido a tiempo, la sesión ha caducado o el audio no está disponible.' };
+  const trozos = Number(info.trozos);
+  const tamano = Number(info.tamano);
+  if (!Number.isInteger(trozos) || trozos < 1 || trozos > 64 || !(tamano > 0)) return { error: 'Los datos del audio que devuelve el servidor no son válidos (audioInfo).' };
+  alProgreso?.(0, trozos);
   const partes: Uint8Array[] = [];
   let total = 0;
   for (let n = 0; n < trozos; n++) {
     const c = await llamar({ op: 'audioTrozo', n }, 60000);
-    if (!c || !esTexto(c.base64) || !BASE64.test(c.base64)) return null;
+    if (!c) return { error: `Ha fallado la descarga del trozo ${n + 1} de ${trozos}: el servidor no ha respondido a tiempo o ha devuelto un error.` };
+    if (!esTexto(c.base64) || !BASE64.test(c.base64)) return { error: `El trozo ${n + 1} de ${trozos} llegó con un formato no válido.` };
     const bin = atob(c.base64);
     const u = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
     partes.push(u);
     total += u.length;
+    alProgreso?.(n + 1, trozos);
   }
-  if (total !== tamano) return null;
-  return URL.createObjectURL(new Blob(partes as BlobPart[], { type: 'audio/mpeg' }));
+  if (total !== tamano) return { error: 'El audio descargado está incompleto: el tamaño recibido no coincide con el esperado.' };
+  // El blob vive solo en memoria; no se guarda en localStorage ni en la caché
+  return { url: URL.createObjectURL(new Blob(partes as BlobPart[], { type: 'audio/mpeg' })) };
 }
