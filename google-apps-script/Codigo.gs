@@ -96,6 +96,8 @@ function manejar(e) {
     if (accion === 'leerProgreso')     return leerProgreso(p);
     if (accion === 'guardarProgreso')  return guardarProgreso(p, e);
     if (accion === 'libroClave')       return libroClave(p, e);
+    if (accion === 'temaPrivado')    return temaPrivado(cuerpoJson_(e));
+    if (accion === 'examenesPrivados') return examenesPrivados(p, e);
     // Entregas por POST: los datos personales viajan en el cuerpo, no en la URL
     if (accion === 'anotarFila')       return anotarFila(cuerpoJson_(e));
 
@@ -1898,4 +1900,105 @@ function json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/* ------------------------------------------------------------------ */
+/* 10. Exámenes privados (solo el correo autorizado, falla cerrado)    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Propiedades de la secuencia de comandos (sin valor en el código):
+ *   · EXAMENES_PRIVADOS_CORREOS — correos autorizados, separados por comas.
+ *   · EXAMENES_PRIVADOS_CARPETA_ID — carpeta de Drive (no compartida por enlace)
+ *                                    con los .md y la subcarpeta de imágenes.
+ * Si falta cualquiera, o la sesión no es de uno de esos correos, se deniega.
+ */
+function examenesPrivadosAutorizado_(s) {
+  if (!s || !s.e || s.i !== true || s.r !== 'profesor') return false;
+  var lista = String(propiedad_('EXAMENES_PRIVADOS_CORREOS') || '').toLowerCase()
+    .split(',').map(function (c) { return c.trim(); }).filter(String);
+  if (!lista.length) return false;
+  return lista.indexOf(String(s.e).toLowerCase()) !== -1;
+}
+
+function examenesPrivadosDenegado_() {
+  return json({ ok: false, codigo: 'no_autorizado', error: 'Acceso no autorizado.' });
+}
+
+function examenesPrivados(p, e) {
+  var d = cuerpoJson_(e);
+  var s = verificarSesion_(String(d.sesion || p.sesion || ''));
+  if (!s) return sesionInvalida_();
+  if (!examenesPrivadosAutorizado_(s)) return examenesPrivadosDenegado_();
+  var raiz = propiedad_('EXAMENES_PRIVADOS_CARPETA_ID');
+  if (!raiz) return examenesPrivadosDenegado_();
+
+  var op = String(d.op || p.op || 'lista');
+  if (op === 'lista') {
+    var docs = listarHijos_(raiz).filter(function (f) { return /\.md$/i.test(f.name); })
+      .map(function (f) { return { id: f.id, nombre: f.name, tamano: Number(f.size) || 0 }; })
+      .sort(function (a, b) { return a.nombre < b.nombre ? -1 : 1; });
+    return json({ ok: true, documentos: docs });
+  }
+  if (op === 'imagenNombre') {
+    var nom = String(d.nombre || p.nombre || '');
+    if (!/^[A-Za-z0-9_.-]{1,100}$/.test(nom)) return json({ ok: false, error: 'Nombre no válido.' });
+    var hijos = listarHijos_(raiz), cand = [];
+    for (var h = 0; h < hijos.length; h++) {
+      if (hijos[h].mimeType === 'application/vnd.google-apps.folder') {
+        var sub = listarHijos_(hijos[h].id);
+        for (var k = 0; k < sub.length; k++) if (sub[k].name === nom) cand.push(sub[k]);
+      } else if (hijos[h].name === nom) cand.push(hijos[h]);
+    }
+    if (cand.length !== 1) return json({ ok: false, error: 'Imagen no encontrada.' });
+    var f = cand[0], t = String(f.mimeType || '');
+    if (t !== 'image/png' && t !== 'image/svg+xml' && t !== 'image/jpeg') return examenesPrivadosDenegado_();
+    if ((Number(f.size) || 0) > 3 * 1024 * 1024) return json({ ok: false, error: 'Imagen demasiado grande.' });
+    var ib = UrlFetchApp.fetch(DRIVE_API + '/files/' + f.id + '?alt=media&supportsAllDrives=true', { headers: cabeceraDrive_(), muteHttpExceptions: true });
+    if (ib.getResponseCode() !== 200) return json({ ok: false, error: 'No se ha podido leer la imagen.' });
+    return json({ ok: true, nombre: f.name, mime: t, base64: Utilities.base64Encode(ib.getContent()) });
+  }
+  var id = String(d.id || p.id || '');
+  if (!/^[A-Za-z0-9_-]{10,80}$/.test(id)) return json({ ok: false, error: 'Identificador no válido.' });
+  var meta = UrlFetchApp.fetch(DRIVE_API + '/files/' + id + '?fields=id,name,mimeType,size,parents,trashed&supportsAllDrives=true',
+    { headers: cabeceraDrive_(), muteHttpExceptions: true });
+  if (meta.getResponseCode() !== 200) return examenesPrivadosDenegado_();
+  var m = jsonDrive_(meta);
+  if (m.trashed || !dentroDeCarpeta_(m, raiz)) return examenesPrivadosDenegado_();
+
+  if (op === 'leer') {
+    if (!/\.md$/i.test(m.name || '')) return examenesPrivadosDenegado_();
+    var r = UrlFetchApp.fetch(DRIVE_API + '/files/' + id + '?alt=media&supportsAllDrives=true', { headers: cabeceraDrive_(), muteHttpExceptions: true });
+    if (r.getResponseCode() !== 200) return json({ ok: false, error: 'No se ha podido leer el documento.' });
+    return json({ ok: true, nombre: m.name, texto: r.getContentText('UTF-8') });
+  }
+  if (op === 'imagen') {
+    var tipo = String(m.mimeType || '');
+    if (tipo !== 'image/png' && tipo !== 'image/svg+xml' && tipo !== 'image/jpeg') return examenesPrivadosDenegado_();
+    if ((Number(m.size) || 0) > 3 * 1024 * 1024) return json({ ok: false, error: 'Imagen demasiado grande.' });
+    var im = UrlFetchApp.fetch(DRIVE_API + '/files/' + id + '?alt=media&supportsAllDrives=true', { headers: cabeceraDrive_(), muteHttpExceptions: true });
+    if (im.getResponseCode() !== 200) return json({ ok: false, error: 'No se ha podido leer la imagen.' });
+    return json({ ok: true, nombre: m.name, mime: tipo, base64: Utilities.base64Encode(im.getContent()) });
+  }
+  return json({ ok: false, error: 'Operación no válida.' });
+}
+
+/** Resuelve imagen por nombre dentro de la subcarpeta de imágenes (img_tema7). */
+function listarHijos_(carpetaId) {
+  var q = "'" + carpetaId + "' in parents and trashed = false";
+  var r = UrlFetchApp.fetch(DRIVE_API + '/files?q=' + encodeURIComponent(q) + '&pageSize=200&fields=' +
+    encodeURIComponent('files(id,name,mimeType,size)') + '&supportsAllDrives=true&includeItemsFromAllDrives=true',
+    { headers: cabeceraDrive_(), muteHttpExceptions: true });
+  return r.getResponseCode() === 200 ? (jsonDrive_(r).files || []) : [];
+}
+
+/** El fichero debe colgar de la carpeta raíz o de una subcarpeta directa suya. */
+function dentroDeCarpeta_(meta, raiz) {
+  var padres = meta.parents || [];
+  if (padres.indexOf(raiz) !== -1) return true;
+  for (var i = 0; i < padres.length; i++) {
+    var pm = UrlFetchApp.fetch(DRIVE_API + '/files/' + padres[i] + '?fields=parents&supportsAllDrives=true', { headers: cabeceraDrive_(), muteHttpExceptions: true });
+    if (pm.getResponseCode() === 200 && (jsonDrive_(pm).parents || []).indexOf(raiz) !== -1) return true;
+  }
+  return false;
 }
