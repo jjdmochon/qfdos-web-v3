@@ -324,7 +324,12 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({ onOpenFirS
 
   // Filtrado de seguridad: Si es estudiante, SOLO ve su propio registro asociado a su correo institucional go.ugr.es
   const currentUserEmail = user?.email?.toLowerCase().trim() || '';
-  const myStudentProfile = students.find(s => s.email.toLowerCase().trim() === currentUserEmail);
+  // El servidor ya devuelve al estudiante solo sus filas. Con cuentas
+  // vinculadas (pestaña `_Alias`) la fila puede venir con la otra cuenta
+  // suya, así que si hay exactamente una fila es la suya aunque el correo
+  // no coincida literalmente con el de la sesión.
+  const myStudentProfile = students.find(s => s.email.toLowerCase().trim() === currentUserEmail)
+    ?? (!isProfesor && students.length === 1 ? students[0] : undefined);
 
   const displayedStudents = isProfesor
     ? students.filter(s =>
