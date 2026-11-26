@@ -27,13 +27,6 @@ const correoTests = {
 
 export const ACTUALIZACIONES: ActualizacionPlataforma[] = [
   {
-    id: 'act-3.97.0-cuentas-vinculadas',
-    version: 'v3.97.0',
-    fecha: '26 Noviembre 2026',
-    titulo: 'Tu Gmail y tu cuenta UGR, vinculados',
-    texto: 'Si hiciste tests con tu Gmail personal y tu cuenta go.ugr.es está vinculada a él, ya ves todo tu historial y tu evaluación entrando con cualquiera de las dos. Si es tu caso y aún no los tienes vinculados, escribe al profesor desde tu correo UGR indicando tu Gmail.'
-  },
-  {
     id: 'act-3.84.0-parcial-bloques',
     version: 'v3.84.0',
     fecha: '19 Noviembre 2026',
