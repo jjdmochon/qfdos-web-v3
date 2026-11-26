@@ -503,6 +503,98 @@ function misEntregas(p) {
  *   · estudiante → sólo la fila cuyo correo coincide con el de su sesión
  * Se puede cambiar de hoja con la propiedad EVALUACION_HOJA_ID.
  */
+
+/* ------------------------------------------------------------------ */
+/* Cuentas vinculadas (alias)                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Un mismo estudiante puede entrar con su Gmail y con su cuenta UGR. La
+ * pestaña `_Alias` del libro de evaluación (privada, solo la edita el
+ * profesorado) vincula esas cuentas: columna A, cuenta principal;
+ * columna B, cuenta vinculada; una fila por vínculo confirmado.
+ * Aquí solo se lee. Si la pestaña no existe o no se puede leer, todo
+ * sigue como antes: cada correo ve únicamente lo suyo.
+ *
+ * El rol (profesor/estudiante) NO se toca aquí: sale de la sesión, en
+ * iniciarSesion. Esto solo decide qué filas de la evaluación se devuelven.
+ */
+var ALIAS_LIBRO_ID = '1gbbet7PZavZQKffB3d7BUs3nhbg9dMJy4ZYGoh3q9yQ';
+var ALIAS_HOJA = '_Alias';
+var ALIAS_MAX_GRUPO = 5;
+// Cuentas personales del profesorado: tampoco se vinculan aunque no estén en
+// la lista PROFESORES (que solo lleva las institucionales).
+var CUENTAS_NO_VINCULABLES = ['jjdmochon@gmail.com', 'jjdugr@gmail.com', 'jjduni@gmail.com', 'juan@destinagenomics.com', 'juanjose.diaz@genyo.es'];
+
+/** [correos vinculados a `email`, él incluido]. Falla en cerrado: solo él. */
+function correosVinculados_(email) {
+  var norm = String(email || '').toLowerCase().trim();
+  if (!norm) return [];
+  var grupo = [norm];
+  try {
+    var id = (propiedad_('ALIAS_LIBRO_ID') || '').trim() || ALIAS_LIBRO_ID;
+    var hoja = SpreadsheetApp.openById(id).getSheetByName(ALIAS_HOJA);
+    if (!hoja || hoja.getLastRow() < 2) return grupo;
+    var filas = hoja.getRange(2, 1, hoja.getLastRow() - 1, 2).getValues();
+
+    // Reglas de saneado de la tabla, pensadas para que un dato mal metido
+    // NUNCA una historiales de dos personas distintas:
+    var profes = {};
+    CUENTAS_NO_VINCULABLES.forEach(function (c) { profes[c] = true; });
+    listaProfesores_().forEach(function (p) { profes[p] = true; });
+    var pares = [];
+    var vistos = {};
+    for (var i = 0; i < filas.length; i++) {
+      var a = String(filas[i][0] || '').toLowerCase().trim();
+      var b = String(filas[i][1] || '').toLowerCase().trim();
+      if (a.indexOf('@') <= 0 || b.indexOf('@') <= 0 || a === b) continue;
+      // 1. Una cuenta docente no se vincula jamás: fuera la fila entera.
+      if (profes[a] || profes[b]) continue;
+      var clave = a + '\n' + b;
+      if (vistos[clave]) continue; // fila duplicada exacta: cuenta una vez
+      vistos[clave] = true;
+      pares.push([a, b]);
+    }
+    // 2. Direcciones ambiguas: una misma cuenta vinculada (columna B) en dos
+    //    filas distintas, o una cuenta que aparece como principal en una fila
+    //    y como vinculada en otra. Cualquiera de las dos señales invalida
+    //    todos los pares que la tocan: podrían unir dos alumnos.
+    var enA = {}, enB = {}, repetidaB = {};
+    for (var p = 0; p < pares.length; p++) {
+      enA[pares[p][0]] = true;
+      if (enB[pares[p][1]]) repetidaB[pares[p][1]] = true;
+      enB[pares[p][1]] = true;
+    }
+    var validos = [];
+    for (var q = 0; q < pares.length; q++) {
+      var pa = pares[q][0], pb = pares[q][1];
+      if (repetidaB[pb]) continue;   // la vinculada cuelga de dos principales
+      if (enB[pa]) continue;         // la principal es vinculada en otra fila
+      if (enA[pb]) continue;         // la vinculada es principal en otra fila
+      validos.push([pa, pb]);
+    }
+    // Con esas reglas cada grupo es una estrella: una principal con sus
+    // vinculadas. La expansión queda por seguridad, con tope.
+    var cambio = true, vueltas = 0;
+    while (cambio && vueltas < 10) {
+      cambio = false; vueltas++;
+      for (var r = 0; r < validos.length; r++) {
+        var tieneA = grupo.indexOf(validos[r][0]) !== -1;
+        var tieneB = grupo.indexOf(validos[r][1]) !== -1;
+        if (tieneA !== tieneB) {
+          grupo.push(tieneA ? validos[r][1] : validos[r][0]);
+          cambio = true;
+        }
+      }
+    }
+    // 3. Tope de grupo: un grupo anómalo no mezcla historiales.
+    if (grupo.length > ALIAS_MAX_GRUPO) return [norm];
+  } catch (err) {
+    return [norm];
+  }
+  return grupo;
+}
+
 var EVALUACION_HOJA_ID = '1gbbet7PZavZQKffB3d7BUs3nhbg9dMJy4ZYGoh3q9yQ';
 
 function evaluacion(p) {
@@ -525,9 +617,11 @@ function evaluacion(p) {
     .map(function (f) { return f.map(texto); });
 
   if (s.r !== 'profesor') {
-    // Sin columna de correo no hay forma de saber qué fila es suya: nada
+    // Sin columna de correo no hay forma de saber qué fila es suya: nada.
+    // Con cuentas vinculadas (`_Alias`) vale cualquiera de las suyas.
+    var vinculados = correosVinculados_(s.e);
     filas = colCorreo === -1 ? [] : filas.filter(function (f) {
-      return String(f[colCorreo]).trim().toLowerCase() === s.e;
+      return vinculados.indexOf(String(f[colCorreo]).trim().toLowerCase()) !== -1;
     });
   }
 
