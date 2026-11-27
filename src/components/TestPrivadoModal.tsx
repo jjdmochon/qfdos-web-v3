@@ -28,7 +28,7 @@ const resumenDe = (preguntas: PreguntaPrivada[]) => {
   return t.join(' · ') + (preguntas.length > 7 ? ' …' : '');
 };
 
-export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => void }> = ({ datos, onClose }) => {
+export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => void; /** Ej.: «Tema 07 · Sistema Histaminérgico». Por defecto, el Tema 7. */ nombreTema?: string; /** Ej.: «Tema 7» */ etiquetaTema?: string }> = ({ datos, onClose, nombreTema = 'Tema 07 · Sistema Histaminérgico', etiquetaTema = 'Tema 7' }) => {
   const [modelIdx, setModelIdx] = useState(0);
   const [examMode, setExamMode] = useState(true);
   const [started, setStarted] = useState(false);
@@ -105,7 +105,7 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-title)', margin: 0, lineHeight: 1.3 }}>
-                  Autoevaluación: Tema 07 · Sistema Histaminérgico
+                  Autoevaluación: {nombreTema}
                 </h3>
                 <span className="qfdos-badge quiz-header-badge" style={{ fontSize: '0.66rem', background: '#3b82f6', color: '#fff', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   <Lock size={10} style={{ marginRight: 4, verticalAlign: '-1px' }} />Vista docente privada
@@ -133,7 +133,7 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
               <div style={{ padding: '14px 16px', marginBottom: '1.1rem', borderRadius: 'var(--radius-lg)', background: 'rgba(30, 58, 138, 0.04)', border: '1.5px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                   <Lock size={16} color="var(--navy)" />
-                  <strong style={{ fontSize: '0.92rem', color: 'var(--text-title)' }}>Vista docente privada del Tema 7</strong>
+                  <strong style={{ fontSize: '0.92rem', color: 'var(--text-title)' }}>Vista docente privada del {etiquetaTema}</strong>
                 </div>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
                   El banco se pide al servidor con tu sesión de profesor y vive solo en esta ventana. No se registra ninguna calificación, no se envía nada a Google Sheets y nada se guarda en este navegador.
@@ -366,7 +366,7 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
                 return (
                   <div className="qfdos-card" style={{ maxWidth: '420px', margin: '0 auto 1.25rem', padding: '1.25rem', textAlign: 'center' }}>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
-                      Calificación (Tema 07 · {etiquetaCorta} ({questions.length}P) · {examMode ? 'Modo Examen' : 'Modo Preparación'}):
+                      Calificación ({nombreTema.split(' · ')[0]} · {etiquetaCorta} ({questions.length}P) · {examMode ? 'Modo Examen' : 'Modo Preparación'}):
                     </div>
                     <div className="font-mono" style={{ fontSize: '2.8rem', fontWeight: 900, color: aprobado ? 'var(--teal-ink)' : 'var(--accent-red)', lineHeight: 1 }}>
                       {resultado.score} <span style={{ fontSize: '1.3rem', color: 'var(--text-muted)' }}>/ 10</span>
