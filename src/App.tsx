@@ -39,7 +39,7 @@ import { CourseInfoSection } from './components/CourseInfoSection';
 import { QuizModal } from './components/QuizModal';
 import { FlashcardsModal } from './components/FlashcardsModal';
 import { TestPrivadoModal } from './components/TestPrivadoModal';
-import { cargarTemaPrivado, cargarAudioPrivado, preguntasComoTest, type TemaPrivado } from './services/temaPrivado';
+import { cargarTemaPrivado, cargarAudioPrivado, preguntasComoTest, TEMAS_MODELOS_DOCENTE, type TemaPrivado } from './services/temaPrivado';
 import { StudentQuestionModal } from './components/StudentQuestionModal';
 import { SpotifyPlayerModal } from './components/SpotifyPlayerModal';
 import { SearchModal } from './components/SearchModal';
@@ -388,6 +388,22 @@ export const App: React.FC = () => {
   const [intentoAudioT7, setIntentoAudioT7] = useState(0);
   const urlAudioT7 = useRef<string | null>(null);
   const [testPrivadoAbierto, setTestPrivadoAbierto] = useState(false);
+  // Modelos de examen privados de los Temas 1-6 (solo docente, solo en memoria; nunca en `topics`)
+  const [modelosDocente, setModelosDocente] = useState<Record<string, TemaPrivado>>({});
+  const [eleccionTest, setEleccionTest] = useState<QfdosTopic | null>(null);
+  const [modeloDocenteAbierto, setModeloDocenteAbierto] = useState<{ topic: QfdosTopic; datos: TemaPrivado } | null>(null);
+  useEffect(() => {
+    if (!isProfesor) { setModelosDocente({}); setEleccionTest(null); setModeloDocenteAbierto(null); return; }
+    let vivo = true;
+    (async () => {
+      for (const id of TEMAS_MODELOS_DOCENTE) {
+        const d = await cargarTemaPrivado(id);
+        if (!vivo) return;
+        if (d) setModelosDocente(prev => ({ ...prev, [id]: d }));
+      }
+    })();
+    return () => { vivo = false; setModelosDocente({}); setEleccionTest(null); setModeloDocenteAbierto(null); };
+  }, [isProfesor]);
   useEffect(() => {
     if (!isProfesor) { setPrivadoT7(null); setAudioPrivadoT7(null); setEstadoAudioT7(null); return; }
     let vivo = true;
@@ -452,6 +468,7 @@ export const App: React.FC = () => {
   const abrirTest = (t: QfdosTopic) => {
     if (!testHabilitado(t, isProfesor)) return;
     if (t.id === 'tema-07' && privadoT7) setTestPrivadoAbierto(true);
+    else if (isProfesor && modelosDocente[t.id]) setEleccionTest(t);
     else setSelectedQuizTopic(t);
   };
 
@@ -765,6 +782,21 @@ export const App: React.FC = () => {
       )}
       {selectedQuizTopic && (
         <QuizModal topic={selectedQuizTopic} onClose={() => setSelectedQuizTopic(null)} />
+      )}
+      {eleccionTest && modelosDocente[eleccionTest.id] && (
+        <div className="modal-overlay" onClick={() => setEleccionTest(null)}>
+          <div className="modal-container" style={{ maxWidth: '460px', width: '95%' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header"><h3 style={{ margin: 0, fontSize: '1.05rem' }}>{eleccionTest.number} · Test</h3></div>
+            <div className="modal-body" style={{ display: 'grid', gap: '10px' }}>
+              <button className="btn btn-primary" onClick={() => { const t = eleccionTest; setEleccionTest(null); setSelectedQuizTopic(t); }}>Tests publicados (alumnado)</button>
+              <button className="btn btn-teal" onClick={() => { const t = eleccionTest; setEleccionTest(null); setModeloDocenteAbierto({ topic: t, datos: modelosDocente[t.id] }); }}>Modelo de examen (solo docente)</button>
+              <button className="btn btn-outline" onClick={() => setEleccionTest(null)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {modeloDocenteAbierto && (
+        <TestPrivadoModal datos={modeloDocenteAbierto.datos} nombreTema={`${modeloDocenteAbierto.topic.number} · ${modeloDocenteAbierto.topic.title}`} etiquetaTema={`Tema ${Number(modeloDocenteAbierto.topic.id.slice(-2))}`} onClose={() => setModeloDocenteAbierto(null)} />
       )}
       {testPrivadoAbierto && privadoT7 && (
         <TestPrivadoModal datos={privadoT7} onClose={() => setTestPrivadoAbierto(false)} />

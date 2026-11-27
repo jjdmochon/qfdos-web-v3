@@ -68,7 +68,11 @@ function temaPrivado(p) {
   var op = String(p.op || '');
   try {
     if (op === 'datos') {
-      var idJson = propiedad_('TEMA7_PRIVADO_JSON_ID');
+      // Tema pedido: tema-01 .. tema-07 (por defecto el 7, como antes). Cada uno tiene su propiedad TEMAn_PRIVADO_JSON_ID.
+      var temaPedido = String(p.temaId || 'tema-07');
+      var mT = /^tema-0([1-7])$/.exec(temaPedido);
+      if (!mT) return temaPrivDenegado_();
+      var idJson = propiedad_('TEMA' + mT[1] + '_PRIVADO_JSON_ID');
       if (!idJson) return temaPrivDenegado_();
       var rj = temaPrivLeer_(idJson);
       if (!rj) return temaPrivDenegado_();

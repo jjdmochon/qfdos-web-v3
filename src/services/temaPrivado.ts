@@ -79,11 +79,14 @@ function dataUrl(imagenes: Record<string, { mime?: unknown; base64?: unknown }>,
   return `data:image/png;base64,${i.base64}`;
 }
 
-/** Contenido del Tema 7 o null (no es el titular, no hay red, el script no tiene la acción o el formato no es el esperado). */
-export async function cargarTemaPrivado(): Promise<TemaPrivado | null> {
-  const c = await llamar({ op: 'datos' }, 60000);
+/** Temas con modelos de examen privados (solo docente). El Tema 7 conserva además tests propios, flashcards y podcast. */
+export const TEMAS_MODELOS_DOCENTE = ['tema-01', 'tema-02', 'tema-03', 'tema-04', 'tema-05', 'tema-06'];
+
+/** Contenido privado de un tema (por defecto el 7) o null (no es el titular, no hay red, el script no tiene ese tema o el formato no es el esperado). */
+export async function cargarTemaPrivado(temaId: string = 'tema-07'): Promise<TemaPrivado | null> {
+  const c = await llamar({ op: 'datos', temaId }, 60000);
   const d = c?.datos as Record<string, unknown> | undefined;
-  if (!d || d.version !== 1 || d.temaId !== 'tema-07' || !Array.isArray(d.tests) || !Array.isArray(d.flashcards)) return null;
+  if (!d || d.version !== 1 || d.temaId !== temaId || !Array.isArray(d.tests) || !Array.isArray(d.flashcards)) return null;
   const imagenes = (d.imagenes && typeof d.imagenes === 'object' ? d.imagenes : {}) as Record<string, { mime?: unknown; base64?: unknown }>;
   try {
     const modelos: ModeloPrivado[] = (d.tests as Record<string, unknown>[]).map(m => ({
@@ -115,7 +118,7 @@ export async function cargarTemaPrivado(): Promise<TemaPrivado | null> {
       imagePath: aImagen(f.imagePath),
       structures: f.structures?.map(s => ({ ...s, imagePath: aImagen(s.imagePath) }))
     }));
-    return { temaId: 'tema-07', modelos, flashcards };
+    return { temaId, modelos, flashcards };
   } catch {
     return null;
   }
