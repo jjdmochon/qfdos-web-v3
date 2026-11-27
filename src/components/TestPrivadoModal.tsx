@@ -321,7 +321,9 @@ export const TestPrivadoModal: React.FC<{ datos: TemaPrivado; onClose: () => voi
                         <span className="font-mono" style={{ width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: selected === i ? 'var(--navy)' : 'var(--surface-alt)', color: selected === i ? '#fff' : 'var(--text-main)', fontSize: '0.78rem', fontWeight: 700, flexShrink: 0, marginTop: '2px' }}>
                           {String.fromCharCode(65 + i)}
                         </span>
-                        <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{opt}</span>
+                        {q.opcionesImagen?.[i]
+                          ? <img src={q.opcionesImagen[i] as string} alt={`Estructura ${String.fromCharCode(97 + i)})`} style={{ maxHeight: 'clamp(130px, 34vw, 190px)', maxWidth: '100%', width: 'auto', height: 'auto', objectFit: 'contain', background: '#fff', borderRadius: '6px' }} />
+                          : <span style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{opt}</span>}
                       </div>
                       {showExplanation && i === q.correcta && <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0, marginLeft: '6px' }} />}
                       {showExplanation && selected === i && i !== q.correcta && <AlertCircle size={20} color="#ef4444" style={{ flexShrink: 0, marginLeft: '6px' }} />}

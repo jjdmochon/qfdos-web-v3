@@ -23,6 +23,8 @@ export interface PreguntaPrivada {
   enunciado: string;
   /** Data URL en memoria, o null */
   imagen: string | null;
+  /** Estructura de cada opción (4 data URL) o null si las opciones son solo texto */
+  opcionesImagen: (string | null)[] | null;
   opciones: string[];
   correcta: number;
   nivel: number;
@@ -96,6 +98,7 @@ export async function cargarTemaPrivado(): Promise<TemaPrivado | null> {
           titulo: String(p.titulo ?? ''),
           enunciado: String(p.enunciado ?? ''),
           imagen: dataUrl(imagenes, p.imagen),
+          opcionesImagen: Array.isArray(p.opcionesImagen) && p.opcionesImagen.length === 4 ? (p.opcionesImagen as unknown[]).map(n => dataUrl(imagenes, n)) : null,
           opciones,
           correcta,
           nivel: Number(p.nivel) || 0,
