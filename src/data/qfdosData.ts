@@ -639,9 +639,10 @@ export interface StudentQuestion {
  * v3.93.0 — Vista docente privada del Tema 7 (test interactivo con corrección, flashcards y podcast): solo para el profesor titular, el contenido se pide a Apps Script con comprobación de sesión en el servidor, vive en memoria y no está en la web ni en el repositorio. El Tema 7 sigue «En Revisión» para el alumnado.
  * v3.92.0 — Gestión docente: sección «Exámenes privados» (solo profesor; los documentos se piden a Codigo.gs a demanda, con comprobación de sesión en el servidor, y no se guardan en el navegador ni en la web).
  * v3.97.2 — Test privado del Tema 7 (modelo 4, solo profesor): cada opción puede llevar su propia estructura (opcionesImagen) en vez de una rejilla en el enunciado. Compatible con los modelos 1 a 3 (campo ausente).
+ * v3.99.0 — Modelo D de test en los Temas 6 y 7 (15 preguntas cada uno, con estructuras en enunciado y opciones, abierto al alumnado) y Temas 6 y 7 en estado Publicado.
  * v3.98.0 — Modelos de examen privados por tema (solo profesor): el cargador privado admite los Temas 1 a 6 (tema-01 a tema-06, cada uno con su propio JSON privado en Apps Script; el Tema 7 no cambia). El botón Test de un tema con modelo ofrece elegir entre los tests publicados y el modelo docente; sin JSON privado del tema todo se comporta como antes. No hay datos de preguntas en el código.
  */
-export const COURSE_DATA_VERSION = '3.98.0';
+export const COURSE_DATA_VERSION = '3.99.0';
 export const COURSE_BUILD_TIMESTAMP = '2026-11-27T14:40:00.000Z';
 
 export const ENLACES_A_OFRECER = ['link-deltaplus-organic-chemistry'];
