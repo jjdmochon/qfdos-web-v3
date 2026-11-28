@@ -5609,7 +5609,8 @@ flashcards: [
     slideCount: 58,
     pdbTargetId: '4DKL',
     targetName: 'Receptor Opioide Mu Humano unido al Antagonista β-FNA',
-    status: 'En Revisión',
+    status: 'Publicado',
+    // Abierto al alumnado por indicación de Juan (28 nov 19:22): Modelos 1-3 y Modelo D visibles.
     // Test (3 modelos JEV, 45P) y 31 flashcards listos para revisión docente.
     testDisponible: true,
     flashcardsDisponibles: true,
@@ -5677,7 +5678,7 @@ flashcards: [
     slideCount: 46,
     pdbTargetId: '3RZE',
     targetName: 'Receptor Histaminérgico H1 Humano unido a Doxepina',
-    status: 'Próximamente',
+    status: 'Publicado',
     slidesPdfUrl: '',
     slidesPdfName: 'Tema 07: Diapositivas Oficiales Sistema Histaminérgico.pdf',
     notesPdfUrl: '',
