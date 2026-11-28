@@ -42,6 +42,8 @@ import {
 import { encolarIntento, anotarResultado, intentosPendientes, reenviarPendientes } from '../services/intentosPendientes';
 import { useAuth } from '../context/AuthContext';
 import { opcionTema6AntesDeResponder } from '../data/tema06OpcionesSinLeyenda';
+import { TEMA6_MODELO_4_TEST_QUESTIONS } from '../data/tema06ModeloD';
+import { TEMA7_MODELO_4_TEST_QUESTIONS } from '../data/tema07ModeloD';
 import { Chem2DDrawer } from './Chem2DDrawer';
 import { ImageLightboxModal, LightboxImagePayload } from './ImageLightboxModal';
 import { pulsable } from '../utils/a11y';
@@ -97,11 +99,11 @@ export type QuizModelType =
   | 't3-modelo-1' | 't3-modelo-2' | 't3-modelo-3'
   | 't4-modelo-1' | 't4-modelo-2' | 't4-modelo-3'
   | 't5-modelo-1' | 't5-modelo-2' | 't5-modelo-3'
-  | 't6-modelo-1' | 't6-modelo-2' | 't6-modelo-3'
-  | 't7-modelo-1' | 't7-modelo-2' | 't7-modelo-3';
+  | 't6-modelo-1' | 't6-modelo-2' | 't6-modelo-3' | 't6-modelo-d'
+  | 't7-modelo-1' | 't7-modelo-2' | 't7-modelo-3' | 't7-modelo-d';
 
 /** Modelos del Tema 3 que ve el alumnado en el selector (tarjetas generadas desde esta lista). */
-const MODELOS_TEMA3: { id: QuizModelType; n: number; titulo: string; etiqueta: string; resumen: string; color: string; fondo: string; tinta: string }[] = [
+const MODELOS_TEMA3: { id: QuizModelType; n: number | string; titulo: string; etiqueta: string; resumen: string; color: string; fondo: string; tinta: string }[] = [
   {
     id: 't3-modelo-1', n: 1, titulo: 'Dopamina, profármacos y síntesis de neurolépticos', etiqueta: 'Consensuado · Calibrado JEV',
     resumen: 'Apomorfina, levodopa e inhibidores periféricos, biosíntesis de la dopamina, retención por carga, MAO-B y COMT, SAR de fenotiazinas y difenilbutilpiperidinas y síntesis de clorprotixeno, haloperidol y trifluperidol.',
@@ -173,6 +175,11 @@ const MODELOS_TEMA6: typeof MODELOS_TEMA3 = [
     id: 't6-modelo-3', n: 3, titulo: 'Rigidez molecular, orvinoles, benzomorfanos, síntesis de fentanilo y análogos peptídicos DAMGO', etiqueta: 'Consolidado con los apuntes',
     resumen: 'Cicloadición de Diels–Alder en tebaína, adición de Grignard, etorfina y buprenorfina, síntesis de fentanilo por aminación reductora, anilidopiperidinas y carfentanilo, metadona y receptores NMDA/hERG, estabilización de encefalinas (D-Ala2, DAMGO).',
     color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
+  },
+  {
+    id: 't6-modelo-d', n: 'D', titulo: 'SAR, síntesis y biotransformación de opioides', etiqueta: 'Nuevo · Revisado por el profesor',
+    resumen: 'Modelo adicional del Tema 6: 5 preguntas de SAR, 5 de síntesis y 5 de biotransformación, con estructuras en el enunciado y en las opciones. Se contesta con los apuntes y las diapositivas.',
+    color: '#d97706', fondo: 'rgba(217, 119, 6, 0.05)', tinta: '#b45309'
   }
 ];
 
@@ -192,6 +199,11 @@ const MODELOS_TEMA7: typeof MODELOS_TEMA3 = [
     id: 't7-modelo-3', n: 3, titulo: 'Antagonistas H₂, Síntesis de antihistamínicos, Biosíntesis y almacenamiento', etiqueta: 'Revisado por el profesor',
     resumen: "Antagonistas H₂, Síntesis de antihistamínicos, Biosíntesis y almacenamiento, Tautomería del anillo de imidazol, Primera generación, Segunda generación, Los cuatro receptores.",
     color: '#8b5cf6', fondo: 'rgba(139, 92, 246, 0.05)', tinta: '#6d28d9'
+  },
+  {
+    id: 't7-modelo-d', n: 'D', titulo: 'SAR, síntesis y biosíntesis en el sistema histaminérgico', etiqueta: 'Nuevo · Revisado por el profesor',
+    resumen: 'Modelo adicional del Tema 7: 4 preguntas de SAR, 7 de síntesis y 4 de biosíntesis y metabolismo, con estructuras en el enunciado y en las opciones. Se contesta con los apuntes y las diapositivas.',
+    color: '#d97706', fondo: 'rgba(217, 119, 6, 0.05)', tinta: '#b45309'
   }
 ];
 
@@ -274,11 +286,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({
     if (topic.id === 'tema-06') {
       if (selectedModel === 't6-modelo-2') return TEMA6_MODELO_2_TEST_QUESTIONS;
       if (selectedModel === 't6-modelo-3') return TEMA6_MODELO_3_TEST_QUESTIONS;
+      if (selectedModel === 't6-modelo-d') return TEMA6_MODELO_4_TEST_QUESTIONS;
       return TEMA6_MODELO_1_TEST_QUESTIONS;
     }
     if (topic.id === 'tema-07') {
       if (selectedModel === 't7-modelo-2') return TEMA7_MODELO_2_TEST_QUESTIONS;
       if (selectedModel === 't7-modelo-3') return TEMA7_MODELO_3_TEST_QUESTIONS;
+      if (selectedModel === 't7-modelo-d') return TEMA7_MODELO_4_TEST_QUESTIONS;
       return TEMA7_MODELO_1_TEST_QUESTIONS;
     }
     return topic.testQuestions && topic.testQuestions.length > 0 ? topic.testQuestions : MODELO_E_TEST_QUESTIONS;
@@ -667,9 +681,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       case 't6-modelo-1': return 'var(--navy)';
       case 't6-modelo-2': return 'var(--teal)';
       case 't6-modelo-3': return '#8b5cf6';
+      case 't6-modelo-d': return '#d97706';
       case 't7-modelo-1': return 'var(--navy)';
       case 't7-modelo-2': return 'var(--teal)';
       case 't7-modelo-3': return '#8b5cf6';
+      case 't7-modelo-d': return '#d97706';
       case 'modelo-e': return 'var(--navy)';
       case 'modelo-fir': return 'var(--teal)';
       case 'modelo-b': return '#8b5cf6';
@@ -2473,7 +2489,9 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       // práctica), sin recortes por CSS; tras responder, el original con el nombre
                       const optImageAntes = optImagePath ? opcionTema6AntesDeResponder(optImagePath) : undefined;
                       const optImageVista = optImageAntes && !showExplanation ? optImageAntes : optImagePath;
-                      const ocultarPieImagen = isExamMode && !showExplanation && !optImageAntes;
+                      // Las PNG del Modelo D (…_mD_…) se generaron sin leyenda: no hay franja que tapar ni recortar
+                      const sinLeyendaPropia = !!optImagePath && /_mD_/.test(optImagePath);
+                      const ocultarPieImagen = isExamMode && !showExplanation && !optImageAntes && !sinLeyendaPropia;
 
                       let optionBg = 'var(--surface)';
                       let optionBorder = 'var(--border-color)';
